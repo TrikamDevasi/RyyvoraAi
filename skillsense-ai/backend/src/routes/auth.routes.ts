@@ -1,13 +1,13 @@
 import { Router, Request, Response } from 'express';
 import passport from 'passport';
 import jwt from 'jsonwebtoken';
-import { register, login, refreshTokens, logout, getMe, getPublicStats } from '../controllers/auth.controller';
+import { register, login, refreshTokens, logout, getMe, getPublicStats, forgotPassword, verifyResetToken, resetPassword, verifyEmail, resendVerification } from '../controllers/auth.controller';
 import { protect } from '../middleware/auth.middleware';
 import { authLimiter } from '../middleware/rateLimit.middleware';
 import { IUser } from '../models/User.model';
 
 const router = Router();
-const FRONTEND_URL = process.env.CORS_ORIGIN || 'http://localhost:3000';
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
 
 /**
  * Generate a long-lived JWT identical to the one produced by local login.
@@ -44,11 +44,14 @@ router.post('/login', authLimiter, login);
 router.get('/me', protect, getMe);
 router.post('/logout', protect, logout);
 router.get('/stats', getPublicStats);
+router.post('/forgot-password', authLimiter, forgotPassword);
+router.get('/reset-password/:token', verifyResetToken);
+router.post('/reset-password/:token', resetPassword);
+router.get('/verify-email/:token', verifyEmail);
+router.post('/resend-verification', authLimiter, resendVerification);
 export { refreshTokens }; // keep named export available if other modules import it
 
 // ── Google OAuth ───────────────────────────────────────────────────────────────
-// TODO: re-enable Google Auth
-/*
 router.get('/google',
   passport.authenticate('google', { scope: ['profile', 'email'], session: false })
 );
@@ -65,12 +68,13 @@ router.get('/google/callback',
     const token   = generateToken(String(user._id), user.role);
     const encoded = encodeUser(user);
 
+    // Matching requested redirect: http://localhost:3000/auth/callback?token=JWT_TOKEN_HERE
+    // We also provide 'user' as base64 for immediate hydration
     res.redirect(
       `${FRONTEND_URL}/auth/callback?token=${token}&user=${encoded}&provider=google`
     );
   }
 );
-*/
 
 // ── GitHub OAuth ───────────────────────────────────────────────────────────────
 router.get('/github',

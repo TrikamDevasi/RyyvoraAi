@@ -1,7 +1,7 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next';
+import path from 'path';
 
 const nextConfig: NextConfig = {
-    // Zero Tolerance Error Nuke: Enforce checks during build
     typescript: {
         ignoreBuildErrors: false,
     },
@@ -12,6 +12,9 @@ const nextConfig: NextConfig = {
             { protocol: 'https', hostname: 'images.unsplash.com' },
         ],
         unoptimized: true,
+    },
+    turbopack: {
+        root: path.resolve(__dirname),
     },
 };
 

@@ -35,8 +35,11 @@ export interface CareerPathway {
     requiredSkills: string[];
     matchPercent: number;
     salaryRange: { min: number; max: number };
+    salaryLabel?: string;
     timeToAchieve: string;
     isRecommended: boolean;
+    growth?: string;
+    roadmap?: string[];
 }
 
 export interface Intervention {

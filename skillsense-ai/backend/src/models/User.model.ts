@@ -21,6 +21,10 @@ export interface IUser extends Document {
   googleId?: string;
   githubId?: string;
   authProvider: 'local' | 'google' | 'github';
+  resetPasswordToken?: string | null;
+  resetPasswordExpires?: Date | null;
+  verificationToken?: string | null;
+  verificationTokenExpires?: Date | null;
   comparePassword(candidate: string): Promise<boolean>;
 }
 
@@ -31,7 +35,7 @@ const UserSchema = new Schema<IUser>(
     password: { type: String, select: false, minlength: [8, 'Password must be at least 8 characters'] },
     role: { 
       type: String, 
-      enum: ['student', 'institute', 'industry', 'government', 'admin'], 
+      enum: ['student', 'employer', 'institute', 'industry', 'government', 'admin'], 
       default: 'student' 
     },
     avatar: { type: String, default: '' },
@@ -48,6 +52,10 @@ const UserSchema = new Schema<IUser>(
     bio: { type: String, default: '' },
     location: { type: String, default: '' },
     skills: { type: [String], default: [] },
+    resetPasswordToken: { type: String, default: null },
+    resetPasswordExpires: { type: Date, default: null },
+    verificationToken: { type: String, default: null },
+    verificationTokenExpires: { type: Date, default: null },
   },
   { timestamps: true }
 );

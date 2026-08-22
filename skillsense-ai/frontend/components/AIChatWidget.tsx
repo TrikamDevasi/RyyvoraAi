@@ -83,31 +83,73 @@ export default function AIChatWidget() {
         setLoading(true);
         setError(null);
 
-        // Build history for context (last 6 messages excluding greeting)
         const history = messages.slice(-6).map(m => ({ role: m.role, content: m.content }));
+        
+        // Add a placeholder assistant message that we will update
+        const aiMsgId = (Date.now() + 1).toString() + '_ai';
+        setMessages(prev => [...prev, { id: aiMsgId, role: 'assistant', content: '' }]);
 
         try {
-            const { data } = await api.post('/ai/chat', {
-                message: text.trim(),
-                history,
-                context: `Student using SkillSense AI dashboard`,
+            const token = localStorage.getItem('skillsense_token');
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1'}/ai/chat`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    message: text.trim(),
+                    history,
+                    context: `Student using SkillSense AI dashboard`,
+                }),
             });
 
-            const aiMsg: Message = {
-                id: Date.now().toString() + '_ai',
-                role: 'assistant',
-                content: data.data?.reply ?? 'Sorry, I had trouble responding. Please try again.',
-                suggestions: data.data?.suggestions ?? [],
-            };
-            setMessages(prev => [...prev, aiMsg]);
-        } catch {
-            setError('Connection failed. Check your internet and try again.');
-            setMessages(prev => [...prev, {
-                id: Date.now().toString() + '_err',
-                role: 'assistant',
-                content: "I'm having trouble connecting right now. Please try again in a moment!",
-                suggestions: ['What is JavaScript?', 'How to get a job in IT?'],
-            }]);
+            if (!response.ok) throw new Error('Network response was not ok');
+            
+            const reader = response.body?.getReader();
+            const decoder = new TextDecoder();
+            let accumulatedContent = '';
+
+            if (reader) {
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    const chunk = decoder.decode(value);
+                    const lines = chunk.split('\n');
+                    
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            try {
+                                const data = JSON.parse(line.slice(6));
+                                if (data.chunk) {
+                                    accumulatedContent += data.chunk;
+                                    setMessages(prev => prev.map(m => 
+                                        m.id === aiMsgId ? { ...m, content: accumulatedContent } : m
+                                    ));
+                                }
+                                if (data.done) {
+                                    setMessages(prev => prev.map(m => 
+                                        m.id === aiMsgId ? { ...m, suggestions: data.suggestions } : m
+                                    ));
+                                }
+                                if (data.error) {
+                                    throw new Error(data.error);
+                                }
+                            } catch (e) {
+                                // Ignore parse errors for partial chunks
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (err: any) {
+            setError('Connection failed. Please try again.');
+            setMessages(prev => prev.map(m => 
+                m.id === aiMsgId 
+                ? { ...m, content: "I'm having trouble connecting right now. Please try again in a moment!", suggestions: ['What is JavaScript?', 'How to get a job in IT?'] }
+                : m
+            ));
         } finally {
             setLoading(false);
         }

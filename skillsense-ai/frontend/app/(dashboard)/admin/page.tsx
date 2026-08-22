@@ -95,7 +95,7 @@ interface Inquiry {
     createdAt: string;
 }
 
-const demoInquiries: Inquiry[] = [
+const SAMPLE_INQUIRIES: Inquiry[] = [
     { _id: '1', company: 'Tata Consultancy Services', contactName: 'Ravi Shankar', email: 'ravi.shankar@tcs.com', phone: '+91 98765 43210', teamSize: '1000+', plan: 'Enterprise', message: 'Looking for workforce analytics at scale.', status: 'new', createdAt: '2026-03-14T10:30:00' },
     { _id: '2', company: 'Infosys', contactName: 'Meena Patel', email: 'meena.p@infosys.com', teamSize: '201-1000', plan: 'Professional', status: 'contacted', createdAt: '2026-03-13T14:20:00' },
     { _id: '3', company: 'Wipro', contactName: 'Suresh Reddy', email: 'suresh.r@wipro.com', phone: '+91 87654 32109', teamSize: '201-1000', plan: 'Professional', message: 'Need skill passport integration.', status: 'new', createdAt: '2026-03-12T09:15:00' },
@@ -126,7 +126,7 @@ const planBadgeColors: Record<string, string> = {
 export default function AdminPage() {
     const fairnessData = sampleFairnessMetrics;
     const [activeTab, setActiveTab] = useState<'overview' | 'inquiries'>('overview');
-    const [inquiries, setInquiries] = useState<Inquiry[]>(demoInquiries);
+    const [inquiries, setInquiries] = useState<Inquiry[]>(SAMPLE_INQUIRIES);
 
     // Try to fetch from API
     useEffect(() => {

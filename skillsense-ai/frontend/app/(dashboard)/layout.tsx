@@ -6,6 +6,7 @@ import Image from 'next/image';
 import dynamic from 'next/dynamic';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import VerificationBanner from '@/components/shared/VerificationBanner';
 
 const GOLD = '#D4A843';
 const AMBER = '#F59E0B';
@@ -23,6 +24,7 @@ const NAV = [
             { label: 'Leaderboard', href: '/student/leaderboard', badge: 'HOT' },
             { label: 'Find Jobs', href: '/student/jobs', badge: 'NEW' },
             { label: 'Career Path', href: '/student/career' },
+            { label: 'Market Trends', href: '/student/market' },
             { label: 'Profile', href: '/student/profile' },
             { label: 'Latest News', href: '/student/news' },
         ],
@@ -93,6 +95,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const [userRole, setUserRole] = useState('');
     const [showDropdown, setShowDropdown] = useState(false);
     const [userAvatar, setUserAvatar] = useState('');
+    const [isVerified, setIsVerified] = useState(true);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -112,8 +115,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 const stored = localStorage.getItem('ss_user');
                 if (stored) {
                     const parsed = JSON.parse(stored);
-                    setUserAvatar(parsed.avatar || '');
                     setUserName(parsed.name || 'User');
+                    setUserRole(parsed.role || '');
+                    setUserAvatar(parsed.avatar || '');
+                    setIsVerified(parsed.isVerified || false);
                 }
             } catch { }
         };
@@ -416,19 +421,22 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 </header>
 
                 {/* Page content */}
-                <main style={{ flex: 1, padding: '28px', overflowY: 'auto', position: 'relative' }}>
-                    <AnimatePresence mode="wait">
-                        <motion.div
-                            key={pathname}
-                            initial={{ opacity: 0, y: 15 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -15 }}
-                            transition={{ duration: 0.3, ease: 'easeOut' }}
-                            style={{ minHeight: '100%' }}
-                        >
-                            {children}
-                        </motion.div>
-                    </AnimatePresence>
+                <main style={{ flex: 1, overflowY: 'auto', position: 'relative' }}>
+                    <VerificationBanner />
+                    <div style={{ padding: '28px' }}>
+                        <AnimatePresence mode="wait">
+                            <motion.div
+                                key={pathname}
+                                initial={{ opacity: 0, y: 15 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -15 }}
+                                transition={{ duration: 0.3, ease: 'easeOut' }}
+                                style={{ minHeight: '100%' }}
+                            >
+                                {children}
+                            </motion.div>
+                        </AnimatePresence>
+                    </div>
                 </main>
             </div>
 

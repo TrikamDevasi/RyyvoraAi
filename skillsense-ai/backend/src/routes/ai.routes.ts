@@ -8,11 +8,15 @@ import {
   predictCareer,
   marketTrends,
   getChatHistory,
+  getAssessment,
 } from '../controllers/ai.controller';
 
 const router = Router();
 
-// All AI routes require authentication
+// Public routes (No auth required for viewing a shared result)
+router.get('/assessment/:id', getAssessment);
+
+// Protected routes
 router.use(protect);
 
 // Chat

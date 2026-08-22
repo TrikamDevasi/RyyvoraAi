@@ -4,6 +4,7 @@ import OpenAI from 'openai';
 import logger from '../utils/logger';
 import { aiService } from '../services/ai.service';
 import ChatSession from '../models/ChatSession.model';
+import Assessment from '../models/Assessment.model';
 
 // ── OpenAI + Perplexity clients ──────────────────────────────────────────────
 
@@ -71,17 +72,29 @@ Context about this user: ${context || 'Student on SkillSense AI platform'}`;
       { role: 'user', content: message },
     ];
 
-    const reply = await aiService.chatWithFallback(messages, {
+    // Set headers for SSE
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+
+    let fullReply = '';
+    const stream = aiService.chatStream(messages, {
       max_tokens: 300,
       temperature: 0.7,
     });
+
+    for await (const chunk of stream) {
+      fullReply += chunk;
+      // SSE format: data: <payload>\n\n
+      res.write(`data: ${JSON.stringify({ chunk })}\n\n`);
+    }
 
     // Generate 3 contextual follow-up suggestions
     let suggestions: string[] = ['Tell me more', 'How do I get started?', 'What skills should I learn?'];
     try {
       const suggestContent = await aiService.chatWithFallback([
         { role: 'system', content: 'You are a helpful assistant. Given the AI reply, generate exactly 3 short follow-up question suggestions a student might ask next. Return a JSON array of 3 strings, each under 8 words. Example: ["How do I learn JavaScript?","What salary can I expect?","Which companies hire freshers?"]' },
-        { role: 'user', content: `AI just said: "${reply.substring(0, 200)}". Suggest 3 follow-up questions.` },
+        { role: 'user', content: `AI just said: "${fullReply.substring(0, 200)}". Suggest 3 follow-up questions.` },
       ], {
         max_tokens: 120,
         temperature: 0.8,
@@ -95,7 +108,9 @@ Context about this user: ${context || 'Student on SkillSense AI platform'}`;
       logger.error('Suggestions generation failed (non-blocking):', err);
     }
 
-    res.status(200).json({ success: true, data: { reply, suggestions }, message: 'OK' });
+    // Send final payload with suggestions
+    res.write(`data: ${JSON.stringify({ done: true, suggestions })}\n\n`);
+    res.end();
 
     // Save to ChatSession in background
     if (userId !== 'anon') {
@@ -107,7 +122,7 @@ Context about this user: ${context || 'Student on SkillSense AI platform'}`;
               messages: {
                 $each: [
                   { role: 'user', content: message, timestamp: new Date() },
-                  { role: 'assistant', content: reply, timestamp: new Date() },
+                  { role: 'assistant', content: fullReply, timestamp: new Date() },
                 ],
               },
             },
@@ -120,14 +135,20 @@ Context about this user: ${context || 'Student on SkillSense AI platform'}`;
     }
   } catch (err) {
     logger.error('AI chat error:', err);
-    res.status(200).json({
-      success: true,
-      data: {
-        reply: 'I\'m having trouble connecting right now. Please try again in a moment! 🙏',
-        suggestions: ['What is JavaScript?', 'How to get a job in IT?', 'What is NSQF?'],
-      },
-      message: 'Fallback response',
-    });
+    // If headers already sent, we can't send a normal error response
+    if (!res.headersSent) {
+      res.status(200).json({
+        success: true,
+        data: {
+          reply: 'I\'m having trouble connecting right now. Please try again in a moment! 🙏',
+          suggestions: ['What is JavaScript?', 'How to get a job in IT?', 'What is NSQF?'],
+        },
+        message: 'Fallback response',
+      });
+    } else {
+      res.write(`data: ${JSON.stringify({ error: 'Stream interrupted' })}\n\n`);
+      res.end();
+    }
   }
 };
 
@@ -204,18 +225,40 @@ Return ONLY valid JSON:
     });
 
     const feedback = JSON.parse(result || '{}');
+    const data = {
+      score: pct,
+      correct,
+      total,
+      level,
+      weakAreas:       feedback.weakAreas       ?? [],
+      strengths:       feedback.strengths       ?? [],
+      improvementPlan: feedback.improvementPlan ?? 'Keep practicing!',
+      nextSteps:       feedback.nextSteps       ?? [],
+    };
+
+    // Save to database in background
+    const user = req.user as any;
+    const userId = user?.id || user?._id || 'anon';
+    
+    let assessmentId = null;
+    if (userId !== 'anon') {
+      try {
+        const newAssessment = await Assessment.create({
+          studentId: userId,
+          category: topic,
+          score: pct,
+          totalQuestions: total,
+          aiAnalysis: JSON.stringify(data),
+        });
+        assessmentId = newAssessment._id;
+      } catch (err) {
+        logger.error('Error saving assessment:', err);
+      }
+    }
+
     res.status(200).json({
       success: true,
-      data: {
-        score: pct,
-        correct,
-        total,
-        level,
-        weakAreas:       feedback.weakAreas       ?? [],
-        strengths:       feedback.strengths       ?? [],
-        improvementPlan: feedback.improvementPlan ?? 'Keep practicing!',
-        nextSteps:       feedback.nextSteps       ?? [],
-      },
+      data: { ...data, id: assessmentId },
       message: 'OK',
     });
   } catch (err) {
@@ -225,6 +268,34 @@ Return ONLY valid JSON:
       data: { score: pct, correct, total, level, weakAreas: [], strengths: [], improvementPlan: 'Good effort! Keep practising.', nextSteps: ['Review the topic', 'Retake the quiz'] },
       message: 'Fallback',
     });
+  }
+};
+
+// ── 3.1 GET /api/v1/ai/assessment/:id ───────────────────────────────────────
+export const getAssessment = async (req: Request, res: Response): Promise<void> => {
+  const { id } = req.params;
+  try {
+    const assessment = await Assessment.findById(id).populate('studentId', 'name profilePicture');
+    if (!assessment) {
+      res.status(404).json({ success: false, message: 'Assessment not found' });
+      return;
+    }
+
+    res.status(200).json({
+      success: true,
+      data: {
+        id: assessment._id,
+        category: assessment.category,
+        score: assessment.score,
+        total: assessment.totalQuestions,
+        completedAt: assessment.completedAt,
+        student: assessment.studentId,
+        ...(JSON.parse(assessment.aiAnalysis || '{}')),
+      },
+    });
+  } catch (err) {
+    logger.error('getAssessment error:', err);
+    res.status(500).json({ success: false, message: 'Failed to retrieve assessment' });
   }
 };
 

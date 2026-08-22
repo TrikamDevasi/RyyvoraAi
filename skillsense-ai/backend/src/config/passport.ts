@@ -11,13 +11,14 @@ console.log('[Passport] GOOGLE_CLIENT_ID:', process.env.GOOGLE_CLIENT_ID?.slice(
 // ── JWT Strategy ──────────────────────────────────────────────────────────────
 const jwtOptions: StrategyOptions = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-  secretOrKey: process.env.JWT_ACCESS_SECRET as string,
+  secretOrKey: process.env.JWT_SECRET as string,
 };
 
 passport.use(
   new JwtStrategy(jwtOptions, async (payload, done) => {
     try {
-      const user = await User.findById(payload.userId);
+      const id = payload.id || payload.userId;
+      const user = await User.findById(id);
       if (!user) return done(null, false);
       return done(null, user);
     } catch (err) {
@@ -27,15 +28,13 @@ passport.use(
 );
 
 // ── Google OAuth Strategy ─────────────────────────────────────────────────────
-// TODO: re-enable Google Auth
-/*
 if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
   passport.use(
     new GoogleStrategy(
       {
         clientID: process.env.GOOGLE_CLIENT_ID!,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-        callbackURL: process.env.GOOGLE_CALLBACK_URL!,
+        callbackURL: process.env.GOOGLE_CALLBACK_URL || 'http://localhost:5000/api/v1/auth/google/callback',
       },
       async (_accessToken, _refreshToken, profile, done) => {
         try {
@@ -44,7 +43,7 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
 
           if (!user) {
             const email = profile.emails?.[0]?.value;
-            // Link to existing account by email
+            // Link to existing account by email or create new
             user = await User.findOne({ email });
             if (user) {
               user.googleId = profile.id;
@@ -62,7 +61,7 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
                 role: 'student',
                 isVerified: true,
                 authProvider: 'google',
-                // password not required for OAuth users — use a dummy hash placeholder
+                // password not required for OAuth users
                 password: `oauth_${profile.id}_${Date.now()}`,
               });
               await user.save();
@@ -80,7 +79,6 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
 } else {
   logger.warn('Google OAuth disabled — GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET not set');
 }
-*/
 
 // ── GitHub OAuth Strategy ─────────────────────────────────────────────────────
 if (process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET) {

@@ -7,11 +7,12 @@ import { setTokens } from '@/lib/auth';
 
 // ── Role → dashboard route map ─────────────────────────────────────────────────
 const ROLE_ROUTES: Record<string, string> = {
-  admin:      '/admin',
   student:    '/student',
+  employer:   '/employer',
   institute:  '/institute',
   industry:   '/industry',
   government: '/government',
+  admin:      '/admin',
 };
 
 interface OAuthUser {
@@ -71,12 +72,14 @@ export default function AuthCallbackPage() {
     }
 
     try {
-      // 1. Store JWT in localStorage + cookie (cookie needed for edge middleware)
-      setToken(token);
-      setTokens(token);
-      console.log('[OAuth Callback] Token stored ✓');
+      // 1. Store JWT in localStorage + cookie
+      if (token) {
+        setToken(token);
+        setTokens(token);
+        console.log('[OAuth Callback] Token stored ✓');
+      }
 
-      // 2. Decode user from base64 payload sent by backend
+      // 2. Decode or fetch user
       let user: OAuthUser | null = null;
       if (userB64) {
         const json = atob(userB64);
@@ -84,13 +87,24 @@ export default function AuthCallbackPage() {
         console.log('[OAuth Callback] User decoded — name:', user.name, '| role:', user.role);
       }
 
-      // 3. Persist user for sidebar display
-      if (user) {
-        localStorage.setItem('ss_user', JSON.stringify({
-          name:  user.name,
-          role:  user.role,
+      // 3. Hydrate authStore
+      if (user && token) {
+        // Map backend IUser to frontend AuthUser
+        const authUser = {
+          _id: user.id,
+          name: user.name,
           email: user.email,
-        }));
+          role: user.role as any,
+          avatar: user.avatar,
+          isVerified: user.isVerified,
+          isActive: user.isActive,
+          createdAt: new Date().toISOString(),
+          authProvider: user.authProvider as any,
+        };
+        useAuthStore.getState().setAuth(authUser, token);
+      } else {
+        // If only token provided, let useAuth hook/checkAuth fetch the user
+        // But for redirect we need role, so we try to decode JWT if no userB64
       }
 
       // 4. Check if account is suspended
@@ -101,8 +115,8 @@ export default function AuthCallbackPage() {
       }
 
       // 5. Route to correct dashboard
-      const role      = user?.role ?? 'student';
-      const destination = ROLE_ROUTES[role] ?? '/student';
+      const role = user?.role ?? 'student';
+      const destination = ROLE_ROUTES[role] || (role === 'employer' ? '/employer' : '/student');
       setLabel(`Welcome back${user?.name ? `, ${user.name.split(' ')[0]}` : ''}! Redirecting…`);
 
       console.log('[OAuth Callback] Redirecting to:', destination);

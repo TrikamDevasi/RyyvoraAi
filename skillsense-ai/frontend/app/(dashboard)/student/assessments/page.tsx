@@ -1,14 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
-import { sampleStudents } from '@/data/sampleStudents';
+import { useRouter } from 'next/navigation';
 import { FileCheck, RotateCcw, Lock, Play } from 'lucide-react';
 
 const GOLD = '#D4A843';
 const MUTED = '#A0A0A0';
 const WHITE = '#FFFFFF';
-
-const student = sampleStudents[0];
 
 interface MockAssessment {
     id: string;
@@ -34,12 +32,12 @@ const assessments: MockAssessment[] = [
 const DIFF_COLORS = { Beginner: '#22c55e', Intermediate: GOLD, Advanced: '#ef4444' };
 
 export default function AssessmentsPage() {
+    const router = useRouter();
     const [filter, setFilter] = useState<'all' | 'completed' | 'available' | 'locked'>('all');
-    const [activeAssessment, setActiveAssessment] = useState<string | null>(null);
 
     const filtered = assessments.filter((a) => filter === 'all' || a.status === filter);
     const completed = assessments.filter((a) => a.status === 'completed');
-    const avgScore = Math.round(completed.reduce((s, a) => s + (a.score ?? 0), 0) / completed.length);
+    const avgScore = Math.round(completed.length > 0 ? (completed.reduce((s, a) => s + (a.score ?? 0), 0) / completed.length) : 0);
 
     return (
         <div style={{ color: WHITE, maxWidth: 960 }}>
@@ -151,6 +149,7 @@ export default function AssessmentsPage() {
                                 )}
                                 <button
                                     disabled={assessment.status === 'locked'}
+                                    onClick={() => router.push(`/student/assessment?topic=${encodeURIComponent(assessment.skill)}&level=${encodeURIComponent(assessment.difficulty)}`)}
                                     style={{
                                         padding: '8px 16px',
                                         borderRadius: 8,

@@ -12,7 +12,7 @@ export function useAuth() {
     logout 
   } = useAuthStore();
 
-  const isAuthenticated = !!accessToken;
+  const isAuthenticated = !!accessToken || useAuthStore((state) => state.isAuthenticated);
 
   useEffect(() => {
     // Only fetch if we have a token but no user data yet

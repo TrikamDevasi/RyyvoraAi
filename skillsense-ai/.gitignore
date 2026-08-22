@@ -1,2 +1,10 @@
-*.env
-*.env
+node_modules
+.env
+.env.*
+!.env.example
+*.log
+dist
+.next
+out
+*.txt
+build_output*

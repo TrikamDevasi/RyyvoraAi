@@ -15,6 +15,12 @@
   --gold-dim: #D4A843;
   --gold-glow: rgba(245, 158, 11, 0.15);
   
+  /* ── Nexus / Violet palette (Phase 5) ── */
+  --violet: #6366f1;
+  --purple: #a78bfa;
+  --navy: #0a0f2c;
+  --nexus-bg: #060b1e;
+  
   --bg: #08060f;
   --bg-2: #0d0b1d;
   --bg-card: rgba(245, 158, 11, 0.04);
@@ -27,6 +33,12 @@
   --text-muted: #64748b;
 
   --accent-gold: linear-gradient(135deg, #F59E0B, #FBBF24);
+}
+
+@property --card-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
 }
 
 html,
@@ -290,4 +302,169 @@ body {
   font-weight: 700;
   font-family: 'Space Grotesk', sans-serif;
   letter-spacing: 0.03em;
+}
+
+/* ── Nexus Premium UI (Phase 5) ── */
+
+.nexus-card {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  max-width: 428px;
+  padding: 48px 40px;
+  border-radius: 28px;
+}
+
+.nexus-card::before {
+  content: '';
+  position: absolute;
+  inset: -1.5px;
+  border-radius: 29.5px;
+  z-index: -1;
+  background: conic-gradient(
+    from var(--card-angle),
+    transparent 0deg,
+    #3a3fd4 55deg,
+    #6366f1 80deg,
+    #a78bfa 105deg,
+    #c4b5fd 120deg,
+    #ffffff 135deg,
+    #6366f1 160deg,
+    transparent 215deg,
+    transparent 360deg
+  );
+  animation: cardBorderSpin 6s linear infinite;
+}
+
+.nexus-card::after {
+  content: '';
+  position: absolute;
+  inset: 1.5px;
+  border-radius: 27px;
+  z-index: -1;
+  background: rgba(6, 11, 30, 0.92);
+  backdrop-filter: blur(24px);
+}
+
+@keyframes cardBorderSpin { 
+  to { --card-angle: 360deg; } 
+}
+
+.nexus-input {
+  width: 100%;
+  height: 44px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 12px;
+  padding: 0 16px;
+  color: #fff;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.nexus-input:focus {
+  border-color: rgba(99, 102, 241, 0.55);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.14);
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.nexus-btn-primary {
+  width: 100%;
+  height: 48px;
+  background: linear-gradient(135deg, #3a3fd4, #6366f1, #7c74f5);
+  border: none;
+  border-radius: 14px;
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  overflow: hidden;
+}
+
+.nexus-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 24px rgba(99, 102, 241, 0.4);
+}
+
+.nexus-btn-primary::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: 0.5s;
+}
+
+.nexus-btn-primary:hover::after {
+  left: 100%;
+}
+
+/* Overlay Animations */
+@keyframes overlayIn {
+  from { opacity: 0; backdrop-filter: blur(0); }
+  to { opacity: 1; backdrop-filter: blur(10px); }
+}
+
+@keyframes overlayOut {
+  from { opacity: 1; backdrop-filter: blur(10px); }
+  to { opacity: 0; backdrop-filter: blur(0); }
+}
+
+.nexus-overlay--out {
+  animation: overlayOut 0.4s ease-in forwards !important;
+}
+
+@keyframes particleRise {
+  0% { transform: translateY(0); opacity: 0; }
+  20% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { transform: translateY(-110vh); opacity: 0; }
+}
+
+@keyframes stackSpin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes orbPulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.55); }
+}
+
+@keyframes labelFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.nexus-toast {
+  position: fixed;
+  bottom: 36px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(99, 102, 241, 0.92);
+  backdrop-filter: blur(14px);
+  padding: 13px 26px;
+  border-radius: 100px;
+  color: white;
+  font-weight: 600;
+  z-index: 100000;
+  animation: toastIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes toastIn {
+  from { transform: translate(-50%, 40px) scale(0.9); opacity: 0; }
+  to { transform: translate(-50%, 0) scale(1); opacity: 1; }
 }

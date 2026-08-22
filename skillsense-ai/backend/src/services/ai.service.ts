@@ -464,6 +464,50 @@ Write a concise 2-3 sentence insight in plain English suitable for a government/
       throw err;
     }
   }
+
+  // ── 9. Chat Streaming (SSE Support) ───────────────────────────────────────
+  async *chatStream(
+    messages: OpenAI.Chat.ChatCompletionMessageParam[],
+    options: { temperature?: number; max_tokens?: number } = {}
+  ): AsyncGenerator<string, void, unknown> {
+    const groqOptions: any = {
+      model: 'llama3-8b-8192',
+      messages: messages as any,
+      max_tokens: options.max_tokens ?? 1024,
+      temperature: options.temperature ?? 0.7,
+      stream: true,
+    };
+
+    // 1. Try Groq (Primary)
+    try {
+      const stream = await groq.chat.completions.create(groqOptions) as any;
+      for await (const chunk of stream) {
+        const content = chunk.choices[0]?.delta?.content || '';
+        if (content) yield content;
+      }
+      return;
+    } catch (err: any) {
+      logger.warn('Groq stream failed, falling back to OpenAI...', err.message);
+    }
+
+    // 2. Fallback to OpenAI
+    try {
+      const stream = await openai.chat.completions.create({
+        model: 'gpt-4o-mini',
+        messages,
+        temperature: options.temperature ?? 0.7,
+        max_tokens: options.max_tokens ?? 1000,
+        stream: true,
+      }) as any;
+      for await (const chunk of stream) {
+        const content = chunk.choices[0]?.delta?.content || '';
+        if (content) yield content;
+      }
+    } catch (err: any) {
+      logger.error('All AI providers (Groq, OpenAI) failed in stream mode:', err.message);
+      throw err;
+    }
+  }
 }
 
 // ── Singleton export ──────────────────────────────────────────────────────────

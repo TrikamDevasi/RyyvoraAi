@@ -9,10 +9,15 @@ out
 .env.local
 .env
 
-# logs
+# logs & build artifacts
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+*.log
+build_output*.txt
+*_errors.txt
+tsc_output.txt
+ts_errors.txt
 
 # OS
 .DS_Store

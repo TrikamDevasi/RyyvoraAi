@@ -24,11 +24,17 @@ import contactRouter from './routes/contact.routes';
 const app = express();
 
 // ── Security & CORS ────────────────────────────────────────────────────────
-app.use(helmet());
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" },
+  crossOriginOpenerPolicy: { policy: "unsafe-none" } // Helps with OAuth popup redirects if needed
+}));
 
 const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:3001',
+  'http://127.0.0.1:3000',
+  'http://127.0.0.1:3001',
+  'http://[::1]:3000',
   'https://skillsense-ai-seven.vercel.app',
   ...(process.env.CORS_ORIGIN?.split(',') || []),
 ].filter(Boolean) as string[];
@@ -44,6 +50,7 @@ app.use(cors({
     // 3. Allow all Vercel preview deployments
     if (origin.endsWith('.vercel.app')) return callback(null, true);
     
+    logger.warn(`[CORS] Rejected origin: ${origin}`);
     return callback(new Error(`CORS blocked: ${origin}`));
   },
   credentials: true,
@@ -78,6 +85,11 @@ app.use(
 
 // ── Rate Limiting ──────────────────────────────────────────────────────────
 app.use(generalLimiter);
+
+// ── Root Route ──────────────────────────────────────────────────────────────
+app.get('/', (_req, res) => {
+  res.status(200).json({ success: true, message: 'SkillSense Backend API is running locally.' });
+});
 
 // ── Health Check ───────────────────────────────────────────────────────────
 app.get('/health', (_req, res) => {

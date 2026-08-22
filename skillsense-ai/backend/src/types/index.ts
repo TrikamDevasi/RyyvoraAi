@@ -1,6 +1,6 @@
 import { IUser } from '../models/User.model';
 
-export type UserRole = 'student' | 'institute' | 'industry' | 'government' | 'admin';
+export type UserRole = 'student' | 'employer' | 'institute' | 'industry' | 'government' | 'admin';
 
 export interface AuthenticatedRequest extends Request {
   user: IUser;

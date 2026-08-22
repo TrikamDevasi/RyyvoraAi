@@ -83,7 +83,7 @@ function Navbar() {
                     ))}
                 </div>
                 <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-                    <Link href="/auth" className="btn-primary" style={{ fontSize: 13 }}>Demo Login</Link>
+                    <Link href="/auth" className="btn-primary" style={{ fontSize: 13 }}>Login</Link>
                 </div>
             </div>
         </nav>
@@ -124,8 +124,8 @@ export default function LandingPage() {
                         <Link href="/auth" className="btn-primary btn-shimmer" style={{ fontSize: 15, padding: '12px 28px' }}>
                             Start Free Assessment
                         </Link>
-                        <Link href="/student" className="btn-ghost" style={{ fontSize: 15, padding: '12px 28px' }}>
-                            View Demo Dashboard
+                        <Link href="/auth" className="btn-ghost" style={{ fontSize: 15, padding: '12px 28px' }}>
+                            Explore Platform
                         </Link>
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, maxWidth: 700, margin: '0 auto' }}>
@@ -388,7 +388,7 @@ export default function LandingPage() {
                                 </p>
                                 <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
                                     <Link href="/auth" className="btn-primary btn-shimmer" style={{ fontSize: 15, padding: '12px 28px' }}>Start Free</Link>
-                                    <Link href="/institute" className="btn-ghost" style={{ fontSize: 15, padding: '12px 28px' }}>Institute Demo</Link>
+                                    <Link href="/auth" className="btn-ghost" style={{ fontSize: 15, padding: '12px 28px' }}>Contact Sales</Link>
                                 </div>
                             </div>
                         </div>
