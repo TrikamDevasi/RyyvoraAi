@@ -3,26 +3,29 @@ import {
   listStudents, getStudent, updateStudent,
   getStudentSkills, getStudentPassport,
   submitAssessment, getCareerPaths, getInterventions,
+  getMyStudentProfile,
 } from '../controllers/student.controller';
-import { protect } from '../middleware/auth.middleware';
-import { requireRole } from '../middleware/role.middleware';
+import { protect, requireStudentOwnership, requireRole } from '../middleware/auth.middleware';
 import { aiLimiter } from '../middleware/rateLimit.middleware';
 
 const router = Router();
 
-// Admin: list all students
-router.get('/', protect, requireRole('admin', 'government'), listStudents);
-// Get / update a student profile
-router.get('/:id', protect, getStudent);
-router.put('/:id', protect, requireRole('student', 'admin'), updateStudent);
-// Skills & passport
-router.get('/:id/skills', protect, getStudentSkills);
-router.get('/:id/passport', protect, getStudentPassport);
-// Career paths
-router.get('/:id/career-paths', protect, getCareerPaths);
-// Assessments
-router.post('/:id/assessments', protect, aiLimiter, submitAssessment);
-// Interventions
-router.get('/:id/interventions', protect, getInterventions);
+// Apply auth to all student routes
+router.use(protect);
+
+// Current student profile
+router.get('/me', getMyStudentProfile);
+
+// Admin / Government: list all students
+router.get('/', requireRole('admin', 'government', 'industry', 'institute'), listStudents);
+
+// ID-based student endpoints guarded with strict ownership checks
+router.get('/:id', requireStudentOwnership, getStudent);
+router.put('/:id', requireStudentOwnership, updateStudent);
+router.get('/:id/skills', requireStudentOwnership, getStudentSkills);
+router.get('/:id/passport', requireStudentOwnership, getStudentPassport);
+router.get('/:id/career-paths', requireStudentOwnership, getCareerPaths);
+router.post('/:id/assessments', aiLimiter, requireStudentOwnership, submitAssessment);
+router.get('/:id/interventions', requireStudentOwnership, getInterventions);
 
 export default router;

@@ -5,8 +5,12 @@ import {
   getNationalHeatmap,
 } from '../services/analytics.service';
 import Skill from '../models/Skill.model';
+import Institution from '../models/Institution.model';
+import Student from '../models/Student.model';
 import { get, set } from '../utils/cache.utils';
 import { buildApiResponse } from '../utils/pagination.utils';
+import { fairnessService } from '../services/fairness.service';
+import { aiService } from '../services/ai.service';
 
 export const getSkillGaps = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -47,53 +51,126 @@ export const getPredictions = async (req: Request, res: Response, next: NextFunc
     const cached = await get<unknown>(cacheKey);
     if (cached) { res.status(200).json(buildApiResponse(cached, 'Predictions retrieved (cached)')); return; }
 
-    // Stub — Member 5 will implement fairness.service integration
-    const stub = { message: 'Predictions powered by AI — Member 5 implementation pending', data: [] };
-    await set(cacheKey, stub, 300);
-    res.status(200).json(buildApiResponse(stub, 'Predictions retrieved'));
+    const sampleCohort = await Student.find().limit(50).lean();
+    const cohortFormatted = sampleCohort.map((s: any) => ({
+      gender: s.gender || 'male',
+      region: s.state || 'south',
+      overallScore: s.overallScore || 70,
+      placementStatus: s.placementStatus || 'seeking',
+    }));
+
+    const aiReport = await fairnessService.runAIFairnessAnalysis(cohortFormatted);
+    const result = {
+      isFair: aiReport.isFair,
+      flags: aiReport.flags,
+      recommendations: aiReport.recommendations,
+      timestamp: new Date().toISOString(),
+    };
+
+    await set(cacheKey, result, 300);
+    res.status(200).json(buildApiResponse(result, 'AI Predictions & Fairness Analysis retrieved'));
   } catch (err) { next(err); }
 };
 
 export const getFairness = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    // Stub — Member 5 to implement fairness analysis
-    res.status(200).json(buildApiResponse(
-      { isFair: true, flags: [], recommendations: [] },
-      'Fairness report (stub — Member 5 pending)'
-    ));
+    const students = await Student.find().limit(200).lean();
+    const formattedStudents = students.map((s: any) => ({
+      id: String(s._id),
+      gender: s.gender || 'male',
+      region: (s.state === 'Delhi' || s.state === 'Punjab') ? 'north' : (s.state === 'Karnataka' || s.state === 'Tamil Nadu') ? 'south' : 'west',
+      nsqfLevel: s.nsqfLevel || 4,
+      overallScore: s.overallScore || 65,
+      placementStatus: s.placementStatus || 'seeking',
+      salary: s.salary || 300000,
+    }));
+
+    const metrics = fairnessService.computeFairnessMetrics(formattedStudents as any, 'Current Quarter');
+    res.status(200).json(buildApiResponse(metrics, 'Fairness report generated successfully'));
   } catch (err) { next(err); }
 };
 
+/**
+ * Optimized Fund Targeting using a single MongoDB Aggregation ($lookup + $group)
+ * Eliminates N+1 query vulnerability.
+ */
 export const getFundTargeting = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const { default: Institution } = await import('../models/Institution.model');
-    const { default: Student } = await import('../models/Student.model');
+    const aggregated = await Institution.aggregate([
+      { $match: { isVerified: true } },
+      {
+        $lookup: {
+          from: 'students',
+          localField: '_id',
+          foreignField: 'institutionId',
+          as: 'students',
+        },
+      },
+      {
+        $project: {
+          name: 1,
+          state: 1,
+          type: 1,
+          programs: 1,
+          studentCount: { $size: '$students' },
+          placedCount: {
+            $size: {
+              $filter: {
+                input: '$students',
+                as: 's',
+                cond: { $eq: ['$$s.placementStatus', 'placed'] },
+              },
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          name: 1,
+          state: 1,
+          type: 1,
+          programs: 1,
+          studentCount: 1,
+          placedCount: 1,
+          placementRate: {
+            $cond: [
+              { $gt: ['$studentCount', 0] },
+              { $round: [{ $multiply: [{ $divide: ['$placedCount', '$studentCount'] }, 100] }, 0] },
+              0,
+            ],
+          },
+          priorityScore: {
+            $cond: [
+              { $gt: ['$studentCount', 0] },
+              {
+                $round: [
+                  {
+                    $multiply: [
+                      { $subtract: [1, { $divide: ['$placedCount', '$studentCount'] }] },
+                      '$studentCount',
+                    ],
+                  },
+                  0,
+                ],
+              },
+              0,
+            ],
+          },
+        },
+      },
+      { $sort: { priorityScore: -1 } },
+      { $limit: 100 },
+    ]);
 
-    const institutions = await Institution.find().lean();
-    const results = await Promise.all(
-      institutions.map(async (inst) => {
-        const students = await Student.find({ institutionId: inst._id });
-        const placed = students.filter((s) => s.placementStatus === 'placed').length;
-        const placementRate = students.length ? placed / students.length : 0;
-        const improvementNeeded = 1 - placementRate;
-        const priorityScore = improvementNeeded * students.length;
-        return { ...inst, studentCount: students.length, placementRate: Math.round(placementRate * 100), priorityScore: Math.round(priorityScore) };
-      })
-    );
-    results.sort((a, b) => b.priorityScore - a.priorityScore);
-    res.status(200).json(buildApiResponse(results, 'Fund targeting data retrieved'));
+    res.status(200).json(buildApiResponse(aggregated, 'Fund targeting data retrieved'));
   } catch (err) { next(err); }
 };
 
-// ── NEW: Dashboard summary ────────────────────────────────────────────────────
 export const getDashboard = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const cacheKey = 'analytics:dashboard';
     const cached = await get<unknown>(cacheKey);
     if (cached) { res.status(200).json(buildApiResponse(cached, 'Dashboard data retrieved (cached)')); return; }
-
-    const { default: Student } = await import('../models/Student.model');
-    const { default: Institution } = await import('../models/Institution.model');
 
     const [totalStudents, totalInstitutions, placedStudents, skillGaps, placementTrends] = await Promise.all([
       Student.countDocuments(),
@@ -117,7 +194,6 @@ export const getDashboard = async (req: Request, res: Response, next: NextFuncti
   } catch (err) { next(err); }
 };
 
-// ── NEW: Per-student skill gap analysis (AI powered) ─────────────────────────
 export const getStudentSkillGaps = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { studentId } = req.params;
@@ -125,17 +201,18 @@ export const getStudentSkillGaps = async (req: Request, res: Response, next: Nex
     const cached = await get<unknown>(cacheKey);
     if (cached) { res.status(200).json(buildApiResponse(cached, 'Skill gap analysis retrieved (cached)')); return; }
 
-    const { default: Student } = await import('../models/Student.model');
-    const student = await Student.findById(studentId);
+    let student = await Student.findById(studentId);
+    if (!student) {
+      student = await Student.findOne({ userId: studentId });
+    }
     if (!student) { res.status(404).json(buildApiResponse(null, 'Student not found', false)); return; }
 
-    const { aiService } = await import('../services/ai.service');
     const analysis = await aiService.analyzeSkillGaps({
       studentId: String(student._id),
-      studentName: student.enrollmentNumber,  // use enrollment number as identifier
-      program: student.program,
-      nsqfLevel: student.nsqfLevel,
-      skills: student.skills.map((s) => ({ skill: String(s.skillId), score: s.score })),
+      studentName: student.enrollmentNumber || 'Student',
+      program: student.program || 'Technology',
+      nsqfLevel: student.nsqfLevel || 4,
+      skills: (student.skills || []).map((s) => ({ skill: String(s.skillId), score: s.score })),
     });
 
     await set(cacheKey, analysis, 600);
@@ -143,7 +220,6 @@ export const getStudentSkillGaps = async (req: Request, res: Response, next: Nex
   } catch (err) { next(err); }
 };
 
-// ── NEW: Per-student career path matching (AI powered) ───────────────────────
 export const getStudentCareerPaths = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { studentId } = req.params;
@@ -151,18 +227,19 @@ export const getStudentCareerPaths = async (req: Request, res: Response, next: N
     const cached = await get<unknown>(cacheKey);
     if (cached) { res.status(200).json(buildApiResponse(cached, 'Career paths retrieved (cached)')); return; }
 
-    const { default: Student } = await import('../models/Student.model');
-    const student = await Student.findById(studentId);
+    let student = await Student.findById(studentId);
+    if (!student) {
+      student = await Student.findOne({ userId: studentId });
+    }
     if (!student) { res.status(404).json(buildApiResponse(null, 'Student not found', false)); return; }
 
-    const { aiService } = await import('../services/ai.service');
     const paths = await aiService.matchCareerPaths({
-      program: student.program,
-      nsqfLevel: student.nsqfLevel,
-      overallScore: student.overallScore ?? 0,
-      state: student.state,
+      program: student.program || 'Technology',
+      nsqfLevel: student.nsqfLevel || 4,
+      overallScore: student.overallScore ?? 75,
+      state: student.state || 'Karnataka',
       gender: (student.gender as 'male' | 'female') ?? 'male',
-      skills: student.skills.map((s) => ({ skill: String(s.skillId), score: s.score })),
+      skills: (student.skills || []).map((s) => ({ skill: String(s.skillId), score: s.score })),
     });
 
     await set(cacheKey, paths, 600);
@@ -170,7 +247,6 @@ export const getStudentCareerPaths = async (req: Request, res: Response, next: N
   } catch (err) { next(err); }
 };
 
-// ── NEW: Industry demand by domain (Perplexity powered) ───────────────────────
 export const getIndustryDemandByDomain = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const rawDomain = req.params.domain || req.query.domain;
@@ -181,9 +257,8 @@ export const getIndustryDemandByDomain = async (req: Request, res: Response, nex
     const cached = await get<unknown>(cacheKey);
     if (cached) { res.status(200).json(buildApiResponse(cached, `Industry demand for ${domain} (cached)`)); return; }
 
-    const { aiService } = await import('../services/ai.service');
     const data = await aiService.researchIndustryDemand(domain);
-    await set(cacheKey, data, 900); // 15 min cache for Perplexity data
+    await set(cacheKey, data, 900);
     res.status(200).json(buildApiResponse(data, `Industry demand for ${domain} retrieved`));
   } catch (err) { next(err); }
 };

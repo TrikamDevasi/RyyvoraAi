@@ -14,6 +14,8 @@ const nextConfig: NextConfig = {
         unoptimized: true,
     },
     turbopack: {
+        // Pin Turbopack to the frontend dir so it does not walk up and pick up
+        // skillsense-ai/package-lock.json (multiple-lockfile warning + wrong workspace root).
         root: path.resolve(__dirname),
     },
 };

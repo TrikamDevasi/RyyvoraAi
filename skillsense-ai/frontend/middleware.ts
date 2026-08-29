@@ -1,24 +1,20 @@
 // frontend/middleware.ts
 // Next.js Edge Middleware — enforces route protection and role-based access.
-// Runs on the server/edge before a page is rendered.
-// Reads `skillsense_token` and `skillsense_role` cookies (set by lib/auth.ts on login).
 
 import { NextRequest, NextResponse } from 'next/server';
 
-// Routes that require authentication
-const PROTECTED_PREFIXES = ['/admin', '/student', '/institute', '/industry', '/government'];
+const PROTECTED_PREFIXES = ['/admin', '/student', '/institute', '/industry', '/government', '/employer'];
 
-// Role-to-allowed-prefix map: key = cookie role value, value = array of allowed route prefixes
 const ROLE_ROUTES: Record<string, string[]> = {
-  admin:      ['/admin', '/student', '/institute', '/industry', '/government'],
+  admin:      ['/admin', '/student', '/institute', '/industry', '/government', '/employer'],
   student:    ['/student'],
   institute:  ['/institute'],
   industry:   ['/industry'],
   government: ['/government'],
+  employer:   ['/employer'],
 };
 
-// Public routes — always accessible
-const PUBLIC_PREFIXES = ['/auth', '/api', '/_next', '/favicon', '/icon'];
+const PUBLIC_PREFIXES = ['/auth', '/api', '/_next', '/favicon', '/icon', '/share', '/exam', '/ai-health'];
 
 const isPublic = (pathname: string): boolean =>
   PUBLIC_PREFIXES.some((p) => pathname.startsWith(p)) || pathname === '/';
@@ -26,8 +22,15 @@ const isPublic = (pathname: string): boolean =>
 const isProtected = (pathname: string): boolean =>
   PROTECTED_PREFIXES.some((p) => pathname.startsWith(p));
 
-export function proxy(request: NextRequest): NextResponse {
+export default function middleware(request: NextRequest): NextResponse {
   const { pathname } = request.nextUrl;
+
+  // Legacy /login redirect to /auth
+  if (pathname === '/login') {
+    const authUrl = request.nextUrl.clone();
+    authUrl.pathname = '/auth';
+    return NextResponse.redirect(authUrl);
+  }
 
   // Always allow public routes through
   if (isPublic(pathname)) return NextResponse.next();
@@ -53,7 +56,6 @@ export function proxy(request: NextRequest): NextResponse {
 
     if (!hasAccess) {
       const homeUrl = request.nextUrl.clone();
-      // Redirect to their role's root dashboard
       homeUrl.pathname = `/${role}`;
       homeUrl.search = '';
       return NextResponse.redirect(homeUrl);
@@ -64,6 +66,5 @@ export function proxy(request: NextRequest): NextResponse {
 }
 
 export const config = {
-  // Run on all routes except static assets and Next.js internals
   matcher: ['/((?!_next/static|_next/image|favicon.ico|icon.png).*)'],
 };

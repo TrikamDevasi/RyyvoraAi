@@ -15,6 +15,15 @@ const ROLES = [
     { key: 'admin', label: 'Admin', desc: 'System Mgmt', icon: Settings, href: '/admin' },
 ];
 
+const ROLE_DASHBOARD: Record<string, string> = {
+    student: '/student',
+    employer: '/employer',
+    institute: '/institute',
+    government: '/government',
+    industry: '/industry',
+    admin: '/admin',
+};
+
 export default function AuthPage() {
     const router = useRouter();
     const { login, register } = useAuthStore();
@@ -41,10 +50,13 @@ export default function AuthPage() {
         try {
             setLoading(true);
             await login(email, password);
-            setTimeout(() => {
-                setLoading(false);
-                router.push('/student');
-            }, 1000);
+            // login() already wrote the cookie via setTokens(token, role)
+            // Read the role from store state immediately after login resolves
+            const { useAuthStore: store } = await import('@/store/authStore');
+            const role = store.getState().user?.role || 'student';
+            const destination = ROLE_DASHBOARD[role] || '/student';
+            setLoading(false);
+            router.push(destination);
         } catch (err: any) {
             setLoading(false);
             const status = err.response?.status;
@@ -84,11 +96,9 @@ export default function AuthPage() {
         try {
             setLoading(true);
             await register(name, email, password, selectedRole as any);
-            const roleData = ROLES.find(r => r.key === selectedRole);
-            setTimeout(() => {
-                setLoading(false);
-                router.push(roleData?.href || '/student');
-            }, 1000);
+            const destination = ROLE_DASHBOARD[selectedRole] || '/student';
+            setLoading(false);
+            router.push(destination);
         } catch (err: any) {
             setLoading(false);
             setError(err.response?.data?.message || 'Registration failed');

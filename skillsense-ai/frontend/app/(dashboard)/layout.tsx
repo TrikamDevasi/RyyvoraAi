@@ -3,10 +3,10 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import dynamic from 'next/dynamic';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import VerificationBanner from '@/components/shared/VerificationBanner';
+import { useAuthStore } from '@/store/authStore';
 
 const GOLD = '#D4A843';
 const AMBER = '#F59E0B';
@@ -91,47 +91,21 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const pathname = usePathname();
     const router = useRouter();
     const [collapsed, setCollapsed] = useState(false);
-    const [userName, setUserName] = useState('');
-    const [userRole, setUserRole] = useState('');
     const [showDropdown, setShowDropdown] = useState(false);
-    const [userAvatar, setUserAvatar] = useState('');
-    const [isVerified, setIsVerified] = useState(true);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
-    useEffect(() => {
-        try {
-            const stored = localStorage.getItem('ss_user');
-            if (stored) {
-                const parsed = JSON.parse(stored);
-                setUserName(parsed.name || 'User');
-                setUserRole(parsed.role || '');
-                setUserAvatar(parsed.avatar || '');
-            }
-        } catch { }
+    const user = useAuthStore(s => s.user);
+    const logout = useAuthStore(s => s.logout);
+    const checkAuth = useAuthStore(s => s.checkAuth);
 
-        // Listen for avatar updates from profile page
-        const handleAvatarUpdate = () => {
-            try {
-                const stored = localStorage.getItem('ss_user');
-                if (stored) {
-                    const parsed = JSON.parse(stored);
-                    setUserName(parsed.name || 'User');
-                    setUserRole(parsed.role || '');
-                    setUserAvatar(parsed.avatar || '');
-                    setIsVerified(parsed.isVerified || false);
-                }
-            } catch { }
-        };
-        window.addEventListener('avatar-updated', handleAvatarUpdate);
-        window.addEventListener('storage', handleAvatarUpdate);
-        // Also poll periodically for cross-component updates
-        const interval = setInterval(handleAvatarUpdate, 2000);
-        return () => {
-            window.removeEventListener('avatar-updated', handleAvatarUpdate);
-            window.removeEventListener('storage', handleAvatarUpdate);
-            clearInterval(interval);
-        };
-    }, []);
+    const userName = user?.name || 'User';
+    const userRole = user?.role || 'student';
+    const userAvatar = user?.avatar || '';
+    const isVerified = user?.isVerified ?? true;
+
+    useEffect(() => {
+        checkAuth();
+    }, [checkAuth]);
 
     // Auto-collapse for mobile screens
     useEffect(() => {
@@ -157,12 +131,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         document.addEventListener('mousedown', handleClick);
         return () => document.removeEventListener('mousedown', handleClick);
     }, []);
-
-    const handleLogout = () => {
-        document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-        localStorage.clear();
-        router.push('/auth');
-    };
 
     // Filter NAV based on role
     const filteredNav = userRole
@@ -258,161 +226,137 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                                     )}
                                 </button>
 
-                                {!collapsed && isOpen && routes.map(route => {
-                                    const active = pathname === route.href;
-                                    const badge = (route as { badge?: string }).badge;
-                                    return (
-                                        <Link key={route.href} href={route.href} style={{
-                                            display: 'flex', alignItems: 'center',
-                                            padding: '8px 16px 8px 28px', textDecoration: 'none',
-                                            background: active ? 'rgba(245, 158, 11, 0.1)' : 'transparent',
-                                            borderLeft: active ? `3px solid #F59E0B` : '3px solid transparent',
-                                            color: active ? '#fff' : '#94a3b8',
-                                            fontSize: 13, fontWeight: active ? 700 : 500,
-                                            transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)', 
-                                            whiteSpace: 'nowrap',
-                                            gap: 8,
-                                            boxShadow: active ? 'inset 10px 0 20px -10px rgba(245, 158, 11, 0.15)' : 'none'
-                                        }}>
-                                            <motion.span whileHover={{ scale: 1.05, x: 2 }}>
-                                                {route.label}
-                                            </motion.span>
-                                            {badge && (
-                                                <span className="badge" style={{
-                                                    fontSize: 8, fontWeight: 800, padding: '2px 6px', borderRadius: 99,
-                                                    background: 'rgba(245, 158, 11, 0.15)', color: '#F59E0B',
-                                                    border: '1px solid rgba(245, 158, 11, 0.2)',
-                                                    letterSpacing: '0.05em',
-                                                }}>{badge}</span>
-                                            )}
-                                        </Link>
-                                    );
-                                })}
+                                {isOpen && !collapsed && (
+                                    <div style={{ paddingBottom: 4 }}>
+                                        {routes.map(({ label, href, badge }: any) => {
+                                            const active = pathname === href || pathname === `${href}/`;
+                                            return (
+                                                <Link
+                                                    key={href}
+                                                    href={href}
+                                                    style={{
+                                                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                                                        padding: '6px 16px 6px 30px',
+                                                        fontSize: 12.5, textDecoration: 'none',
+                                                        color: active ? '#fff' : '#64748b',
+                                                        fontWeight: active ? 600 : 400,
+                                                        background: active ? 'rgba(212,168,67,0.08)' : 'transparent',
+                                                        borderLeft: active ? `2px solid ${accent}` : '2px solid transparent',
+                                                        transition: 'all 0.15s',
+                                                    }}
+                                                >
+                                                    <span>{label}</span>
+                                                    {badge && (
+                                                        <span style={{
+                                                            fontSize: 9, fontWeight: 700, padding: '1px 5px', borderRadius: 4,
+                                                            background: badge === 'HOT' ? 'rgba(239,68,68,0.2)' : 'rgba(212,168,67,0.2)',
+                                                            color: badge === 'HOT' ? '#ef4444' : accent,
+                                                        }}>
+                                                            {badge}
+                                                        </span>
+                                                    )}
+                                                </Link>
+                                            );
+                                        })}
+                                    </div>
+                                )}
                             </div>
                         );
                     })}
                 </nav>
 
-                {/* Sidebar bottom: Logout */}
-                {!collapsed && (
-                    <button
-                        onClick={handleLogout}
-                        style={{
-                            padding: '10px 16px', background: 'transparent', border: 'none',
-                            borderTop: '1px solid rgba(212,168,67,0.08)', cursor: 'pointer',
-                            color: '#ef4444', fontSize: 12, display: 'flex', alignItems: 'center', gap: 8,
-                            fontFamily: "'Space Grotesk', sans-serif", fontWeight: 600,
-                            transition: 'background 0.15s',
-                        }}
-                        onMouseEnter={e => (e.currentTarget.style.background = 'rgba(239,68,68,0.06)')}
-                        onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-                    >
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2">
-                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                            <polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" />
-                        </svg>
-                        Logout
-                    </button>
-                )}
-
-                {/* Collapse toggle */}
-                <button
-                    onClick={() => setCollapsed(c => !c)}
-                    style={{
-                        padding: '12px', background: 'transparent', border: 'none',
-                        borderTop: '1px solid rgba(212,168,67,0.08)', cursor: 'pointer',
-                        color: '#334155', fontSize: 10, display: 'flex', alignItems: 'center', gap: 8,
-                        justifyContent: collapsed ? 'center' : undefined,
-                        paddingLeft: collapsed ? 0 : 16, transition: 'all 0.15s',
-                    }}
-                >
-                    <span>{collapsed ? '»' : '«'}</span>
-                    {!collapsed && <span className="font-display" style={{ fontWeight: 600, fontSize: 11 }}>Collapse</span>}
-                </button>
-            </aside>
-
-            {/* Main area */}
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-                {/* Sticky header */}
-                <header style={{
-                    position: 'sticky', top: 0, zIndex: 50,
-                    background: 'rgba(8,6,15,0.85)', backdropFilter: 'blur(16px)',
-                    borderBottom: '1px solid rgba(212,168,67,0.08)',
-                    padding: '0 28px', height: 52,
+                {/* Bottom user profile & collapse toggle */}
+                <div style={{
+                    padding: '12px 16px',
+                    borderTop: '1px solid rgba(212,168,67,0.08)',
                     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                 }}>
-                    <p style={{ color: '#94a3b8', fontSize: 12, fontWeight: 600 }}>
-                        {crumb || 'Dashboard'}
-                    </p>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                        {userName && <span style={{ fontSize: 12, color: '#94a3b8', fontWeight: 500 }}>{userName}</span>}
-                        <span style={{ fontSize: 12, color: '#475569' }}>
-                            {new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
-                        </span>
+                    {!collapsed && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <div style={{
+                                width: 28, height: 28, borderRadius: '50%',
+                                background: 'rgba(245,158,11,0.2)', color: '#F59E0B',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                fontSize: 11, fontWeight: 700,
+                            }}>
+                                {initials}
+                            </div>
+                            <div style={{ overflow: 'hidden' }}>
+                                <div style={{ fontSize: 12, fontWeight: 600, color: '#fff', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                    {userName}
+                                </div>
+                                <div style={{ fontSize: 10, color: '#64748b', textTransform: 'capitalize' }}>
+                                    {userRole}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                    <button
+                        onClick={() => setCollapsed(!collapsed)}
+                        style={{
+                            background: 'transparent', border: 'none', color: '#64748b',
+                            cursor: 'pointer', padding: 4, fontSize: 12,
+                        }}
+                    >
+                        {collapsed ? '→' : '←'}
+                    </button>
+                </div>
+            </aside>
 
-                        {/* Avatar with dropdown */}
+            {/* Main content */}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, background: '#08060f' }}>
+                {/* Topbar */}
+                <header style={{
+                    height: 56, flexShrink: 0,
+                    borderBottom: '1px solid rgba(212,168,67,0.08)',
+                    background: 'rgba(8,6,15,0.7)', backdropFilter: 'blur(12px)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    padding: '0 24px', position: 'sticky', top: 0, zIndex: 40,
+                }}>
+                    <div style={{ fontSize: 13, color: '#64748b', fontWeight: 500 }}>
+                        {crumb}
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
                         <div ref={dropdownRef} style={{ position: 'relative' }}>
-                            <div
-                                onClick={() => setShowDropdown(p => !p)}
+                            <button
+                                onClick={() => setShowDropdown(!showDropdown)}
                                 style={{
-                                    width: 30, height: 30, borderRadius: '50%',
-                                    background: userAvatar ? 'transparent' : 'linear-gradient(135deg, #D4A843, #F0C05A)',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    fontSize: 11, fontWeight: 800, color: '#08060f', cursor: 'pointer',
-                                    transition: 'box-shadow 0.2s',
-                                    boxShadow: showDropdown ? '0 0 0 2px #D4A843' : 'none',
-                                    overflow: 'hidden',
-                                    border: userAvatar ? '2px solid #D4A843' : 'none',
+                                    display: 'flex', alignItems: 'center', gap: 8,
+                                    background: 'transparent', border: 'none', cursor: 'pointer',
+                                    padding: '4px 8px', borderRadius: 8,
                                 }}
                             >
-                                {userAvatar ? (
-                                    <Image src={userAvatar} alt="Avatar" width={30} height={30} style={{ objectFit: 'cover' }} />
-                                ) : (
-                                    initials
-                                )}
-                            </div>
+                                <div style={{
+                                    width: 32, height: 32, borderRadius: '50%',
+                                    background: 'linear-gradient(135deg, #F59E0B, #FBBF24)',
+                                    color: '#08060f', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    fontSize: 12, fontWeight: 800,
+                                }}>
+                                    {initials}
+                                </div>
+                            </button>
 
                             {showDropdown && (
                                 <div style={{
-                                    position: 'absolute', top: '100%', right: 0, marginTop: 8,
-                                    background: '#111', border: '1px solid rgba(212,168,67,0.12)',
-                                    borderRadius: 12, padding: '6px', minWidth: 180,
-                                    boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
-                                    animation: 'fadeIn 0.15s ease',
+                                    position: 'absolute', right: 0, top: '100%', marginTop: 8,
+                                    width: 180, background: '#0f0d1c', border: '1px solid rgba(212,168,67,0.2)',
+                                    borderRadius: 10, padding: '6px 0', boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
+                                    zIndex: 50,
                                 }}>
-                                    <div style={{ padding: '8px 12px', borderBottom: '1px solid rgba(212,168,67,0.08)', marginBottom: 4 }}>
-                                        <div style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>{userName}</div>
-                                        <div style={{ fontSize: 11, color: '#475569', textTransform: 'capitalize' }}>{userRole || 'Student'}</div>
+                                    <div style={{ padding: '8px 16px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                                        <div style={{ fontSize: 12, fontWeight: 700, color: '#fff' }}>{userName}</div>
+                                        <div style={{ fontSize: 11, color: '#64748b' }}>{user?.email}</div>
                                     </div>
-                                    <Link href="/student/profile" onClick={() => setShowDropdown(false)} style={{
-                                        display: 'flex', alignItems: 'center', gap: 8,
-                                        padding: '8px 12px', textDecoration: 'none',
-                                        color: '#94a3b8', fontSize: 13, borderRadius: 8,
-                                        transition: 'background 0.15s',
-                                    }}
-                                        onMouseEnter={e => (e.currentTarget.style.background = 'rgba(212,168,67,0.06)')}
-                                        onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                                    <button
+                                        onClick={() => logout()}
+                                        style={{
+                                            width: '100%', textAlign: 'left', padding: '8px 16px',
+                                            background: 'transparent', border: 'none', color: '#ef4444',
+                                            fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                                        }}
                                     >
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2">
-                                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
-                                        </svg>
-                                        View Profile
-                                    </Link>
-                                    <button onClick={() => { setShowDropdown(false); handleLogout(); }} style={{
-                                        width: '100%', display: 'flex', alignItems: 'center', gap: 8,
-                                        padding: '8px 12px', background: 'transparent', border: 'none',
-                                        color: '#ef4444', fontSize: 13, cursor: 'pointer', borderRadius: 8,
-                                        fontFamily: "'Space Grotesk', sans-serif",
-                                        transition: 'background 0.15s',
-                                    }}
-                                        onMouseEnter={e => (e.currentTarget.style.background = 'rgba(239,68,68,0.06)')}
-                                        onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-                                    >
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2">
-                                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                                            <polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" />
-                                        </svg>
-                                        Logout
+                                        Sign Out
                                     </button>
                                 </div>
                             )}
@@ -420,27 +364,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     </div>
                 </header>
 
-                {/* Page content */}
-                <main style={{ flex: 1, overflowY: 'auto', position: 'relative' }}>
-                    <VerificationBanner />
-                    <div style={{ padding: '28px' }}>
-                        <AnimatePresence mode="wait">
-                            <motion.div
-                                key={pathname}
-                                initial={{ opacity: 0, y: 15 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -15 }}
-                                transition={{ duration: 0.3, ease: 'easeOut' }}
-                                style={{ minHeight: '100%' }}
-                            >
-                                {children}
-                            </motion.div>
-                        </AnimatePresence>
-                    </div>
+                {!isVerified && <VerificationBanner />}
+
+                {/* Page body */}
+                <main style={{ flex: 1, padding: '24px', overflowY: 'auto' }}>
+                    {children}
                 </main>
             </div>
-
-            <style>{`@keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }`}</style>
         </div>
     );
 }

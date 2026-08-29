@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import Institution from '../models/Institution.model';
-import Student from '../models/Student.model';
+import Student, { IStudent } from '../models/Student.model';
 import { parseCSV } from '../services/upload.service';
 import { anonymiseExport } from '../utils/anonymise.utils';
 import { parsePagination, buildPaginatedResponse, buildApiResponse } from '../utils/pagination.utils';
@@ -13,7 +13,7 @@ export const getInstituteDashboard = async (req: Request, res: Response, next: N
       return;
     }
 
-    const students = await Student.find({ institutionId: req.params.id });
+    const students = await Student.find({ institutionId: institution._id });
     const placed = students.filter((s) => s.placementStatus === 'placed');
 
     const avgScore =
@@ -24,7 +24,7 @@ export const getInstituteDashboard = async (req: Request, res: Response, next: N
     // Program distribution
     const programMap: Record<string, number> = {};
     students.forEach((s) => {
-      programMap[s.program] = (programMap[s.program] || 0) + 1;
+      if (s.program) programMap[s.program] = (programMap[s.program] || 0) + 1;
     });
     const topPrograms = Object.entries(programMap)
       .sort((a, b) => b[1] - a[1])
@@ -50,11 +50,11 @@ export const getInstituteStudents = async (req: Request, res: Response, next: Ne
     const isAdmin = req.user?.role === 'admin';
 
     const [students, total] = await Promise.all([
-      Student.find({ institutionId: req.params.id }).skip(skip).limit(limit),
+      Student.find({ institutionId: req.params.id }).skip(skip).limit(limit).populate('userId', 'name email avatar'),
       Student.countDocuments({ institutionId: req.params.id }),
     ]);
 
-    const data = isAdmin ? students : anonymiseExport(students as any);
+    const data = isAdmin ? students : anonymiseExport(students as unknown as IStudent[]);
     res.status(200).json(buildPaginatedResponse(data, total, page, limit));
   } catch (err) { next(err); }
 };
@@ -62,20 +62,20 @@ export const getInstituteStudents = async (req: Request, res: Response, next: Ne
 export const getPlacementTrend = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const trend = await Student.aggregate([
-      { $match: { institutionId: req.params.id, placementStatus: 'placed', placedAt: { $exists: true } } },
+      { $match: { institutionId: req.params.id, placementStatus: 'placed' } },
       {
         $group: {
-          _id: { year: { $year: '$placedAt' }, month: { $month: '$placedAt' } },
+          _id: { $dateToString: { format: '%Y-%m', date: { $ifNull: ['$placedAt', '$updatedAt', new Date()] } } },
           count: { $sum: 1 },
           avgSalary: { $avg: '$salary' },
         },
       },
-      { $sort: { '_id.year': 1, '_id.month': 1 } },
+      { $sort: { '_id': 1 } },
       { $limit: 12 },
     ]);
 
     const formatted = trend.map((t) => ({
-      month: `${t._id.year}-${String(t._id.month).padStart(2, '0')}`,
+      month: t._id,
       placed: t.count,
       avgSalary: Math.round(t.avgSalary || 0),
     }));
@@ -86,12 +86,12 @@ export const getPlacementTrend = async (req: Request, res: Response, next: NextF
 
 export const getInstituteROI = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const institution = await Institution.findById(req.params.id).select('programRoiScores');
+    const institution = await Institution.findById(req.params.id).select('programRoiScores name');
     if (!institution) {
       res.status(404).json(buildApiResponse(null, 'Institution not found', false));
       return;
     }
-    res.status(200).json(buildApiResponse(institution.programRoiScores, 'ROI scores retrieved'));
+    res.status(200).json(buildApiResponse(institution.programRoiScores ?? [], 'ROI scores retrieved'));
   } catch (err) { next(err); }
 };
 

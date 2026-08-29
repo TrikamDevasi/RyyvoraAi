@@ -1,6 +1,6 @@
 // backend/src/routes/ai.routes.ts
 import { Router } from 'express';
-import { protect } from '../middleware/auth.middleware';
+import { protect, optionalProtect } from '../middleware/auth.middleware';
 import {
   chat,
   assessSkill,
@@ -13,14 +13,13 @@ import {
 
 const router = Router();
 
-// Public routes (No auth required for viewing a shared result)
+// Public / Guest accessible routes
 router.get('/assessment/:id', getAssessment);
+router.post('/chat', optionalProtect, chat);
 
 // Protected routes
 router.use(protect);
 
-// Chat
-router.post('/chat', chat);
 router.get('/history', getChatHistory);
 
 // Skill Assessment

@@ -91,12 +91,13 @@ export default function AIChatWidget() {
 
         try {
             const token = localStorage.getItem('skillsense_token');
+            const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+            if (token && token !== 'null' && token !== 'undefined') {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1'}/ai/chat`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
+                headers,
                 body: JSON.stringify({
                     message: text.trim(),
                     history,
@@ -106,40 +107,55 @@ export default function AIChatWidget() {
 
             if (!response.ok) throw new Error('Network response was not ok');
             
-            const reader = response.body?.getReader();
-            const decoder = new TextDecoder();
-            let accumulatedContent = '';
+            const contentType = response.headers.get('content-type') || '';
+            if (contentType.includes('application/json')) {
+                const json = await response.json();
+                const reply = json.data?.reply || json.message || "I'm having trouble connecting right now. Please try again in a moment! 🙏";
+                const suggestions = json.data?.suggestions || ['What is JavaScript?', 'How to get a job in IT?'];
+                setMessages(prev => prev.map(m => 
+                    m.id === aiMsgId ? { ...m, content: reply, suggestions } : m
+                ));
+            } else {
+                const reader = response.body?.getReader();
+                const decoder = new TextDecoder();
+                let accumulatedContent = '';
 
-            if (reader) {
-                while (true) {
-                    const { done, value } = await reader.read();
-                    if (done) break;
+                if (reader) {
+                    while (true) {
+                        const { done, value } = await reader.read();
+                        if (done) break;
 
-                    const chunk = decoder.decode(value);
-                    const lines = chunk.split('\n');
-                    
-                    for (const line of lines) {
-                        if (line.startsWith('data: ')) {
-                            try {
-                                const data = JSON.parse(line.slice(6));
-                                if (data.chunk) {
-                                    accumulatedContent += data.chunk;
-                                    setMessages(prev => prev.map(m => 
-                                        m.id === aiMsgId ? { ...m, content: accumulatedContent } : m
-                                    ));
+                        const chunk = decoder.decode(value);
+                        const lines = chunk.split('\n');
+                        
+                        for (const line of lines) {
+                            if (line.startsWith('data: ')) {
+                                try {
+                                    const data = JSON.parse(line.slice(6));
+                                    if (data.chunk) {
+                                        accumulatedContent += data.chunk;
+                                        setMessages(prev => prev.map(m => 
+                                            m.id === aiMsgId ? { ...m, content: accumulatedContent } : m
+                                        ));
+                                    }
+                                    if (data.done) {
+                                        setMessages(prev => prev.map(m => 
+                                            m.id === aiMsgId ? { ...m, suggestions: data.suggestions } : m
+                                        ));
+                                    }
+                                    if (data.error) {
+                                        throw new Error(data.error);
+                                    }
+                                } catch (e) {
+                                    // Ignore parse errors for partial chunks
                                 }
-                                if (data.done) {
-                                    setMessages(prev => prev.map(m => 
-                                        m.id === aiMsgId ? { ...m, suggestions: data.suggestions } : m
-                                    ));
-                                }
-                                if (data.error) {
-                                    throw new Error(data.error);
-                                }
-                            } catch (e) {
-                                // Ignore parse errors for partial chunks
                             }
                         }
+                    }
+                    if (!accumulatedContent) {
+                        setMessages(prev => prev.map(m => 
+                            m.id === aiMsgId ? { ...m, content: "I'm having trouble connecting right now. Please try again in a moment! 🙏", suggestions: ['What is JavaScript?', 'How to get a job in IT?'] } : m
+                        ));
                     }
                 }
             }

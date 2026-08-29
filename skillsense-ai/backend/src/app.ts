@@ -1,15 +1,16 @@
-import dotenv from 'dotenv';
-dotenv.config();
 import express from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
 import morgan from 'morgan';
+import session from 'express-session';
+import mongoose from 'mongoose';
 
+import env from './config/env';
 import { generalLimiter } from './middleware/rateLimit.middleware';
 import errorHandler from './middleware/errorHandler.middleware';
 import logger from './utils/logger';
 import passportConfig from './config/passport';
-import session from 'express-session';
+import redisClient from './config/redis';
 
 import authRouter from './routes/auth.routes';
 import studentRouter from './routes/student.routes';
@@ -23,44 +24,60 @@ import contactRouter from './routes/contact.routes';
 
 const app = express();
 
+// ── Simple Cookie Parser Middleware ─────────────────────────────────────────
+app.use((req, _res, next) => {
+  const cookieHeader = req.headers.cookie;
+  (req as unknown as { cookies: Record<string, string> }).cookies = {};
+  if (cookieHeader) {
+    cookieHeader.split(';').forEach((cookie) => {
+      const parts = cookie.split('=');
+      const name = parts[0]?.trim();
+      const val = parts.slice(1).join('=').trim();
+      if (name) (req as unknown as { cookies: Record<string, string> }).cookies[name] = decodeURIComponent(val);
+    });
+  }
+  next();
+});
+
 // ── Security & CORS ────────────────────────────────────────────────────────
 app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" },
-  crossOriginOpenerPolicy: { policy: "unsafe-none" } // Helps with OAuth popup redirects if needed
+  crossOriginOpenerPolicy: { policy: "unsafe-none" }
 }));
 
+// Strict allowlist: No wildcard regex patterns
 const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:3001',
+  'http://localhost:5173',
   'http://127.0.0.1:3000',
   'http://127.0.0.1:3001',
-  'http://[::1]:3000',
-  'https://skillsense-ai-seven.vercel.app',
-  ...(process.env.CORS_ORIGIN?.split(',') || []),
-].filter(Boolean) as string[];
+  'http://127.0.0.1:5173',
+  'https://skillsense-ai.vercel.app',
+  'https://skillsense.vercel.app',
+  ...env.CORS_ORIGIN.split(',').map(o => o.trim()),
+].filter(Boolean);
 
 app.use(cors({
   origin: (origin, callback) => {
-    // 1. Allow if no origin (server-to-server, Postman)
+    // Allow non-browser requests without origin header (e.g. server-to-server, mobile app)
     if (!origin) return callback(null, true);
     
-    // 2. Allow if in explicit list
-    if (allowedOrigins.includes(origin)) return callback(null, true);
+    // Strict exact allowlist match
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
     
-    // 3. Allow all Vercel preview deployments
-    if (origin.endsWith('.vercel.app')) return callback(null, true);
-    
-    logger.warn(`[CORS] Rejected origin: ${origin}`);
-    return callback(new Error(`CORS blocked: ${origin}`));
+    logger.warn(`[CORS] Rejected untrusted origin: ${origin}`);
+    return callback(new Error(`CORS blocked: Origin '${origin}' is not authorized.`));
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  exposedHeaders: ['Authorization'],
+  exposedHeaders: ['Authorization', 'Set-Cookie'],
   preflightContinue: false,
   optionsSuccessStatus: 204,
 }));
-
 
 // ── Body Parsing ───────────────────────────────────────────────────────────
 app.use(express.json({ limit: '10mb' }));
@@ -68,13 +85,13 @@ app.use(express.urlencoded({ extended: true }));
 
 // ── Session & Passport (for OAuth) ────────────────────────────────────────
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'skillsense_session_secret',
+  secret: env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: process.env.NODE_ENV === 'production', httpOnly: true, maxAge: 24 * 60 * 60 * 1000 },
+  cookie: { secure: env.NODE_ENV === 'production', httpOnly: true, maxAge: 24 * 60 * 60 * 1000 },
 }));
 app.use(passportConfig.initialize());
-// Note: passportConfig.session() is intentionally omitted — we use JWT, not session auth
+
 app.use(
   morgan('combined', {
     stream: {
@@ -88,12 +105,29 @@ app.use(generalLimiter);
 
 // ── Root Route ──────────────────────────────────────────────────────────────
 app.get('/', (_req, res) => {
-  res.status(200).json({ success: true, message: 'SkillSense Backend API is running locally.' });
+  res.status(200).json({ success: true, message: 'SkillSense Backend API is running.' });
 });
 
 // ── Health Check ───────────────────────────────────────────────────────────
 app.get('/health', (_req, res) => {
-  res.status(200).json({ success: true, data: { status: 'ok', uptime: process.uptime() }, message: 'Server is healthy' });
+  const dbState = mongoose.connection.readyState;
+  const dbStatus = dbState === 1 ? 'connected' : dbState === 2 ? 'connecting' : 'disconnected';
+  const redisStatus = redisClient.status === 'ready' || redisClient.status === 'connect' ? 'connected' : 'disconnected';
+  const isHealthy = dbState === 1;
+
+  res.status(isHealthy ? 200 : 503).json({
+    success: isHealthy,
+    data: {
+      status: isHealthy ? 'ok' : 'degraded',
+      uptime: process.uptime(),
+      timestamp: new Date().toISOString(),
+      services: {
+        database: { status: dbStatus, healthy: dbStatus === 'connected' },
+        redis: { status: redisStatus, healthy: redisStatus === 'connected' },
+      },
+    },
+    message: isHealthy ? 'All services operational' : 'Database service is unavailable',
+  });
 });
 
 app.get('/api/v1/ai-health', async (_req, res) => {

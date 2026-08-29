@@ -4,6 +4,7 @@ import { Error as MongooseError } from 'mongoose';
 import { MongoServerError } from 'mongodb';
 import { ZodError } from 'zod';
 import logger from '../utils/logger';
+import env from '../config/env';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const errorHandler: ErrorRequestHandler = (err: unknown, _req: Request, res: Response, _next: NextFunction) => {
@@ -25,7 +26,7 @@ const errorHandler: ErrorRequestHandler = (err: unknown, _req: Request, res: Res
     res.status(401).json({
       success: false,
       data: null,
-      message: 'Invalid or expired token.',
+      message: 'Invalid or expired authentication token.',
     });
     return;
   }
@@ -40,7 +41,7 @@ const errorHandler: ErrorRequestHandler = (err: unknown, _req: Request, res: Res
       success: false,
       data: null,
       message: 'Validation failed',
-      error: JSON.stringify(errors),
+      errors,
     });
     return;
   }
@@ -52,13 +53,17 @@ const errorHandler: ErrorRequestHandler = (err: unknown, _req: Request, res: Res
       success: false,
       data: null,
       message: 'Request validation failed',
-      error: JSON.stringify(errors),
+      errors,
     });
     return;
   }
 
-  // Default 500
-  const message = err instanceof Error ? err.message : 'Internal server error';
+  // Default 500: conceal internal details in production
+  const isProd = env.NODE_ENV === 'production';
+  const message = isProd
+    ? 'An unexpected internal error occurred. Please try again later.'
+    : (err instanceof Error ? err.message : 'Internal server error');
+
   res.status(500).json({
     success: false,
     data: null,

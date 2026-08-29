@@ -5,10 +5,11 @@ import { create } from 'zustand';
 import api from '@/lib/api';
 import { setTokens, removeTokens } from '@/lib/auth';
 
-export type UserRole = 'student' | 'institute' | 'industry' | 'government' | 'admin';
+export type UserRole = 'student' | 'employer' | 'institute' | 'industry' | 'government' | 'admin';
 
 export interface AuthUser {
-  _id: string;
+  _id?: string;
+  id?: string;
   name: string;
   email: string;
   role: UserRole;
@@ -16,8 +17,8 @@ export interface AuthUser {
   avatar?: string;
   authProvider?: 'local' | 'google' | 'github';
   isVerified: boolean;
-  isActive: boolean;
-  createdAt: string;
+  isActive?: boolean;
+  createdAt?: string;
 }
 
 interface AuthState {
@@ -31,37 +32,46 @@ interface AuthState {
   register: (name: string, email: string, password: string, role: UserRole) => Promise<void>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
+  updateUser: (partialUser: Partial<AuthUser>) => void;
   resendVerification: (email: string) => Promise<void>;
   clearError: () => void;
   setToken: (token: string) => void;
   setAuth: (user: AuthUser, token: string) => void;
 }
 
+function persistUser(user: AuthUser) {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem('ss_user', JSON.stringify(user));
+}
+
+function getStoredUser(): AuthUser | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = localStorage.getItem('ss_user');
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
 export const useAuthStore = create<AuthState>((set, get) => ({
-  user: null,
+  user: getStoredUser(),
   accessToken:
     typeof window !== 'undefined' ? localStorage.getItem('skillsense_token') : null,
-  isAuthenticated: false,
+  isAuthenticated:
+    typeof window !== 'undefined' ? !!localStorage.getItem('skillsense_token') : false,
   loading: false,
   error: null,
 
-  // ── Login ─────────────────────────────────────────────────────────────────
   login: async (email: string, password: string) => {
     set({ loading: true, error: null });
     try {
       const response = await api.post('/auth/login', { email, password });
       const { user, token } = response.data.data;
-      
-      setTokens(token);
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('skillsense_token', token);
-        localStorage.setItem('ss_user', JSON.stringify({ 
-          name: user.name, 
-          role: user.role, 
-          email: user.email,
-          isVerified: user.isVerified 
-        }));
-      }
+
+      setTokens(token, user.role);
+      persistUser(user);
+
       set({ user, accessToken: token, loading: false, isAuthenticated: true });
     } catch (err: any) {
       const message = err.response?.data?.message || 'Login failed.';
@@ -70,23 +80,15 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 
-  // ── Register ──────────────────────────────────────────────────────────────
   register: async (name: string, email: string, password: string, role: UserRole) => {
     set({ loading: true, error: null });
     try {
       const response = await api.post('/auth/register', { name, email, password, role });
       const { user, token } = response.data.data;
 
-      setTokens(token);
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('skillsense_token', token);
-        localStorage.setItem('ss_user', JSON.stringify({ 
-          name: user.name, 
-          role: user.role, 
-          email: user.email,
-          isVerified: user.isVerified 
-        }));
-      }
+      setTokens(token, user.role);
+      persistUser(user);
+
       set({ user, accessToken: token, loading: false, isAuthenticated: true });
     } catch (err: any) {
       const message = err.response?.data?.message || 'Registration failed.';
@@ -95,52 +97,51 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 
-  // ── Logout ────────────────────────────────────────────────────────────────
   logout: async () => {
     try {
       await api.post('/auth/logout');
     } catch {
-      // Ignore
+      // Ignore network errors on logout
     } finally {
       removeTokens();
+      set({ user: null, accessToken: null, isAuthenticated: false, loading: false });
       if (typeof window !== 'undefined') {
-        localStorage.removeItem('skillsense_token');
-        localStorage.removeItem('token');
-        localStorage.removeItem('ss_user');
         window.location.href = '/auth';
       }
-      set({ user: null, accessToken: null });
     }
   },
 
-  // ── Check Auth (rehydrate on page load) ───────────────────────────────────
   checkAuth: async () => {
     const token = typeof window !== 'undefined'
       ? localStorage.getItem('skillsense_token')
       : null;
-    
-    if (!token) return;
+
+    if (!token || get().loading) return;
 
     set({ loading: true });
     try {
-      const response = await api.get('/auth/me', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await api.get('/auth/me');
       const { user } = response.data.data;
-      
-      setTokens(token);
-      set({ user, accessToken: token, loading: false });
+
+      setTokens(token, user.role);
+      persistUser(user);
+
+      set({ user, accessToken: token, loading: false, isAuthenticated: true });
     } catch {
       removeTokens();
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('skillsense_token');
-        localStorage.removeItem('ss_user');
-      }
-      set({ user: null, accessToken: null, loading: false });
+      set({ user: null, accessToken: null, loading: false, isAuthenticated: false });
     }
   },
 
-  // ── Resend Verification ──────────────────────────────────────────────────
+  updateUser: (partialUser: Partial<AuthUser>) => {
+    const currentUser = get().user;
+    if (currentUser) {
+      const updated = { ...currentUser, ...partialUser };
+      persistUser(updated);
+      set({ user: updated });
+    }
+  },
+
   resendVerification: async (email: string) => {
     set({ loading: true, error: null });
     try {
@@ -153,10 +154,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 
-  // ── Helpers ───────────────────────────────────────────────────────────────
   clearError: () => set({ error: null }),
 
-  // ── setToken (used by OAuth callback) ─────────────────────────────────────
   setToken: (token: string) => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('skillsense_token', token);
@@ -164,18 +163,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ accessToken: token });
   },
 
-  // ── setAuth (Standard way to hydrate) ───────────────────────────────────
   setAuth: (user: AuthUser, token: string) => {
-    setTokens(token);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('skillsense_token', token);
-      localStorage.setItem('ss_user', JSON.stringify({ 
-        name: user.name, 
-        role: user.role, 
-        email: user.email,
-        isVerified: user.isVerified 
-      }));
-    }
-    set({ user, accessToken: token, isAuthenticated: true });
+    setTokens(token, user.role);
+    persistUser(user);
+    set({ user, accessToken: token, isAuthenticated: true, loading: false });
   },
 }));

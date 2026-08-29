@@ -132,8 +132,15 @@ export default function AdminPage() {
     useEffect(() => {
         if (activeTab === 'inquiries') {
             api.get('/contact/industry')
-                .then(r => { if (r.data?.data?.inquiries?.length) setInquiries(r.data.data.inquiries); })
-                .catch(() => { /* use demo data */ });
+                .then(r => {
+                    const data = r.data?.data;
+                    if (Array.isArray(data) && data.length > 0) {
+                        setInquiries(data);
+                    } else if (data?.inquiries?.length) {
+                        setInquiries(data.inquiries);
+                    }
+                })
+                .catch(() => { /* fallback to sample data if empty */ });
         }
     }, [activeTab]);
 
@@ -141,8 +148,8 @@ export default function AdminPage() {
         setInquiries(prev => prev.map(inq => {
             if (inq._id === id) {
                 const newStatus = statusCycle[inq.status];
-                // Try API update
-                api.patch(`/contact/industry/${id}`, { status: newStatus }).catch(() => { /* update only locally */ });
+                // Update via API
+                api.patch(`/contact/industry/${id}`, { status: newStatus }).catch(() => { /* update locally */ });
                 return { ...inq, status: newStatus };
             }
             return inq;

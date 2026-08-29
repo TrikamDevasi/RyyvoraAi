@@ -5,7 +5,7 @@ const MAX_RETRIES = 3;
 const RETRY_DELAY_MS = 5000;
 
 const connectDB = async () => {
-  const uri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/skillsense';
+  const uri = process.env.MONGODB_URI || process.env.MONGO_URI_ATLAS || 'mongodb://127.0.0.1:27017/skillsense';
   const maxRetries = 3;
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
@@ -19,8 +19,8 @@ const connectDB = async () => {
     } catch (err: any) {
       logger.error(`MongoDB connection attempt ${attempt} failed: ${err.message}`);
       if (attempt < maxRetries) {
-        logger.info(`Retrying in 5s...`);
-        await new Promise(res => setTimeout(res, 5000));
+        logger.info(`Retrying in 3s...`);
+        await new Promise(res => setTimeout(res, 3000));
       } else {
         // If Atlas fails, try local as last resort
         if (!uri.includes('127.0.0.1')) {
@@ -33,8 +33,7 @@ const connectDB = async () => {
             logger.error('Local MongoDB also failed: ' + localErr.message);
           }
         }
-        logger.error('MongoDB connection failed after max retries. Exiting.');
-        process.exit(1);
+        logger.warn('MongoDB connection unavailable. Server will continue running and reconnect when available.');
       }
     }
   }

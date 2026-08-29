@@ -1,7 +1,8 @@
 // frontend/lib/api.ts
-// Central axios instance — all frontend API calls go through here.
+// Central Axios API instance with automatic JWT Authorization headers and 401 handling.
 
 import axios from 'axios';
+import { removeTokens } from './auth';
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '') 
@@ -10,7 +11,7 @@ const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
-// ── Request Interceptor: attach JWT from localStorage ─────────────────────────
+// Attach Authorization token to outgoing requests
 api.interceptors.request.use((config) => {
   if (typeof window !== 'undefined') {
     const token = localStorage.getItem('skillsense_token');
@@ -21,17 +22,24 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// ── Response Interceptor: handle 401 globally ─────────────────────────────────
+// Handle 401 Unauthorized globally
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (
-      typeof window !== 'undefined' &&
-      error.response?.status === 401 &&
-      !window.location.pathname.startsWith('/auth')
-    ) {
-      localStorage.removeItem('skillsense_token');
-      window.location.href = '/auth';
+    if (typeof window !== 'undefined' && error.response?.status === 401) {
+      removeTokens();
+
+      const isProtectedRoute =
+        window.location.pathname.startsWith('/student') ||
+        window.location.pathname.startsWith('/admin') ||
+        window.location.pathname.startsWith('/employer') ||
+        window.location.pathname.startsWith('/institute') ||
+        window.location.pathname.startsWith('/industry') ||
+        window.location.pathname.startsWith('/government');
+
+      if (isProtectedRoute && !window.location.pathname.startsWith('/auth')) {
+        window.location.href = `/auth?redirect=${encodeURIComponent(window.location.pathname)}`;
+      }
     }
     return Promise.reject(error);
   }

@@ -72,14 +72,7 @@ export default function AuthCallbackPage() {
     }
 
     try {
-      // 1. Store JWT in localStorage + cookie
-      if (token) {
-        setToken(token);
-        setTokens(token);
-        console.log('[OAuth Callback] Token stored ✓');
-      }
-
-      // 2. Decode or fetch user
+      // 1. Decode or fetch user first (needed for role to set cookie correctly)
       let user: OAuthUser | null = null;
       if (userB64) {
         const json = atob(userB64);
@@ -87,9 +80,8 @@ export default function AuthCallbackPage() {
         console.log('[OAuth Callback] User decoded — name:', user.name, '| role:', user.role);
       }
 
-      // 3. Hydrate authStore
+      // 2. Store JWT + role in both localStorage AND cookie via setAuth
       if (user && token) {
-        // Map backend IUser to frontend AuthUser
         const authUser = {
           _id: user.id,
           name: user.name,
@@ -102,9 +94,11 @@ export default function AuthCallbackPage() {
           authProvider: user.authProvider as any,
         };
         useAuthStore.getState().setAuth(authUser, token);
-      } else {
-        // If only token provided, let useAuth hook/checkAuth fetch the user
-        // But for redirect we need role, so we try to decode JWT if no userB64
+        console.log('[OAuth Callback] Token + cookie stored ✓');
+      } else if (token) {
+        // No user payload — store token only and let checkAuth fetch user
+        setTokens(token);
+        console.log('[OAuth Callback] Token stored (no user payload) ✓');
       }
 
       // 4. Check if account is suspended

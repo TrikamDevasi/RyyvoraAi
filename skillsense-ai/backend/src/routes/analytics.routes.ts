@@ -4,8 +4,7 @@ import {
   getNationalHeatmapCtrl, getPredictions, getFairness, getFundTargeting,
   getStudentSkillGaps, getStudentCareerPaths, getDashboard, getIndustryDemandByDomain,
 } from '../controllers/analytics.controller';
-import { protect } from '../middleware/auth.middleware';
-import { requireRole } from '../middleware/role.middleware';
+import { protect, requireStudentOwnership, requireRole } from '../middleware/auth.middleware';
 import { aiLimiter } from '../middleware/rateLimit.middleware';
 
 const router = Router();
@@ -22,8 +21,9 @@ router.get('/heatmap', protect, getNationalHeatmapCtrl);  // alias
 router.get('/predictions', protect, getPredictions);
 router.get('/fairness', protect, requireRole('admin', 'government'), getFairness);
 router.get('/fund-targeting', protect, requireRole('government', 'admin'), getFundTargeting);
-// Per-student AI analytics
-router.get('/skill-gaps/:studentId', protect, aiLimiter, getStudentSkillGaps);
-router.get('/career-paths/:studentId', protect, aiLimiter, getStudentCareerPaths);
+
+// Per-student AI analytics — strictly protected against IDOR
+router.get('/skill-gaps/:studentId', protect, aiLimiter, requireStudentOwnership, getStudentSkillGaps);
+router.get('/career-paths/:studentId', protect, aiLimiter, requireStudentOwnership, getStudentCareerPaths);
 
 export default router;
