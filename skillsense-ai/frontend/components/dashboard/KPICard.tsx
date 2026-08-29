@@ -8,8 +8,8 @@ interface KPICardProps extends KPIData {
     compact?: boolean;
 }
 
-const GOLD = '#D4A843';
-const MUTED = '#A0A0A0';
+const GOLD = '#F59E0B';
+const MUTED = '#94A3B8';
 const WHITE = '#FFFFFF';
 
 const TREND_COLORS = {
