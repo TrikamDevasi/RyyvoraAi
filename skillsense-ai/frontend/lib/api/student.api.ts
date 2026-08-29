@@ -13,6 +13,7 @@ export interface StudentProfile {
   program: string;
   nsqfLevel: number;
   state: string;
+  phone?: string;
   gender: string;
   placementStatus: 'studying' | 'placed' | 'seeking' | 'higher_education';
   overallScore: number;

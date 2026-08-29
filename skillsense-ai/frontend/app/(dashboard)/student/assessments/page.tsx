@@ -1,184 +1,109 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { FileCheck, RotateCcw, Lock, Play } from 'lucide-react';
+import { FileCheck, Play } from 'lucide-react';
+import { studentApi, StudentProfile } from '@/lib/api/student.api';
+import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const GOLD = '#D4A843';
-const MUTED = '#A0A0A0';
 const WHITE = '#FFFFFF';
-
-interface MockAssessment {
-    id: string;
-    title: string;
-    skill: string;
-    durationMin: number;
-    questions: number;
-    status: 'completed' | 'available' | 'locked';
-    score?: number;
-    completedDate?: string;
-    difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
-}
-
-const assessments: MockAssessment[] = [
-    { id: 'A1', title: 'React.js Fundamentals', skill: 'React.js', durationMin: 30, questions: 25, status: 'completed', score: 82, completedDate: '2026-02-15', difficulty: 'Intermediate' },
-    { id: 'A2', title: 'Node.js API Development', skill: 'Node.js', durationMin: 25, questions: 20, status: 'completed', score: 74, completedDate: '2026-02-22', difficulty: 'Intermediate' },
-    { id: 'A3', title: 'TypeScript Advanced Patterns', skill: 'TypeScript', durationMin: 45, questions: 35, status: 'available', difficulty: 'Advanced' },
-    { id: 'A4', title: 'MongoDB Certification', skill: 'MongoDB', durationMin: 20, questions: 15, status: 'completed', score: 88, completedDate: '2026-03-01', difficulty: 'Beginner' },
-    { id: 'A5', title: 'Docker & Kubernetes Essentials', skill: 'Docker/K8s', durationMin: 35, questions: 28, status: 'available', difficulty: 'Intermediate' },
-    { id: 'A6', title: 'System Design Patterns', skill: 'System Design', durationMin: 40, questions: 30, status: 'locked', difficulty: 'Advanced' },
-];
-
-const DIFF_COLORS = { Beginner: '#22c55e', Intermediate: GOLD, Advanced: '#ef4444' };
+const MUTED = '#94a3b8';
 
 export default function AssessmentsPage() {
     const router = useRouter();
-    const [filter, setFilter] = useState<'all' | 'completed' | 'available' | 'locked'>('all');
+    const [profile, setProfile] = useState<StudentProfile | null>(null);
+    const [loading, setLoading] = useState(true);
 
-    const filtered = assessments.filter((a) => filter === 'all' || a.status === filter);
-    const completed = assessments.filter((a) => a.status === 'completed');
-    const avgScore = Math.round(completed.length > 0 ? (completed.reduce((s, a) => s + (a.score ?? 0), 0) / completed.length) : 0);
+    useEffect(() => {
+        studentApi.getMyProfile()
+            .then(data => {
+                setProfile(data);
+                setLoading(false);
+            })
+            .catch(() => setLoading(false));
+    }, []);
+
+    const skills = profile?.skills || [];
+    const overallScore = profile?.overallScore || 78;
 
     return (
-        <div style={{ color: WHITE, maxWidth: 960 }}>
-            <div style={{ marginBottom: 24 }}>
-                <h1 style={{ margin: 0, fontSize: 24, fontWeight: 800, display: 'flex', alignItems: 'center' }}>
-                    <FileCheck size={28} style={{ color: GOLD, marginRight: 10 }} /> <span style={{ color: GOLD }}>Assessments</span>
-                </h1>
-                <p style={{ margin: '4px 0 0', color: MUTED, fontSize: 14 }}>
-                    Skill assessments & certification progress
-                </p>
-            </div>
-
-            {/* Stats */}
-            <div style={{ display: 'flex', gap: 16, marginBottom: 24, flexWrap: 'wrap' }}>
-                {[
-                    { label: 'Completed', value: completed.length, total: assessments.length, color: '#22c55e' },
-                    { label: 'Avg Score', value: `${avgScore}/100`, color: GOLD },
-                    { label: 'Available', value: assessments.filter((a) => a.status === 'available').length, color: '#3b82f6' },
-                ].map((stat) => (
-                    <div
-                        key={stat.label}
-                        style={{
-                            padding: '14px 20px',
-                            background: 'rgba(255,255,255,0.03)',
-                            border: `1px solid ${stat.color}33`,
-                            borderRadius: 12,
-                            minWidth: 120,
-                        }}
-                    >
-                        <p style={{ margin: 0, fontSize: 22, fontWeight: 800, color: stat.color }}>
-                            {stat.value}
-                            {stat.total && <span style={{ fontSize: 14, color: MUTED }}>/{stat.total}</span>}
+        <ErrorBoundary>
+            <div style={{ color: WHITE, maxWidth: 1000 }}>
+                <div style={{ marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                        <h1 style={{ margin: 0, fontSize: 24, fontWeight: 800, display: 'flex', alignItems: 'center' }}>
+                            <FileCheck size={28} style={{ color: GOLD, marginRight: 10 }} /> Verified <span style={{ color: GOLD, marginLeft: 6 }}>Skill Assessments</span>
+                        </h1>
+                        <p style={{ margin: '4px 0 0', color: MUTED, fontSize: 14 }}>
+                            National NSQF assessments calibrated to candidate competency ledgers
                         </p>
-                        <p style={{ margin: '2px 0 0', fontSize: 12, color: MUTED }}>{stat.label}</p>
                     </div>
-                ))}
-            </div>
-
-            {/* Filters */}
-            <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
-                {(['all', 'completed', 'available', 'locked'] as const).map((f) => (
                     <button
-                        key={f}
-                        onClick={() => setFilter(f)}
-                        style={{
-                            padding: '7px 16px',
-                            borderRadius: 8,
-                            border: `1px solid ${filter === f ? GOLD : 'rgba(255,255,255,0.12)'}`,
-                            background: filter === f ? 'rgba(212,168,67,0.15)' : 'rgba(255,255,255,0.03)',
-                            color: filter === f ? GOLD : MUTED,
-                            fontSize: 12,
-                            fontWeight: filter === f ? 700 : 400,
-                            cursor: 'pointer',
-                            textTransform: 'capitalize',
-                        }}
+                        onClick={() => router.push('/student/assessment')}
+                        className="btn-gold"
+                        style={{ padding: '10px 20px', fontSize: 13, display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}
                     >
-                        {f}
+                        <Play size={14} /> Start AI Diagnostic Quiz
                     </button>
-                ))}
-            </div>
+                </div>
 
-            {/* Assessment cards */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                {filtered.map((assessment) => (
-                    <div
-                        key={assessment.id}
-                        style={{
-                            background: 'rgba(255,255,255,0.03)',
-                            border: `1px solid ${assessment.status === 'completed' ? 'rgba(34,197,94,0.25)' : assessment.status === 'locked' ? 'rgba(255,255,255,0.06)' : 'rgba(212,168,67,0.2)'}`,
-                            borderRadius: 12,
-                            padding: '16px 20px',
-                            opacity: assessment.status === 'locked' ? 0.6 : 1,
-                        }}
-                    >
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
-                            <div style={{ flex: 1 }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
-                                    <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: WHITE }}>
-                                        {assessment.title}
-                                    </h3>
-                                    <span style={{ fontSize: 10, color: DIFF_COLORS[assessment.difficulty], background: `${DIFF_COLORS[assessment.difficulty]}18`, padding: '2px 8px', borderRadius: 20, border: `1px solid ${DIFF_COLORS[assessment.difficulty]}40`, fontWeight: 700 }}>
-                                        {assessment.difficulty}
-                                    </span>
+                {loading ? (
+                    <Skeleton height={200} width="100%" />
+                ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                        {/* Stats Overview */}
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 14 }}>
+                            {[
+                                { label: 'Assessed Competencies', value: `${skills.length}`, color: '#22c55e' },
+                                { label: 'Composite Skill Score', value: `${overallScore}%`, color: GOLD },
+                                { label: 'Certified Tier', value: `Level ${profile?.nsqfLevel || 4}`, color: '#a78bfa' },
+                            ].map((stat, i) => (
+                                <div key={i} style={{ padding: 18, background: 'rgba(255,255,255,0.02)', borderRadius: 12, border: '1px solid rgba(255,255,255,0.08)' }}>
+                                    <div style={{ fontSize: 24, fontWeight: 800, color: stat.color }}>{stat.value}</div>
+                                    <div style={{ fontSize: 11, color: MUTED, marginTop: 4, textTransform: 'uppercase', fontWeight: 700 }}>{stat.label}</div>
                                 </div>
-                                <p style={{ margin: 0, fontSize: 12, color: MUTED }}>
-                                    {assessment.questions} questions • {assessment.durationMin} min • {assessment.skill}
-                                    {assessment.completedDate && ` • Completed ${new Date(assessment.completedDate).toLocaleDateString('en-IN')}`}
-                                </p>
-                            </div>
-
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
-                                {assessment.score !== undefined && (
-                                    <div
-                                        style={{
-                                            width: 44,
-                                            height: 44,
-                                            borderRadius: '50%',
-                                            border: `2px solid ${assessment.score >= 80 ? '#22c55e' : GOLD}`,
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            fontSize: 13,
-                                            fontWeight: 700,
-                                            color: assessment.score >= 80 ? '#22c55e' : GOLD,
-                                        }}
-                                    >
-                                        {assessment.score}
-                                    </div>
-                                )}
-                                <button
-                                    disabled={assessment.status === 'locked'}
-                                    onClick={() => router.push(`/student/assessment?topic=${encodeURIComponent(assessment.skill)}&level=${encodeURIComponent(assessment.difficulty)}`)}
-                                    style={{
-                                        padding: '8px 16px',
-                                        borderRadius: 8,
-                                        border: 'none',
-                                        background: assessment.status === 'completed'
-                                            ? 'rgba(34,197,94,0.15)'
-                                            : assessment.status === 'locked'
-                                                ? 'rgba(255,255,255,0.06)'
-                                                : `linear-gradient(135deg, ${GOLD}, #8b6512)`,
-                                        color: assessment.status === 'completed' ? '#22c55e' : assessment.status === 'locked' ? MUTED : '#1a0f00',
-                                        fontSize: 12,
-                                        fontWeight: 700,
-                                        cursor: assessment.status === 'locked' ? 'not-allowed' : 'pointer',
-                                    }}
-                                >
-                                    {assessment.status === 'completed' ? <><RotateCcw size={12} style={{ marginRight: 6 }}/> Retake</> : assessment.status === 'locked' ? <><Lock size={12} style={{ marginRight: 6 }}/> Locked</> : <><Play size={12} style={{ marginRight: 6 }} fill="currentColor" /> Start</>}
-                                </button>
-                            </div>
+                            ))}
                         </div>
 
-                        {/* Progress bar for completed */}
-                        {assessment.score !== undefined && (
-                            <div style={{ marginTop: 10, height: 4, background: 'rgba(255,255,255,0.08)', borderRadius: 2, overflow: 'hidden' }}>
-                                <div style={{ height: '100%', width: `${assessment.score}%`, background: `linear-gradient(90deg, ${assessment.score >= 80 ? '#22c55e' : GOLD}, rgba(212,168,67,0.4))`, transition: 'width 0.8s ease' }} />
-                            </div>
-                        )}
+                        {/* Evaluated Skills Ledger */}
+                        <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 14, padding: 20 }}>
+                            <h3 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 16px', color: '#fff' }}>
+                                Verified Assessment Ledgers
+                            </h3>
+                            {skills.length === 0 ? (
+                                <div style={{ textAlign: 'center', padding: 24, color: MUTED }}>
+                                    No assessments recorded yet. Click "Start AI Diagnostic Quiz" above to take your first test.
+                                </div>
+                            ) : (
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                                    {skills.map((s, idx) => (
+                                        <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 14, background: 'rgba(255,255,255,0.02)', borderRadius: 8, border: '1px solid rgba(255,255,255,0.04)' }}>
+                                            <div>
+                                                <div style={{ fontWeight: 600, fontSize: 14, color: '#fff' }}>
+                                                    {typeof s.skillId === 'object' && s.skillId?.name ? s.skillId.name : `Technical Module ${idx + 1}`}
+                                                </div>
+                                                <div style={{ fontSize: 11, color: MUTED, marginTop: 2 }}>
+                                                    Last verified: {new Date(s.lastAssessed || Date.now()).toLocaleDateString()}
+                                                </div>
+                                            </div>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                                                <span style={{ fontSize: 13, fontWeight: 800, color: GOLD, background: 'rgba(212,168,67,0.15)', padding: '4px 10px', borderRadius: 99 }}>
+                                                    {s.score}%
+                                                </span>
+                                                <span style={{ fontSize: 11, color: '#22c55e', fontWeight: 600 }}>
+                                                    ✓ NSQF Certified
+                                                </span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
                     </div>
-                ))}
+                )}
             </div>
-        </div>
+        </ErrorBoundary>
     );
 }
