@@ -198,6 +198,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                         {/* Active Role Badge */}
                         <span
                             suppressHydrationWarning
+                            className="nav-role-badge"
                             style={{
                                 fontSize: 10, fontWeight: 800, padding: '2px 8px', borderRadius: 99,
                                 background: 'rgba(245, 158, 11, 0.12)', color: GOLD,
@@ -210,7 +211,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     </div>
 
                     {/* Middle: Horizontal Nav Items (Desktop) */}
-                    <nav className="nav-desktop-container">
+                    <nav className="desktop-only-nav">
                         {primaryRoutes.map(({ label, href, badge }: any) => {
                             const active = pathname === href || pathname === `${href}/`;
                             return (
@@ -324,7 +325,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                                 >
                                     {initials}
                                 </div>
-                                <span suppressHydrationWarning style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>
+                                <span suppressHydrationWarning className="nav-username" style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>
                                     {userName.split(' ')[0]}
                                 </span>
                                 <ChevronDown size={13} color="#94A3B8" />
@@ -367,7 +368,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                             style={{
                                 background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.1)',
                                 borderRadius: 8, padding: '7px', color: '#fff', cursor: 'pointer',
-                                alignItems: 'center', justifyContent: 'center',
                             }}
                         >
                             {mobileOpen ? <X size={18} /> : <Menu size={18} />}

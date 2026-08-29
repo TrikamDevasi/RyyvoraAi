@@ -143,8 +143,8 @@ export default function StudentPage() {
                 {/* KPI Cards Grid */}
                 <div style={{ 
                     display: 'grid', 
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 180px), 1fr))', 
-                    gap: 14 
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 140px), 1fr))', 
+                    gap: 12 
                 }}>
                     {[
                         { label: 'Overall Skill Score', value: `${overallScore}/100`, color: GOLD },
@@ -152,7 +152,7 @@ export default function StudentPage() {
                         { label: 'Skills Assessed', value: `${skills.length || 5}`, color: AMBER },
                         { label: 'NSQF Level', value: `Level ${nsqfLevel}`, color: ORANGE },
                     ].map((stat, i) => (
-                        <div key={i} className="stat-card glass" style={{ borderTop: `2px solid ${stat.color}60`, padding: 18, borderRadius: 14, background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                        <div key={i} className="stat-card glass" style={{ borderTop: `2px solid ${stat.color}60`, padding: 14, borderRadius: 14, background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}>
                             {loading ? (
                                 <>
                                     <Skeleton width={32} height={20} style={{ marginBottom: 12 }} />
@@ -160,8 +160,8 @@ export default function StudentPage() {
                                 </>
                             ) : (
                                 <>
-                                    <div className="font-display text-gradient-gold" style={{ fontSize: 26, fontWeight: 900 }}>{stat.value}</div>
-                                    <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 4, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{stat.label}</div>
+                                    <div className="font-display text-gradient-gold" style={{ fontSize: 24, fontWeight: 900 }}>{stat.value}</div>
+                                    <div style={{ fontSize: 10, color: '#94a3b8', marginTop: 4, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{stat.label}</div>
                                 </>
                             )}
                         </div>
@@ -171,19 +171,19 @@ export default function StudentPage() {
                 {/* Charts Grid */}
                 <div style={{ 
                     display: 'grid', 
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 340px), 1fr))', 
-                    gap: 18 
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', 
+                    gap: 16 
                 }}>
                     {/* Skill Competency Radar */}
-                    <div className="glass-card" style={{ padding: 20, borderRadius: 14, background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(245,158,11,0.15)' }}>
-                        <h3 className="font-display" style={{ fontSize: 16, fontWeight: 700, marginBottom: 12, color: '#fff' }}>
+                    <div className="glass-card" style={{ padding: 16, borderRadius: 14, background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(245,158,11,0.15)' }}>
+                        <h3 className="font-display" style={{ fontSize: 15, fontWeight: 700, marginBottom: 10, color: '#fff' }}>
                             Skill Competency Map
                         </h3>
                         <div style={{ height: 260, width: '100%' }}>
                             <ResponsiveContainer width="100%" height="100%">
-                                <RadarChart data={radarData}>
+                                <RadarChart cx="50%" cy="50%" outerRadius="62%" data={radarData}>
                                     <PolarGrid stroke="rgba(255,255,255,0.1)" />
-                                    <PolarAngleAxis dataKey="subject" stroke="#94a3b8" tick={{ fontSize: 11 }} />
+                                    <PolarAngleAxis dataKey="subject" stroke="#94a3b8" tick={{ fontSize: 10, fill: '#94a3b8' }} />
                                     <Radar name="My Score" dataKey="score" stroke={GOLD} fill={GOLD} fillOpacity={0.4} />
                                     <Radar name="Benchmark" dataKey="bench" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.1} />
                                     <Tooltip content={<Tip />} />
@@ -193,16 +193,16 @@ export default function StudentPage() {
                     </div>
 
                     {/* Growth Trajectory */}
-                    <div className="glass-card" style={{ padding: 20, borderRadius: 14, background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(245,158,11,0.15)' }}>
-                        <h3 className="font-display" style={{ fontSize: 16, fontWeight: 700, marginBottom: 12, color: '#fff' }}>
+                    <div className="glass-card" style={{ padding: 16, borderRadius: 14, background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(245,158,11,0.15)' }}>
+                        <h3 className="font-display" style={{ fontSize: 15, fontWeight: 700, marginBottom: 10, color: '#fff' }}>
                             Score Growth Trajectory
                         </h3>
                         <div style={{ height: 260, width: '100%' }}>
                             <ResponsiveContainer width="100%" height="100%">
                                 <AreaChart data={progressData}>
                                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-                                    <XAxis dataKey="month" stroke="#94a3b8" tick={{ fontSize: 11 }} />
-                                    <YAxis stroke="#94a3b8" tick={{ fontSize: 11 }} domain={[0, 100]} />
+                                    <XAxis dataKey="month" stroke="#94a3b8" tick={{ fontSize: 10 }} />
+                                    <YAxis stroke="#94a3b8" tick={{ fontSize: 10 }} domain={[0, 100]} />
                                     <Tooltip content={<Tip />} />
                                     <Area type="monotone" dataKey="score" stroke={GOLD} fill="rgba(245,158,11,0.2)" strokeWidth={2} />
                                 </AreaChart>

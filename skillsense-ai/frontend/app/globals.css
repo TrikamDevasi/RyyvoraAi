@@ -584,6 +584,37 @@ body {
 }
 
 /* ── Mobile Responsive Optimizations ── */
+.mobile-toggle-btn {
+  display: flex !important;
+}
+
+.desktop-only-nav {
+  display: flex !important;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: nowrap;
+}
+
+@media (min-width: 991px) {
+  .mobile-toggle-btn {
+    display: none !important;
+  }
+}
+
+@media (max-width: 990px) {
+  .desktop-only-nav {
+    display: none !important;
+  }
+
+  .nav-username {
+    display: none !important;
+  }
+
+  .nav-role-badge {
+    display: none !important;
+  }
+}
+
 @media (max-width: 768px) {
   html, body {
     font-size: 14px;
