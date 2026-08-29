@@ -107,13 +107,15 @@ export default function FindJobsPage() {
                     </p>
                 </div>
 
-                <div style={{ marginBottom: 20 }}>
+                <div style={{ marginBottom: 20, position: 'relative' }}>
+                    <Search size={16} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
                     <input
                         type="text"
                         placeholder="Search positions by title, domain, or technology..."
                         value={search}
                         onChange={e => setSearch(e.target.value)}
-                        style={{ width: '100%', padding: '10px 14px', borderRadius: 8, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', fontSize: 13, outline: 'none' }}
+                        className="input-base"
+                        style={{ paddingLeft: 36 }}
                     />
                 </div>
 
@@ -124,7 +126,7 @@ export default function FindJobsPage() {
                         <p style={{ color: '#94a3b8', fontSize: 14 }}>No job openings matching your search criteria.</p>
                     </div>
                 ) : (
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 16 }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))', gap: 14 }}>
                         {filtered.map(job => (
                             <div key={job.id} style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 14, padding: 20, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                                 <div>

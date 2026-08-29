@@ -582,3 +582,61 @@ body {
   from { transform: translate(-50%, 40px) scale(0.9); opacity: 0; }
   to { transform: translate(-50%, 0) scale(1); opacity: 1; }
 }
+
+/* ── Mobile Responsive Optimizations ── */
+@media (max-width: 768px) {
+  html, body {
+    font-size: 14px;
+  }
+
+  .card-base {
+    padding: 16px 14px;
+    border-radius: 12px;
+  }
+
+  .stat-card {
+    padding: 14px 12px;
+    border-radius: 10px;
+  }
+
+  .btn-gold, .btn-primary, .btn-ghost {
+    padding: 8px 14px;
+    font-size: 12px;
+    min-height: 38px;
+  }
+
+  .table-responsive {
+    border-radius: 10px;
+    margin-bottom: 12px;
+  }
+
+  .table-responsive th, .table-responsive td {
+    padding: 10px 12px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  /* Responsive grid auto-collapse */
+  .responsive-grid-2 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .responsive-grid-4 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .card-base {
+    padding: 14px 10px;
+  }
+
+  .responsive-grid-4 {
+    grid-template-columns: 1fr !important;
+  }
+
+  h1, .font-display {
+    font-size: clamp(1.25rem, 5vw, 1.75rem) !important;
+    line-height: 1.25 !important;
+  }
+}

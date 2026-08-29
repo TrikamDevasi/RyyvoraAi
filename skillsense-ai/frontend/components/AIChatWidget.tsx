@@ -200,8 +200,8 @@ export default function AIChatWidget() {
             <button
                 onClick={() => setOpen(o => !o)}
                 style={{
-                    position: 'fixed', bottom: 80, right: 24, zIndex: 300,
-                    width: 52, height: 52, borderRadius: '50%', border: 'none',
+                    position: 'fixed', bottom: 24, right: 20, zIndex: 300,
+                    width: 48, height: 48, borderRadius: '50%', border: 'none',
                     background: `linear-gradient(135deg, ${INDIGO}, ${PURPLE})`,
                     color: '#fff', cursor: 'pointer', fontSize: 22,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -214,14 +214,15 @@ export default function AIChatWidget() {
                 aria-label="Open AI Chat"
                 title="Chat with SkillSense AI"
             >
-                {open ? <X size={24} /> : <MessageCircle size={24} />}
+                {open ? <X size={22} /> : <MessageCircle size={22} />}
             </button>
 
             {/* ── Chat Panel ──────────────────────────────────────── */}
             {open && (
                 <div style={{
-                    position: 'fixed', bottom: 144, right: 24, zIndex: 299,
-                    width: 380, height: 500, borderRadius: 18, overflow: 'hidden',
+                    position: 'fixed', bottom: 82, right: 16, zIndex: 299,
+                    width: 'calc(100vw - 32px)', maxWidth: 380, height: 'min(500px, calc(100vh - 120px))',
+                    borderRadius: 18, overflow: 'hidden',
                     background: PANEL_BG,
                     border: '1px solid rgba(99,102,241,0.2)',
                     boxShadow: '0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(99,102,241,0.1)',

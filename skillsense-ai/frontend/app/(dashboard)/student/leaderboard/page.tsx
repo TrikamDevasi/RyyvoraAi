@@ -76,15 +76,15 @@ export default function LeaderboardPage() {
                 {loading ? (
                     <Skeleton height={250} width="100%" />
                 ) : (
-                    <div style={{ background: 'rgba(255,255,255,0.02)', borderRadius: 14, border: '1px solid rgba(255,255,255,0.08)', overflow: 'hidden' }}>
-                        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+                    <div className="table-responsive">
+                        <table>
                             <thead>
-                                <tr style={{ background: 'rgba(255,255,255,0.03)', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-                                    <th style={{ padding: '12px 16px', textAlign: 'left', color: GOLD, width: 80 }}>Rank</th>
-                                    <th style={{ padding: '12px 16px', textAlign: 'left', color: '#94a3b8' }}>Candidate</th>
-                                    <th style={{ padding: '12px 16px', textAlign: 'left', color: '#94a3b8' }}>Program / Domain</th>
-                                    <th style={{ padding: '12px 16px', textAlign: 'left', color: '#94a3b8' }}>NSQF Tier</th>
-                                    <th style={{ padding: '12px 16px', textAlign: 'right', color: '#94a3b8' }}>Overall Score</th>
+                                <tr>
+                                    <th style={{ color: GOLD, width: 80 }}>Rank</th>
+                                    <th>Candidate</th>
+                                    <th>Program / Domain</th>
+                                    <th>NSQF Tier</th>
+                                    <th style={{ textAlign: 'right' }}>Overall Score</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -92,19 +92,18 @@ export default function LeaderboardPage() {
                                     <tr
                                         key={r.id || r.rank}
                                         style={{
-                                            borderBottom: '1px solid rgba(255,255,255,0.04)',
-                                            background: r.isCurrentUser ? 'rgba(212,168,67,0.1)' : 'transparent',
+                                            background: r.isCurrentUser ? 'rgba(245,158,11,0.1)' : 'transparent',
                                         }}
                                     >
-                                        <td style={{ padding: '12px 16px', fontWeight: 800, color: r.rank === 1 ? '#eab308' : r.rank === 2 ? '#94a3b8' : r.rank === 3 ? '#b45309' : '#fff' }}>
+                                        <td style={{ fontWeight: 800, color: r.rank === 1 ? '#eab308' : r.rank === 2 ? '#94a3b8' : r.rank === 3 ? '#b45309' : '#fff' }}>
                                             #{r.rank} {r.rank === 1 && '🥇'} {r.rank === 2 && '🥈'} {r.rank === 3 && '🥉'}
                                         </td>
-                                        <td style={{ padding: '12px 16px', fontWeight: 600 }}>
+                                        <td style={{ fontWeight: 600 }}>
                                             {r.name} {r.isCurrentUser && <span style={{ fontSize: 11, color: GOLD, marginLeft: 6 }}>(You)</span>}
                                         </td>
-                                        <td style={{ padding: '12px 16px', color: MUTED }}>{r.program}</td>
-                                        <td style={{ padding: '12px 16px' }}>Level {r.nsqfLevel}</td>
-                                        <td style={{ padding: '12px 16px', textAlign: 'right', fontWeight: 800, color: GOLD }}>
+                                        <td style={{ color: MUTED }}>{r.program}</td>
+                                        <td>Level {r.nsqfLevel}</td>
+                                        <td style={{ textAlign: 'right', fontWeight: 800, color: GOLD }}>
                                             {r.overallScore}%
                                         </td>
                                     </tr>
