@@ -88,6 +88,7 @@ const ROLE_GROUP_MAP: Record<string, string> = {
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
     const router = useRouter();
+    const [mounted, setMounted] = useState(false);
     const [mobileOpen, setMobileOpen] = useState(false);
     const [showDropdown, setShowDropdown] = useState(false);
     const [showMoreMenu, setShowMoreMenu] = useState(false);
@@ -98,13 +99,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const logout = useAuthStore(s => s.logout);
     const checkAuth = useAuthStore(s => s.checkAuth);
 
-    const userName = user?.name || 'User';
-    const userRole = user?.role || 'student';
-    const isVerified = user?.isVerified ?? true;
-
     useEffect(() => {
+        setMounted(true);
         checkAuth();
     }, [checkAuth]);
+
+    const userName = (mounted && user?.name) ? user.name : 'User';
+    const userRole = (mounted && user?.role) ? user.role : 'student';
+    const isVerified = user?.isVerified ?? true;
 
     // Close menus on route change
     useEffect(() => {
@@ -135,7 +137,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     const primaryRoutes = routes.slice(0, 6);
     const overflowRoutes = routes.slice(6);
 
-    const initials = userName
+    const initials = userName !== 'User'
         ? userName.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2)
         : 'U';
 
@@ -194,12 +196,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                         </Link>
 
                         {/* Active Role Badge */}
-                        <span style={{
-                            fontSize: 10, fontWeight: 800, padding: '2px 8px', borderRadius: 99,
-                            background: 'rgba(245, 158, 11, 0.12)', color: GOLD,
-                            border: '1px solid rgba(245, 158, 11, 0.25)',
-                            textTransform: 'uppercase', letterSpacing: '0.06em'
-                        }}>
+                        <span
+                            suppressHydrationWarning
+                            style={{
+                                fontSize: 10, fontWeight: 800, padding: '2px 8px', borderRadius: 99,
+                                background: 'rgba(245, 158, 11, 0.12)', color: GOLD,
+                                border: '1px solid rgba(245, 158, 11, 0.25)',
+                                textTransform: 'uppercase', letterSpacing: '0.06em'
+                            }}
+                        >
                             {currentNavGroup.group}
                         </span>
                     </div>
@@ -308,15 +313,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                                     borderRadius: 99, padding: '4px 10px 4px 4px', cursor: 'pointer',
                                 }}
                             >
-                                <div style={{
-                                    width: 28, height: 28, borderRadius: '50%',
-                                    background: 'linear-gradient(135deg, #F59E0B, #FBBF24)',
-                                    color: '#08060F', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    fontSize: 11, fontWeight: 800,
-                                }}>
+                                <div
+                                    suppressHydrationWarning
+                                    style={{
+                                        width: 28, height: 28, borderRadius: '50%',
+                                        background: 'linear-gradient(135deg, #F59E0B, #FBBF24)',
+                                        color: '#08060F', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        fontSize: 11, fontWeight: 800,
+                                    }}
+                                >
                                     {initials}
                                 </div>
-                                <span style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>
+                                <span suppressHydrationWarning style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>
                                     {userName.split(' ')[0]}
                                 </span>
                                 <ChevronDown size={13} color="#94A3B8" />
