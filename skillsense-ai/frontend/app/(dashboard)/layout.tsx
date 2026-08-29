@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import VerificationBanner from '@/components/shared/VerificationBanner';
 import { useAuthStore } from '@/store/authStore';
-import { Menu, X, ChevronDown, ChevronRight, LogOut, User as UserIcon } from 'lucide-react';
+import { Menu, X, ChevronDown, LogOut, User as UserIcon, Bell, Sparkles } from 'lucide-react';
 
 const GOLD = '#F59E0B';
 const AMBER = '#F59E0B';
@@ -18,15 +18,13 @@ const NAV = [
             { label: 'Overview', href: '/student' },
             { label: 'Skill Passport', href: '/student/passport' },
             { label: 'AI Analyzer', href: '/student/analyzer' },
-            { label: 'My Submissions', href: '/student/submissions' },
             { label: 'Assessments', href: '/student/assessments' },
-            { label: 'Tests', href: '/student/tests' },
-            { label: 'Leaderboard', href: '/student/leaderboard', badge: 'HOT' },
             { label: 'Find Jobs', href: '/student/jobs', badge: 'NEW' },
+            { label: 'Leaderboard', href: '/student/leaderboard', badge: 'HOT' },
             { label: 'Career Path', href: '/student/career' },
             { label: 'Market Trends', href: '/student/market' },
+            { label: 'My Submissions', href: '/student/submissions' },
             { label: 'Profile', href: '/student/profile' },
-            { label: 'Latest News', href: '/student/news' },
         ],
     },
     {
@@ -90,10 +88,11 @@ const ROLE_GROUP_MAP: Record<string, string> = {
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
     const router = useRouter();
-    const [collapsed, setCollapsed] = useState(false);
     const [mobileOpen, setMobileOpen] = useState(false);
     const [showDropdown, setShowDropdown] = useState(false);
+    const [showMoreMenu, setShowMoreMenu] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
+    const moreMenuRef = useRef<HTMLDivElement>(null);
 
     const user = useAuthStore(s => s.user);
     const logout = useAuthStore(s => s.logout);
@@ -107,22 +106,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         checkAuth();
     }, [checkAuth]);
 
-    // Close mobile menu on route change
+    // Close menus on route change
     useEffect(() => {
         setMobileOpen(false);
+        setShowMoreMenu(false);
+        setShowDropdown(false);
     }, [pathname]);
-
-    // Handle screen resize
-    useEffect(() => {
-        const handleResize = () => {
-            if (window.innerWidth < 768) {
-                setCollapsed(true);
-            }
-        };
-        handleResize();
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
 
     // Close dropdown on outside click
     useEffect(() => {
@@ -130,309 +119,291 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
                 setShowDropdown(false);
             }
+            if (moreMenuRef.current && !moreMenuRef.current.contains(e.target as Node)) {
+                setShowMoreMenu(false);
+            }
         };
         document.addEventListener('mousedown', handleClick);
         return () => document.removeEventListener('mousedown', handleClick);
     }, []);
 
     // Filter NAV based on role
-    const filteredNav = userRole
-        ? NAV.filter(n => n.group === ROLE_GROUP_MAP[userRole])
-        : NAV;
+    const currentNavGroup = NAV.find(n => n.group === (ROLE_GROUP_MAP[userRole] || 'Student')) || NAV[0];
+    const routes = currentNavGroup.routes;
 
-    const [openGroups, setOpenGroups] = useState<string[]>(filteredNav.map(n => n.group));
-
-    useEffect(() => {
-        setOpenGroups(filteredNav.map(n => n.group));
-    }, [userRole]);
-
-    const toggleGroup = (g: string) =>
-        setOpenGroups(prev => prev.includes(g) ? prev.filter(x => x !== g) : [...prev, g]);
-
-    const parts = pathname.split('/').filter(Boolean);
-    const crumb = parts.map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' / ');
+    // Primary routes (first 6) and overflow routes
+    const primaryRoutes = routes.slice(0, 6);
+    const overflowRoutes = routes.slice(6);
 
     const initials = userName
         ? userName.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2)
         : 'U';
 
-    const renderNavContent = () => (
-        <>
-            {/* Logo row */}
-            <div style={{
-                padding: '18px 16px',
-                display: 'flex', alignItems: 'center', gap: 10,
-                borderBottom: '1px solid rgba(245,158,11,0.1)', flexShrink: 0,
-                justifyContent: collapsed && !mobileOpen ? 'center' : 'space-between',
+    return (
+        <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: '#08060f', color: '#fff', fontFamily: 'Inter, sans-serif' }}>
+            
+            {/* ── Proper Top Navigation Bar ── */}
+            <header style={{
+                position: 'sticky', top: 0, zIndex: 100,
+                background: 'rgba(8, 6, 15, 0.94)',
+                backdropFilter: 'blur(16px)',
+                borderBottom: '1px solid rgba(245, 158, 11, 0.12)',
             }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <div style={{
-                        width: 32, height: 32, borderRadius: 8, flexShrink: 0,
-                        background: 'linear-gradient(135deg, #F59E0B, #FBBF24)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    }}>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
-                                stroke="#08060f" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                    </div>
-                    {(!collapsed || mobileOpen) && (
-                        <span className="font-display text-gradient-gold" style={{ fontWeight: 900, fontSize: 16, color: '#fff', whiteSpace: 'nowrap', letterSpacing: '-0.02em' }}>
-                            SkillSense AI
-                        </span>
-                    )}
-                </div>
-                {mobileOpen && (
-                    <button onClick={() => setMobileOpen(false)} style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: 4 }}>
-                        <X size={20} />
-                    </button>
-                )}
-            </div>
+                <div style={{
+                    maxWidth: 1360, margin: '0 auto', padding: '0 20px',
+                    height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 20
+                }}>
+                    
+                    {/* Left: Brand Logo & Role Pill */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
+                        <Link href={`/${userRole}`} style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
+                            <div style={{
+                                width: 34, height: 34, borderRadius: 8,
+                                background: 'linear-gradient(135deg, #F59E0B, #FBBF24)',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                boxShadow: '0 0 16px rgba(245, 158, 11, 0.3)'
+                            }}>
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
+                                        stroke="#08060f" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
+                            </div>
+                            <span className="font-display text-gradient-gold" style={{ fontWeight: 900, fontSize: 17, color: '#fff', letterSpacing: '-0.02em' }}>
+                                SkillSense AI
+                            </span>
+                        </Link>
 
-            {/* Nav Links */}
-            <nav style={{ flex: 1, padding: '10px 0', overflowY: 'auto' }}>
-                {filteredNav.map(({ group, accent, routes }) => {
-                    const isOpen = openGroups.includes(group);
-                    const isGroupActive = routes.some(r => pathname === r.href || pathname.startsWith(r.href + '/'));
-                    return (
-                        <div key={group}>
-                            <button
-                                onClick={() => (!collapsed || mobileOpen) && toggleGroup(group)}
-                                style={{
-                                    width: '100%', display: 'flex', alignItems: 'center', gap: 8,
-                                    padding: collapsed && !mobileOpen ? '8px 0' : '7px 16px',
-                                    border: 'none', background: 'transparent', cursor: 'pointer',
-                                    color: isGroupActive ? accent : '#94a3b8',
-                                    justifyContent: collapsed && !mobileOpen ? 'center' : 'space-between',
-                                    transition: 'color 0.15s',
-                                }}
-                            >
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                    <div style={{
-                                        width: 6, height: 6, borderRadius: '50%',
-                                        background: isGroupActive ? accent : '#334155', flexShrink: 0,
-                                    }} />
-                                    {(!collapsed || mobileOpen) && (
-                                        <span className="font-display" style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em' }}>
-                                            {group}
+                        {/* Active Role Badge */}
+                        <span style={{
+                            fontSize: 10, fontWeight: 800, padding: '3px 8px', borderRadius: 99,
+                            background: 'rgba(245, 158, 11, 0.12)', color: GOLD,
+                            border: '1px solid rgba(245, 158, 11, 0.25)',
+                            textTransform: 'uppercase', letterSpacing: '0.06em'
+                        }} className="hidden sm:inline-block">
+                            {currentNavGroup.group}
+                        </span>
+                    </div>
+
+                    {/* Middle: Horizontal Nav Items (Desktop) */}
+                    <nav className="hidden lg:flex" style={{ alignItems: 'center', gap: 4, flex: 1, justifyContent: 'center' }}>
+                        {primaryRoutes.map(({ label, href, badge }: any) => {
+                            const active = pathname === href || pathname === `${href}/`;
+                            return (
+                                <Link
+                                    key={href}
+                                    href={href}
+                                    style={{
+                                        display: 'inline-flex', alignItems: 'center', gap: 6,
+                                        padding: '7px 14px', borderRadius: 8,
+                                        fontSize: 13, textDecoration: 'none',
+                                        color: active ? '#FFFFFF' : '#94A3B8',
+                                        fontWeight: active ? 700 : 500,
+                                        background: active ? 'rgba(245, 158, 11, 0.1)' : 'transparent',
+                                        borderBottom: active ? `2px solid ${GOLD}` : '2px solid transparent',
+                                        transition: 'all 0.15s ease',
+                                    }}
+                                    onMouseEnter={e => { if (!active) e.currentTarget.style.color = '#FFFFFF'; }}
+                                    onMouseLeave={e => { if (!active) e.currentTarget.style.color = '#94A3B8'; }}
+                                >
+                                    <span>{label}</span>
+                                    {badge && (
+                                        <span style={{
+                                            fontSize: 9, fontWeight: 800, padding: '1px 5px', borderRadius: 4,
+                                            background: badge === 'HOT' ? 'rgba(239,68,68,0.2)' : 'rgba(245,158,11,0.2)',
+                                            color: badge === 'HOT' ? '#ef4444' : GOLD,
+                                        }}>
+                                            {badge}
                                         </span>
                                     )}
-                                </div>
-                                {(!collapsed || mobileOpen) && (
-                                    <span style={{ fontSize: 10, opacity: 0.4, marginLeft: 'auto' }}>{isOpen ? <ChevronDown size={12} /> : <ChevronRight size={12} />}</span>
+                                </Link>
+                            );
+                        })}
+
+                        {/* More Menu Dropdown for Overflow Routes */}
+                        {overflowRoutes.length > 0 && (
+                            <div ref={moreMenuRef} style={{ position: 'relative' }}>
+                                <button
+                                    onClick={() => setShowMoreMenu(!showMoreMenu)}
+                                    style={{
+                                        display: 'inline-flex', alignItems: 'center', gap: 4,
+                                        padding: '7px 12px', borderRadius: 8,
+                                        fontSize: 13, color: '#94A3B8', fontWeight: 500,
+                                        background: 'transparent', border: 'none', cursor: 'pointer',
+                                    }}
+                                >
+                                    <span>More</span>
+                                    <ChevronDown size={14} />
+                                </button>
+
+                                {showMoreMenu && (
+                                    <div style={{
+                                        position: 'absolute', top: '100%', right: 0, marginTop: 6,
+                                        width: 190, background: '#0d0b1d', border: '1px solid rgba(245, 158, 11, 0.25)',
+                                        borderRadius: 10, padding: '6px', boxShadow: '0 12px 36px rgba(0,0,0,0.6)',
+                                        zIndex: 150,
+                                    }}>
+                                        {overflowRoutes.map(({ label, href, badge }: any) => {
+                                            const active = pathname === href;
+                                            return (
+                                                <Link
+                                                    key={href}
+                                                    href={href}
+                                                    style={{
+                                                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                                                        padding: '8px 12px', borderRadius: 6,
+                                                        fontSize: 13, textDecoration: 'none',
+                                                        color: active ? '#FFFFFF' : '#94A3B8',
+                                                        fontWeight: active ? 700 : 500,
+                                                        background: active ? 'rgba(245, 158, 11, 0.12)' : 'transparent',
+                                                    }}
+                                                >
+                                                    <span>{label}</span>
+                                                    {badge && (
+                                                        <span style={{ fontSize: 9, fontWeight: 700, padding: '1px 5px', borderRadius: 4, background: 'rgba(245,158,11,0.2)', color: GOLD }}>
+                                                            {badge}
+                                                        </span>
+                                                    )}
+                                                </Link>
+                                            );
+                                        })}
+                                    </div>
                                 )}
-                            </button>
-
-                            {isOpen && (!collapsed || mobileOpen) && (
-                                <div style={{ paddingBottom: 4 }}>
-                                    {routes.map(({ label, href, badge }: any) => {
-                                        const active = pathname === href || pathname === `${href}/`;
-                                        return (
-                                            <Link
-                                                key={href}
-                                                href={href}
-                                                style={{
-                                                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                                                    padding: '7px 16px 7px 30px',
-                                                    fontSize: 13, textDecoration: 'none',
-                                                    color: active ? '#fff' : '#94a3b8',
-                                                    fontWeight: active ? 600 : 400,
-                                                    background: active ? 'rgba(245,158,11,0.08)' : 'transparent',
-                                                    borderLeft: active ? `2px solid ${accent}` : '2px solid transparent',
-                                                    transition: 'all 0.15s',
-                                                }}
-                                            >
-                                                <span>{label}</span>
-                                                {badge && (
-                                                    <span style={{
-                                                        fontSize: 9, fontWeight: 700, padding: '1px 5px', borderRadius: 4,
-                                                        background: badge === 'HOT' ? 'rgba(239,68,68,0.2)' : 'rgba(245,158,11,0.2)',
-                                                        color: badge === 'HOT' ? '#ef4444' : accent,
-                                                    }}>
-                                                        {badge}
-                                                    </span>
-                                                )}
-                                            </Link>
-                                        );
-                                    })}
-                                </div>
-                            )}
-                        </div>
-                    );
-                })}
-            </nav>
-
-            {/* Bottom user profile & collapse toggle */}
-            <div style={{
-                padding: '12px 16px',
-                borderTop: '1px solid rgba(245,158,11,0.08)',
-                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            }}>
-                {(!collapsed || mobileOpen) && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <div style={{
-                            width: 28, height: 28, borderRadius: '50%',
-                            background: 'rgba(245,158,11,0.2)', color: '#F59E0B',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            fontSize: 11, fontWeight: 700,
-                        }}>
-                            {initials}
-                        </div>
-                        <div style={{ overflow: 'hidden' }}>
-                            <div style={{ fontSize: 12, fontWeight: 600, color: '#fff', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                {userName}
                             </div>
-                            <div style={{ fontSize: 10, color: '#94a3b8', textTransform: 'capitalize' }}>
-                                {userRole}
-                            </div>
-                        </div>
-                    </div>
-                )}
-                {!mobileOpen && (
-                    <button
-                        onClick={() => setCollapsed(!collapsed)}
-                        style={{
-                            background: 'transparent', border: 'none', color: '#94a3b8',
-                            cursor: 'pointer', padding: 4, fontSize: 12,
-                        }}
-                    >
-                        {collapsed ? '→' : '←'}
-                    </button>
-                )}
-            </div>
-        </>
-    );
+                        )}
+                    </nav>
 
-    return (
-        <div style={{ display: 'flex', minHeight: '100vh', background: '#08060f', color: '#fff', fontFamily: 'Inter, sans-serif' }}>
-
-            {/* Desktop Sidebar (hidden on mobile, visible md+) */}
-            <aside style={{
-                width: collapsed ? 56 : 218, flexShrink: 0,
-                background: 'rgba(245,158,11,0.02)',
-                borderRight: '1px solid rgba(245,158,11,0.08)',
-                display: 'flex', flexDirection: 'column',
-                transition: 'width 0.25s ease', overflowX: 'hidden',
-            }} className="hidden md:flex">
-                {renderNavContent()}
-            </aside>
-
-            {/* Mobile Drawer Overlay */}
-            <AnimatePresence>
-                {mobileOpen && (
-                    <>
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            onClick={() => setMobileOpen(false)}
-                            style={{
-                                position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)',
-                                backdropFilter: 'blur(6px)', zIndex: 90,
-                            }}
-                            className="md:hidden"
-                        />
-                        <motion.aside
-                            initial={{ x: -280 }}
-                            animate={{ x: 0 }}
-                            exit={{ x: -280 }}
-                            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                            style={{
-                                position: 'fixed', left: 0, top: 0, bottom: 0, width: 260,
-                                background: '#0d0b1d', borderRight: '1px solid rgba(245,158,11,0.2)',
-                                zIndex: 100, display: 'flex', flexDirection: 'column',
-                            }}
-                            className="md:hidden"
-                        >
-                            {renderNavContent()}
-                        </motion.aside>
-                    </>
-                )}
-            </AnimatePresence>
-
-            {/* Main content */}
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, background: '#08060f' }}>
-                {/* Topbar */}
-                <header style={{
-                    height: 56, flexShrink: 0,
-                    borderBottom: '1px solid rgba(245,158,11,0.08)',
-                    background: 'rgba(8,6,15,0.85)', backdropFilter: 'blur(12px)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                    padding: '0 16px', position: 'sticky', top: 0, zIndex: 40,
-                }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <button
-                            onClick={() => setMobileOpen(true)}
-                            aria-label="Open Navigation Menu"
-                            style={{
-                                background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: 8, padding: '6px', color: '#fff', cursor: 'pointer',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            }}
-                            className="md:hidden"
-                        >
-                            <Menu size={18} />
-                        </button>
-                        <div style={{ fontSize: 13, color: '#94a3b8', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                            {crumb || 'Dashboard'}
-                        </div>
-                    </div>
-
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    {/* Right: User Profile & Mobile Toggle */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
+                        
+                        {/* Profile Dropdown */}
                         <div ref={dropdownRef} style={{ position: 'relative' }}>
                             <button
                                 onClick={() => setShowDropdown(!showDropdown)}
                                 style={{
-                                    display: 'flex', alignItems: 'center', gap: 8,
-                                    background: 'transparent', border: 'none', cursor: 'pointer',
-                                    padding: '4px', borderRadius: 8,
+                                    display: 'flex', alignItems: 'center', gap: 10,
+                                    background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.08)',
+                                    borderRadius: 99, padding: '4px 10px 4px 4px', cursor: 'pointer',
                                 }}
                             >
                                 <div style={{
-                                    width: 32, height: 32, borderRadius: '50%',
+                                    width: 30, height: 30, borderRadius: '50%',
                                     background: 'linear-gradient(135deg, #F59E0B, #FBBF24)',
-                                    color: '#08060f', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    fontSize: 12, fontWeight: 800,
+                                    color: '#08060F', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    fontSize: 11, fontWeight: 800,
                                 }}>
                                     {initials}
                                 </div>
+                                <span style={{ fontSize: 13, fontWeight: 600, color: '#fff' }} className="hidden sm:inline-block">
+                                    {userName.split(' ')[0]}
+                                </span>
+                                <ChevronDown size={14} color="#94A3B8" />
                             </button>
 
                             {showDropdown && (
                                 <div style={{
                                     position: 'absolute', right: 0, top: '100%', marginTop: 8,
-                                    width: 200, background: '#0f0d1c', border: '1px solid rgba(245,158,11,0.2)',
-                                    borderRadius: 10, padding: '6px 0', boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
-                                    zIndex: 50,
+                                    width: 220, background: '#0d0b1d', border: '1px solid rgba(245, 158, 11, 0.25)',
+                                    borderRadius: 12, padding: '8px', boxShadow: '0 12px 36px rgba(0,0,0,0.6)',
+                                    zIndex: 150,
                                 }}>
-                                    <div style={{ padding: '8px 16px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                                        <div style={{ fontSize: 12, fontWeight: 700, color: '#fff' }}>{userName}</div>
-                                        <div style={{ fontSize: 11, color: '#94a3b8', textOverflow: 'ellipsis', overflow: 'hidden' }}>{user?.email}</div>
+                                    <div style={{ padding: '8px 10px', borderBottom: '1px solid rgba(255, 255, 255, 0.06)', marginBottom: 4 }}>
+                                        <div style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>{userName}</div>
+                                        <div style={{ fontSize: 11, color: '#94A3B8', textOverflow: 'ellipsis', overflow: 'hidden' }}>{user?.email}</div>
+                                        <div style={{ fontSize: 10, color: GOLD, marginTop: 3, textTransform: 'capitalize', fontWeight: 600 }}>{userRole} Account</div>
                                     </div>
                                     <button
                                         onClick={() => logout()}
                                         style={{
-                                            width: '100%', textAlign: 'left', padding: '8px 16px',
+                                            width: '100%', textAlign: 'left', padding: '8px 10px',
                                             background: 'transparent', border: 'none', color: '#ef4444',
-                                            fontSize: 12, fontWeight: 600, cursor: 'pointer',
-                                            display: 'flex', alignItems: 'center', gap: 6,
+                                            fontSize: 12, fontWeight: 600, cursor: 'pointer', borderRadius: 6,
+                                            display: 'flex', alignItems: 'center', gap: 8,
                                         }}
+                                        onMouseEnter={e => (e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)')}
+                                        onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                                     >
                                         <LogOut size={14} /> Sign Out
                                     </button>
                                 </div>
                             )}
                         </div>
+
+                        {/* Mobile Hamburger Toggle */}
+                        <button
+                            onClick={() => setMobileOpen(!mobileOpen)}
+                            aria-label="Toggle navigation menu"
+                            className="lg:hidden"
+                            style={{
+                                background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.1)',
+                                borderRadius: 8, padding: '7px', color: '#fff', cursor: 'pointer',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            }}
+                        >
+                            {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+                        </button>
                     </div>
-                </header>
+                </div>
 
-                {!isVerified && <VerificationBanner />}
+                {/* ── Mobile Navigation Dropdown ── */}
+                <AnimatePresence>
+                    {mobileOpen && (
+                        <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            style={{
+                                background: '#0d0b1d', borderTop: '1px solid rgba(245, 158, 11, 0.15)',
+                                padding: '12px 20px 20px', display: 'flex', flexDirection: 'column', gap: 4,
+                            }}
+                            className="lg:hidden"
+                        >
+                            <div style={{ fontSize: 11, fontWeight: 700, color: GOLD, textTransform: 'uppercase', padding: '4px 8px', letterSpacing: '0.06em' }}>
+                                {currentNavGroup.group} Navigation
+                            </div>
+                            {routes.map(({ label, href, badge }: any) => {
+                                const active = pathname === href || pathname === `${href}/`;
+                                return (
+                                    <Link
+                                        key={href}
+                                        href={href}
+                                        onClick={() => setMobileOpen(false)}
+                                        style={{
+                                            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                                            padding: '10px 12px', borderRadius: 8,
+                                            fontSize: 14, textDecoration: 'none',
+                                            color: active ? '#FFFFFF' : '#94A3B8',
+                                            fontWeight: active ? 700 : 500,
+                                            background: active ? 'rgba(245, 158, 11, 0.12)' : 'transparent',
+                                            borderLeft: active ? `3px solid ${GOLD}` : '3px solid transparent',
+                                        }}
+                                    >
+                                        <span>{label}</span>
+                                        {badge && (
+                                            <span style={{
+                                                fontSize: 9, fontWeight: 800, padding: '1px 6px', borderRadius: 4,
+                                                background: badge === 'HOT' ? 'rgba(239,68,68,0.2)' : 'rgba(245,158,11,0.2)',
+                                                color: badge === 'HOT' ? '#ef4444' : GOLD,
+                                            }}>
+                                                {badge}
+                                            </span>
+                                        )}
+                                    </Link>
+                                );
+                            })}
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </header>
 
-                {/* Page body */}
-                <main style={{ flex: 1, padding: '18px 14px', overflowY: 'auto' }} className="md:p-6">
-                    {children}
-                </main>
-            </div>
+            {!isVerified && <VerificationBanner />}
+
+            {/* ── Main Full-Width Content Container ── */}
+            <main style={{
+                flex: 1, width: '100%', maxWidth: 1360, margin: '0 auto',
+                padding: '24px 20px', overflowY: 'auto'
+            }} className="sm:px-6 lg:px-8">
+                {children}
+            </main>
         </div>
     );
 }
