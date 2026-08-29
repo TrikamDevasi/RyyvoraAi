@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import VerificationBanner from '@/components/shared/VerificationBanner';
 import { useAuthStore } from '@/store/authStore';
-import { Menu, X, ChevronDown, LogOut, User as UserIcon, Bell, Sparkles } from 'lucide-react';
+import { Menu, X, ChevronDown, LogOut, User as UserIcon } from 'lucide-react';
 
 const GOLD = '#F59E0B';
 const AMBER = '#F59E0B';
@@ -142,50 +142,70 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     return (
         <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: '#08060f', color: '#fff', fontFamily: 'Inter, sans-serif' }}>
             
+            <style jsx>{`
+                .nav-desktop-container {
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                    flex-wrap: nowrap;
+                }
+                .mobile-toggle-btn {
+                    display: none;
+                }
+                @media (max-width: 990px) {
+                    .nav-desktop-container {
+                        display: none !important;
+                    }
+                    .mobile-toggle-btn {
+                        display: flex !important;
+                    }
+                }
+            `}</style>
+
             {/* ── Proper Top Navigation Bar ── */}
             <header style={{
                 position: 'sticky', top: 0, zIndex: 100,
-                background: 'rgba(8, 6, 15, 0.94)',
+                background: 'rgba(8, 6, 15, 0.96)',
                 backdropFilter: 'blur(16px)',
-                borderBottom: '1px solid rgba(245, 158, 11, 0.12)',
+                borderBottom: '1px solid rgba(245, 158, 11, 0.15)',
             }}>
                 <div style={{
                     maxWidth: 1360, margin: '0 auto', padding: '0 20px',
-                    height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 20
+                    height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16
                 }}>
                     
                     {/* Left: Brand Logo & Role Pill */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
                         <Link href={`/${userRole}`} style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
                             <div style={{
-                                width: 34, height: 34, borderRadius: 8,
+                                width: 32, height: 32, borderRadius: 8,
                                 background: 'linear-gradient(135deg, #F59E0B, #FBBF24)',
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                boxShadow: '0 0 16px rgba(245, 158, 11, 0.3)'
+                                boxShadow: '0 0 14px rgba(245, 158, 11, 0.35)'
                             }}>
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
                                     <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
                                         stroke="#08060f" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                                 </svg>
                             </div>
-                            <span className="font-display text-gradient-gold" style={{ fontWeight: 900, fontSize: 17, color: '#fff', letterSpacing: '-0.02em' }}>
+                            <span className="font-display text-gradient-gold" style={{ fontWeight: 900, fontSize: 16, color: '#fff', letterSpacing: '-0.02em' }}>
                                 SkillSense AI
                             </span>
                         </Link>
 
                         {/* Active Role Badge */}
                         <span style={{
-                            fontSize: 10, fontWeight: 800, padding: '3px 8px', borderRadius: 99,
+                            fontSize: 10, fontWeight: 800, padding: '2px 8px', borderRadius: 99,
                             background: 'rgba(245, 158, 11, 0.12)', color: GOLD,
                             border: '1px solid rgba(245, 158, 11, 0.25)',
                             textTransform: 'uppercase', letterSpacing: '0.06em'
-                        }} className="hidden sm:inline-block">
+                        }}>
                             {currentNavGroup.group}
                         </span>
                     </div>
 
                     {/* Middle: Horizontal Nav Items (Desktop) */}
-                    <nav className="hidden lg:flex" style={{ alignItems: 'center', gap: 4, flex: 1, justifyContent: 'center' }}>
+                    <nav className="nav-desktop-container">
                         {primaryRoutes.map(({ label, href, badge }: any) => {
                             const active = pathname === href || pathname === `${href}/`;
                             return (
@@ -193,14 +213,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                                     key={href}
                                     href={href}
                                     style={{
-                                        display: 'inline-flex', alignItems: 'center', gap: 6,
-                                        padding: '7px 14px', borderRadius: 8,
+                                        display: 'inline-flex', alignItems: 'center', gap: 5,
+                                        padding: '6px 12px', borderRadius: 8,
                                         fontSize: 13, textDecoration: 'none',
                                         color: active ? '#FFFFFF' : '#94A3B8',
                                         fontWeight: active ? 700 : 500,
                                         background: active ? 'rgba(245, 158, 11, 0.1)' : 'transparent',
-                                        borderBottom: active ? `2px solid ${GOLD}` : '2px solid transparent',
+                                        border: active ? '1px solid rgba(245, 158, 11, 0.3)' : '1px solid transparent',
                                         transition: 'all 0.15s ease',
+                                        whiteSpace: 'nowrap',
                                     }}
                                     onMouseEnter={e => { if (!active) e.currentTarget.style.color = '#FFFFFF'; }}
                                     onMouseLeave={e => { if (!active) e.currentTarget.style.color = '#94A3B8'; }}
@@ -226,13 +247,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                                     onClick={() => setShowMoreMenu(!showMoreMenu)}
                                     style={{
                                         display: 'inline-flex', alignItems: 'center', gap: 4,
-                                        padding: '7px 12px', borderRadius: 8,
+                                        padding: '6px 12px', borderRadius: 8,
                                         fontSize: 13, color: '#94A3B8', fontWeight: 500,
-                                        background: 'transparent', border: 'none', cursor: 'pointer',
+                                        background: showMoreMenu ? 'rgba(245, 158, 11, 0.1)' : 'transparent',
+                                        border: '1px solid transparent', cursor: 'pointer',
+                                        whiteSpace: 'nowrap',
                                     }}
                                 >
                                     <span>More</span>
-                                    <ChevronDown size={14} />
+                                    <ChevronDown size={13} />
                                 </button>
 
                                 {showMoreMenu && (
@@ -273,30 +296,30 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     </nav>
 
                     {/* Right: User Profile & Mobile Toggle */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
                         
                         {/* Profile Dropdown */}
                         <div ref={dropdownRef} style={{ position: 'relative' }}>
                             <button
                                 onClick={() => setShowDropdown(!showDropdown)}
                                 style={{
-                                    display: 'flex', alignItems: 'center', gap: 10,
+                                    display: 'flex', alignItems: 'center', gap: 8,
                                     background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.08)',
                                     borderRadius: 99, padding: '4px 10px 4px 4px', cursor: 'pointer',
                                 }}
                             >
                                 <div style={{
-                                    width: 30, height: 30, borderRadius: '50%',
+                                    width: 28, height: 28, borderRadius: '50%',
                                     background: 'linear-gradient(135deg, #F59E0B, #FBBF24)',
                                     color: '#08060F', display: 'flex', alignItems: 'center', justifyContent: 'center',
                                     fontSize: 11, fontWeight: 800,
                                 }}>
                                     {initials}
                                 </div>
-                                <span style={{ fontSize: 13, fontWeight: 600, color: '#fff' }} className="hidden sm:inline-block">
+                                <span style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>
                                     {userName.split(' ')[0]}
                                 </span>
-                                <ChevronDown size={14} color="#94A3B8" />
+                                <ChevronDown size={13} color="#94A3B8" />
                             </button>
 
                             {showDropdown && (
@@ -332,14 +355,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                         <button
                             onClick={() => setMobileOpen(!mobileOpen)}
                             aria-label="Toggle navigation menu"
-                            className="lg:hidden"
+                            className="mobile-toggle-btn"
                             style={{
                                 background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.1)',
                                 borderRadius: 8, padding: '7px', color: '#fff', cursor: 'pointer',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                alignItems: 'center', justifyContent: 'center',
                             }}
                         >
-                            {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+                            {mobileOpen ? <X size={18} /> : <Menu size={18} />}
                         </button>
                     </div>
                 </div>
@@ -355,7 +378,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                                 background: '#0d0b1d', borderTop: '1px solid rgba(245, 158, 11, 0.15)',
                                 padding: '12px 20px 20px', display: 'flex', flexDirection: 'column', gap: 4,
                             }}
-                            className="lg:hidden"
                         >
                             <div style={{ fontSize: 11, fontWeight: 700, color: GOLD, textTransform: 'uppercase', padding: '4px 8px', letterSpacing: '0.06em' }}>
                                 {currentNavGroup.group} Navigation
@@ -401,7 +423,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <main style={{
                 flex: 1, width: '100%', maxWidth: 1360, margin: '0 auto',
                 padding: '24px 20px', overflowY: 'auto'
-            }} className="sm:px-6 lg:px-8">
+            }}>
                 {children}
             </main>
         </div>
