@@ -15,6 +15,7 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { FadeIn } from '@/components/shared/FadeIn';
+import { QuickTipsSegment } from '@/components/shared/QuickTipsSegment';
 import {
   Brain,
   Award,
@@ -232,6 +233,9 @@ export default function StudentDashboardPage() {
         {/* ── TAB 1: OVERVIEW ── */}
         {activeTab === 'overview' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+            {/* Platform Tips & UI Feature Segment */}
+            <QuickTipsSegment />
+
             {/* AI Actionable Insight Banner */}
             {topCareer ? (
               <AIInsightCard

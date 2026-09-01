@@ -30,7 +30,9 @@ import {
   Landmark,
   Settings,
   ChevronDown,
+  Lightbulb,
 } from 'lucide-react';
+import { FeatureTipsGuideModal } from '@/components/shared/FeatureTipsGuide';
 
 function VerificationBanner() {
   const { user } = useAuth();
@@ -84,6 +86,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   } = useNavigationStore();
 
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [guideOpen, setGuideOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 
   const [mounted, setMounted] = useState(false);
@@ -409,7 +412,28 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </div>
 
             {/* Right Quick Controls */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              {/* UI Guide & Feature Tips Button */}
+              <button
+                type="button"
+                onClick={() => setGuideOpen(true)}
+                className="btn-secondary"
+                style={{
+                  fontSize: 11.5,
+                  padding: '5px 11px',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 5,
+                  color: 'var(--gold)',
+                  border: '1px solid rgba(245,158,11,0.3)',
+                  background: 'rgba(245,158,11,0.06)',
+                }}
+                aria-label="Open UI Feature Guide and Pro Tips"
+              >
+                <Lightbulb size={13} color="var(--gold)" />
+                <span>UI Guide</span>
+              </button>
+
               {/* Telemetry Pill */}
               <Link
                 href="/ai-health"
@@ -607,6 +631,29 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             >
               <Layout size={12} />
               <span>{navigationStyle === 'sidebar' ? 'Navbar Mode' : 'Sidebar Mode'}</span>
+            </button>
+
+            {/* UI Guide Button */}
+            <button
+              type="button"
+              onClick={() => setGuideOpen(true)}
+              className="btn-secondary"
+              style={{
+                fontSize: 11,
+                padding: '4px 9px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 5,
+                color: 'var(--gold)',
+                border: '1px solid rgba(245,158,11,0.3)',
+                background: 'rgba(245,158,11,0.06)',
+                cursor: 'pointer',
+              }}
+              title="UI Feature Guide & Tips"
+              aria-label="Open UI Feature Guide and Pro Tips"
+            >
+              <Lightbulb size={12} color="var(--gold)" />
+              <span className="hidden sm:inline">UI Guide</span>
             </button>
 
             {/* Live AI Telemetry Pill */}
@@ -813,8 +860,37 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   ))}
                 </div>
 
+                {/* Mobile Feature Guide Button */}
+                <div style={{ padding: '8px 0', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMobileOpen(false);
+                      setGuideOpen(true);
+                    }}
+                    style={{
+                      width: '100%',
+                      padding: '8px 10px',
+                      borderRadius: 8,
+                      background: 'rgba(245, 158, 11, 0.08)',
+                      border: '1px solid rgba(245, 158, 11, 0.25)',
+                      color: 'var(--gold)',
+                      fontSize: 12,
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 6,
+                    }}
+                  >
+                    <Lightbulb size={14} />
+                    <span>💡 UI Feature Guide & Tips</span>
+                  </button>
+                </div>
+
                 {/* Mobile Drawer Footer */}
-                <div style={{ borderTop: '1px solid var(--border)', paddingTop: 12, marginTop: 10 }}>
+                <div style={{ borderTop: '1px solid var(--border)', paddingTop: 12, marginTop: 4 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
                       <div style={{ fontSize: 12, color: '#f8fafc', fontWeight: 700, maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -840,6 +916,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </>
         )}
       </AnimatePresence>
+
+      {/* ── Interactive Feature Guide & Tips Modal ── */}
+      <FeatureTipsGuideModal isOpen={guideOpen} onClose={() => setGuideOpen(false)} />
     </div>
   );
 }
