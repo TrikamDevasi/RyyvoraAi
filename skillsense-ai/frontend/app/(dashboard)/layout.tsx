@@ -86,8 +86,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 
+  const [mounted, setMounted] = useState(false);
+
   // Initialize navigation preferences on mount
   useEffect(() => {
+    setMounted(true);
     initPreferences();
   }, [initPreferences]);
 
@@ -127,11 +130,20 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   };
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg)', color: 'var(--text-primary)', flexDirection: navigationStyle === 'navbar' ? 'column' : 'row' }}>
+    <div
+      suppressHydrationWarning
+      style={{
+        display: 'flex',
+        minHeight: '100vh',
+        background: 'var(--bg)',
+        color: 'var(--text-primary)',
+        flexDirection: mounted && navigationStyle === 'navbar' ? 'column' : 'row',
+      }}
+    >
       {/* ═════════════════════════════════════════════════════════════════════════ */}
       {/* ── 1. SIDEBAR MODE (Desktop: Left Vertical Navigation) ─────────────────── */}
       {/* ═════════════════════════════════════════════════════════════════════════ */}
-      {navigationStyle === 'sidebar' && (
+      {(!mounted || navigationStyle === 'sidebar') && (
         <aside
           aria-label="Primary application sidebar"
           style={{
@@ -324,7 +336,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* ═════════════════════════════════════════════════════════════════════════ */}
       {/* ── 2. NAVBAR MODE (Desktop: Horizontal Top Navigation Bar) ─────────────── */}
       {/* ═════════════════════════════════════════════════════════════════════════ */}
-      {navigationStyle === 'navbar' && (
+      {mounted && navigationStyle === 'navbar' && (
         <header
           aria-label="Primary top application navigation"
           style={{
@@ -484,7 +496,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             top: 0,
             zIndex: 30,
           }}
-          className={navigationStyle === 'navbar' ? 'md:hidden flex' : 'flex'}
+          className={mounted && navigationStyle === 'navbar' ? 'md:hidden flex' : 'flex'}
         >
           {/* Left: Mobile Toggle & App Identity or Breadcrumbs */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>

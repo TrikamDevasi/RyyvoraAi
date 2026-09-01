@@ -72,8 +72,8 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable}`}>
-      <body className="antialiased font-sans">
+    <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable}`} suppressHydrationWarning>
+      <body className="antialiased font-sans" suppressHydrationWarning>
         <SplashScreen>{children}</SplashScreen>
         <ChatWidgetLoader />
       </body>

@@ -3,10 +3,12 @@
 import React, { useState, useEffect } from 'react';
 
 export default function SplashScreen({ children }: { children: React.ReactNode }) {
+    const [mounted, setMounted] = useState(false);
     const [visible, setVisible] = useState(false);
     const [fadeOut, setFadeOut] = useState(false);
 
     useEffect(() => {
+        setMounted(true);
         // Only show a brief splash once per tab session (first render), never on route changes.
         // Respect prefers-reduced-motion by skipping the animation entirely.
         const prefersReducedMotion =
@@ -29,7 +31,7 @@ export default function SplashScreen({ children }: { children: React.ReactNode }
         return () => { clearTimeout(timer1); clearTimeout(timer2); };
     }, []);
 
-    if (!visible) return <>{children}</>;
+    if (!mounted || !visible) return <>{children}</>;
 
     return (
         <>
