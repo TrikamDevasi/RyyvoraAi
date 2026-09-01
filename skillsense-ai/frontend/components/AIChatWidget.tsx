@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import api from '../lib/api';
 import { useAuth } from '@/hooks/useAuth';
 import toast from 'react-hot-toast';
@@ -17,6 +17,8 @@ import {
   Minimize2,
   AlertTriangle,
   RotateCcw,
+  User,
+  ChevronRight,
 } from 'lucide-react';
 import { AIBadge } from '@/components/ui/AIBadge';
 
@@ -27,6 +29,145 @@ interface Message {
   suggestions?: string[];
   isError?: boolean;
   failedPrompt?: string;
+}
+
+// ── Inline Markdown & List Formatter ──────────────────────────────────────────
+function renderInlineText(text: string) {
+  // Replace bold **...** and inline code `...`
+  const parts: (string | React.ReactNode)[] = [];
+  const regex = /(\*\*.*?\*\*|`.*?`|\*.*?\*)/g;
+  let lastIdx = 0;
+  let match;
+
+  while ((match = regex.exec(text)) !== null) {
+    if (match.index > lastIdx) {
+      parts.push(text.substring(lastIdx, match.index));
+    }
+    const token = match[0];
+    if (token.startsWith('**') && token.endsWith('**')) {
+      parts.push(
+        <strong key={match.index} style={{ color: '#fde68a', fontWeight: 650 }}>
+          {token.slice(2, -2)}
+        </strong>
+      );
+    } else if (token.startsWith('`') && token.endsWith('`')) {
+      parts.push(
+        <code
+          key={match.index}
+          style={{
+            background: 'rgba(255, 255, 255, 0.08)',
+            padding: '2px 5px',
+            borderRadius: 4,
+            fontSize: '0.9em',
+            fontFamily: 'monospace',
+            color: '#38bdf8',
+          }}
+        >
+          {token.slice(1, -1)}
+        </code>
+      );
+    } else if (token.startsWith('*') && token.endsWith('*')) {
+      parts.push(
+        <em key={match.index} style={{ color: '#e2e8f0' }}>
+          {token.slice(1, -1)}
+        </em>
+      );
+    }
+    lastIdx = regex.lastIndex;
+  }
+
+  if (lastIdx < text.length) {
+    parts.push(text.substring(lastIdx));
+  }
+
+  return parts;
+}
+
+function FormattedMessageContent({ text }: { text: string }) {
+  // Pre-process text to separate numbered items if joined in one line (e.g. "... 1. **Title:** ... 2. **Title:** ...")
+  let normalized = text;
+  normalized = normalized.replace(/\s+(?=\d+\.\s+\*\*|\d+\.\s+[A-Z])/g, '\n\n');
+  normalized = normalized.replace(/\s+(?=-\s+\*\*|-\s+[A-Z])/g, '\n');
+
+  // Split into paragraphs / lines
+  const rawParagraphs = normalized.split(/\n\n+/).filter(Boolean);
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10, fontSize: 13, lineHeight: 1.62 }}>
+      {rawParagraphs.map((para, pIdx) => {
+        const trimmed = para.trim();
+
+        // Check if paragraph is a numbered item (e.g. "1. **Title:** Description" or "1. Description")
+        const numberedMatch = trimmed.match(/^(\d+)\.\s+([\s\S]*)$/);
+        if (numberedMatch) {
+          const num = numberedMatch[1];
+          const rest = numberedMatch[2];
+
+          return (
+            <div
+              key={pIdx}
+              style={{
+                display: 'flex',
+                gap: 9,
+                background: 'rgba(255, 255, 255, 0.025)',
+                border: '1px solid rgba(255, 255, 255, 0.05)',
+                borderRadius: 8,
+                padding: '8px 10px',
+                marginTop: 2,
+              }}
+            >
+              <div
+                style={{
+                  minWidth: 20,
+                  height: 20,
+                  borderRadius: 6,
+                  background: 'rgba(245, 158, 11, 0.15)',
+                  border: '1px solid rgba(245, 158, 11, 0.3)',
+                  color: '#f59e0b',
+                  fontSize: 11,
+                  fontWeight: 700,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginTop: 1,
+                }}
+              >
+                {num}
+              </div>
+              <div style={{ flex: 1, color: '#f1f5f9' }}>
+                {renderInlineText(rest)}
+              </div>
+            </div>
+          );
+        }
+
+        // Check if paragraph is a bullet list (lines starting with '-' or '*')
+        if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
+          const bulletLines = trimmed.split(/\n/).filter(Boolean);
+          return (
+            <div key={pIdx} style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {bulletLines.map((line, bIdx) => {
+                const cleanLine = line.replace(/^[-*]\s+/, '');
+                return (
+                  <div key={bIdx} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+                    <span style={{ color: '#f59e0b', fontSize: 13, lineHeight: '18px' }}>•</span>
+                    <div style={{ flex: 1, color: '#f1f5f9' }}>{renderInlineText(cleanLine)}</div>
+                  </div>
+                );
+              })}
+            </div>
+          );
+        }
+
+        // Regular paragraph
+        return (
+          <p key={pIdx} style={{ margin: 0, color: '#f1f5f9' }}>
+            {renderInlineText(trimmed)}
+          </p>
+        );
+      })}
+    </div>
+  );
 }
 
 const DEFAULT_SUGGESTIONS = [
@@ -425,99 +566,160 @@ export default function AIChatWidget() {
                   key={m.id}
                   style={{
                     display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: isAssistant ? 'flex-start' : 'flex-end',
+                    flexDirection: isAssistant ? 'row' : 'row-reverse',
+                    alignItems: 'flex-start',
+                    gap: 10,
+                    width: '100%',
                   }}
                 >
-                  <div
-                    style={{
-                      maxWidth: '88%',
-                      padding: '10px 14px',
-                      borderRadius: isAssistant ? '4px 12px 12px 12px' : '12px 12px 4px 12px',
-                      background: isAssistant
-                        ? m.isError
-                          ? 'rgba(239, 68, 68, 0.1)'
-                          : 'rgba(255,255,255,0.03)'
-                        : 'linear-gradient(135deg, #f59e0b, #d97706)',
-                      color: isAssistant ? (m.isError ? '#fca5a5' : '#cbd5e1') : '#090a0f',
-                      border: isAssistant ? `1px solid ${m.isError ? 'rgba(239,68,68,0.3)' : 'var(--border)'}` : 'none',
-                      fontSize: 12.5,
-                      lineHeight: 1.5,
-                      fontWeight: isAssistant ? 400 : 600,
-                      position: 'relative',
-                    }}
-                  >
-                    {m.content || (
-                      <div style={{ display: 'flex', gap: 4, padding: '4px 0', alignItems: 'center' }}>
-                        <span style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--gold)', animation: 'pulse-slow 1s infinite' }} />
-                        <span style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--gold)', animation: 'pulse-slow 1.2s infinite' }} />
-                        <span style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--gold)', animation: 'pulse-slow 1.4s infinite' }} />
-                      </div>
-                    )}
-
-                    {isAssistant && m.content && !m.isError && (
-                      <button
-                        type="button"
-                        onClick={() => handleCopy(m.id, m.content)}
-                        aria-label="Copy AI response"
-                        style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: 3,
-                          marginTop: 6,
-                          background: 'transparent',
-                          border: 'none',
-                          color: copiedId === m.id ? '#10b981' : 'var(--text-muted)',
-                          fontSize: 10,
-                          cursor: 'pointer',
-                        }}
-                      >
-                        {copiedId === m.id ? <Check size={11} /> : <Copy size={11} />}
-                        <span>{copiedId === m.id ? 'Copied' : 'Copy'}</span>
-                      </button>
-                    )}
-
-                    {/* Retry Button on Error */}
-                    {isAssistant && m.isError && m.failedPrompt && (
-                      <button
-                        type="button"
-                        onClick={() => sendMessage(m.failedPrompt!)}
-                        className="btn-gold"
-                        style={{ fontSize: 11, padding: '4px 10px', marginTop: 8 }}
-                      >
-                        <RotateCcw size={11} /> Retry Request
-                      </button>
-                    )}
-                  </div>
-
-                  {/* Suggestion Chips */}
-                  {isAssistant && m.suggestions && m.suggestions.length > 0 && !m.isError && (
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 8, maxWidth: '92%' }}>
-                      {m.suggestions.map((s, idx) => (
-                        <button
-                          key={idx}
-                          type="button"
-                          onClick={() => sendMessage(s)}
-                          style={{
-                            padding: '4px 10px',
-                            borderRadius: 99,
-                            background: 'rgba(245,158,11,0.06)',
-                            border: '1px solid rgba(245,158,11,0.2)',
-                            color: 'var(--gold)',
-                            fontSize: 11,
-                            fontWeight: 600,
-                            cursor: 'pointer',
-                            textAlign: 'left',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 4,
-                          }}
-                        >
-                          <Sparkles size={10} /> {s}
-                        </button>
-                      ))}
+                  {/* Assistant Avatar */}
+                  {isAssistant && (
+                    <div
+                      style={{
+                        width: 28,
+                        height: 28,
+                        borderRadius: '50%',
+                        background: 'linear-gradient(135deg, rgba(245,158,11,0.2), rgba(245,158,11,0.05))',
+                        border: '1px solid rgba(245,158,11,0.3)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: '#f59e0b',
+                        flexShrink: 0,
+                        marginTop: 2,
+                      }}
+                    >
+                      <Bot size={15} />
                     </div>
                   )}
+
+                  <div
+                    style={{
+                      maxWidth: isAssistant ? '88%' : '82%',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: isAssistant ? 'flex-start' : 'flex-end',
+                    }}
+                  >
+                    {/* Chat Bubble */}
+                    <div
+                      style={{
+                        padding: isAssistant ? '12px 16px' : '10px 15px',
+                        borderRadius: isAssistant ? '4px 14px 14px 14px' : '14px 14px 4px 14px',
+                        background: isAssistant
+                          ? m.isError
+                            ? 'rgba(239, 68, 68, 0.12)'
+                            : '#141724'
+                          : 'linear-gradient(135deg, #f59e0b, #d97706)',
+                        color: isAssistant ? (m.isError ? '#fca5a5' : '#f1f5f9') : '#090a0f',
+                        border: isAssistant
+                          ? `1px solid ${m.isError ? 'rgba(239,68,68,0.35)' : 'rgba(255,255,255,0.09)'}`
+                          : 'none',
+                        boxShadow: isAssistant
+                          ? '0 4px 16px rgba(0,0,0,0.3)'
+                          : '0 4px 12px rgba(245,158,11,0.25)',
+                        fontFamily: 'var(--font-inter), system-ui, -apple-system, sans-serif',
+                        fontSize: 13,
+                        lineHeight: 1.6,
+                        fontWeight: isAssistant ? 400 : 600,
+                        position: 'relative',
+                        width: '100%',
+                      }}
+                    >
+                      {m.content ? (
+                        isAssistant && !m.isError ? (
+                          <FormattedMessageContent text={m.content} />
+                        ) : (
+                          <span style={{ whiteSpace: 'pre-wrap' }}>{m.content}</span>
+                        )
+                      ) : (
+                        <div style={{ display: 'flex', gap: 5, padding: '6px 0', alignItems: 'center' }}>
+                          <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#f59e0b', animation: 'pulse-slow 1s infinite' }} />
+                          <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#f59e0b', animation: 'pulse-slow 1.2s infinite' }} />
+                          <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#f59e0b', animation: 'pulse-slow 1.4s infinite' }} />
+                        </div>
+                      )}
+
+                      {/* Assistant Card Footer Bar */}
+                      {isAssistant && m.content && !m.isError && (
+                        <div
+                          style={{
+                            display: 'flex',
+                            justifyContent: 'flex-end',
+                            alignItems: 'center',
+                            marginTop: 10,
+                            paddingTop: 6,
+                            borderTop: '1px solid rgba(255,255,255,0.06)',
+                          }}
+                        >
+                          <button
+                            type="button"
+                            onClick={() => handleCopy(m.id, m.content)}
+                            aria-label="Copy AI response"
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: 4,
+                              background: 'rgba(255,255,255,0.04)',
+                              border: '1px solid rgba(255,255,255,0.08)',
+                              borderRadius: 6,
+                              padding: '3px 8px',
+                              color: copiedId === m.id ? '#10b981' : '#94a3b8',
+                              fontSize: 10.5,
+                              fontWeight: 500,
+                              cursor: 'pointer',
+                              transition: 'all 0.15s ease',
+                            }}
+                            className="hover:text-white hover:bg-white/10"
+                          >
+                            {copiedId === m.id ? <Check size={12} /> : <Copy size={12} />}
+                            <span>{copiedId === m.id ? 'Copied' : 'Copy'}</span>
+                          </button>
+                        </div>
+                      )}
+
+                      {/* Retry Button on Error */}
+                      {isAssistant && m.isError && m.failedPrompt && (
+                        <button
+                          type="button"
+                          onClick={() => sendMessage(m.failedPrompt!)}
+                          className="btn-gold"
+                          style={{ fontSize: 11, padding: '5px 12px', marginTop: 10, display: 'inline-flex', alignItems: 'center', gap: 5 }}
+                        >
+                          <RotateCcw size={12} /> Retry Request
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Suggestion Chips */}
+                    {isAssistant && m.suggestions && m.suggestions.length > 0 && !m.isError && (
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 8, maxWidth: '92%' }}>
+                        {m.suggestions.map((s, idx) => (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={() => sendMessage(s)}
+                            style={{
+                              padding: '4px 10px',
+                              borderRadius: 99,
+                              background: 'rgba(245,158,11,0.06)',
+                              border: '1px solid rgba(245,158,11,0.2)',
+                              color: 'var(--gold)',
+                              fontSize: 11,
+                              fontWeight: 600,
+                              cursor: 'pointer',
+                              textAlign: 'left',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 4,
+                            }}
+                          >
+                            <Sparkles size={10} /> {s}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
               );
             })}
