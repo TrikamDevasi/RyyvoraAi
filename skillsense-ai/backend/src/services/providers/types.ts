@@ -3,14 +3,19 @@ import { z } from 'zod';
 
 // ── Common Provider Interface ──────────────────────────────────────────────────
 
+export type ProviderState = 'HEALTHY' | 'DEGRADED' | 'UNAVAILABLE' | 'INVALID_CREDENTIALS' | 'RATE_LIMITED';
+
 export interface ProviderHealth {
   name: string;
   configured: boolean;
   healthy: boolean;
+  state?: ProviderState;
   model: string;
   latencyMs: number;
   message: string;
   lastChecked?: string;
+  consecutiveFailures?: number;
+  cooldownUntil?: number;
 }
 
 export interface ChatMessage {

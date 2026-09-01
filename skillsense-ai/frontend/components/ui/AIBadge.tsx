@@ -1,14 +1,38 @@
 'use client';
 
 import React from 'react';
-import { Cpu, ShieldCheck, Sparkles, Activity } from 'lucide-react';
+import { Cpu, ShieldCheck, Sparkles, Activity, AlertCircle } from 'lucide-react';
 
 interface AIBadgeProps {
-  type?: 'ai' | 'verified' | 'live' | 'nsqf';
+  type?: 'ai' | 'verified' | 'live' | 'nsqf' | 'error';
   label?: string;
 }
 
 export function AIBadge({ type = 'ai', label }: AIBadgeProps) {
+  if (type === 'error') {
+    return (
+      <span
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 4,
+          padding: '2px 8px',
+          background: 'rgba(239,68,68,0.1)',
+          border: '1px solid rgba(239,68,68,0.3)',
+          color: '#fca5a5',
+          fontSize: 10.5,
+          fontWeight: 700,
+          borderRadius: 99,
+          letterSpacing: '0.03em',
+          textTransform: 'uppercase',
+        }}
+      >
+        <AlertCircle size={12} />
+        {label || 'INVALID RECORD'}
+      </span>
+    );
+  }
+
   if (type === 'verified') {
     return (
       <span
@@ -71,9 +95,10 @@ export function AIBadge({ type = 'ai', label }: AIBadgeProps) {
           fontWeight: 700,
           borderRadius: 99,
           letterSpacing: '0.03em',
+          textTransform: 'uppercase',
         }}
       >
-        <Cpu size={12} />
+        <Activity size={12} />
         {label || 'NSQF LEVEL 4'}
       </span>
     );
@@ -85,14 +110,14 @@ export function AIBadge({ type = 'ai', label }: AIBadgeProps) {
         display: 'inline-flex',
         alignItems: 'center',
         gap: 4,
-        padding: '2px 7px',
-        background: 'rgba(245,158,11,0.06)',
-        border: '1px solid rgba(245,158,11,0.2)',
+        padding: '2px 8px',
+        background: 'rgba(245,158,11,0.08)',
+        border: '1px solid rgba(245,158,11,0.25)',
         color: '#f59e0b',
         fontSize: 10.5,
         fontWeight: 700,
-        borderRadius: 4,
-        letterSpacing: '0.02em',
+        borderRadius: 99,
+        letterSpacing: '0.03em',
         textTransform: 'uppercase',
       }}
     >

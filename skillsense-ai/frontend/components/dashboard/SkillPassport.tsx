@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import type { SampleStudent } from '../../types/charts';
 import { Award, ShieldCheck, Share2, Printer, CheckCircle2, QrCode, Copy, ExternalLink, Cpu } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -38,12 +39,22 @@ export default function SkillPassport({ student }: Props) {
           <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Status: Active & Cryptographically Verified</span>
         </div>
 
-        <div style={{ display: 'flex', gap: 8 }}>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          <Link
+            href={`/verify/${encodeURIComponent(hash)}`}
+            target="_blank"
+            className="btn-gold"
+            style={{ fontSize: 12, padding: '6px 14px', textDecoration: 'none' }}
+            aria-label="Open public verification page"
+          >
+            <ExternalLink size={13} /> Public Verification URL
+          </Link>
           <button
             type="button"
             onClick={copyHash}
             className="btn-secondary"
             style={{ fontSize: 12, padding: '6px 12px' }}
+            aria-label="Copy SHA-256 hash"
           >
             <Copy size={13} /> {copied ? 'Hash Copied!' : 'Copy Hash'}
           </button>
@@ -52,6 +63,7 @@ export default function SkillPassport({ student }: Props) {
             onClick={handlePrint}
             className="btn-secondary"
             style={{ fontSize: 12, padding: '6px 12px' }}
+            aria-label="Export and print certificate"
           >
             <Printer size={13} /> Export Credential
           </button>
@@ -80,6 +92,7 @@ export default function SkillPassport({ student }: Props) {
             pointerEvents: 'none',
             color: 'var(--gold)',
           }}
+          aria-hidden="true"
         >
           <Award size={260} />
         </div>
@@ -218,7 +231,11 @@ export default function SkillPassport({ student }: Props) {
               <div style={{ fontSize: 10, color: '#10b981' }}>Live Consensus</div>
             </div>
 
-            <div
+            <Link
+              href={`/verify/${encodeURIComponent(hash)}`}
+              target="_blank"
+              title="Click to open live public verification"
+              aria-label="Scan QR or open verification"
               style={{
                 width: 44,
                 height: 44,
@@ -229,10 +246,13 @@ export default function SkillPassport({ student }: Props) {
                 justifyContent: 'center',
                 color: '#090a0f',
                 padding: 4,
+                textDecoration: 'none',
+                transition: 'transform 0.15s ease',
               }}
+              className="hover:scale-105"
             >
               <QrCode size={36} />
-            </div>
+            </Link>
           </div>
         </div>
       </div>

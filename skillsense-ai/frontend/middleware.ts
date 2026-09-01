@@ -14,7 +14,7 @@ const ROLE_ROUTES: Record<string, string[]> = {
   employer:   ['/employer'],
 };
 
-const PUBLIC_PREFIXES = ['/auth', '/api', '/_next', '/favicon', '/icon', '/share', '/exam', '/ai-health'];
+const PUBLIC_PREFIXES = ['/auth', '/api', '/_next', '/favicon', '/icon', '/share', '/exam', '/ai-health', '/verify'];
 
 const isPublic = (pathname: string): boolean =>
   PUBLIC_PREFIXES.some((p) => pathname.startsWith(p)) || pathname === '/';

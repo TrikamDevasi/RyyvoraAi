@@ -455,7 +455,37 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            {/* Stakeholder Workspace Switcher (Demo / Evaluator Friendly) */}
+            <div className="hidden lg:flex" style={{ alignItems: 'center', gap: 4, background: 'rgba(255,255,255,0.03)', padding: 3, borderRadius: 8, border: '1px solid var(--border)' }}>
+              {[
+                { role: 'student', label: 'Student', href: '/student' },
+                { role: 'institute', label: 'Institute', href: '/institute' },
+                { role: 'industry', label: 'Industry', href: '/industry' },
+                { role: 'government', label: 'Gov', href: '/government' },
+              ].map((sw) => {
+                const isCur = pathname.startsWith(sw.href);
+                return (
+                  <Link
+                    key={sw.role}
+                    href={sw.href}
+                    style={{
+                      fontSize: 11,
+                      fontWeight: isCur ? 700 : 500,
+                      padding: '3px 8px',
+                      borderRadius: 6,
+                      background: isCur ? 'rgba(245,158,11,0.15)' : 'transparent',
+                      color: isCur ? 'var(--gold)' : 'var(--text-muted)',
+                      textDecoration: 'none',
+                      transition: 'all 0.15s ease',
+                    }}
+                  >
+                    {sw.label}
+                  </Link>
+                );
+              })}
+            </div>
+
             {/* Live AI Telemetry Pill */}
             <Link
               href="/ai-health"
@@ -474,7 +504,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               }}
             >
               <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10b981', animation: 'pulse-slow 2s infinite' }} />
-              <span>AI TELEMETRY LIVE</span>
+              <span>AI TELEMETRY</span>
             </Link>
 
             <Link

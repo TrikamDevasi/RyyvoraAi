@@ -4,13 +4,18 @@ import {
   getStudentSkills, getStudentPassport,
   submitAssessment, getCareerPaths, getInterventions,
   getMyStudentProfile, analyzeStudentSkills,
+  verifyPublicPassport,
 } from '../controllers/student.controller';
 import { protect, requireStudentOwnership, requireRole } from '../middleware/auth.middleware';
 import { aiLimiter } from '../middleware/rateLimit.middleware';
 
 const router = Router();
 
-// Apply auth to all student routes
+// ── Public Endpoint: Anyone (Recruiters, Deans, Public) can verify a cryptographic Skill Passport ──
+router.get('/passport/verify/:hash', verifyPublicPassport);
+router.get('/verify/:hash', verifyPublicPassport);
+
+// Apply auth to all subsequent protected student routes
 router.use(protect);
 
 // Current student profile

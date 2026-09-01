@@ -5,7 +5,6 @@ import api from '../lib/api';
 import { useAuth } from '@/hooks/useAuth';
 import toast from 'react-hot-toast';
 import {
-  MessageSquare,
   Bot,
   X,
   Send,
@@ -14,10 +13,10 @@ import {
   Check,
   RefreshCw,
   Trash2,
-  Cpu,
-  ArrowRight,
   Maximize2,
   Minimize2,
+  AlertTriangle,
+  RotateCcw,
 } from 'lucide-react';
 import { AIBadge } from '@/components/ui/AIBadge';
 
@@ -26,6 +25,8 @@ interface Message {
   role: 'user' | 'assistant';
   content: string;
   suggestions?: string[];
+  isError?: boolean;
+  failedPrompt?: string;
 }
 
 const DEFAULT_SUGGESTIONS = [
@@ -50,8 +51,10 @@ export default function AIChatWidget() {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   // Fetch session history
   useEffect(() => {
@@ -71,6 +74,25 @@ export default function AIChatWidget() {
         .catch(() => {});
     }
   }, [user]);
+
+  // Clean up streaming on unmount or when closed
+  useEffect(() => {
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+        abortControllerRef.current = null;
+      }
+    };
+  }, []);
+
+  const handleClose = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+    setLoading(false);
+    setOpen(false);
+  };
 
   // Auto-scroll
   useEffect(() => {
@@ -110,6 +132,13 @@ export default function AIChatWidget() {
     async (text: string) => {
       if (!text.trim() || loading) return;
 
+      // Abort any existing stream
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+      const controller = new AbortController();
+      abortControllerRef.current = controller;
+
       const userMsg: Message = { id: Date.now().toString(), role: 'user', content: text.trim() };
       setMessages((prev) => [...prev, userMsg]);
       setInput('');
@@ -119,6 +148,11 @@ export default function AIChatWidget() {
       const aiMsgId = `${Date.now() + 1}_ai`;
 
       setMessages((prev) => [...prev, { id: aiMsgId, role: 'assistant', content: '' }]);
+
+      // 20-second connection timeout
+      const timeoutId = setTimeout(() => {
+        controller.abort();
+      }, 20000);
 
       try {
         const token = localStorage.getItem('skillsense_token');
@@ -132,6 +166,7 @@ export default function AIChatWidget() {
           {
             method: 'POST',
             headers,
+            signal: controller.signal,
             body: JSON.stringify({
               message: text.trim(),
               history,
@@ -140,8 +175,10 @@ export default function AIChatWidget() {
           }
         );
 
+        clearTimeout(timeoutId);
+
         if (!response.ok) {
-          throw new Error('AI service response error');
+          throw new Error('AI service returned non-200 status');
         }
 
         const reader = response.body?.getReader();
@@ -181,25 +218,45 @@ export default function AIChatWidget() {
         setMessages((prev) =>
           prev.map((m) =>
             m.id === aiMsgId
-              ? { ...m, content: accumulated || 'Response received.', suggestions: finalSuggestions }
+              ? { ...m, content: accumulated || 'Response received.', suggestions: finalSuggestions, isError: false }
               : m
           )
         );
       } catch (err: any) {
-        setMessages((prev) =>
-          prev.map((m) =>
-            m.id === aiMsgId
-              ? {
-                  ...m,
-                  content:
-                    "I encountered a momentary connection issue. Please verify your internet connection or retry your prompt.",
-                  suggestions: DEFAULT_SUGGESTIONS,
-                }
-              : m
-          )
-        );
+        clearTimeout(timeoutId);
+        if (err.name === 'AbortError') {
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === aiMsgId
+                ? {
+                    ...m,
+                    content: "Request was cancelled or timed out. Click retry to try again.",
+                    suggestions: DEFAULT_SUGGESTIONS,
+                    isError: true,
+                    failedPrompt: text.trim(),
+                  }
+                : m
+            )
+          );
+        } else {
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === aiMsgId
+                ? {
+                    ...m,
+                    content:
+                      "AI services are temporarily unavailable or busy. Please check your connection and retry.",
+                    suggestions: DEFAULT_SUGGESTIONS,
+                    isError: true,
+                    failedPrompt: text.trim(),
+                  }
+                : m
+            )
+          );
+        }
       } finally {
         setLoading(false);
+        abortControllerRef.current = null;
       }
     },
     [messages, loading, user]
@@ -212,6 +269,7 @@ export default function AIChatWidget() {
         <button
           type="button"
           onClick={() => setOpen(true)}
+          aria-label="Open SkillSense AI Copilot assistant"
           style={{
             position: 'fixed',
             bottom: 24,
@@ -250,6 +308,8 @@ export default function AIChatWidget() {
       {/* ── Chat Modal / Drawer ── */}
       {open && (
         <div
+          role="dialog"
+          aria-label="SkillSense AI Copilot"
           style={{
             position: 'fixed',
             bottom: 24,
@@ -315,6 +375,7 @@ export default function AIChatWidget() {
                 onClick={handleClearHistory}
                 style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 4 }}
                 title="Clear chat history"
+                aria-label="Clear chat history"
               >
                 <Trash2 size={14} />
               </button>
@@ -324,15 +385,17 @@ export default function AIChatWidget() {
                 onClick={() => setExpanded(!expanded)}
                 style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 4 }}
                 title={expanded ? 'Minimize' : 'Maximize'}
+                aria-label={expanded ? 'Minimize assistant drawer' : 'Maximize assistant drawer'}
               >
                 {expanded ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
               </button>
 
               <button
                 type="button"
-                onClick={() => setOpen(false)}
+                onClick={handleClose}
                 style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 4 }}
                 title="Close chat"
+                aria-label="Close assistant drawer"
               >
                 <X size={16} />
               </button>
@@ -340,7 +403,10 @@ export default function AIChatWidget() {
           </div>
 
           {/* Messages Stream */}
-          <div style={{ flex: 1, overflowY: 'auto', padding: 16, display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <div
+            aria-live="polite"
+            style={{ flex: 1, overflowY: 'auto', padding: 16, display: 'flex', flexDirection: 'column', gap: 14 }}
+          >
             {messages.map((m) => {
               const isAssistant = m.role === 'assistant';
 
@@ -358,9 +424,13 @@ export default function AIChatWidget() {
                       maxWidth: '88%',
                       padding: '10px 14px',
                       borderRadius: isAssistant ? '4px 12px 12px 12px' : '12px 12px 4px 12px',
-                      background: isAssistant ? 'rgba(255,255,255,0.03)' : 'linear-gradient(135deg, #f59e0b, #d97706)',
-                      color: isAssistant ? '#cbd5e1' : '#090a0f',
-                      border: isAssistant ? '1px solid var(--border)' : 'none',
+                      background: isAssistant
+                        ? m.isError
+                          ? 'rgba(239, 68, 68, 0.1)'
+                          : 'rgba(255,255,255,0.03)'
+                        : 'linear-gradient(135deg, #f59e0b, #d97706)',
+                      color: isAssistant ? (m.isError ? '#fca5a5' : '#cbd5e1') : '#090a0f',
+                      border: isAssistant ? `1px solid ${m.isError ? 'rgba(239,68,68,0.3)' : 'var(--border)'}` : 'none',
                       fontSize: 12.5,
                       lineHeight: 1.5,
                       fontWeight: isAssistant ? 400 : 600,
@@ -375,10 +445,11 @@ export default function AIChatWidget() {
                       </div>
                     )}
 
-                    {isAssistant && m.content && (
+                    {isAssistant && m.content && !m.isError && (
                       <button
                         type="button"
                         onClick={() => handleCopy(m.id, m.content)}
+                        aria-label="Copy AI response"
                         style={{
                           display: 'inline-flex',
                           alignItems: 'center',
@@ -395,10 +466,22 @@ export default function AIChatWidget() {
                         <span>{copiedId === m.id ? 'Copied' : 'Copy'}</span>
                       </button>
                     )}
+
+                    {/* Retry Button on Error */}
+                    {isAssistant && m.isError && m.failedPrompt && (
+                      <button
+                        type="button"
+                        onClick={() => sendMessage(m.failedPrompt!)}
+                        className="btn-gold"
+                        style={{ fontSize: 11, padding: '4px 10px', marginTop: 8 }}
+                      >
+                        <RotateCcw size={11} /> Retry Request
+                      </button>
+                    )}
                   </div>
 
                   {/* Suggestion Chips */}
-                  {isAssistant && m.suggestions && m.suggestions.length > 0 && (
+                  {isAssistant && m.suggestions && m.suggestions.length > 0 && !m.isError && (
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 8, maxWidth: '92%' }}>
                       {m.suggestions.map((s, idx) => (
                         <button
@@ -453,6 +536,7 @@ export default function AIChatWidget() {
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask Copilot about skills, career paths, interview prep..."
               disabled={loading}
+              aria-label="Ask SkillSense AI Copilot"
               style={{
                 flex: 1,
                 padding: '9px 12px',
@@ -467,6 +551,7 @@ export default function AIChatWidget() {
             <button
               type="submit"
               disabled={!input.trim() || loading}
+              aria-label="Send message to Copilot"
               style={{
                 width: 34,
                 height: 34,
