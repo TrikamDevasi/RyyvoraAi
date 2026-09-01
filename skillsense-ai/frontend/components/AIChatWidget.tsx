@@ -423,31 +423,31 @@ export default function AIChatWidget() {
           aria-label="Open SkillSense AI Copilot assistant"
           style={{
             position: 'fixed',
-            bottom: 24,
-            right: 24,
+            bottom: 16,
+            right: 16,
             zIndex: 50,
-            padding: '10px 18px',
+            padding: '9px 15px',
             borderRadius: 99,
             background: 'linear-gradient(135deg, #f59e0b, #d97706)',
             color: '#090a0f',
             border: '1px solid #f59e0b',
             fontWeight: 800,
-            fontSize: 13,
+            fontSize: 12.5,
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
-            gap: 8,
+            gap: 7,
             boxShadow: '0 8px 32px rgba(245,158,11,0.35)',
             transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
           }}
           className="hover:scale-105 active:scale-95"
         >
-          <Sparkles size={16} />
+          <Sparkles size={15} />
           <span>AI Copilot</span>
           <span
             style={{
-              width: 8,
-              height: 8,
+              width: 7,
+              height: 7,
               borderRadius: '50%',
               background: '#10b981',
               boxShadow: '0 0 6px #10b981',
@@ -463,21 +463,21 @@ export default function AIChatWidget() {
           aria-label="SkillSense AI Copilot"
           style={{
             position: 'fixed',
-            bottom: 24,
-            right: 24,
-            width: expanded ? 580 : 380,
-            height: expanded ? 680 : 540,
-            maxWidth: 'calc(100vw - 48px)',
-            maxHeight: 'calc(100vh - 48px)',
+            bottom: 12,
+            right: 12,
+            width: expanded ? 'calc(100vw - 24px)' : 'calc(100vw - 24px)',
+            maxWidth: expanded ? 580 : 390,
+            height: expanded ? 'calc(100dvh - 24px)' : 'calc(100dvh - 24px)',
+            maxHeight: expanded ? 680 : 540,
             background: 'var(--bg-surface)',
             border: '1px solid var(--border)',
             borderRadius: 16,
-            boxShadow: '0 20px 60px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.06)',
+            boxShadow: '0 20px 60px rgba(0,0,0,0.85), 0 0 0 1px rgba(255,255,255,0.06)',
             display: 'flex',
             flexDirection: 'column',
             zIndex: 50,
             overflow: 'hidden',
-            transition: 'width 0.2s ease, height 0.2s ease',
+            transition: 'all 0.2s ease',
           }}
         >
           {/* Header */}

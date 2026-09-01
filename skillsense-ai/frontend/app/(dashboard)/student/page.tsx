@@ -148,27 +148,44 @@ export default function StudentDashboardPage() {
     <ErrorBoundary>
       <FadeIn>
         {/* ── Top Intelligence Briefing ── */}
-        <div style={{ marginBottom: 24 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+        <div style={{ marginBottom: 20 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 14 }}>
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
                 <AIBadge type="nsqf" label={`NSQF LEVEL ${nsqfLevel || '—'}`} />
                 <AIBadge type="verified" label={profile?.passportHash ? 'CREDENTIAL VERIFIED' : 'CREDENTIAL PENDING'} />
               </div>
-              <h1 className="font-display" style={{ fontSize: 26, fontWeight: 800, color: '#f8fafc', margin: 0 }}>
+              <h1
+                className="font-display"
+                style={{
+                  fontSize: 'clamp(20px, 5vw, 26px)',
+                  fontWeight: 800,
+                  color: '#f8fafc',
+                  margin: 0,
+                  lineHeight: 1.25,
+                }}
+              >
                 Welcome back, <span style={{ color: 'var(--gold)' }}>{studentName}</span>
               </h1>
-              <p style={{ color: 'var(--text-secondary)', fontSize: 13.5, marginTop: 4 }}>
-                {program} · Enrollment ID: <span className="font-mono" style={{ color: '#cbd5e1' }}>{profile?.enrollmentNumber || '—'}</span>
+              <p style={{ color: 'var(--text-secondary)', fontSize: 13, marginTop: 4, lineHeight: 1.5 }}>
+                {program} · ID: <span className="font-mono" style={{ color: '#cbd5e1' }}>{profile?.enrollmentNumber || '—'}</span>
               </p>
             </div>
 
-            <div style={{ display: 'flex', gap: 10 }}>
-              <Link href="/student/analyzer" className="btn-gold" style={{ fontSize: 12.5, padding: '7px 16px' }}>
-                <Brain size={15} /> Run AI Analyzer
+            <div style={{ display: 'flex', gap: 8, width: '100%', flexWrap: 'wrap' }} className="sm:w-auto">
+              <Link
+                href="/student/analyzer"
+                className="btn-gold"
+                style={{ fontSize: 12.5, padding: '7px 14px', flex: 1, textAlign: 'center', justifyContent: 'center' }}
+              >
+                <Brain size={14} /> Run AI Analyzer
               </Link>
-              <Link href="/student/assessment" className="btn-secondary" style={{ fontSize: 12.5, padding: '7px 16px' }}>
-                <CheckCircle2 size={15} /> Take Assessment
+              <Link
+                href="/student/assessment"
+                className="btn-secondary"
+                style={{ fontSize: 12.5, padding: '7px 14px', flex: 1, textAlign: 'center', justifyContent: 'center' }}
+              >
+                <CheckCircle2 size={14} /> Take Assessment
               </Link>
             </div>
           </div>
@@ -176,13 +193,15 @@ export default function StudentDashboardPage() {
 
         {/* ── Navigation Tabs ── */}
         <div
+          className="no-scrollbar touch-pan-x"
           style={{
             display: 'flex',
             gap: 6,
             borderBottom: '1px solid var(--border)',
             paddingBottom: 2,
-            marginBottom: 24,
+            marginBottom: 20,
             overflowX: 'auto',
+            WebkitOverflowScrolling: 'touch',
           }}
         >
           {TABS.map((t) => (
@@ -191,16 +210,17 @@ export default function StudentDashboardPage() {
               type="button"
               onClick={() => setActiveTab(t.key)}
               style={{
-                padding: '8px 16px',
+                padding: '7px 14px',
                 borderRadius: '8px 8px 0 0',
                 border: 'none',
                 borderBottom: `2px solid ${activeTab === t.key ? 'var(--gold)' : 'transparent'}`,
                 background: activeTab === t.key ? 'rgba(245,158,11,0.08)' : 'transparent',
                 color: activeTab === t.key ? 'var(--gold)' : 'var(--text-secondary)',
-                fontSize: 13,
+                fontSize: 12.5,
                 fontWeight: activeTab === t.key ? 700 : 500,
                 cursor: 'pointer',
                 whiteSpace: 'nowrap',
+                flexShrink: 0,
                 transition: 'all 0.15s ease',
               }}
             >
@@ -211,7 +231,7 @@ export default function StudentDashboardPage() {
 
         {/* ── TAB 1: OVERVIEW ── */}
         {activeTab === 'overview' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
             {/* AI Actionable Insight Banner */}
             {topCareer ? (
               <AIInsightCard
@@ -224,18 +244,18 @@ export default function StudentDashboardPage() {
                 category="Career Acceleration"
               />
             ) : (
-              <div className="card-linear" style={{ padding: 18 }}>
-                <p style={{ margin: 0, fontSize: 13.5, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+              <div className="card-linear" style={{ padding: 16 }}>
+                <p style={{ margin: 0, fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
                   No verified assessments yet — run the AI skill analyzer to receive a workforce placement recommendation based on real competency data.
                 </p>
-                <Link href="/student/analyzer" className="btn-gold" style={{ marginTop: 12, display: 'inline-block', fontSize: 12.5, padding: '7px 16px' }}>
-                  <Brain size={15} /> Run AI Analyzer
+                <Link href="/student/analyzer" className="btn-gold" style={{ marginTop: 12, display: 'inline-flex', fontSize: 12, padding: '6px 14px' }}>
+                  <Brain size={14} /> Run AI Analyzer
                 </Link>
               </div>
             )}
 
             {/* Top Score Matrix */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 10 }}>
               {[
                 { label: 'Overall Readiness Index', value: overallScore > 0 ? `${overallScore}/100` : '—', sub: 'NSQF Benchmarked', color: 'var(--gold)' },
                 { label: 'Top Career Alignment', value: careers[0]?.matchPercent != null ? `${careers[0].matchPercent}%` : '—', sub: topCareer?.title || 'No career analysis yet', color: '#10b981' },

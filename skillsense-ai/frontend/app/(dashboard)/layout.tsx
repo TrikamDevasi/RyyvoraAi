@@ -419,6 +419,29 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <span>AI LIVE</span>
               </Link>
 
+              {/* Layout Switcher */}
+              <button
+                type="button"
+                onClick={() => setNavigationStyle('sidebar')}
+                title="Switch layout to Sidebar mode"
+                aria-label="Switch layout to Sidebar mode"
+                style={{
+                  background: 'rgba(255,255,255,0.03)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 6,
+                  padding: '4px 8px',
+                  color: 'var(--text-secondary)',
+                  fontSize: 11,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 5,
+                }}
+              >
+                <SidebarIcon size={12} />
+                <span>Sidebar</span>
+              </button>
+
               {/* User Dropdown / Settings Link */}
               <Link
                 href="/student/profile"
@@ -447,7 +470,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* ── 3. MAIN CONTENT CONTAINER ─────────────────────────────────────────── */}
       {/* ═════════════════════════════════════════════════════════════════════════ */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-        {/* Topbar for Sidebar Mode or Mobile Header */}
+        {/* Topbar: Rendered on Desktop in Sidebar mode, OR on Mobile for both modes */}
         <header
           style={{
             height: 56,
@@ -456,32 +479,60 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            padding: '0 24px',
+            padding: '0 16px',
             position: 'sticky',
             top: 0,
             zIndex: 30,
           }}
           className={navigationStyle === 'navbar' ? 'md:hidden flex' : 'flex'}
         >
-          {/* Left: Mobile Toggle & Breadcrumbs */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          {/* Left: Mobile Toggle & App Identity or Breadcrumbs */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <button
               type="button"
               onClick={() => setMobileOpen(!mobileOpen)}
               aria-label="Open mobile navigation drawer"
               style={{
-                background: 'transparent',
-                border: 'none',
-                color: '#fff',
+                background: 'rgba(255,255,255,0.05)',
+                border: '1px solid var(--border)',
+                borderRadius: 7,
+                color: '#f8fafc',
                 cursor: 'pointer',
-                padding: 4,
+                padding: '6px 8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
               className="md:hidden"
             >
-              {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+              {mobileOpen ? <X size={18} /> : <Menu size={18} />}
             </button>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'var(--text-secondary)' }}>
+            {/* Mobile Logo Brand */}
+            <div className="flex md:hidden" style={{ alignItems: 'center', gap: 8 }}>
+              <div
+                style={{
+                  width: 26,
+                  height: 26,
+                  borderRadius: 6,
+                  background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: 900,
+                  fontSize: 11,
+                  color: '#090a0f',
+                }}
+              >
+                SK
+              </div>
+              <span className="font-display" style={{ fontSize: 14, fontWeight: 800, color: '#f8fafc' }}>
+                SkillSense <span style={{ color: 'var(--gold)' }}>AI</span>
+              </span>
+            </div>
+
+            {/* Desktop Breadcrumbs in Sidebar mode */}
+            <div className="hidden md:flex" style={{ alignItems: 'center', gap: 6, fontSize: 13, color: 'var(--text-secondary)' }}>
               <span style={{ color: 'var(--text-muted)' }}>SkillSense</span>
               <span>/</span>
               <span style={{ color: '#f8fafc', fontWeight: 600, textTransform: 'capitalize' }}>
@@ -491,8 +542,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
 
           {/* Right: Workspace Switcher & Controls */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            {/* Stakeholder Workspace Switcher (Demo Friendly) */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            {/* Stakeholder Workspace Switcher (Desktop Only) */}
             <div className="hidden lg:flex" style={{ alignItems: 'center', gap: 3, background: 'rgba(255,255,255,0.03)', padding: 3, borderRadius: 8, border: '1px solid var(--border)' }}>
               {[
                 { role: 'student', label: 'Student', href: '/student' },
@@ -522,7 +573,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               })}
             </div>
 
-            {/* Quick Layout Style Toggle Button in Topbar */}
+            {/* Quick Layout Style Toggle Button in Desktop Topbar */}
             <button
               type="button"
               onClick={() => setNavigationStyle(navigationStyle === 'sidebar' ? 'navbar' : 'sidebar')}
@@ -553,26 +604,26 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: 5,
-                padding: '4px 10px',
+                padding: '3px 8px',
                 background: 'rgba(16,185,129,0.06)',
                 border: '1px solid rgba(16,185,129,0.2)',
                 borderRadius: 99,
-                fontSize: 11,
+                fontSize: 10.5,
                 fontWeight: 700,
                 color: '#34d399',
                 textDecoration: 'none',
               }}
             >
-              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10b981', animation: 'pulse-slow 2s infinite' }} />
-              <span>AI TELEMETRY</span>
+              <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#10b981', animation: 'pulse-slow 2s infinite' }} />
+              <span>AI LIVE</span>
             </Link>
 
             <Link
               href="/student/analyzer"
               className="btn-gold hidden sm:inline-flex"
-              style={{ fontSize: 12, padding: '5px 12px' }}
+              style={{ fontSize: 11.5, padding: '4px 10px' }}
             >
-              <Sparkles size={13} /> Analyzer
+              <Sparkles size={12} /> Analyzer
             </Link>
           </div>
         </header>
@@ -581,7 +632,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <VerificationBanner />
 
         {/* Main Content Area */}
-        <main style={{ flex: 1, padding: '24px 28px', maxWidth: 1400, width: '100%', margin: '0 auto' }}>
+        <main
+          style={{
+            flex: 1,
+            padding: '16px',
+            maxWidth: 1400,
+            width: '100%',
+            margin: '0 auto',
+          }}
+          className="sm:p-5 md:p-7"
+        >
           {children}
         </main>
       </div>
@@ -601,8 +661,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               style={{
                 position: 'fixed',
                 inset: 0,
-                background: 'rgba(0,0,0,0.75)',
-                backdropFilter: 'blur(4px)',
+                background: 'rgba(0,0,0,0.8)',
+                backdropFilter: 'blur(6px)',
                 zIndex: 49,
               }}
               className="md:hidden"
@@ -616,27 +676,30 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               initial={{ opacity: 0, x: -280 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -280 }}
-              transition={{ duration: 0.25, ease: 'easeOut' }}
+              transition={{ duration: 0.22, ease: 'easeOut' }}
               style={{
                 position: 'fixed',
                 top: 0,
                 left: 0,
                 bottom: 0,
-                width: 280,
-                background: 'var(--bg-surface)',
-                borderRight: '1px solid var(--border)',
+                width: 290,
+                maxWidth: '85vw',
+                background: '#0e111a',
+                borderRight: '1px solid rgba(255,255,255,0.08)',
                 zIndex: 50,
-                padding: 16,
+                padding: '18px 16px',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',
+                boxShadow: '0 12px 40px rgba(0,0,0,0.8)',
               }}
               className="md:hidden"
             >
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+                {/* Header */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <div style={{ width: 28, height: 28, borderRadius: 6, background: 'var(--gold)', color: '#090a0f', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 13 }}>
+                    <div style={{ width: 28, height: 28, borderRadius: 6, background: 'var(--gold)', color: '#090a0f', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 12 }}>
                       SK
                     </div>
                     <span className="font-display" style={{ fontSize: 15, fontWeight: 800, color: '#f8fafc' }}>
@@ -648,17 +711,59 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     type="button"
                     onClick={() => setMobileOpen(false)}
                     aria-label="Close navigation drawer"
-                    style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 4 }}
+                    style={{
+                      background: 'rgba(255,255,255,0.05)',
+                      border: '1px solid var(--border)',
+                      borderRadius: 6,
+                      color: 'var(--text-muted)',
+                      cursor: 'pointer',
+                      padding: 5,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
                   >
-                    <X size={18} />
+                    <X size={16} />
                   </button>
                 </div>
 
-                {/* Mobile Navigation List */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 16, overflowY: 'auto', maxHeight: 'calc(100vh - 160px)' }}>
+                {/* Workspace Role Switcher Pills */}
+                <div style={{ marginBottom: 16, background: 'rgba(255,255,255,0.03)', padding: 3, borderRadius: 8, border: '1px solid var(--border)', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 2 }}>
+                  {[
+                    { role: 'student', label: 'Student', href: '/student' },
+                    { role: 'institute', label: 'College', href: '/institute' },
+                    { role: 'industry', label: 'Company', href: '/industry' },
+                    { role: 'government', label: 'Gov', href: '/government' },
+                  ].map((sw) => {
+                    const isCur = pathname.startsWith(sw.href);
+                    return (
+                      <Link
+                        key={sw.role}
+                        href={sw.href}
+                        onClick={() => setMobileOpen(false)}
+                        style={{
+                          fontSize: 10.5,
+                          fontWeight: isCur ? 700 : 500,
+                          padding: '5px 2px',
+                          borderRadius: 6,
+                          textAlign: 'center',
+                          background: isCur ? 'rgba(245,158,11,0.15)' : 'transparent',
+                          color: isCur ? 'var(--gold)' : 'var(--text-muted)',
+                          textDecoration: 'none',
+                          transition: 'all 0.15s ease',
+                        }}
+                      >
+                        {sw.label}
+                      </Link>
+                    );
+                  })}
+                </div>
+
+                {/* Mobile Navigation Links */}
+                <div className="no-scrollbar" style={{ display: 'flex', flexDirection: 'column', gap: 14, overflowY: 'auto', flex: 1, paddingRight: 4 }}>
                   {navGroups.map((group, gIdx) => (
                     <div key={gIdx}>
-                      <div style={{ fontSize: 10, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6 }}>
+                      <div style={{ fontSize: 9.5, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6, paddingLeft: 4 }}>
                         {group.group}
                       </div>
 
@@ -676,17 +781,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                                 display: 'flex',
                                 alignItems: 'center',
                                 gap: 10,
-                                padding: '9px 12px',
+                                padding: '8px 10px',
                                 borderRadius: 8,
-                                fontSize: 13,
+                                fontSize: 12.5,
                                 fontWeight: active ? 700 : 500,
                                 color: active ? 'var(--gold)' : '#cbd5e1',
-                                background: active ? 'rgba(245, 158, 11, 0.1)' : 'transparent',
+                                background: active ? 'rgba(245, 158, 11, 0.12)' : 'transparent',
                                 borderLeft: active ? '3px solid var(--gold)' : '3px solid transparent',
                                 textDecoration: 'none',
                               }}
                             >
-                              <Icon size={16} />
+                              <Icon size={15} />
                               <span>{route.label}</span>
                             </Link>
                           );
@@ -695,22 +800,28 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     </div>
                   ))}
                 </div>
-              </div>
 
-              {/* Mobile Drawer Footer */}
-              <div style={{ borderTop: '1px solid var(--border)', paddingTop: 14 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div style={{ fontSize: 12, color: '#f8fafc', fontWeight: 600 }}>
-                    {user?.name || 'Candidate'}
+                {/* Mobile Drawer Footer */}
+                <div style={{ borderTop: '1px solid var(--border)', paddingTop: 12, marginTop: 10 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <div style={{ fontSize: 12, color: '#f8fafc', fontWeight: 700, maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {user?.name || 'Candidate'}
+                      </div>
+                      <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'capitalize' }}>
+                        {role} account
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={handleLogout}
+                      className="btn-ghost"
+                      style={{ fontSize: 11, padding: '4px 8px', display: 'flex', alignItems: 'center', gap: 4 }}
+                    >
+                      <LogOut size={12} /> Sign Out
+                    </button>
                   </div>
-                  <button
-                    type="button"
-                    onClick={handleLogout}
-                    className="btn-ghost"
-                    style={{ fontSize: 11, padding: '4px 8px' }}
-                  >
-                    <LogOut size={13} /> Sign Out
-                  </button>
                 </div>
               </div>
             </motion.div>
