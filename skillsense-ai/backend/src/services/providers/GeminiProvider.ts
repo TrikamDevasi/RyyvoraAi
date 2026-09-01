@@ -7,10 +7,9 @@ export class GeminiProvider implements AIProvider {
   name = 'Gemini';
   private client: OpenAI | null = null;
   private candidateModels = [
+    'gemini-3.5-flash',
     'gemini-3.6-flash',
     'gemini-3.7-flash',
-    'gemini-2.5-flash',
-    'gemini-2.5-flash-lite',
   ];
 
   constructor(apiKey?: string) {
@@ -46,7 +45,7 @@ export class GeminiProvider implements AIProvider {
         const completion = await this.client.chat.completions.create({
           model,
           messages: [{ role: 'user', content: 'Respond with OK' }],
-          max_tokens: 5,
+          max_tokens: 30,
           temperature: 0.1,
         });
 
