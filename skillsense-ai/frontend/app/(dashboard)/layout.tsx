@@ -1,421 +1,453 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import VerificationBanner from '@/components/shared/VerificationBanner';
-import { useAuthStore } from '@/store/authStore';
+import { useAuth } from '@/hooks/useAuth';
+import { NAVIGATION_CONFIG, NavGroup, RouteItem } from '@/config/navigation';
+import { useNavigationStore, NavigationStyle } from '@/store/navigationStore';
 import {
-  LayoutDashboard,
-  Award,
   Brain,
-  FileCode,
+  Award,
   CheckSquare,
-  Trophy,
-  Briefcase,
   Compass,
+  FileCode,
+  Briefcase,
   TrendingUp,
+  Trophy,
   User,
-  Newspaper,
-  Building,
-  Landmark,
-  Shield,
-  Activity,
   LogOut,
   ChevronLeft,
   ChevronRight,
   Menu,
   X,
   Sparkles,
-  Zap,
+  Layout,
+  Sidebar as SidebarIcon,
+  ShieldCheck,
+  Building,
+  Landmark,
+  Settings,
+  ChevronDown,
 } from 'lucide-react';
 
-interface RouteItem {
-  label: string;
-  href: string;
-  icon: React.ElementType;
-  badge?: string;
-}
+function VerificationBanner() {
+  const { user } = useAuth();
+  if (!user || user.isVerified) return null;
 
-interface NavGroup {
-  group: string;
-  role: string;
-  routes: RouteItem[];
+  return (
+    <div
+      style={{
+        background: 'rgba(245, 158, 11, 0.08)',
+        borderBottom: '1px solid rgba(245, 158, 11, 0.25)',
+        padding: '8px 24px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        fontSize: 12.5,
+        color: '#f59e0b',
+        fontWeight: 600,
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#f59e0b' }} />
+        <span>Verification Pending · Please complete your profile to activate official NSQF ledger credentials.</span>
+      </div>
+      <Link
+        href="/student/passport"
+        style={{
+          color: '#f59e0b',
+          textDecoration: 'underline',
+          fontWeight: 700,
+        }}
+      >
+        View Passport →
+      </Link>
+    </div>
+  );
 }
-
-const NAV_GROUPS: NavGroup[] = [
-  {
-    group: 'Student Intelligence',
-    role: 'student',
-    routes: [
-      { label: 'Overview', href: '/student', icon: LayoutDashboard },
-      { label: 'AI Skill Analyzer', href: '/student/analyzer', icon: Brain, badge: 'AI' },
-      { label: 'Skill Passport', href: '/student/passport', icon: Award, badge: 'VERIFIED' },
-      { label: 'Assessments', href: '/student/assessment', icon: CheckSquare },
-      { label: 'Career Predictor', href: '/student/career', icon: Compass },
-      { label: 'My Submissions', href: '/student/submissions', icon: FileCode },
-      { label: 'Find Jobs', href: '/student/jobs', icon: Briefcase, badge: 'NEW' },
-      { label: 'Market Demand', href: '/student/market', icon: TrendingUp },
-      { label: 'Leaderboard', href: '/student/leaderboard', icon: Trophy },
-      { label: 'Profile', href: '/student/profile', icon: User },
-      { label: 'Latest News', href: '/student/news', icon: Newspaper },
-    ],
-  },
-  {
-    group: 'Institute Workspace',
-    role: 'institute',
-    routes: [
-      { label: 'Overview', href: '/institute', icon: LayoutDashboard },
-      { label: 'Students Directory', href: '/institute/students', icon: User },
-      { label: 'Evaluations Ledger', href: '/institute/evaluations', icon: CheckSquare },
-      { label: 'Placement Pipeline', href: '/institute/placement', icon: Briefcase },
-      { label: 'Program ROI', href: '/institute/roi', icon: TrendingUp },
-      { label: 'Upload Cohort Data', href: '/institute/upload', icon: FileCode },
-      { label: 'Latest News', href: '/institute/news', icon: Newspaper },
-    ],
-  },
-  {
-    group: 'Employer Hub',
-    role: 'employer',
-    routes: [
-      { label: 'Overview', href: '/employer', icon: LayoutDashboard },
-      { label: 'Feedback Ledgers', href: '/employer/feedback', icon: CheckSquare },
-      { label: 'Skill Validation', href: '/employer/validations', icon: Shield },
-      { label: 'Candidate Placement', href: '/employer/placements', icon: Briefcase },
-    ],
-  },
-  {
-    group: 'Industry Portal',
-    role: 'industry',
-    routes: [
-      { label: 'Overview', href: '/industry', icon: LayoutDashboard },
-      { label: 'Talent Pool', href: '/industry/talent', icon: User },
-      { label: 'Demand Signals', href: '/industry/demand', icon: TrendingUp },
-      { label: 'Campus Connect', href: '/industry/campus', icon: Building },
-      { label: 'Latest News', href: '/industry/news', icon: Newspaper },
-    ],
-  },
-  {
-    group: 'Government / Regulatory',
-    role: 'government',
-    routes: [
-      { label: 'Overview', href: '/government', icon: LayoutDashboard },
-      { label: 'Regional Heatmap', href: '/government/heatmap', icon: Landmark },
-      { label: 'Fund Targeting', href: '/government/fund-targeting', icon: TrendingUp },
-      { label: 'NSQF Compliance', href: '/government/compliance', icon: Shield },
-      { label: 'Latest News', href: '/government/news', icon: Newspaper },
-    ],
-  },
-  {
-    group: 'Admin Control Center',
-    role: 'admin',
-    routes: [
-      { label: 'Overview', href: '/admin', icon: LayoutDashboard },
-      { label: 'User Directory', href: '/admin/users', icon: User },
-      { label: 'Institutes', href: '/admin/institutes', icon: Building },
-      { label: 'AI Fairness Audit', href: '/admin/fairness', icon: Shield },
-      { label: 'Audit Logs', href: '/admin/audit-logs', icon: Activity },
-      { label: 'Institutional Reports', href: '/admin/reports', icon: FileCode },
-    ],
-  },
-];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const [collapsed, setCollapsed] = useState(false);
+  const { user, logout } = useAuth();
+
+  const {
+    navigationStyle,
+    sidebarCollapsed,
+    setNavigationStyle,
+    setSidebarCollapsed,
+    toggleSidebar,
+    initPreferences,
+    isHydrated,
+  } = useNavigationStore();
+
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [showDropdown, setShowDropdown] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 
-  const user = useAuthStore((s) => s.user);
-  const logout = useAuthStore((s) => s.logout);
-  const checkAuth = useAuthStore((s) => s.checkAuth);
-
-  const userName = user?.name || 'Candidate';
-  const userRole = user?.role || 'student';
-  const userEmail = user?.email || '';
-
+  // Initialize navigation preferences on mount
   useEffect(() => {
-    checkAuth();
-  }, [checkAuth]);
+    initPreferences();
+  }, [initPreferences]);
 
-  // Handle responsive collapse
+  // Close mobile drawer on route change
   useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 1024) {
-        setCollapsed(true);
-      } else {
-        setCollapsed(false);
+    setMobileOpen(false);
+    setActiveDropdown(null);
+  }, [pathname]);
+
+  // Close mobile drawer on ESC key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setMobileOpen(false);
+        setActiveDropdown(null);
       }
     };
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Close dropdown on outside click
-  useEffect(() => {
-    const handleClick = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setShowDropdown(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
-  }, []);
+  // Determine active role configuration
+  const role = (user?.role || 'student').toLowerCase();
+  const navGroups: NavGroup[] = NAVIGATION_CONFIG[role] || NAVIGATION_CONFIG.student;
+  const allRoutes = navGroups.flatMap((g) => g.routes);
 
-  // Filter navigation for the user's role
-  const activeNav = NAV_GROUPS.find((n) => n.role === userRole) || NAV_GROUPS[0];
-
-  const handleLogout = async () => {
-    await logout();
-    router.push('/auth/login');
+  const isRouteActive = (href: string) => {
+    if (href === '/student' || href === '/institute' || href === '/industry' || href === '/government' || href === '/admin') {
+      return pathname === href;
+    }
+    return pathname === href || pathname.startsWith(`${href}/`);
   };
 
-  const initials = userName
-    ? userName
-        .split(' ')
-        .map((w) => w[0])
-        .join('')
-        .toUpperCase()
-        .slice(0, 2)
-    : 'SK';
+  const handleLogout = async () => {
+    if (logout) await logout();
+    router.push('/auth');
+  };
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg)', color: 'var(--text-primary)' }}>
-      {/* ── Sidebar (Desktop) ── */}
-      <aside
-        style={{
-          width: collapsed ? 72 : 248,
-          minWidth: collapsed ? 72 : 248,
-          background: 'var(--bg-surface)',
-          borderRight: '1px solid var(--border)',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-between',
-          transition: 'width 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-          position: 'sticky',
-          top: 0,
-          height: '100vh',
-          zIndex: 40,
-        }}
-        className="hidden md:flex"
-      >
-        <div>
-          {/* Brand Header */}
-          <div
-            style={{
-              padding: collapsed ? '18px 12px' : '18px 16px',
-              borderBottom: '1px solid var(--border)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: collapsed ? 'center' : 'space-between',
-            }}
-          >
-            <Link
-              href={activeNav.routes[0].href}
-              style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', color: '#fff' }}
+    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg)', color: 'var(--text-primary)', flexDirection: navigationStyle === 'navbar' ? 'column' : 'row' }}>
+      {/* ═════════════════════════════════════════════════════════════════════════ */}
+      {/* ── 1. SIDEBAR MODE (Desktop: Left Vertical Navigation) ─────────────────── */}
+      {/* ═════════════════════════════════════════════════════════════════════════ */}
+      {navigationStyle === 'sidebar' && (
+        <aside
+          aria-label="Primary application sidebar"
+          style={{
+            width: sidebarCollapsed ? 72 : 248,
+            minWidth: sidebarCollapsed ? 72 : 248,
+            background: 'var(--bg-surface)',
+            borderRight: '1px solid var(--border)',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            position: 'sticky',
+            top: 0,
+            height: '100vh',
+            zIndex: 40,
+            transition: 'width 0.2s cubic-bezier(0.4, 0, 0.2, 1), min-width 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+          }}
+          className="hidden md:flex"
+        >
+          {/* Top Brand Header */}
+          <div>
+            <div
+              style={{
+                height: 60,
+                padding: sidebarCollapsed ? '0 16px' : '0 20px',
+                borderBottom: '1px solid var(--border)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: sidebarCollapsed ? 'center' : 'space-between',
+              }}
             >
-              <div
-                style={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: 8,
-                  background: 'linear-gradient(135deg, #f59e0b, #d97706)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontWeight: 900,
-                  fontSize: 14,
-                  color: '#090a0f',
-                  boxShadow: '0 2px 8px rgba(245,158,11,0.3)',
-                }}
-              >
-                SK
-              </div>
-              {!collapsed && (
-                <div>
-                  <div className="font-display" style={{ fontSize: 15, fontWeight: 800, letterSpacing: '-0.02em' }}>
-                    SkillSense <span style={{ color: 'var(--gold)' }}>AI</span>
+              <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
+                <div
+                  style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: 8,
+                    background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontWeight: 900,
+                    fontSize: 14,
+                    color: '#090a0f',
+                    flexShrink: 0,
+                    boxShadow: '0 2px 10px rgba(245,158,11,0.3)',
+                  }}
+                >
+                  SK
+                </div>
+                {!sidebarCollapsed && (
+                  <div>
+                    <span className="font-display" style={{ fontSize: 15, fontWeight: 800, color: '#f8fafc', letterSpacing: '-0.02em' }}>
+                      SkillSense <span style={{ color: 'var(--gold)' }}>AI</span>
+                    </span>
+                    <div style={{ fontSize: 9.5, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>
+                      {role} Workspace
+                    </div>
                   </div>
-                  <div style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>
-                    {activeNav.role} platform
+                )}
+              </Link>
+
+              {!sidebarCollapsed && (
+                <button
+                  type="button"
+                  onClick={toggleSidebar}
+                  aria-label="Collapse sidebar"
+                  style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 4 }}
+                >
+                  <ChevronLeft size={16} />
+                </button>
+              )}
+            </div>
+
+            {/* Navigation Groups */}
+            <div style={{ padding: sidebarCollapsed ? '16px 8px' : '16px 12px', display: 'flex', flexDirection: 'column', gap: 18, overflowY: 'auto', maxHeight: 'calc(100vh - 150px)' }}>
+              {navGroups.map((group, gIdx) => (
+                <div key={gIdx}>
+                  {!sidebarCollapsed && (
+                    <div style={{ fontSize: 10, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', padding: '0 8px', marginBottom: 6 }}>
+                      {group.group}
+                    </div>
+                  )}
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    {group.routes.map((route) => {
+                      const Icon = route.icon;
+                      const active = isRouteActive(route.href);
+
+                      return (
+                        <Link
+                          key={route.href}
+                          href={route.href}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 10,
+                            padding: sidebarCollapsed ? '10px 0' : '8px 12px',
+                            justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
+                            borderRadius: 8,
+                            fontSize: 13,
+                            fontWeight: active ? 700 : 500,
+                            color: active ? '#f8fafc' : 'var(--text-secondary)',
+                            background: active ? 'rgba(245, 158, 11, 0.1)' : 'transparent',
+                            borderLeft: active ? '3px solid var(--gold)' : '3px solid transparent',
+                            textDecoration: 'none',
+                            transition: 'all 0.15s ease',
+                          }}
+                          title={sidebarCollapsed ? route.label : undefined}
+                          aria-label={route.label}
+                        >
+                          <Icon size={16} color={active ? '#f59e0b' : 'currentColor'} />
+                          {!sidebarCollapsed && (
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flex: 1 }}>
+                              <span>{route.label}</span>
+                              {route.badge && (
+                                <span
+                                  style={{
+                                    fontSize: 9,
+                                    fontWeight: 800,
+                                    padding: '1px 5px',
+                                    borderRadius: 4,
+                                    background: route.badge === 'AI' ? 'rgba(245,158,11,0.2)' : 'rgba(255,255,255,0.06)',
+                                    color: route.badge === 'AI' ? '#f59e0b' : 'var(--text-secondary)',
+                                  }}
+                                >
+                                  {route.badge}
+                                </span>
+                              )}
+                            </div>
+                          )}
+                        </Link>
+                      );
+                    })}
                   </div>
                 </div>
-              )}
-            </Link>
-
-            {!collapsed && (
-              <button
-                type="button"
-                onClick={() => setCollapsed(true)}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  color: 'var(--text-muted)',
-                  cursor: 'pointer',
-                  padding: 4,
-                  borderRadius: 4,
-                }}
-                title="Collapse sidebar"
-              >
-                <ChevronLeft size={16} />
-              </button>
-            )}
-          </div>
-
-          {/* Navigation Links */}
-          <div style={{ padding: '14px 8px', overflowY: 'auto', maxHeight: 'calc(100vh - 160px)' }}>
-            {!collapsed && (
-              <div
-                style={{
-                  fontSize: 10,
-                  fontWeight: 800,
-                  color: 'var(--text-muted)',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.06em',
-                  padding: '4px 10px 8px',
-                }}
-              >
-                {activeNav.group}
-              </div>
-            )}
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              {activeNav.routes.map((route) => {
-                const Icon = route.icon;
-                const isActive = pathname === route.href || (route.href !== '/student' && pathname.startsWith(route.href));
-
-                return (
-                  <Link
-                    key={route.href}
-                    href={route.href}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 10,
-                      padding: collapsed ? '10px 0' : '8px 12px',
-                      justifyContent: collapsed ? 'center' : 'flex-start',
-                      borderRadius: 8,
-                      fontSize: 13,
-                      fontWeight: isActive ? 700 : 500,
-                      color: isActive ? '#f8fafc' : 'var(--text-secondary)',
-                      background: isActive ? 'rgba(245, 158, 11, 0.1)' : 'transparent',
-                      borderLeft: isActive ? '3px solid var(--gold)' : '3px solid transparent',
-                      textDecoration: 'none',
-                      transition: 'all 0.15s ease',
-                      position: 'relative',
-                    }}
-                    title={collapsed ? route.label : undefined}
-                  >
-                    <Icon size={16} color={isActive ? '#f59e0b' : 'currentColor'} />
-                    {!collapsed && (
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flex: 1 }}>
-                        <span>{route.label}</span>
-                        {route.badge && (
-                          <span
-                            style={{
-                              fontSize: 9,
-                              fontWeight: 800,
-                              padding: '1px 5px',
-                              borderRadius: 4,
-                              background: route.badge === 'AI' ? 'rgba(245,158,11,0.2)' : 'rgba(255,255,255,0.06)',
-                              color: route.badge === 'AI' ? '#f59e0b' : 'var(--text-secondary)',
-                            }}
-                          >
-                            {route.badge}
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  </Link>
-                );
-              })}
+              ))}
             </div>
           </div>
-        </div>
 
-        {/* Bottom User Area */}
-        <div
+          {/* Bottom Footer & Expand Button */}
+          <div style={{ padding: sidebarCollapsed ? '10px 8px' : '12px 14px', borderTop: '1px solid var(--border)', background: 'var(--bg-surface)' }}>
+            {sidebarCollapsed ? (
+              <button
+                type="button"
+                onClick={toggleSidebar}
+                aria-label="Expand sidebar"
+                style={{ width: '100%', padding: '6px 0', background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex', justifyContent: 'center' }}
+              >
+                <ChevronRight size={18} />
+              </button>
+            ) : (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'rgba(245,158,11,0.15)', color: 'var(--gold)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 11 }}>
+                    {user?.name?.charAt(0) || 'U'}
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: '#f8fafc', maxWidth: 110, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {user?.name || 'Candidate'}
+                    </div>
+                    <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'capitalize' }}>
+                      {role}
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: 4 }}>
+                  <Link
+                    href="/student/profile"
+                    aria-label="Settings"
+                    style={{ color: 'var(--text-muted)', padding: 5, borderRadius: 6, display: 'flex', alignItems: 'center' }}
+                  >
+                    <Settings size={14} />
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    aria-label="Sign out"
+                    style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 5, borderRadius: 6 }}
+                  >
+                    <LogOut size={14} />
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </aside>
+      )}
+
+      {/* ═════════════════════════════════════════════════════════════════════════ */}
+      {/* ── 2. NAVBAR MODE (Desktop: Horizontal Top Navigation Bar) ─────────────── */}
+      {/* ═════════════════════════════════════════════════════════════════════════ */}
+      {navigationStyle === 'navbar' && (
+        <header
+          aria-label="Primary top application navigation"
           style={{
-            padding: collapsed ? '12px 6px' : '12px 12px',
-            borderTop: '1px solid var(--border)',
+            height: 60,
             background: 'var(--bg-surface)',
+            borderBottom: '1px solid var(--border)',
+            position: 'sticky',
+            top: 0,
+            zIndex: 40,
           }}
+          className="hidden md:block"
         >
-          {collapsed ? (
-            <button
-              type="button"
-              onClick={() => setCollapsed(false)}
-              style={{
-                width: '100%',
-                padding: '8px 0',
-                background: 'transparent',
-                border: 'none',
-                color: 'var(--text-muted)',
-                cursor: 'pointer',
-                display: 'flex',
-                justifyContent: 'center',
-              }}
-              title="Expand sidebar"
-            >
-              <ChevronRight size={16} />
-            </button>
-          ) : (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, overflow: 'hidden' }}>
+          <div style={{ maxWidth: 1440, margin: '0 auto', padding: '0 24px', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            {/* Logo */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+              <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
                 <div
                   style={{
                     width: 30,
                     height: 30,
-                    borderRadius: '50%',
-                    background: 'rgba(255,255,255,0.08)',
-                    border: '1px solid var(--border)',
+                    borderRadius: 8,
+                    background: 'linear-gradient(135deg, #f59e0b, #d97706)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    fontSize: 11,
-                    fontWeight: 700,
-                    color: '#fff',
+                    fontWeight: 900,
+                    fontSize: 13,
+                    color: '#090a0f',
+                    boxShadow: '0 2px 8px rgba(245,158,11,0.3)',
                   }}
                 >
-                  {initials}
+                  SK
                 </div>
-                <div style={{ overflow: 'hidden' }}>
-                  <div style={{ fontSize: 12.5, fontWeight: 700, color: '#f8fafc', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
-                    {userName}
-                  </div>
-                  <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'capitalize' }}>
-                    {userRole}
-                  </div>
-                </div>
-              </div>
+                <span className="font-display" style={{ fontSize: 15, fontWeight: 800, color: '#f8fafc' }}>
+                  SkillSense <span style={{ color: 'var(--gold)' }}>AI</span>
+                </span>
+              </Link>
+
+              {/* Horizontal Navigation Items */}
+              <nav style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                {allRoutes.slice(0, 7).map((route) => {
+                  const Icon = route.icon;
+                  const active = isRouteActive(route.href);
+
+                  return (
+                    <Link
+                      key={route.href}
+                      href={route.href}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 6,
+                        padding: '6px 12px',
+                        borderRadius: 6,
+                        fontSize: 12.5,
+                        fontWeight: active ? 700 : 500,
+                        color: active ? 'var(--gold)' : 'var(--text-secondary)',
+                        background: active ? 'rgba(245,158,11,0.1)' : 'transparent',
+                        borderBottom: active ? '2px solid var(--gold)' : '2px solid transparent',
+                        textDecoration: 'none',
+                        transition: 'all 0.15s ease',
+                      }}
+                    >
+                      <Icon size={14} />
+                      <span>{route.label}</span>
+                    </Link>
+                  );
+                })}
+              </nav>
+            </div>
+
+            {/* Right Quick Controls */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              {/* Telemetry Pill */}
+              <Link
+                href="/ai-health"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 5,
+                  padding: '3px 8px',
+                  background: 'rgba(16,185,129,0.06)',
+                  border: '1px solid rgba(16,185,129,0.2)',
+                  borderRadius: 99,
+                  fontSize: 10.5,
+                  fontWeight: 700,
+                  color: '#34d399',
+                  textDecoration: 'none',
+                }}
+              >
+                <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#10b981', animation: 'pulse-slow 2s infinite' }} />
+                <span>AI LIVE</span>
+              </Link>
+
+              {/* User Dropdown / Settings Link */}
+              <Link
+                href="/student/profile"
+                className="btn-secondary"
+                style={{ fontSize: 11.5, padding: '5px 10px' }}
+                aria-label="Profile and Settings"
+              >
+                <Settings size={13} /> Settings
+              </Link>
 
               <button
                 type="button"
                 onClick={handleLogout}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  color: 'var(--text-muted)',
-                  cursor: 'pointer',
-                  padding: 6,
-                  borderRadius: 6,
-                }}
-                title="Sign out"
+                className="btn-ghost"
+                style={{ fontSize: 11.5, padding: '5px 8px' }}
+                aria-label="Logout"
               >
-                <LogOut size={15} />
+                <LogOut size={13} />
               </button>
             </div>
-          )}
-        </div>
-      </aside>
+          </div>
+        </header>
+      )}
 
-      {/* ── Main Content Area ── */}
+      {/* ═════════════════════════════════════════════════════════════════════════ */}
+      {/* ── 3. MAIN CONTENT CONTAINER ─────────────────────────────────────────── */}
+      {/* ═════════════════════════════════════════════════════════════════════════ */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-        {/* Topbar */}
+        {/* Topbar for Sidebar Mode or Mobile Header */}
         <header
           style={{
             height: 56,
@@ -429,12 +461,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             top: 0,
             zIndex: 30,
           }}
+          className={navigationStyle === 'navbar' ? 'md:hidden flex' : 'flex'}
         >
+          {/* Left: Mobile Toggle & Breadcrumbs */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <button
               type="button"
               onClick={() => setMobileOpen(!mobileOpen)}
-              className="md:hidden"
+              aria-label="Open mobile navigation drawer"
               style={{
                 background: 'transparent',
                 border: 'none',
@@ -442,6 +476,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 cursor: 'pointer',
                 padding: 4,
               }}
+              className="md:hidden"
             >
               {mobileOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
@@ -455,9 +490,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </div>
           </div>
 
+          {/* Right: Workspace Switcher & Controls */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            {/* Stakeholder Workspace Switcher (Demo / Evaluator Friendly) */}
-            <div className="hidden lg:flex" style={{ alignItems: 'center', gap: 4, background: 'rgba(255,255,255,0.03)', padding: 3, borderRadius: 8, border: '1px solid var(--border)' }}>
+            {/* Stakeholder Workspace Switcher (Demo Friendly) */}
+            <div className="hidden lg:flex" style={{ alignItems: 'center', gap: 3, background: 'rgba(255,255,255,0.03)', padding: 3, borderRadius: 8, border: '1px solid var(--border)' }}>
               {[
                 { role: 'student', label: 'Student', href: '/student' },
                 { role: 'institute', label: 'Institute', href: '/institute' },
@@ -486,13 +522,37 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               })}
             </div>
 
+            {/* Quick Layout Style Toggle Button in Topbar */}
+            <button
+              type="button"
+              onClick={() => setNavigationStyle(navigationStyle === 'sidebar' ? 'navbar' : 'sidebar')}
+              title={`Switch layout to ${navigationStyle === 'sidebar' ? 'Top Navbar' : 'Sidebar'}`}
+              aria-label={`Switch layout to ${navigationStyle === 'sidebar' ? 'Top Navbar' : 'Sidebar'}`}
+              style={{
+                background: 'rgba(255,255,255,0.03)',
+                border: '1px solid var(--border)',
+                borderRadius: 6,
+                padding: '4px 8px',
+                color: 'var(--text-secondary)',
+                fontSize: 11,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 5,
+              }}
+              className="hidden md:flex"
+            >
+              <Layout size={12} />
+              <span>{navigationStyle === 'sidebar' ? 'Navbar Mode' : 'Sidebar Mode'}</span>
+            </button>
+
             {/* Live AI Telemetry Pill */}
             <Link
               href="/ai-health"
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: 6,
+                gap: 5,
                 padding: '4px 10px',
                 background: 'rgba(16,185,129,0.06)',
                 border: '1px solid rgba(16,185,129,0.2)',
@@ -520,87 +580,141 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* Verification banner if applicable */}
         <VerificationBanner />
 
-        {/* Page View Container */}
+        {/* Main Content Area */}
         <main style={{ flex: 1, padding: '24px 28px', maxWidth: 1400, width: '100%', margin: '0 auto' }}>
           {children}
         </main>
       </div>
 
-      {/* ── Mobile Drawer ── */}
+      {/* ═════════════════════════════════════════════════════════════════════════ */}
+      {/* ── 4. MOBILE RESPONSIVE DRAWER ────────────────────────────────────────── */}
+      {/* ═════════════════════════════════════════════════════════════════════════ */}
       <AnimatePresence>
         {mobileOpen && (
-          <motion.div
-            initial={{ opacity: 0, x: -260 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -260 }}
-            style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              bottom: 0,
-              width: 260,
-              background: 'var(--bg-surface)',
-              borderRight: '1px solid var(--border)',
-              zIndex: 50,
-              padding: 16,
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-            }}
-          >
-            <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-                <div className="font-display" style={{ fontSize: 16, fontWeight: 800 }}>
-                  SkillSense <span style={{ color: 'var(--gold)' }}>AI</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setMobileOpen(false)}
-                  style={{ background: 'transparent', border: 'none', color: '#94a3b8' }}
-                >
-                  <X size={18} />
-                </button>
-              </div>
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setMobileOpen(false)}
+              style={{
+                position: 'fixed',
+                inset: 0,
+                background: 'rgba(0,0,0,0.75)',
+                backdropFilter: 'blur(4px)',
+                zIndex: 49,
+              }}
+              className="md:hidden"
+            />
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                {activeNav.routes.map((route) => {
-                  const Icon = route.icon;
-                  const isActive = pathname === route.href;
-                  return (
-                    <Link
-                      key={route.href}
-                      href={route.href}
-                      onClick={() => setMobileOpen(false)}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 10,
-                        padding: '10px 12px',
-                        borderRadius: 8,
-                        fontSize: 13.5,
-                        fontWeight: isActive ? 700 : 500,
-                        color: isActive ? '#f8fafc' : 'var(--text-secondary)',
-                        background: isActive ? 'rgba(245, 158, 11, 0.1)' : 'transparent',
-                        textDecoration: 'none',
-                      }}
-                    >
-                      <Icon size={16} color={isActive ? '#f59e0b' : 'currentColor'} />
-                      <span>{route.label}</span>
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="btn-secondary"
-              style={{ width: '100%', justifyContent: 'center', fontSize: 13 }}
+            {/* Slide-out Drawer */}
+            <motion.div
+              role="dialog"
+              aria-modal="true"
+              aria-label="Mobile Navigation"
+              initial={{ opacity: 0, x: -280 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -280 }}
+              transition={{ duration: 0.25, ease: 'easeOut' }}
+              style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                bottom: 0,
+                width: 280,
+                background: 'var(--bg-surface)',
+                borderRight: '1px solid var(--border)',
+                zIndex: 50,
+                padding: 16,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+              }}
+              className="md:hidden"
             >
-              <LogOut size={14} /> Sign Out
-            </button>
-          </motion.div>
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div style={{ width: 28, height: 28, borderRadius: 6, background: 'var(--gold)', color: '#090a0f', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 13 }}>
+                      SK
+                    </div>
+                    <span className="font-display" style={{ fontSize: 15, fontWeight: 800, color: '#f8fafc' }}>
+                      SkillSense AI
+                    </span>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setMobileOpen(false)}
+                    aria-label="Close navigation drawer"
+                    style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 4 }}
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
+
+                {/* Mobile Navigation List */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 16, overflowY: 'auto', maxHeight: 'calc(100vh - 160px)' }}>
+                  {navGroups.map((group, gIdx) => (
+                    <div key={gIdx}>
+                      <div style={{ fontSize: 10, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6 }}>
+                        {group.group}
+                      </div>
+
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                        {group.routes.map((route) => {
+                          const Icon = route.icon;
+                          const active = isRouteActive(route.href);
+
+                          return (
+                            <Link
+                              key={route.href}
+                              href={route.href}
+                              onClick={() => setMobileOpen(false)}
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 10,
+                                padding: '9px 12px',
+                                borderRadius: 8,
+                                fontSize: 13,
+                                fontWeight: active ? 700 : 500,
+                                color: active ? 'var(--gold)' : '#cbd5e1',
+                                background: active ? 'rgba(245, 158, 11, 0.1)' : 'transparent',
+                                borderLeft: active ? '3px solid var(--gold)' : '3px solid transparent',
+                                textDecoration: 'none',
+                              }}
+                            >
+                              <Icon size={16} />
+                              <span>{route.label}</span>
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Mobile Drawer Footer */}
+              <div style={{ borderTop: '1px solid var(--border)', paddingTop: 14 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ fontSize: 12, color: '#f8fafc', fontWeight: 600 }}>
+                    {user?.name || 'Candidate'}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="btn-ghost"
+                    style={{ fontSize: 11, padding: '4px 8px' }}
+                  >
+                    <LogOut size={13} /> Sign Out
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </div>

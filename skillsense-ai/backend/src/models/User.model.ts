@@ -25,6 +25,11 @@ export interface IUser extends Document {
   resetPasswordExpires?: Date | null;
   verificationToken?: string | null;
   verificationTokenExpires?: Date | null;
+  preferences?: {
+    navigationStyle?: 'sidebar' | 'navbar';
+    theme?: string;
+    sidebarCollapsed?: boolean;
+  };
   comparePassword(candidate: string): Promise<boolean>;
 }
 
@@ -43,6 +48,11 @@ const UserSchema = new Schema<IUser>(
     isVerified: { type: Boolean, default: false },
     isActive: { type: Boolean, default: true },
     isDeleted: { type: Boolean, default: false },
+    preferences: {
+      navigationStyle: { type: String, enum: ['sidebar', 'navbar'], default: 'sidebar' },
+      theme: { type: String, default: 'dark' },
+      sidebarCollapsed: { type: Boolean, default: false },
+    },
     refreshToken: { type: String, select: false },
     // OAuth
     googleId: { type: String, sparse: true, index: true },

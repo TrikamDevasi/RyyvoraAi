@@ -194,6 +194,60 @@ export const getMe = async (req: Request, res: Response, next: NextFunction) => 
   }
 };
 
+export const getPreferences = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const user = req.user as any;
+    const preferences = user?.preferences || { navigationStyle: 'sidebar', theme: 'dark', sidebarCollapsed: false };
+    res.status(200).json({
+      success: true,
+      data: { preferences },
+      message: 'Preferences retrieved',
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const preferencesSchema = z.object({
+  navigationStyle: z.enum(['sidebar', 'navbar']).optional(),
+  theme: z.string().optional(),
+  sidebarCollapsed: z.boolean().optional(),
+});
+
+export const updatePreferences = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const parsed = preferencesSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({
+        success: false,
+        message: 'Invalid preferences payload: ' + parsed.error.errors.map(e => e.message).join(', '),
+      });
+      return;
+    }
+
+    const userId = (req.user as any)?._id;
+    const user = await User.findById(userId);
+    if (!user) {
+      res.status(404).json({ success: false, message: 'User not found' });
+      return;
+    }
+
+    user.preferences = {
+      ...(user.preferences || {}),
+      ...parsed.data,
+    };
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      data: { preferences: user.preferences },
+      message: 'Preferences updated successfully',
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 export const refreshTokens = async (req: Request, res: Response) => {
   res.status(200).json({ success: true, message: 'Session active' });
 };

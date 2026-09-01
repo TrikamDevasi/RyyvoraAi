@@ -3,7 +3,8 @@ import passport from 'passport';
 import {
   register, login, refreshTokens, logout, getMe,
   getPublicStats, forgotPassword, verifyResetToken,
-  resetPassword, verifyEmail, resendVerification
+  resetPassword, verifyEmail, resendVerification,
+  getPreferences, updatePreferences,
 } from '../controllers/auth.controller';
 import { protect } from '../middleware/auth.middleware';
 import { authLimiter } from '../middleware/rateLimit.middleware';
@@ -31,6 +32,9 @@ const encodeUser = (user: IUser): string => {
 router.post('/register', authLimiter, register);
 router.post('/login', authLimiter, login);
 router.get('/me', protect, getMe);
+router.get('/preferences', protect, getPreferences);
+router.patch('/preferences', protect, updatePreferences);
+router.put('/preferences', protect, updatePreferences);
 router.post('/logout', protect, logout);
 router.get('/stats', getPublicStats);
 router.post('/forgot-password', authLimiter, forgotPassword);
