@@ -12,26 +12,80 @@ export function extractJsonString(raw: string): string {
   let cleaned = raw.trim();
 
   // Strip markdown code fences if present
-  const markdownMatch = cleaned.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
+  const markdownMatch = cleaned.match(/```(?:json)?\s*([\s\S]*?)(?:```|$)/i);
   if (markdownMatch && markdownMatch[1]) {
     cleaned = markdownMatch[1].trim();
   }
 
-  // Find outermost curly braces or square brackets
+  // Find first opening brace or bracket
   const firstBrace = cleaned.indexOf('{');
-  const lastBrace = cleaned.lastIndexOf('}');
   const firstBracket = cleaned.indexOf('[');
-  const lastBracket = cleaned.lastIndexOf(']');
 
-  if (firstBrace !== -1 && lastBrace !== -1 && (firstBracket === -1 || firstBrace < firstBracket)) {
-    cleaned = cleaned.substring(firstBrace, lastBrace + 1);
-  } else if (firstBracket !== -1 && lastBracket !== -1) {
-    cleaned = cleaned.substring(firstBracket, lastBracket + 1);
+  let isObject = false;
+  let startIndex = -1;
+
+  if (firstBrace !== -1 && (firstBracket === -1 || firstBrace < firstBracket)) {
+    startIndex = firstBrace;
+    isObject = true;
+  } else if (firstBracket !== -1) {
+    startIndex = firstBracket;
+    isObject = false;
   }
 
-  // Remove trailing commas before closing braces/brackets (common LLM hallucination)
+  if (startIndex === -1) return '{}';
+
+  cleaned = cleaned.substring(startIndex);
+
+  // If already balanced, check last matching closing token
+  const lastClose = isObject ? cleaned.lastIndexOf('}') : cleaned.lastIndexOf(']');
+  if (lastClose !== -1) {
+    cleaned = cleaned.substring(0, lastClose + 1);
+  }
+
+  // Remove trailing commas before closing braces/brackets
   cleaned = cleaned.replace(/,\s*([}\]])/g, '$1');
 
+  // Attempt to balance unclosed braces/brackets if cut off
+  let openBraces = 0;
+  let openBrackets = 0;
+  let inString = false;
+  let escapeNext = false;
+
+  for (let i = 0; i < cleaned.length; i++) {
+    const char = cleaned[i];
+    if (escapeNext) {
+      escapeNext = false;
+      continue;
+    }
+    if (char === '\\') {
+      escapeNext = true;
+      continue;
+    }
+    if (char === '"') {
+      inString = !inString;
+      continue;
+    }
+    if (!inString) {
+      if (char === '{') openBraces++;
+      else if (char === '}') openBraces = Math.max(0, openBraces - 1);
+      else if (char === '[') openBrackets++;
+      else if (char === ']') openBrackets = Math.max(0, openBrackets - 1);
+    }
+  }
+
+  if (inString) {
+    cleaned += '"';
+  }
+  while (openBrackets > 0) {
+    cleaned += ']';
+    openBrackets--;
+  }
+  while (openBraces > 0) {
+    cleaned += '}';
+    openBraces--;
+  }
+
+  cleaned = cleaned.replace(/,\s*([}\]])/g, '$1');
   return cleaned;
 }
 

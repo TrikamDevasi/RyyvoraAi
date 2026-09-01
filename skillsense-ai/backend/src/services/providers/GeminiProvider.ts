@@ -7,8 +7,8 @@ export class GeminiProvider implements AIProvider {
   name = 'Gemini';
   private client: OpenAI | null = null;
   private candidateModels = [
-    'gemini-3.5-flash',
     'gemini-3.6-flash',
+    'gemini-3.5-flash',
     'gemini-3.7-flash',
   ];
 
