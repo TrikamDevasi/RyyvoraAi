@@ -39,7 +39,12 @@ export default function StudentSubmissionsPage() {
                 projects: [title, description].filter(Boolean),
             });
 
-            const score = analysis.overallScore || 80;
+            const score = analysis.overallScore;
+            if (typeof score !== 'number') {
+                toast.error('The analysis did not return a competency score. Please try again.');
+                setSubmitting(false);
+                return;
+            }
             setLastScore(score);
 
             // Record assessment submission

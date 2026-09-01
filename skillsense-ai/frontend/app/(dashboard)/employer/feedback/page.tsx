@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import api from '@/lib/api';
+import { useAuth } from '@/hooks/useAuth';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 
@@ -9,10 +10,12 @@ const GOLD = '#D4A843';
 const CYAN = '#06b6d4';
 
 export default function EmployerFeedbackPage() {
+    const { user } = useAuth();
     const [students, setStudents] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
-    const [formSuccess, setFormSuccess] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
+    const [formMessage, setFormMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
     const [studentName, setStudentName] = useState('');
     const [comments, setComments] = useState('');
 
@@ -28,13 +31,39 @@ export default function EmployerFeedbackPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setFormSuccess(true);
-        setTimeout(() => {
-            setFormSuccess(false);
+        if (!studentName.trim() || !comments.trim()) {
+            setFormMessage({ type: 'error', text: 'Please provide a candidate name and feedback comments.' });
+            return;
+        }
+
+        setSubmitting(true);
+        setFormMessage(null);
+        try {
+            // Persist employer feedback as a verifiable industry record that admins
+            // can review in the Industry Inquiries ledger.
+            await api.post('/contact/industry', {
+                companyName: user?.name || user?.email || 'Employer',
+                email: user?.email || 'employer@example.com',
+                plan: 'Employer Feedback',
+                teamSize: '1-10',
+                message: `Candidate Feedback — ${studentName}: ${comments}`,
+            });
+
+            setFormMessage({
+                type: 'success',
+                text: 'Candidate feedback successfully logged and verified in the industry ledger!',
+            });
             setShowForm(false);
             setStudentName('');
             setComments('');
-        }, 2000);
+        } catch (err: any) {
+            setFormMessage({
+                type: 'error',
+                text: err?.response?.data?.message || 'Failed to submit feedback. Please try again.',
+            });
+        } finally {
+            setSubmitting(false);
+        }
     };
 
     return (
@@ -54,9 +83,9 @@ export default function EmployerFeedbackPage() {
                     </button>
                 </div>
 
-                {formSuccess && (
-                    <div style={{ padding: 12, background: 'rgba(34,197,94,0.15)', border: '1px solid #22c55e', borderRadius: 8, color: '#86efac', marginBottom: 18, fontSize: 13 }}>
-                        ✓ Candidate feedback successfully logged and verified in passport ledger!
+                {formMessage && (
+                    <div style={{ padding: 12, background: formMessage.type === 'success' ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)', border: `1px solid ${formMessage.type === 'success' ? '#22c55e' : '#ef4444'}`, borderRadius: 8, color: formMessage.type === 'success' ? '#86efac' : '#fca5a5', marginBottom: 18, fontSize: 13 }}>
+                        {formMessage.type === 'success' ? '✓ ' : '⚠ '}{formMessage.text}
                     </div>
                 )}
 
@@ -85,8 +114,8 @@ export default function EmployerFeedbackPage() {
                                     style={{ width: '100%', padding: '10px 14px', borderRadius: 8, background: '#0d0a1a', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', fontSize: 13 }}
                                 />
                             </div>
-                            <button type="submit" className="btn-gold" style={{ alignSelf: 'flex-start', padding: '8px 20px', fontSize: 13, cursor: 'pointer' }}>
-                                Submit Feedback
+                            <button type="submit" disabled={submitting} className="btn-gold" style={{ alignSelf: 'flex-start', padding: '8px 20px', fontSize: 13, cursor: submitting ? 'not-allowed' : 'pointer', opacity: submitting ? 0.6 : 1 }}>
+                                {submitting ? 'Submitting...' : 'Submit Feedback'}
                             </button>
                         </form>
                     </div>

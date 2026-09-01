@@ -8,13 +8,23 @@ export class GroqProvider implements AIProvider {
   private client: Groq | null = null;
   private candidateModels = [
     'llama-3.3-70b-versatile',
-    'llama-3.1-70b-versatile',
-    'llama3-70b-8192',
     'llama-3.1-8b-instant',
-    'llama3-8b-8192',
-    'mixtral-8x7b-32768',
-    'gemma2-9b-it',
+    'llama-3.3-70b-specdec',
   ];
+
+  private isModelError(err: any): boolean {
+    if (!err) return false;
+    const msg = `${err?.status || ''} ${err?.message || ''}`;
+    return (
+      err?.status === 404 ||
+      err?.message?.includes('model_not_found') ||
+      err?.message?.includes('model_decommissioned') ||
+      err?.message?.includes('does not exist') ||
+      err?.message?.includes('is not supported') ||
+      err?.error?.code === 'model_decommissioned' ||
+      err?.error?.code === 'model_not_found'
+    );
+  }
 
   constructor(apiKey?: string) {
     const key = apiKey || process.env.GROQ_API_KEY;
@@ -63,8 +73,8 @@ export class GroqProvider implements AIProvider {
           lastChecked: new Date().toISOString(),
         };
       } catch (err: any) {
-        // If it's a 404 model not found, try next candidate
-        if (err?.status === 404 || err?.message?.includes('model_not_found')) {
+        // If it's a model not found/decommissioned error, try next candidate
+        if (this.isModelError(err)) {
           continue;
         }
         // If auth error or other error, return error
@@ -115,7 +125,7 @@ export class GroqProvider implements AIProvider {
         const text = response.choices[0]?.message?.content?.trim();
         if (text) return text;
       } catch (err: any) {
-        if (err?.status === 404 || err?.message?.includes('model_not_found')) {
+        if (this.isModelError(err)) {
           continue;
         }
         logger.warn(`Groq model (${model}) failed: ${err.message}. Trying next candidate...`);
@@ -153,7 +163,7 @@ export class GroqProvider implements AIProvider {
         }
         if (yielded) return;
       } catch (err: any) {
-        if (err?.status === 404 || err?.message?.includes('model_not_found')) {
+        if (this.isModelError(err)) {
           continue;
         }
         logger.warn(`Groq streaming with ${model} failed: ${err.message}. Trying next candidate...`);

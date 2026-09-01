@@ -12,29 +12,33 @@ const BarChart = dynamic(() => import('recharts').then(m => m.BarChart), { ssr: 
 
 const GOLD = '#D4A843';
 const AMBER = '#F59E0B';
+const GREEN = '#22c55e';
 const WHITE = '#FFFFFF';
 
 export default function EmployerPage() {
-    const [_stats, setStats] = useState<any>(null);
+    const [stats, setStats] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         api.get('/analytics/placement-trends')
             .then(res => {
                 const data = res.data?.data;
-                setStats(data);
+                setStats(Array.isArray(data) ? data : []);
                 setLoading(false);
             })
-            .catch(() => setLoading(false));
+            .catch(() => {
+                setError('Placement data is currently unavailable. Please try again.');
+                setLoading(false);
+            });
     }, []);
 
-    const chartData = [
-        { month: 'Jan', hires: 42 },
-        { month: 'Feb', hires: 58 },
-        { month: 'Mar', hires: 65 },
-        { month: 'Apr', hires: 84 },
-        { month: 'May', hires: 92 },
-    ];
+    const chartData = stats.map((s) => ({
+        month: s.month,
+        hires: s.placed ?? 0,
+    }));
+
+    const totalPlaced = stats.reduce((sum, s) => sum + (s.placed ?? 0), 0);
 
     return (
         <ErrorBoundary>
@@ -50,14 +54,21 @@ export default function EmployerPage() {
 
                 {loading ? (
                     <Skeleton height={200} width="100%" />
+                ) : error ? (
+                    <div style={{ padding: 24, borderRadius: 12, background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.3)', color: '#fca5a5', fontSize: 13, textAlign: 'center' }}>
+                        ⚠ {error}
+                    </div>
+                ) : stats.length === 0 ? (
+                    <div style={{ padding: 24, borderRadius: 12, background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.08)', color: '#94a3b8', fontSize: 13, textAlign: 'center' }}>
+                        No verified placement records found yet. Placement data will appear here as candidates are placed.
+                    </div>
                 ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 14 }}>
                             {[
-                                { label: 'Verified Hires', value: '341', color: '#22c55e' },
-                                { label: 'Active Pipeline Candidates', value: '1,280', color: GOLD },
-                                { label: 'Skill Match Accuracy', value: '94.2%', color: AMBER },
-                                { label: 'Partner Institutions', value: '48', color: '#a78bfa' },
+                                { label: 'Verified Placements', value: String(totalPlaced), color: GREEN },
+                                { label: 'Data Points Tracked', value: String(stats.length * 2), color: GOLD },
+                                { label: 'Latest Month Placements', value: String(chartData[chartData.length - 1]?.hires ?? 0), color: AMBER },
                             ].map((s, i) => (
                                 <div key={i} style={{ padding: 18, background: 'rgba(255,255,255,0.02)', borderRadius: 12, border: '1px solid rgba(255,255,255,0.08)' }}>
                                     <div className="font-display" style={{ fontSize: 24, fontWeight: 900, color: s.color }}>{s.value}</div>

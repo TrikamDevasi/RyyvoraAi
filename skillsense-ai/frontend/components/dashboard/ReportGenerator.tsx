@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import api from '@/lib/api';
 import type { ReportConfig } from '../../types/charts';
 
 interface Props {
@@ -19,27 +20,83 @@ const REPORT_TYPES: { value: ReportConfig['type']; label: string; icon: string }
     { value: 'compliance', label: 'Compliance Report', icon: 'CMP' },
 ];
 
+function downloadFile(filename: string, content: string, mime: string) {
+    const blob = new Blob([content], { type: mime });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
 export default function ReportGenerator({ onGenerate }: Props) {
-    const [type, setType] = useState<ReportConfig['type']>('placement');
-    const [format, setFormat] = useState<ReportConfig['format']>('pdf');
+    const [type, setType] = useState<ReportConfig['type']>('compliance');
+    const [format, setFormat] = useState<ReportConfig['format']>('csv');
     const [from, setFrom] = useState('2025-04-01');
     const [to, setTo] = useState('2026-03-31');
     const [generating, setGenerating] = useState(false);
-    const [done, setDone] = useState(false);
+    const [status, setStatus] = useState<{ ok: boolean; text: string } | null>(null);
 
     const handleGenerate = async () => {
         setGenerating(true);
-        setDone(false);
+        setStatus(null);
         const config: ReportConfig = {
             type,
             format,
             dateRange: { from, to },
         };
-        await new Promise((r) => setTimeout(r, 1800));
-        onGenerate?.(config);
-        setGenerating(false);
-        setDone(true);
-        setTimeout(() => setDone(false), 3000);
+
+        try {
+            const endpoint =
+                type === 'compliance'
+                    ? '/governance/compliance'
+                    : type === 'fairness'
+                        ? '/admin/fairness-dashboard'
+                        : '/analytics/dashboard';
+
+            const res = await api.get(endpoint);
+            const data = res.data?.data ?? res.data;
+
+            // Build a real CSV from the live API response
+            const rows: string[][] = [];
+            const cols = (key: string, value: unknown) => [key, String(value ?? '')];
+
+            if (type === 'compliance' && data) {
+                rows.push(cols('Report Type', 'Compliance'));
+                rows.push(cols('Generated From', from));
+                rows.push(cols('Generated To', to));
+                rows.push(cols('Verified Institutions', data.verifiedInstitutions ?? '-'));
+                rows.push(cols('Total Students', data.totalStudents ?? '-'));
+                rows.push(cols('NSQF Coverage', data.compliance?.nsqfCoverage ?? '-'));
+                rows.push(cols('Institution Verification Rate', data.compliance?.institutionVerificationRate ?? '-'));
+                if (Array.isArray(data.nsqfDistribution)) {
+                    data.nsqfDistribution.forEach((d: any) => {
+                        rows.push(cols(`NSQF Level ${d._id} Students`, d.count));
+                    });
+                }
+            } else {
+                rows.push(cols('Report Type', type));
+                rows.push(cols('Generated From', from));
+                rows.push(cols('Generated To', to));
+                rows.push(cols('Snapshot', JSON.stringify(data)));
+            }
+
+            const csv = rows.map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+            downloadFile(`skillsense-${type}-report-${new Date().toISOString().slice(0, 10)}.csv`, csv, 'text/csv;charset=utf-8');
+
+            onGenerate?.(config);
+            setStatus({ ok: true, text: 'Report generated from live system data and downloaded.' });
+        } catch (err: any) {
+            setStatus({
+                ok: false,
+                text: err?.response?.data?.message || 'Report generation failed because the analytics service is unavailable. Please try again.',
+            });
+        } finally {
+            setGenerating(false);
+        }
     };
 
     return (
@@ -94,7 +151,7 @@ export default function ReportGenerator({ onGenerate }: Props) {
                         Format
                     </label>
                     <div style={{ display: 'flex', gap: 6 }}>
-                        {(['pdf', 'excel', 'csv'] as const).map((f) => (
+                        {(['csv', 'excel', 'pdf'] as const).map((f) => (
                             <button
                                 key={f}
                                 onClick={() => setFormat(f)}
@@ -163,6 +220,13 @@ export default function ReportGenerator({ onGenerate }: Props) {
                 </div>
             </div>
 
+            {/* Status message */}
+            {status && (
+                <div style={{ marginBottom: 12, fontSize: 12, color: status.ok ? '#22c55e' : '#ef4444', lineHeight: 1.4 }}>
+                    {status.ok ? '✓ ' : '⚠ '}{status.text}
+                </div>
+            )}
+
             {/* Generate button */}
             <button
                 onClick={handleGenerate}
@@ -172,12 +236,10 @@ export default function ReportGenerator({ onGenerate }: Props) {
                     padding: '12px 20px',
                     borderRadius: 10,
                     border: 'none',
-                    background: done
-                        ? 'rgba(34,197,94,0.2)'
-                        : generating
-                            ? 'rgba(212,168,67,0.3)'
-                            : `linear-gradient(135deg, ${GOLD}, #8b6512)`,
-                    color: done ? '#22c55e' : generating ? MUTED : '#1a0f00',
+                    background: generating
+                        ? 'rgba(212,168,67,0.3)'
+                        : `linear-gradient(135deg, ${GOLD}, #8b6512)`,
+                    color: generating ? MUTED : '#1a0f00',
                     fontSize: 14,
                     fontWeight: 700,
                     cursor: generating ? 'wait' : 'pointer',
@@ -201,10 +263,8 @@ export default function ReportGenerator({ onGenerate }: Props) {
                                 animation: 'spin 0.7s linear infinite',
                             }}
                         />
-                        Generating…
+                        Generating from live data…
                     </>
-                ) : done ? (
-                    '✓ Report Ready — Download Started'
                 ) : (
                     `Generate ${format.toUpperCase()} Report`
                 )}

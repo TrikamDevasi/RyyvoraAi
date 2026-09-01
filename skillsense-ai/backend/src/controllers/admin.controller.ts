@@ -140,12 +140,12 @@ export const getFairnessDashboard = async (req: Request, res: Response, next: Ne
     const students = await Student.find().limit(150).lean();
     const formatted = students.map((s: any) => ({
       id: String(s._id),
-      gender: s.gender || 'male',
-      region: (s.state === 'Delhi' || s.state === 'Punjab') ? 'north' : (s.state === 'Karnataka' || s.state === 'Tamil Nadu') ? 'south' : 'west',
-      nsqfLevel: s.nsqfLevel || 4,
-      overallScore: s.overallScore || 68,
+      gender: s.gender || 'unspecified',
+      region: (s.state === 'Delhi' || s.state === 'Punjab') ? 'north' : (s.state === 'Karnataka' || s.state === 'Tamil Nadu') ? 'south' : (s.state ? 'west' : 'unknown'),
+      nsqfLevel: s.nsqfLevel ?? 0,
+      overallScore: s.overallScore ?? 0,
       placementStatus: s.placementStatus || 'seeking',
-      salary: s.salary || 320000,
+      salary: s.salary ?? 0,
     }));
 
     const metrics = fairnessService.computeFairnessMetrics(formatted as any, 'Current Audit Period');

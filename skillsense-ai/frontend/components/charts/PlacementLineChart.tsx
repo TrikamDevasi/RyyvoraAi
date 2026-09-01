@@ -47,20 +47,24 @@ const CustomTooltip = ({ active, payload, label }: any) => {
                         Placed: <span style={{ color: '#F59E0B', fontWeight: 600 }}>{d.placedCount}</span>
                     </p>
                     <p style={{ color: '#ffffff', fontSize: '13px', margin: 0 }}>
-                        Avg Salary: <span style={{ color: '#F59E0B', fontWeight: 600 }}>&#8377;{d.avgSalary.toLocaleString('en-IN')}</span>
+                        Avg Salary: <span style={{ color: '#F59E0B', fontWeight: 600 }}>&#8377;{(d.avgSalary || 0).toLocaleString('en-IN')}</span>
                     </p>
-                    <p style={{ color: '#ffffff', fontSize: '13px', margin: 0 }}>
-                        Rate: <span style={{ color: '#22c55e', fontWeight: 700 }}>{d.placementRate}%</span>
-                    </p>
-                    <p style={{ 
-                        color: '#94a3b8', 
-                        fontSize: '11px', 
-                        marginTop: '8px',
-                        paddingTop: '8px',
-                        borderTop: '1px solid rgba(255,255,255,0.1)' 
-                    }}>
-                        Top: {d.topSector} • Female {d.femalePercent}%
-                    </p>
+                    {d.placementRate !== undefined && (
+                        <p style={{ color: '#ffffff', fontSize: '13px', margin: 0 }}>
+                            Rate: <span style={{ color: '#22c55e', fontWeight: 700 }}>{d.placementRate}%</span>
+                        </p>
+                    )}
+                    {d.topSector !== undefined && d.topSector !== null && (
+                        <p style={{
+                            color: '#94a3b8',
+                            fontSize: '11px',
+                            marginTop: '8px',
+                            paddingTop: '8px',
+                            borderTop: '1px solid rgba(255,255,255,0.1)'
+                        }}>
+                            Top: {d.topSector}{d.femalePercent !== undefined ? ` • Female ${d.femalePercent}%` : ''}
+                        </p>
+                    )}
                 </div>
             </div>
         );

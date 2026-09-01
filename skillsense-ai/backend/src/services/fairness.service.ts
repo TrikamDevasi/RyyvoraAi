@@ -217,14 +217,8 @@ export class FairnessService {
   // ── 2. AI-Powered Bias Analysis (OpenAI) ──────────────────────────────────
   async runAIFairnessAnalysis(
     cohortData: any[]
-  ): Promise<AIFairnessReport> {
-    const fallback: AIFairnessReport = {
-      isFair: true,
-      flags: [],
-      recommendations: [],
-    };
-
-    if (!cohortData || cohortData.length === 0) return fallback;
+  ): Promise<AIFairnessReport | null> {
+    if (!cohortData || cohortData.length === 0) return null;
 
     try {
       const prompt = `You are an AI bias auditor for a vocational education platform in India.
@@ -252,16 +246,17 @@ Return ONLY valid JSON:
         }
       );
 
-      const parsed = JSON.parse(content || '{}');
+      if (!content) throw new Error('AI fairness analysis unavailable (empty provider response)');
+      const parsed = JSON.parse(content);
 
       return {
-        isFair:          parsed.isFair          ?? true,
-        flags:           parsed.flags           ?? [],
-        recommendations: parsed.recommendations ?? [],
+        isFair:          parsed.isFair          ?? null,
+        flags:           Array.isArray(parsed.flags) ? parsed.flags : [],
+        recommendations: Array.isArray(parsed.recommendations) ? parsed.recommendations : [],
       };
     } catch (err) {
       logger.error('AI fairness analysis error:', err);
-      return fallback;
+      return null;
     }
   }
 

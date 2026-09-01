@@ -37,30 +37,22 @@ export default function PassportPage() {
     ? {
         id: profile._id,
         name: profile.userId?.name || 'Candidate',
-        enrollmentNumber: profile.enrollmentNumber || 'SKP-2026-LIVE',
-        program: profile.program || 'Computer Science & Engineering',
-        institution: 'SkillSense National Training Institute',
-        state: profile.state || 'Karnataka',
-        gender: profile.gender || 'male',
-        nsqfLevel: profile.nsqfLevel || 4,
-        overallScore: profile.overallScore || 78,
+        enrollmentNumber: profile.enrollmentNumber || '',
+        program: profile.program || '',
+        state: profile.state || '',
+        gender: profile.gender || '',
+        nsqfLevel: profile.nsqfLevel || 0,
+        overallScore: profile.overallScore || 0,
         placementStatus: profile.placementStatus || 'seeking',
-        passportHash:
-          profile.passportHash ||
-          '8f4c2b9a7d1e3f5c0a2b4d6e8f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8',
+        passportHash: profile.passportHash || '',
         skills:
           profile.skills && profile.skills.length > 0
             ? profile.skills.map((s: any) => ({
                 name: typeof s.skillId === 'object' && s.skillId?.name ? s.skillId.name : 'Core Competency',
-                score: s.score || 75,
+                score: s.score || 0,
                 verified: true,
               }))
-            : [
-                { name: 'TypeScript & Algorithms', score: 85, verified: true },
-                { name: 'Node.js & REST API', score: 80, verified: true },
-                { name: 'Database & SQL Architecture', score: 76, verified: true },
-                { name: 'System Design & Scalability', score: 72, verified: true },
-              ],
+            : [],
       }
     : null;
 

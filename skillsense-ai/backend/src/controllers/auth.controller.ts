@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import User from '../models/User.model';
+import Skill from '../models/Skill.model';
+import Institution from '../models/Institution.model';
 import bcrypt from 'bcryptjs';
 import { z } from 'zod';
 import crypto from 'crypto';
@@ -260,23 +262,24 @@ export const logout = async (req: Request, res: Response) => {
 
 export const getPublicStats = async (req: Request, res: Response) => {
   try {
-    const [totalUsers, totalStudents] = await Promise.all([
+    const [totalUsers, totalStudents, verifiedInstitutions] = await Promise.all([
       User.countDocuments({ isDeleted: { $ne: true } }),
       User.countDocuments({ role: 'student', isDeleted: { $ne: true } }),
+      Institution.countDocuments({ isVerified: true }),
     ]);
-    
+
     res.json({
       success: true,
       data: {
-        totalUsers: totalUsers + 1240, 
-        totalStudents: totalStudents + 850,
-        coursesCount: 542,
-        partnersCount: 200,
-        accuracy: 94
-      }
+        totalUsers,
+        totalStudents,
+        partnersCount: verifiedInstitutions,
+        coursesCount: await Skill.countDocuments(),
+        accuracy: null,
+      },
     });
   } catch (err) {
-    res.json({ success: true, data: { totalUsers: 1450, totalStudents: 980, coursesCount: 500, partnersCount: 200, accuracy: 94 } });
+    res.status(500).json({ success: false, message: 'Could not load public stats' });
   }
 };
 

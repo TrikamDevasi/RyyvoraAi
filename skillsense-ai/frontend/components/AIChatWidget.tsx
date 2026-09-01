@@ -185,6 +185,7 @@ export default function AIChatWidget() {
         const decoder = new TextDecoder();
         let accumulated = '';
         let finalSuggestions: string[] = DEFAULT_SUGGESTIONS;
+        let streamError = '';
 
         if (reader) {
           while (true) {
@@ -198,6 +199,9 @@ export default function AIChatWidget() {
               if (line.startsWith('data: ')) {
                 try {
                   const parsed = JSON.parse(line.replace('data: ', '').trim());
+                  if (parsed.error) {
+                    streamError = parsed.error as string;
+                  }
                   if (parsed.chunk) {
                     accumulated += parsed.chunk;
                     setMessages((prev) =>
@@ -218,7 +222,13 @@ export default function AIChatWidget() {
         setMessages((prev) =>
           prev.map((m) =>
             m.id === aiMsgId
-              ? { ...m, content: accumulated || 'Response received.', suggestions: finalSuggestions, isError: false }
+              ? {
+                  ...m,
+                  content: streamError || accumulated,
+                  suggestions: finalSuggestions,
+                  isError: !!streamError,
+                  failedPrompt: streamError ? text.trim() : m.failedPrompt,
+                }
               : m
           )
         );

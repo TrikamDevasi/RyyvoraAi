@@ -37,14 +37,25 @@ export default function UploadZone() {
             addUploadJob(job);
 
             try {
-                let institutionId = '660000000000000000000001';
+                let institutionId = '';
                 try {
                     const stored = localStorage.getItem('ss_user');
                     if (stored) {
                         const parsed = JSON.parse(stored);
-                        if (parsed.institutionId) institutionId = parsed.institutionId;
+                        institutionId = parsed._id || parsed.id || parsed.institutionId || '';
                     }
                 } catch {}
+
+                if (!institutionId) {
+                    setErrorMsg('No institution linked to this account. Please contact an administrator to link an institution before uploading.');
+                    updateUploadJob(job.id, {
+                        status: 'error',
+                        progress: 100,
+                        recordsProcessed: 0,
+                        errorsFound: 0,
+                    });
+                    return;
+                }
 
                 const formData = new FormData();
                 formData.append('file', file);
@@ -56,18 +67,25 @@ export default function UploadZone() {
                 });
 
                 const data = res.data?.data;
+                const processed =
+                    typeof data?.processed === 'number' ? data.processed :
+                    typeof data?.inserted === 'number' ? data.inserted :
+                    Array.isArray(data?.results) ? data.results.length :
+                    data?.count ?? 0;
                 updateUploadJob(job.id, {
                     status: 'complete',
                     progress: 100,
-                    recordsProcessed: data?.processed || data?.count || 12,
-                    errorsFound: data?.errors?.length || 0,
+                    recordsProcessed: processed,
+                    errorsFound: typeof data?.failed === 'number' ? data.failed : (data?.errors?.length || 0),
                 });
             } catch (err: any) {
+                const message = err?.response?.data?.message || err?.message || 'Upload failed';
+                setErrorMsg(message);
                 updateUploadJob(job.id, {
-                    status: 'complete',
+                    status: 'error',
                     progress: 100,
-                    recordsProcessed: 1,
-                    errorsFound: 0,
+                    recordsProcessed: 0,
+                    errorsFound: 1,
                 });
             }
         },
@@ -136,8 +154,12 @@ export default function UploadZone() {
                                 <div style={{ fontSize: 11, color: MUTED, marginTop: 2 }}>{formatSize(job.fileSize)} • {new Date(job.uploadedAt).toLocaleTimeString()}</div>
                             </div>
                             <div style={{ textAlign: 'right' }}>
-                                <div style={{ fontSize: 12, fontWeight: 700, color: job.status === 'complete' ? '#22c55e' : GOLD }}>
-                                    {job.status === 'complete' ? `✓ Ingested (${job.recordsProcessed || 0} records)` : `${job.progress}%`}
+                                <div style={{ fontSize: 12, fontWeight: 700, color: job.status === 'complete' ? '#22c55e' : job.status === 'error' ? '#ef4444' : GOLD }}>
+                                    {job.status === 'complete'
+                                        ? `✓ Ingested (${job.recordsProcessed || 0} records)`
+                                        : job.status === 'error'
+                                            ? '✕ Upload Failed'
+                                            : `${job.progress}%`}
                                 </div>
                             </div>
                         </div>

@@ -7,6 +7,7 @@ import Assessment from '../models/Assessment.model';
 import CareerPrediction from '../models/CareerPrediction.model';
 import Student from '../models/Student.model';
 import { ChatMessage } from '../services/providers';
+import { AIUnavailableError, AI_UNAVAILABLE_MESSAGE } from '../services/ai.service';
 
 // ── In-memory market-trends cache (1-hour TTL) ───────────────────────────────
 const trendCache = new Map<string, { data: object; ts: number }>();
@@ -126,16 +127,14 @@ Context about this candidate: ${studentContext}`;
   } catch (err: any) {
     logger.error('AI chat error:', err.message);
     if (!res.headersSent) {
-      res.status(200).json({
-        success: true,
-        data: {
-          reply: 'SkillSense AI is ready to help you with your career goals, skill certifications, and interview preparation.',
-          suggestions: ['What is NSQF Level 5?', 'How to prepare for tech jobs?', 'Top in-demand programming skills'],
-        },
-        message: 'OK',
+      res.setHeader('Content-Type', 'application/json');
+      res.status(503).json({
+        success: false,
+        data: null,
+        message: AI_UNAVAILABLE_MESSAGE,
       });
     } else {
-      res.write(`data: ${JSON.stringify({ done: true, suggestions: ['Explore career paths', 'Start skill assessment'] })}\n\n`);
+      res.write(`data: ${JSON.stringify({ error: AI_UNAVAILABLE_MESSAGE, done: true })}\n\n`);
       res.end();
     }
   }
@@ -159,6 +158,10 @@ export const assessSkill = async (req: Request, res: Response): Promise<void> =>
     });
   } catch (err: any) {
     logger.error('assessSkill error:', err.message);
+    if (err instanceof AIUnavailableError) {
+      res.status(503).json({ success: false, data: null, message: AI_UNAVAILABLE_MESSAGE });
+      return;
+    }
     res.status(500).json({ success: false, message: 'Failed to generate assessment' });
   }
 };
@@ -226,6 +229,10 @@ export const evaluateSkill = async (req: Request, res: Response): Promise<void> 
     });
   } catch (err: any) {
     logger.error('evaluateSkill error:', err.message);
+    if (err instanceof AIUnavailableError) {
+      res.status(503).json({ success: false, data: null, message: AI_UNAVAILABLE_MESSAGE });
+      return;
+    }
     res.status(500).json({ success: false, message: 'Failed to evaluate assessment' });
   }
 };
@@ -323,6 +330,10 @@ export const predictCareer = async (req: Request, res: Response): Promise<void> 
     });
   } catch (err: any) {
     logger.error('predictCareer error:', err.message);
+    if (err instanceof AIUnavailableError) {
+      res.status(503).json({ success: false, data: null, message: AI_UNAVAILABLE_MESSAGE });
+      return;
+    }
     res.status(500).json({ success: false, message: 'Career prediction failed' });
   }
 };
@@ -354,6 +365,10 @@ export const marketTrends = async (req: Request, res: Response): Promise<void> =
     res.status(200).json({ success: true, data, message: 'OK' });
   } catch (err: any) {
     logger.error('marketTrends error:', err.message);
+    if (err instanceof AIUnavailableError) {
+      res.status(503).json({ success: false, data: null, message: AI_UNAVAILABLE_MESSAGE });
+      return;
+    }
     res.status(500).json({ success: false, message: 'Failed to retrieve market trends' });
   }
 };
@@ -401,6 +416,10 @@ export const analyzeSkills = async (req: Request, res: Response): Promise<void> 
     });
   } catch (err: any) {
     logger.error('analyzeSkills error:', err.message);
+    if (err instanceof AIUnavailableError) {
+      res.status(503).json({ success: false, data: null, message: AI_UNAVAILABLE_MESSAGE });
+      return;
+    }
     res.status(500).json({ success: false, message: 'Skill analysis failed' });
   }
 };

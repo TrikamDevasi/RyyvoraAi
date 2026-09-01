@@ -19,31 +19,26 @@ export default function CampusPage() {
     const [message, setMessage] = useState('');
     const [submitting, setSubmitting] = useState(false);
     const [toast, setToast] = useState('');
+    const [toastError, setToastError] = useState(false);
+    const [error, setError] = useState('');
 
     useEffect(() => {
+        setLoading(true);
         api.get('/industry/campus-connect')
             .then(res => {
                 const data = res.data?.data;
-                if (Array.isArray(data) && data.length > 0) {
-                    setInstitutions(data);
-                } else {
-                    setInstitutions([
-                        { _id: '1', name: 'National Institute of Technology', state: 'Karnataka', programs: ['Full-Stack', 'AI/ML'], placementRate: 88, studentCount: 1400 },
-                        { _id: '2', name: 'Government Polytechnic Pune', state: 'Maharashtra', programs: ['Cloud DevOps', 'Backend'], placementRate: 82, studentCount: 950 },
-                    ]);
-                }
-                setLoading(false);
+                setInstitutions(Array.isArray(data) ? data : []);
+                setError(Array.isArray(data) && data.length === 0 ? 'No verified institutions are currently listed for campus partnerships.' : '');
             })
             .catch(() => {
-                setInstitutions([
-                    { _id: '1', name: 'National Institute of Technology', state: 'Karnataka', programs: ['Full-Stack', 'AI/ML'], placementRate: 88, studentCount: 1400 },
-                ]);
-                setLoading(false);
-            });
+                setError('Campus partner data is currently unavailable. Please try again.');
+            })
+            .finally(() => setLoading(false));
     }, []);
 
-    const showToast = (msg: string) => {
+    const showToast = (msg: string, isError = false) => {
         setToast(msg);
+        setToastError(isError);
         setTimeout(() => setToast(''), 4000);
     };
 
@@ -61,9 +56,7 @@ export default function CampusPage() {
             setSelectedInst('');
             setMessage('');
         } catch {
-            showToast('✓ Campus drive request submitted successfully!');
-            setSelectedInst('');
-            setMessage('');
+            showToast('Your campus drive request could not be submitted. Please try again.', true);
         } finally {
             setSubmitting(false);
         }
@@ -82,7 +75,7 @@ export default function CampusPage() {
                 </div>
 
                 {toast && (
-                    <div style={{ padding: 12, background: 'rgba(34,197,94,0.15)', border: '1px solid #22c55e', borderRadius: 8, color: '#86efac', marginBottom: 18, fontSize: 13 }}>
+                    <div style={{ padding: 12, background: toastError ? 'rgba(239,68,68,0.15)' : 'rgba(34,197,94,0.15)', border: `1px solid ${toastError ? '#ef4444' : '#22c55e'}`, borderRadius: 8, color: toastError ? '#fca5a5' : '#86efac', marginBottom: 18, fontSize: 13 }}>
                         {toast}
                     </div>
                 )}
@@ -133,6 +126,14 @@ export default function CampusPage() {
 
                 {loading ? (
                     <Skeleton height={250} width="100%" />
+                ) : error && institutions.length === 0 ? (
+                    <div style={{ padding: 32, textAlign: 'center', background: 'rgba(255,255,255,0.02)', borderRadius: 12, border: '1px solid rgba(255,255,255,0.06)' }}>
+                        <p style={{ color: MUTED, fontSize: 14, margin: 0 }}>{error}</p>
+                    </div>
+                ) : institutions.length === 0 ? (
+                    <div style={{ padding: 32, textAlign: 'center', background: 'rgba(255,255,255,0.02)', borderRadius: 12, border: '1px solid rgba(255,255,255,0.06)' }}>
+                        <p style={{ color: MUTED, fontSize: 14, margin: 0 }}>No verified institutions are currently available for campus partnerships.</p>
+                    </div>
                 ) : (
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 16 }}>
                         {institutions.map((inst, idx) => (
@@ -140,17 +141,20 @@ export default function CampusPage() {
                                 <div>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
                                         <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#fff' }}>{inst.name}</h3>
-                                        <span style={{ fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 99, background: 'rgba(34,197,94,0.15)', color: '#22c55e' }}>
-                                            {inst.placementRate || 85}% Placed
+                                        <span style={{ fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 99, background: inst.placementRate != null ? 'rgba(34,197,94,0.15)' : 'rgba(255,255,255,0.08)', color: inst.placementRate != null ? '#22c55e' : MUTED }}>
+                                            {inst.placementRate != null ? `${inst.placementRate}% Placed` : 'Rate not reported'}
                                         </span>
                                     </div>
-                                    <p style={{ margin: '0 0 12px', fontSize: 12, color: MUTED }}>{inst.state || 'National Institution'} • {inst.studentCount || 800} Enrolled</p>
+                                    <p style={{ margin: '0 0 12px', fontSize: 12, color: MUTED }}>{inst.state || 'State not listed'} {inst.district ? `• ${inst.district}` : ''} {inst.studentCount != null ? `• ${inst.studentCount} Enrolled` : ''}</p>
                                     <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 16 }}>
-                                        {(inst.programs || ['Engineering', 'Data Science']).map((p: string, i: number) => (
+                                        {(inst.programs || []).map((p: string, i: number) => (
                                             <span key={i} style={{ fontSize: 11, padding: '3px 8px', borderRadius: 4, background: 'rgba(255,255,255,0.05)', color: '#cbd5e1' }}>
                                                 {p}
                                             </span>
                                         ))}
+                                        {(inst.programs || []).length === 0 && (
+                                            <span style={{ fontSize: 11, color: MUTED }}>Programs not listed</span>
+                                        )}
                                     </div>
                                 </div>
                                 <button

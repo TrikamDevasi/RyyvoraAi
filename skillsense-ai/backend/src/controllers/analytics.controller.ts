@@ -61,9 +61,10 @@ export const getPredictions = async (req: Request, res: Response, next: NextFunc
 
     const aiReport = await fairnessService.runAIFairnessAnalysis(cohortFormatted);
     const result = {
-      isFair: aiReport.isFair,
-      flags: aiReport.flags,
-      recommendations: aiReport.recommendations,
+      isFair: aiReport ? aiReport.isFair : null,
+      flags: aiReport ? aiReport.flags : [],
+      recommendations: aiReport ? aiReport.recommendations : [],
+      biasAnalysisAvailable: !!aiReport,
       timestamp: new Date().toISOString(),
     };
 

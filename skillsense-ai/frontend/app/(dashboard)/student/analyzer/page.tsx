@@ -80,7 +80,6 @@ export default function AIAnalyzerPage() {
         <div style={{ marginBottom: 24 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
             <AIBadge type="ai" label="NEURAL SKILL ENGINE" />
-            <ConfidenceScore score={0.94} />
           </div>
           <h1 className="font-display" style={{ fontSize: 26, fontWeight: 800, color: '#f8fafc', margin: 0 }}>
             AI Skill Intelligence & Extraction
@@ -258,7 +257,7 @@ export default function AIAnalyzerPage() {
               </div>
 
               <div style={{ textAlign: 'right' }}>
-                <ConfidenceScore score={result.confidence || 0.9} size="md" />
+                {typeof result.confidence === 'number' && <ConfidenceScore score={result.confidence} size="md" /> }
                 <div style={{ fontSize: 11, color: '#10b981', marginTop: 6, display: 'flex', alignItems: 'center', gap: 4, justifyContent: 'flex-end' }}>
                   <ShieldCheck size={13} /> Synced to Skill Passport
                 </div>

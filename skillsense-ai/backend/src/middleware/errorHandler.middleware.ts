@@ -5,10 +5,21 @@ import { MongoServerError } from 'mongodb';
 import { ZodError } from 'zod';
 import logger from '../utils/logger';
 import env from '../config/env';
+import { AIUnavailableError, AI_UNAVAILABLE_MESSAGE } from '../services/ai.service';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const errorHandler: ErrorRequestHandler = (err: unknown, _req: Request, res: Response, _next: NextFunction) => {
   logger.error('Unhandled error:', err);
+
+  // AI provider unavailability (honest 503, never fabricated results)
+  if (err instanceof AIUnavailableError) {
+    res.status(503).json({
+      success: false,
+      data: null,
+      message: AI_UNAVAILABLE_MESSAGE,
+    });
+    return;
+  }
 
   // Duplicate key (MongoDB 11000)
   if (err instanceof MongoServerError && err.code === 11000) {

@@ -13,7 +13,7 @@ import {
 import { aiService } from '../src/services/ai.service';
 
 export async function runAITests(): Promise<void> {
-  console.log('🧪 Running AI Provider, Schemas, Fallback & Service Tests...');
+  console.log('🧪 Running AI Provider, Schemas & Service Tests...');
 
   // 1. Provider Manager Registration
   const providers = providerManager.getProviders();
@@ -155,17 +155,23 @@ export async function runAITests(): Promise<void> {
   assert.strictEqual(validatedEval.data.score, 80);
   console.log('  ✅ AssessmentEvaluationSchema Zod validation passed');
 
-  // 9. AIService End-to-End Fallback Test
-  const fallbackAnalysis = await aiService.analyzeSkills({
-    text: 'Experienced with React, Node.js, Express, MongoDB, and TypeScript microservices.',
-    program: 'Computer Science',
-    nsqfLevel: 5,
-  });
-
-  assert(fallbackAnalysis && typeof fallbackAnalysis.overallScore === 'number', 'analyzeSkills must return valid overallScore');
-  assert(Array.isArray(fallbackAnalysis.technicalSkills), 'analyzeSkills must return technicalSkills array');
-  assert(fallbackAnalysis.technicalSkills.length > 0, 'analyzeSkills must extract competencies');
-  console.log(`  ✅ AIService.analyzeSkills returned score: ${fallbackAnalysis.overallScore}/100 with ${fallbackAnalysis.technicalSkills.length} competencies`);
+  // 9. Honesty contract: invalid/unavailable AI output must fail loudly, never fabricate
+  assert.throws(
+    () => parseAndValidateAIOutput('this is not valid json', SkillAnalysisSchema),
+    /Invalid JSON/,
+    'Unparseable AI output must throw when no fallback is supplied'
+  );
+  assert.throws(
+    () => parseAndValidateAIOutput('{"overallScore": "nope"}', SkillAnalysisSchema),
+    /Schema validation failed/,
+    'Schema-invalid AI output must throw when no fallback is supplied'
+  );
+  assert.throws(
+    () => parseAndValidateAIOutput('', SkillAnalysisSchema),
+    /Schema validation failed/,
+    'Empty AI output must not be served as a fabricated analysis'
+  );
+  console.log('  ✅ No fabricated AI fallbacks: invalid/unavailable AI output throws honestly');
 
   // 10. AI Health Telemetry Reporting
   const healthReport = await aiService.testConnectivity();

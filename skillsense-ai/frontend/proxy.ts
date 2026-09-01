@@ -1,5 +1,5 @@
-// frontend/middleware.ts
-// Next.js Edge Middleware — enforces route protection and role-based access.
+// frontend/proxy.ts
+// Next.js Edge Proxy — enforces route protection and role-based access.
 
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -22,7 +22,7 @@ const isPublic = (pathname: string): boolean =>
 const isProtected = (pathname: string): boolean =>
   PROTECTED_PREFIXES.some((p) => pathname.startsWith(p));
 
-export default function middleware(request: NextRequest): NextResponse {
+export default function proxy(request: NextRequest): NextResponse {
   const { pathname } = request.nextUrl;
 
   // Legacy /login redirect to /auth

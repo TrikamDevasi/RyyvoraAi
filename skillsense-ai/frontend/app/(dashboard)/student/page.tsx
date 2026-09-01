@@ -4,14 +4,13 @@ import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import {
-  Radar, PolarGrid, PolarAngleAxis, Area, XAxis, YAxis, CartesianGrid, Tooltip,
+  Radar, PolarGrid, PolarAngleAxis, Tooltip,
 } from 'recharts';
 import { studentApi, StudentProfile } from '@/lib/api/student.api';
 import api from '@/lib/api';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AIInsightCard } from '@/components/ui/AIInsightCard';
 import { AIBadge } from '@/components/ui/AIBadge';
-import { ConfidenceScore } from '@/components/ui/ConfidenceScore';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
@@ -35,7 +34,6 @@ import confetti from 'canvas-confetti';
 
 const RadarChart = dynamic(() => import('recharts').then((mod) => mod.RadarChart), { ssr: false });
 const ResponsiveContainer = dynamic(() => import('recharts').then((mod) => mod.ResponsiveContainer), { ssr: false });
-const AreaChart = dynamic(() => import('recharts').then((mod) => mod.AreaChart), { ssr: false });
 
 const TABS = [
   { key: 'overview', label: 'Intelligence Overview' },
@@ -104,9 +102,9 @@ export default function StudentDashboardPage() {
     fetchProfile();
   }, []);
 
-  // Fetch skill gaps when tab opened
+  // Fetch skill gaps once profile is available
   useEffect(() => {
-    if (activeTab === 'gaps' && profile?._id && !gapData) {
+    if (profile?._id && !gapData) {
       setLoadingGaps(true);
       api
         .get(`/analytics/skill-gaps/${profile._id}`)
@@ -117,9 +115,9 @@ export default function StudentDashboardPage() {
   }, [activeTab, profile, gapData]);
 
   const studentName = profile?.userId?.name || 'Student Candidate';
-  const overallScore = profile?.overallScore || 78;
-  const nsqfLevel = profile?.nsqfLevel || 4;
-  const program = profile?.program || 'Computer Science & Engineering';
+  const overallScore = profile?.overallScore ?? 0;
+  const nsqfLevel = profile?.nsqfLevel ?? 0;
+  const program = profile?.program || 'Program not yet specified';
   const skills = profile?.skills || [];
 
   // Sort skills to find strongest and weakest
@@ -131,47 +129,12 @@ export default function StudentDashboardPage() {
     skills.length > 0
       ? skills.map((s: any) => ({
           subject: typeof s.skillId === 'object' && s.skillId?.name ? s.skillId.name : String(s.skillId),
-          score: s.score || 70,
-          benchmark: 85,
+          score: s.score || 0,
         }))
-      : [
-          { subject: 'JavaScript/TS', score: 82, benchmark: 85 },
-          { subject: 'Node API', score: 76, benchmark: 80 },
-          { subject: 'Database', score: 74, benchmark: 80 },
-          { subject: 'System Design', score: 65, benchmark: 75 },
-          { subject: 'Cloud DevOps', score: 60, benchmark: 80 },
-        ];
+      : [];
 
-  const progressData = [
-    { period: 'Month 1', score: Math.max(35, overallScore - 20) },
-    { period: 'Month 2', score: Math.max(45, overallScore - 14) },
-    { period: 'Month 3', score: Math.max(55, overallScore - 8) },
-    { period: 'Month 4', score: Math.max(65, overallScore - 4) },
-    { period: 'Current', score: overallScore },
-  ];
-
-  const careers = careerData?.topCareerPaths || [
-    {
-      title: 'Full-Stack Software Engineer',
-      matchPercent: 92,
-      salaryRange: '₹7,50,000 – ₹15,00,000/year (Model Estimate)',
-      timeToAchieve: '2-3 months',
-      growth: 'High',
-      requiredSkills: ['React', 'Node.js', 'PostgreSQL', 'REST APIs'],
-      missingSkills: ['System Design', 'Docker CI/CD'],
-      roadmap: ['Build high-concurrency caching service', 'Deploy containerized microservice on AWS'],
-    },
-    {
-      title: 'Cloud Solutions Architect',
-      matchPercent: 85,
-      salaryRange: '₹9,00,000 – ₹18,00,000/year (Model Estimate)',
-      timeToAchieve: '3-5 months',
-      growth: 'Exponential',
-      requiredSkills: ['AWS/GCP', 'Linux', 'Terraform', 'Container Orchestration'],
-      missingSkills: ['Infrastructure as Code', 'Kubernetes'],
-      roadmap: ['Master AWS Core VPC & IAM architectures', 'Write automated Terraform infrastructure'],
-    },
-  ];
+  const careers = careerData?.topCareerPaths || [];
+  const topCareer = careers[0] || null;
 
   if (error) {
     return (
@@ -189,14 +152,14 @@ export default function StudentDashboardPage() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                <AIBadge type="nsqf" label={`NSQF LEVEL ${nsqfLevel}`} />
-                <AIBadge type="verified" label="CREDENTIAL VERIFIED" />
+                <AIBadge type="nsqf" label={`NSQF LEVEL ${nsqfLevel || '—'}`} />
+                <AIBadge type="verified" label={profile?.passportHash ? 'CREDENTIAL VERIFIED' : 'CREDENTIAL PENDING'} />
               </div>
               <h1 className="font-display" style={{ fontSize: 26, fontWeight: 800, color: '#f8fafc', margin: 0 }}>
                 Welcome back, <span style={{ color: 'var(--gold)' }}>{studentName}</span>
               </h1>
               <p style={{ color: 'var(--text-secondary)', fontSize: 13.5, marginTop: 4 }}>
-                {program} · Enrollment ID: <span className="font-mono" style={{ color: '#cbd5e1' }}>{profile?.enrollmentNumber || 'SKP-7819'}</span>
+                {program} · Enrollment ID: <span className="font-mono" style={{ color: '#cbd5e1' }}>{profile?.enrollmentNumber || '—'}</span>
               </p>
             </div>
 
@@ -250,23 +213,34 @@ export default function StudentDashboardPage() {
         {activeTab === 'overview' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
             {/* AI Actionable Insight Banner */}
-            <AIInsightCard
-              title="Workforce Placement Recommendation"
-              badgeText="NSQF CAREER BRIEF"
-              insight={`Based on your evaluated competency score (${overallScore}/100) in ${program}, closing your gap in 'Distributed System Design' (+15%) will raise your match for Top-Tier Software Engineering roles in India from 82% to 94%.`}
-              actionText="View Targeted Upskilling Plan"
-              actionHref="/student/career"
-              confidence={0.92}
-              category="Career Acceleration"
-            />
+            {topCareer ? (
+              <AIInsightCard
+                title="Workforce Placement Recommendation"
+                badgeText="NSQF CAREER BRIEF"
+                insight={`Based on your evaluated competency score (${overallScore}/100) in ${program}, sharpening ${topCareer.missingSkills?.[0] || 'your priority skill gap'} can raise your alignment with ${topCareer.title} opportunities.`}
+                actionText="View Targeted Upskilling Plan"
+                actionHref="/student/career"
+                confidence={Math.min(1, Math.max(0, (topCareer.matchPercent || 0) / 100))}
+                category="Career Acceleration"
+              />
+            ) : (
+              <div className="card-linear" style={{ padding: 18 }}>
+                <p style={{ margin: 0, fontSize: 13.5, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                  No verified assessments yet — run the AI skill analyzer to receive a workforce placement recommendation based on real competency data.
+                </p>
+                <Link href="/student/analyzer" className="btn-gold" style={{ marginTop: 12, display: 'inline-block', fontSize: 12.5, padding: '7px 16px' }}>
+                  <Brain size={15} /> Run AI Analyzer
+                </Link>
+              </div>
+            )}
 
             {/* Top Score Matrix */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14 }}>
               {[
-                { label: 'Overall Readiness Index', value: `${overallScore}/100`, sub: 'NSQF Benchmarked', color: 'var(--gold)' },
-                { label: 'Top Career Alignment', value: `${careers[0]?.matchPercent || 92}%`, sub: careers[0]?.title || 'Software Engineer', color: '#10b981' },
-                { label: 'Assessed Competencies', value: `${skills.length || 5} Domains`, sub: 'Cryptographically signed', color: '#60a5fa' },
-                { label: 'Hiring Velocity', value: 'High Demand', sub: 'Bengaluru / Hyderabad', color: '#f59e0b' },
+                { label: 'Overall Readiness Index', value: overallScore > 0 ? `${overallScore}/100` : '—', sub: 'NSQF Benchmarked', color: 'var(--gold)' },
+                { label: 'Top Career Alignment', value: careers[0]?.matchPercent != null ? `${careers[0].matchPercent}%` : '—', sub: topCareer?.title || 'No career analysis yet', color: '#10b981' },
+                { label: 'Assessed Competencies', value: `${skills.length} Domains`, sub: 'Skill passport entries', color: '#60a5fa' },
+                { label: 'Skill Gap Index', value: gapData?.overallGapScore != null ? `${gapData.overallGapScore}%` : '—', sub: 'vs current job benchmarks', color: '#f59e0b' },
               ].map((card, i) => (
                 <div key={i} className="card-linear" style={{ padding: '16px 18px' }}>
                   {loading ? (
@@ -301,20 +275,26 @@ export default function StudentDashboardPage() {
                       Measured against NSQF Level {nsqfLevel} standard
                     </p>
                   </div>
-                  <ConfidenceScore score={0.92} />
                 </div>
 
-                <div style={{ height: 260, width: '100%' }}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <RadarChart data={radarData}>
-                      <PolarGrid stroke="rgba(255,255,255,0.08)" />
-                      <PolarAngleAxis dataKey="subject" stroke="#94a3b8" tick={{ fontSize: 11 }} />
-                      <Radar name="Assessed Score" dataKey="score" stroke="var(--gold)" fill="var(--gold)" fillOpacity={0.35} />
-                      <Radar name="Benchmark" dataKey="benchmark" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.08} />
-                      <Tooltip content={<DarkTooltip />} />
-                    </RadarChart>
-                  </ResponsiveContainer>
-                </div>
+                {skills.length > 0 ? (
+                  <div style={{ height: 260, width: '100%' }}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <RadarChart data={radarData}>
+                        <PolarGrid stroke="rgba(255,255,255,0.08)" />
+                        <PolarAngleAxis dataKey="subject" stroke="#94a3b8" tick={{ fontSize: 11 }} />
+                        <Radar name="Assessed Score" dataKey="score" stroke="var(--gold)" fill="var(--gold)" fillOpacity={0.35} />
+                        <Tooltip content={<DarkTooltip />} />
+                      </RadarChart>
+                    </ResponsiveContainer>
+                  </div>
+                ) : (
+                  <div style={{ padding: '30px 0', textAlign: 'center' }}>
+                    <p style={{ margin: 0, fontSize: 13, color: 'var(--text-muted)' }}>
+                      No assessed competencies yet. Run the AI analyzer or take an assessment to build your radar.
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* Trajectory Area Chart */}
@@ -328,19 +308,12 @@ export default function StudentDashboardPage() {
                       Progression over recent evaluation cycles
                     </p>
                   </div>
-                  <span style={{ fontSize: 11, color: '#10b981', fontWeight: 700 }}>+18% Growth</span>
                 </div>
 
-                <div style={{ height: 260, width: '100%' }}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={progressData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                      <XAxis dataKey="period" stroke="#64748b" tick={{ fontSize: 11 }} />
-                      <YAxis stroke="#64748b" tick={{ fontSize: 11 }} domain={[0, 100]} />
-                      <Tooltip content={<DarkTooltip />} />
-                      <Area type="monotone" dataKey="score" stroke="var(--gold)" fill="rgba(245,158,11,0.15)" strokeWidth={2} />
-                    </AreaChart>
-                  </ResponsiveContainer>
+                <div style={{ padding: '30px 0', textAlign: 'center' }}>
+                  <p style={{ margin: 0, fontSize: 13, color: 'var(--text-muted)' }}>
+                    No historical evaluation cycles yet — your score growth trajectory will appear here after repeated assessments.
+                  </p>
                 </div>
               </div>
             </div>
@@ -356,12 +329,15 @@ export default function StudentDashboardPage() {
                   </h4>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                  {(strongestSkills.length > 0 ? strongestSkills : [{ skillId: { name: 'Full-Stack JavaScript & APIs' }, score: 85 }]).map((s: any, i: number) => (
+                  {(strongestSkills.length > 0 ? strongestSkills : []).map((s: any, i: number) => (
                     <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 12.5 }}>
                       <span style={{ color: '#cbd5e1' }}>{typeof s.skillId === 'object' && s.skillId?.name ? s.skillId.name : String(s.skillId)}</span>
                       <span style={{ fontWeight: 800, color: '#10b981' }}>{s.score}%</span>
                     </div>
                   ))}
+                  {strongestSkills.length === 0 && (
+                    <p style={{ margin: 0, fontSize: 12.5, color: 'var(--text-muted)' }}>Complete an assessment to measure your demonstrated strengths.</p>
+                  )}
                 </div>
               </div>
 
@@ -374,7 +350,7 @@ export default function StudentDashboardPage() {
                   </h4>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                  {(weakestSkills.length > 0 ? weakestSkills : [{ skillId: { name: 'Cloud CI/CD & Kubernetes' }, score: 62 }]).map((w: any, i: number) => (
+                  {(weakestSkills.length > 0 ? weakestSkills : []).map((w: any, i: number) => (
                     <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 12.5 }}>
                       <span style={{ color: '#cbd5e1' }}>{typeof w.skillId === 'object' && w.skillId?.name ? w.skillId.name : String(w.skillId)}</span>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -385,6 +361,9 @@ export default function StudentDashboardPage() {
                       </div>
                     </div>
                   ))}
+                  {weakestSkills.length === 0 && (
+                    <p style={{ margin: 0, fontSize: 12.5, color: 'var(--text-muted)' }}>Complete an assessment to surface priority upskilling targets.</p>
+                  )}
                 </div>
               </div>
             </div>
@@ -404,17 +383,17 @@ export default function StudentDashboardPage() {
                       Target Trajectory
                     </span>
                     <h3 className="font-display" style={{ fontSize: 20, fontWeight: 800, color: '#f8fafc', margin: '2px 0 0' }}>
-                      {gapData?.targetRole || 'Full-Stack Software Engineer'}
+                      {gapData?.targetRole || 'Target role not analyzed yet'}
                     </h3>
                     <p style={{ color: 'var(--text-secondary)', fontSize: 13, marginTop: 4 }}>
-                      {gapData?.aiSummary || 'Analysis of competencies calibrated to Indian tech hiring benchmarks.'}
+                      {gapData?.aiSummary || 'Run a skill-gap analysis to see your target trajectory and upskilling roadmap.'}
                     </p>
                   </div>
 
                   <div style={{ textAlign: 'right' }}>
                     <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Deficiency Index</div>
                     <div style={{ fontSize: 22, fontWeight: 800, color: '#f59e0b' }}>
-                      {gapData?.overallGapScore || 28}%
+                      {gapData?.overallGapScore != null ? `${gapData.overallGapScore}%` : '—'}
                     </div>
                   </div>
                 </div>
@@ -425,22 +404,7 @@ export default function StudentDashboardPage() {
                     Critical Skill Deficiencies
                   </h4>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 12 }}>
-                    {(gapData?.criticalGaps || [
-                      {
-                        skill: 'System Architecture & Caching',
-                        currentScore: 60,
-                        requiredScore: 85,
-                        priority: 'High',
-                        recommendedAction: 'Build Redis caching layer and microservice endpoints',
-                      },
-                      {
-                        skill: 'Cloud Deployment & Docker CI/CD',
-                        currentScore: 55,
-                        requiredScore: 80,
-                        priority: 'High',
-                        recommendedAction: 'Containerize web apps and configure GitHub Actions CI/CD',
-                      },
-                    ]).map((g: any, i: number) => (
+                    {gapData?.criticalGaps && gapData.criticalGaps.length > 0 ? gapData.criticalGaps.map((g: any, i: number) => (
                       <div key={i} style={{ padding: 14, background: 'rgba(255,255,255,0.02)', borderRadius: 10, border: '1px solid var(--border)' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                           <span style={{ fontWeight: 700, color: '#f8fafc', fontSize: 13 }}>{g.skill}</span>
@@ -455,7 +419,11 @@ export default function StudentDashboardPage() {
                           Action: {g.recommendedAction}
                         </div>
                       </div>
-                    ))}
+                    )) : (
+                    <p style={{ margin: 0, fontSize: 12.5, color: 'var(--text-muted)' }}>
+                      No critical skill gaps reported yet — run the skill-gap analysis to identify priorities.
+                    </p>
+                  )}
                   </div>
                 </div>
 
@@ -502,7 +470,14 @@ export default function StudentDashboardPage() {
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 16 }}>
-              {careers.map((c: any, i: number) => (
+              {careers.length === 0 ? (
+                <EmptyState
+                  title="No Career Pathways Yet"
+                  description="Run the AI career match to see predicted roles based on your verified skills and real hiring demand."
+                  actionText="Run Career Match"
+                  actionHref="/student/career"
+                />
+              ) : careers.map((c: any, i: number) => (
                 <div key={i} className="card-linear" style={{ padding: 20 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <h4 style={{ fontSize: 15, fontWeight: 700, color: '#f8fafc', margin: 0 }}>{c.title}</h4>
@@ -512,11 +487,11 @@ export default function StudentDashboardPage() {
                   </div>
 
                   <div style={{ marginTop: 10, fontSize: 12.5, color: 'var(--text-secondary)' }}>
-                    Est. Salary: <strong style={{ color: '#10b981' }}>{c.salaryRange || '₹7.5L – ₹15L/year (Model Estimate)'}</strong>
+                    Est. Salary: <strong style={{ color: '#10b981' }}>{c.salaryRange || 'Not reported'}</strong>
                   </div>
 
                   <div style={{ marginTop: 4, fontSize: 11.5, color: 'var(--text-muted)' }}>
-                    Timeline to Job Ready: {c.timeToAchieve || '2-4 months'}
+                    Timeline to Job Ready: {c.timeToAchieve || 'Not reported'}
                   </div>
 
                   {c.roadmap && c.roadmap.length > 0 && (
@@ -552,18 +527,18 @@ export default function StudentDashboardPage() {
 
             <div style={{ padding: 20, background: '#090a0f', borderRadius: 12, border: '1px solid var(--border)', maxWidth: 640 }}>
               <div style={{ fontSize: 15, fontWeight: 700, color: '#f8fafc' }}>Candidate: {studentName}</div>
-              <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', marginTop: 4 }}>ID: {profile?.enrollmentNumber || 'SKP-LIVE'}</div>
+              <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', marginTop: 4 }}>ID: {profile?.enrollmentNumber || '—'}</div>
               <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', marginTop: 2 }}>Program: {program}</div>
-              <div style={{ fontSize: 13, color: 'var(--gold)', marginTop: 6, fontWeight: 700 }}>
-                Verified Score: {overallScore}/100 (NSQF Level {nsqfLevel})
-              </div>
+<div style={{ fontSize: 13, color: 'var(--gold)', marginTop: 6, fontWeight: 700 }}>
+                    Verified Score: {overallScore > 0 ? `${overallScore}/100` : 'Pending assessment'} (NSQF Level {nsqfLevel || '—'})
+                  </div>
 
               <div style={{ marginTop: 16, paddingTop: 12, borderTop: '1px solid var(--border)' }}>
                 <div style={{ fontSize: 10.5, color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>
                   SHA-256 Verification Hash
                 </div>
                 <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 4, fontFamily: 'monospace', wordBreak: 'break-all', background: 'rgba(255,255,255,0.03)', padding: '6px 10px', borderRadius: 6 }}>
-                  {profile?.passportHash || 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'}
+                  {profile?.passportHash || 'No verification hash issued yet'}
                 </div>
               </div>
             </div>

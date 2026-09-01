@@ -1,7 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import axios from 'axios';
-
-const API_BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000') + '/api/v1';
+import api from '@/lib/api';
 
 interface ApiState<T> {
   data: T | null;
@@ -23,18 +21,15 @@ export function useApi<T>(url?: string) {
   ) => {
     setState(prev => ({ ...prev, loading: true, error: null }));
     try {
-      const res = await axios({
+      const res = await api({
         method,
-        url: `${API_BASE}${endpoint}`,
+        url: endpoint,
         data: body,
-        withCredentials: true,
       });
       setState({ data: res.data.data || res.data, loading: false, error: null });
       return res.data;
     } catch (err: unknown) {
-      const message = axios.isAxiosError(err)
-        ? err.response?.data?.message || err.message
-        : 'Something went wrong';
+      const message = (err as any)?.response?.data?.message || (err as any)?.message || 'Something went wrong';
       setState({ data: null, loading: false, error: message });
       throw err;
     }

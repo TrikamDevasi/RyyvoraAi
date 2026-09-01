@@ -5,69 +5,59 @@ import ProgramROIBar from '@/components/charts/ProgramROIBar';
 import api from '@/lib/api';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
+import { useAuth } from '@/hooks/useAuth';
 
 const GOLD = '#D4A843';
 const MUTED = '#A0A0A0';
 const WHITE = '#FFFFFF';
 
+interface ROIRow {
+    program: string;
+    roi: number;
+}
+
 export default function ROIPage() {
-    const [institutions, setInstitutions] = useState<any[]>([]);
-    const [selectedId, setSelectedId] = useState<string>('');
+    const { user } = useAuth();
+    const institutionId = user?._id;
+
+    const [roiRows, setRoiRows] = useState<ROIRow[]>([]);
+    const [placementRate, setPlacementRate] = useState<number | null>(null);
+    const [studentCount, setStudentCount] = useState<number | null>(null);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
 
-    useEffect(() => {
-        api.get('/analytics/fund-targeting')
-            .then(res => {
-                const data = res.data?.data;
-                if (Array.isArray(data) && data.length > 0) {
-                    setInstitutions(data);
-                    setSelectedId(data[0]._id || data[0].institutionId || 'inst1');
+    const load = () => {
+        if (!institutionId) {
+            setError('No linked institution found for this account.');
+            setLoading(false);
+            return;
+        }
+        setLoading(true);
+        setError('');
+        Promise.all([
+            api.get(`/institutes/${institutionId}/dashboard`),
+            api.get(`/institutes/${institutionId}/roi`),
+        ])
+            .then(([dashRes, roiRes]) => {
+                const dash = dashRes.data?.data;
+                setPlacementRate(dash?.stats?.placementRate ?? null);
+                setStudentCount(dash?.stats?.studentCount ?? null);
+                const roi = roiRes.data?.data;
+                if (Array.isArray(roi)) {
+                    setRoiRows(roi.filter((r: any) => r && typeof r.roi === 'number'));
                 } else {
-                    setInstitutions([
-                        {
-                            _id: 'inst1',
-                            name: 'National Skill Institute',
-                            programs: ['Full-Stack', 'Cloud DevOps', 'AI Engineering'],
-                            placementRate: 88,
-                            programROI: [
-                                { program: 'Full-Stack Development', roi: 142 },
-                                { program: 'Cloud & DevOps', roi: 168 },
-                                { program: 'AI Engineering', roi: 185 },
-                            ]
-                        }
-                    ]);
-                    setSelectedId('inst1');
+                    setRoiRows([]);
                 }
-                setLoading(false);
             })
-            .catch(() => {
-                setInstitutions([
-                    {
-                        _id: 'inst1',
-                        name: 'National Skill Institute',
-                        programs: ['Full-Stack', 'Cloud DevOps', 'AI Engineering'],
-                        placementRate: 88,
-                        programROI: [
-                            { program: 'Full-Stack Development', roi: 142 },
-                            { program: 'Cloud & DevOps', roi: 168 },
-                            { program: 'AI Engineering', roi: 185 },
-                        ]
-                    }
-                ]);
-                setSelectedId('inst1');
-                setLoading(false);
-            });
-    }, []);
+            .catch(() => setError('ROI analytics are currently unavailable. Please try again.'))
+            .finally(() => setLoading(false));
+    };
 
-    const currentInst = institutions.find(i => (i._id || i.institutionId) === selectedId) || institutions[0];
-    const programROI = currentInst?.programROI || (currentInst?.programs || ['Full-Stack', 'Cloud Engineering']).map((p: string, idx: number) => ({
-        program: p,
-        roi: 120 + idx * 25,
-    }));
+    useEffect(() => { load(); }, [institutionId]);
 
-    const avgROI = programROI.length > 0
-        ? Math.round(programROI.reduce((s: number, p: any) => s + (p.roi || 120), 0) / programROI.length)
-        : 145;
+    const avgROI = roiRows.length > 0
+        ? Math.round(roiRows.reduce((s, r) => s + r.roi, 0) / roiRows.length)
+        : null;
 
     return (
         <ErrorBoundary>
@@ -77,42 +67,30 @@ export default function ROIPage() {
                         Program <span style={{ color: GOLD }}>ROI & Impact Analytics</span>
                     </h1>
                     <p style={{ margin: '4px 0 0', color: MUTED, fontSize: 14 }}>
-                        Live return on investment and placement velocity by program domain
+                        Declared program ROI and placement velocity for your institution
                     </p>
                 </div>
 
                 {loading ? (
                     <Skeleton height={250} width="100%" />
+                ) : error ? (
+                    <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 14, padding: 40, textAlign: 'center' }}>
+                        <p style={{ color: '#f87171', fontSize: 13.5, margin: 0 }}>{error}</p>
+                        {institutionId && (
+                            <button type="button" className="btn-gold" style={{ marginTop: 16, padding: '8px 20px', fontSize: 13 }} onClick={load}>
+                                Retry
+                            </button>
+                        )}
+                    </div>
                 ) : (
                     <>
-                        {/* Selector */}
-                        <div style={{ display: 'flex', gap: 8, marginBottom: 24, flexWrap: 'wrap' }}>
-                            {institutions.map((inst, idx) => (
-                                <button
-                                    key={inst._id || inst.institutionId || idx}
-                                    onClick={() => setSelectedId(inst._id || inst.institutionId)}
-                                    style={{
-                                        padding: '7px 14px',
-                                        borderRadius: 8,
-                                        border: `1px solid ${selectedId === (inst._id || inst.institutionId) ? GOLD : 'rgba(255,255,255,0.12)'}`,
-                                        background: selectedId === (inst._id || inst.institutionId) ? 'rgba(212,168,67,0.15)' : 'rgba(255,255,255,0.03)',
-                                        color: selectedId === (inst._id || inst.institutionId) ? GOLD : MUTED,
-                                        fontSize: 12,
-                                        fontWeight: selectedId === (inst._id || inst.institutionId) ? 700 : 400,
-                                        cursor: 'pointer',
-                                    }}
-                                >
-                                    {inst.name || `Institution #${idx + 1}`}
-                                </button>
-                            ))}
-                        </div>
-
                         {/* Summary Cards */}
                         <div style={{ display: 'flex', gap: 16, marginBottom: 24, flexWrap: 'wrap' }}>
                             {[
-                                { label: 'Average Program ROI', value: `${avgROI}%`, color: GOLD },
-                                { label: 'Active Curriculums', value: `${programROI.length}`, color: WHITE },
-                                { label: 'Placement Velocity', value: `${currentInst?.placementRate || 85}%`, color: '#22c55e' },
+                                { label: 'Average Program ROI', value: avgROI != null ? `${avgROI}%` : '—', color: GOLD },
+                                { label: 'Programs with ROI Reported', value: `${roiRows.length}`, color: WHITE },
+                                { label: 'Placement Rate', value: placementRate != null ? `${placementRate}%` : '—', color: '#22c55e' },
+                                { label: 'Students Tracked', value: studentCount != null ? String(studentCount) : '—', color: '#22c55e' },
                             ].map((s) => (
                                 <div key={s.label} style={{ padding: '14px 20px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 12, minWidth: 160 }}>
                                     <p style={{ margin: 0, fontSize: 20, fontWeight: 800, color: s.color }}>{s.value}</p>
@@ -124,9 +102,17 @@ export default function ROIPage() {
                         {/* Chart */}
                         <div style={{ padding: 20, background: 'rgba(255,255,255,0.02)', borderRadius: 14, border: '1px solid rgba(255,255,255,0.08)' }}>
                             <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 16, color: '#fff' }}>
-                                Comparative Program ROI Yield
+                                Program ROI Yield
                             </h3>
-                            <ProgramROIBar data={programROI} />
+                            {roiRows.length > 0 ? (
+                                <ProgramROIBar data={roiRows} />
+                            ) : (
+                                <div style={{ padding: '30px 10px', textAlign: 'center' }}>
+                                    <p style={{ color: MUTED, fontSize: 13.5, margin: 0 }}>
+                                        No program ROI scores have been reported for this institution yet.
+                                    </p>
+                                </div>
+                            )}
                         </div>
                     </>
                 )}

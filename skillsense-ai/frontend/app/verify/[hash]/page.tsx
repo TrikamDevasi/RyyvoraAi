@@ -42,11 +42,10 @@ export default function PublicVerifyPage() {
       const res = await fetch(`${baseUrl}/students/passport/verify/${encodeURIComponent(hash)}`);
       const json = await res.json();
 
-      if (json && json.data) {
-        setData(json.data);
-      } else {
+      if (json.success === false || !json.data || json.data.status !== 'VERIFIED') {
         throw new Error(json?.message || 'Credential not found');
       }
+      setData(json.data);
     } catch (err: any) {
       setError(err?.message || 'Verification could not be established');
     } finally {

@@ -30,7 +30,6 @@ import {
   Briefcase,
 } from 'lucide-react';
 import { AIBadge } from '@/components/ui/AIBadge';
-import { ConfidenceScore } from '@/components/ui/ConfidenceScore';
 
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
@@ -497,7 +496,7 @@ export default function LandingPage() {
               Explore the Platform in Action
             </h2>
             <p style={{ color: 'var(--text-secondary)', fontSize: 14.5 }}>
-              Click between real platform modules to see how SkillSense powers workforce intelligence.
+              Click between platform modules to explore the product flow. All figures in this showcase are illustrative sample data — not a live account.
             </p>
           </div>
 
@@ -540,7 +539,6 @@ export default function LandingPage() {
                   <h4 className="font-display" style={{ fontSize: 16, fontWeight: 800, color: '#f8fafc', margin: 0 }}>
                     Candidate Intelligence Cockpit · NSQF Level 5
                   </h4>
-                  <ConfidenceScore score={0.94} />
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
                   <div style={{ padding: 14, background: 'rgba(255,255,255,0.02)', borderRadius: 8, border: '1px solid var(--border)' }}>
@@ -805,13 +803,13 @@ export default function LandingPage() {
             <div style={{ padding: 20, background: '#090a0f', borderRadius: 14, border: '1px solid var(--border)', maxWidth: 420, width: '100%' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border)', paddingBottom: 10, marginBottom: 12 }}>
                 <div style={{ fontSize: 12, fontWeight: 700, color: '#f8fafc' }}>Digital Passport #SKP-7819</div>
-                <span style={{ fontSize: 10, color: '#10b981', fontWeight: 700 }}>✓ VERIFIED</span>
+                <span style={{ fontSize: 10, color: '#10b981', fontWeight: 700 }}>✓ VERIFIED (DEMO SAMPLE)</span>
               </div>
-              <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginBottom: 6 }}>Candidate: Arjun Mehta</div>
+              <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginBottom: 6 }}>Candidate: Arjun Mehta (illustrative)</div>
               <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginBottom: 6 }}>NSQF Tier: Level 5 (Advanced Diploma)</div>
-              <div style={{ fontSize: 12, color: 'var(--gold)', fontWeight: 700, marginBottom: 12 }}>Verified Score: 84/100</div>
+              <div style={{ fontSize: 12, color: 'var(--gold)', fontWeight: 700, marginBottom: 12 }}>Verified Score: 84/100 (sample)</div>
               <div className="font-mono" style={{ fontSize: 10, color: 'var(--text-muted)', wordBreak: 'break-all', background: 'rgba(255,255,255,0.03)', padding: 8, borderRadius: 6 }}>
-                SHA-256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+                Sample SHA-256 for illustration — live passports mint a unique hash per student.
               </div>
             </div>
           </div>

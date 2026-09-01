@@ -15,11 +15,12 @@ interface Props {
 export default function SkillPassport({ student }: Props) {
   const [copied, setCopied] = useState(false);
 
-  const hash =
-    student.passportHash ||
-    'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855';
+  const hash: string = student.passportHash || '';
+
+  const hasHash = hash.length >= 8;
 
   const copyHash = () => {
+    if (!hasHash) return;
     navigator.clipboard.writeText(hash);
     setCopied(true);
     toast.success('SHA-256 Verification Hash copied to clipboard');
@@ -39,25 +40,33 @@ export default function SkillPassport({ student }: Props) {
           <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Status: Active & Cryptographically Verified</span>
         </div>
 
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          <Link
-            href={`/verify/${encodeURIComponent(hash)}`}
-            target="_blank"
-            className="btn-gold"
-            style={{ fontSize: 12, padding: '6px 14px', textDecoration: 'none' }}
-            aria-label="Open public verification page"
-          >
-            <ExternalLink size={13} /> Public Verification URL
-          </Link>
-          <button
-            type="button"
-            onClick={copyHash}
-            className="btn-secondary"
-            style={{ fontSize: 12, padding: '6px 12px' }}
-            aria-label="Copy SHA-256 hash"
-          >
-            <Copy size={13} /> {copied ? 'Hash Copied!' : 'Copy Hash'}
-          </button>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+          {hasHash ? (
+            <Link
+              href={`/verify/${encodeURIComponent(hash)}`}
+              target="_blank"
+              className="btn-gold"
+              style={{ fontSize: 12, padding: '6px 14px', textDecoration: 'none' }}
+              aria-label="Open public verification page"
+            >
+              <ExternalLink size={13} /> Public Verification URL
+            </Link>
+          ) : (
+            <span className="badge" style={{ fontSize: 11, color: '#f59e0b', border: '1px solid rgba(245,158,11,0.4)', background: 'rgba(245,158,11,0.08)' }}>
+              Passport not yet ledger-signed
+            </span>
+          )}
+          {hasHash && (
+            <button
+              type="button"
+              onClick={copyHash}
+              className="btn-secondary"
+              style={{ fontSize: 12, padding: '6px 12px' }}
+              aria-label="Copy SHA-256 hash"
+            >
+              <Copy size={13} /> {copied ? 'Hash Copied!' : 'Copy Hash'}
+            </button>
+          )}
           <button
             type="button"
             onClick={handlePrint}
@@ -160,33 +169,50 @@ export default function SkillPassport({ student }: Props) {
           </h4>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 10 }}>
-            {student.skills.map((s: any, idx: number) => (
+            {student.skills.length === 0 ? (
               <div
-                key={idx}
                 style={{
-                  padding: '12px 14px',
+                  gridColumn: '1 / -1',
+                  padding: '14px 16px',
                   borderRadius: 8,
                   background: 'rgba(255,255,255,0.02)',
                   border: '1px solid var(--border)',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
+                  fontSize: 12.5,
+                  color: 'var(--text-secondary)',
                 }}
               >
-                <div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: '#f8fafc' }}>
-                    {s.name || s.skill}
-                  </div>
-                  <div style={{ fontSize: 10.5, color: '#10b981', display: 'flex', alignItems: 'center', gap: 4, marginTop: 2 }}>
-                    <CheckCircle2 size={11} /> Cryptographically verified
-                  </div>
-                </div>
-
-                <div className="font-display" style={{ fontSize: 15, fontWeight: 800, color: 'var(--gold)' }}>
-                  {s.score}%
-                </div>
+                No verified competencies are linked to this passport yet. Assess your skills to generate verified ledgers
+                that can be signed into this credential.
               </div>
-            ))}
+            ) : (
+              student.skills.map((s: any, idx: number) => (
+                <div
+                  key={idx}
+                  style={{
+                    padding: '12px 14px',
+                    borderRadius: 8,
+                    background: 'rgba(255,255,255,0.02)',
+                    border: '1px solid var(--border)',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                  }}
+                >
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: '#f8fafc' }}>
+                      {s.name || s.skill}
+                    </div>
+                    <div style={{ fontSize: 10.5, color: '#10b981', display: 'flex', alignItems: 'center', gap: 4, marginTop: 2 }}>
+                      <CheckCircle2 size={11} /> Cryptographically verified
+                    </div>
+                  </div>
+
+                  <div className="font-display" style={{ fontSize: 15, fontWeight: 800, color: 'var(--gold)' }}>
+                    {s.score}%
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
 
@@ -208,20 +234,26 @@ export default function SkillPassport({ student }: Props) {
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
               <ShieldCheck size={14} color="#10b981" /> Immutable SHA-256 Ledger Signature
             </div>
-            <div
-              className="font-mono"
-              style={{
-                fontSize: 11,
-                color: '#cbd5e1',
-                marginTop: 4,
-                wordBreak: 'break-all',
-                background: 'rgba(255,255,255,0.03)',
-                padding: '6px 10px',
-                borderRadius: 6,
-              }}
-            >
-              {hash}
-            </div>
+            {hasHash ? (
+              <div
+                className="font-mono"
+                style={{
+                  fontSize: 11,
+                  color: '#cbd5e1',
+                  marginTop: 4,
+                  wordBreak: 'break-all',
+                  background: 'rgba(255,255,255,0.03)',
+                  padding: '6px 10px',
+                  borderRadius: 6,
+                }}
+              >
+                {hash}
+              </div>
+            ) : (
+              <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 6 }}>
+                No ledger signature has been issued yet. A signed hash will appear here once your passport is finalized.
+              </div>
+            )}
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -231,28 +263,30 @@ export default function SkillPassport({ student }: Props) {
               <div style={{ fontSize: 10, color: '#10b981' }}>Live Consensus</div>
             </div>
 
-            <Link
-              href={`/verify/${encodeURIComponent(hash)}`}
-              target="_blank"
-              title="Click to open live public verification"
-              aria-label="Scan QR or open verification"
-              style={{
-                width: 44,
-                height: 44,
-                background: '#fff',
-                borderRadius: 6,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#090a0f',
-                padding: 4,
-                textDecoration: 'none',
-                transition: 'transform 0.15s ease',
-              }}
-              className="hover:scale-105"
-            >
-              <QrCode size={36} />
-            </Link>
+            {hasHash && (
+              <Link
+                href={`/verify/${encodeURIComponent(hash)}`}
+                target="_blank"
+                title="Click to open live public verification"
+                aria-label="Scan QR or open verification"
+                style={{
+                  width: 44,
+                  height: 44,
+                  background: '#fff',
+                  borderRadius: 6,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#090a0f',
+                  padding: 4,
+                  textDecoration: 'none',
+                  transition: 'transform 0.15s ease',
+                }}
+                className="hover:scale-105"
+              >
+                <QrCode size={36} />
+              </Link>
+            )}
           </div>
         </div>
       </div>

@@ -2,9 +2,9 @@ export interface PlacementData {
     month: string;
     placedCount: number;
     avgSalary: number;
-    topSector: string;
-    placementRate: number;
-    femalePercent: number;
+    topSector?: string;
+    placementRate?: number;
+    femalePercent?: number;
 }
 
 export const samplePlacements: PlacementData[] = [

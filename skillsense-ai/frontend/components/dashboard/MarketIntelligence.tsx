@@ -19,7 +19,6 @@ import {
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AIBadge } from '@/components/ui/AIBadge';
-import { ConfidenceScore } from '@/components/ui/ConfidenceScore';
 import { ScanningState } from '@/components/ui/ScanningState';
 import { AIInsightCard } from '@/components/ui/AIInsightCard';
 
@@ -83,7 +82,6 @@ export default function MarketIntelligence() {
         <div style={{ position: 'relative', zIndex: 10, maxWidth: 720 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
             <AIBadge type="live" label="LIVE MARKET TELEMETRY" />
-            <ConfidenceScore score={0.93} />
           </div>
 
           <h2 className="font-display" style={{ fontSize: 24, fontWeight: 900, color: '#f8fafc', margin: '0 0 6px' }}>

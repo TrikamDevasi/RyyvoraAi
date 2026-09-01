@@ -299,40 +299,6 @@ export const verifyPublicPassport = async (req: Request, res: Response, next: Ne
       .populate('skills.skillId', 'name domain nsqfLevel');
 
     if (!student) {
-      // Check if hash matches sample or fallback demo hash
-      if (hash.startsWith('8f4c2b9a') || hash.startsWith('e3b0c442')) {
-        res.status(200).json(
-          buildApiResponse(
-            {
-              status: 'VERIFIED',
-              isVerified: true,
-              candidate: {
-                name: 'Verified Student (Demo Credential)',
-                enrollmentNumber: 'SKP-DEMO-2026',
-                program: 'Computer Science & Engineering',
-                institution: 'National Skill Development Institute',
-                state: 'Karnataka',
-                nsqfLevel: 5,
-                overallScore: 84,
-                placementStatus: 'seeking',
-              },
-              skills: [
-                { name: 'TypeScript & Modern React', score: 92, verified: true },
-                { name: 'Node.js & Express REST APIs', score: 85, verified: true },
-                { name: 'Database & SQL Architecture', score: 78, verified: true },
-                { name: 'System Design & Scalability', score: 74, verified: true },
-              ],
-              issuedAt: new Date(Date.now() - 30 * 86400000).toISOString(),
-              passportHash: hash,
-              verifiedAt: new Date().toISOString(),
-              algorithm: 'SHA-256 HMAC Digital Seal',
-            },
-            'Public credential verified'
-          )
-        );
-        return;
-      }
-
       res.status(404).json(
         buildApiResponse(
           { status: 'NOT_FOUND', isVerified: false, passportHash: hash },

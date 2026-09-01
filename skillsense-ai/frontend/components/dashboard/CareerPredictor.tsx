@@ -8,7 +8,6 @@ import CareerPathwayCard from './CareerPathwayCard';
 import type { CareerPathway } from '@/types/charts';
 import { ScanningState } from '@/components/ui/ScanningState';
 import { AIBadge } from '@/components/ui/AIBadge';
-import { ConfidenceScore } from '@/components/ui/ConfidenceScore';
 
 export default function CareerPredictor() {
   const { request } = useApi();
@@ -44,8 +43,8 @@ export default function CareerPredictor() {
         education,
       });
 
-      if (res.data.success && res.data.data.careers) {
-        setPredictions(res.data.data.careers);
+      if (res?.success && Array.isArray(res.data?.careers) && res.data.careers.length > 0) {
+        setPredictions(res.data.careers);
         setStep('results');
         toast.success('AI career pathways calculated!');
       } else {
@@ -77,7 +76,6 @@ export default function CareerPredictor() {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
               <AIBadge type="ai" label="AI PREDICTION" />
-              <ConfidenceScore score={0.92} />
             </div>
             <h2 className="font-display" style={{ fontSize: 20, fontWeight: 800, color: '#f8fafc', margin: 0 }}>
               Your AI-Matched Career Trajectories
@@ -103,14 +101,14 @@ export default function CareerPredictor() {
               id: `P-${idx}`,
               title: career.title,
               role: career.title,
-              organization: 'Enterprise & Tier-1 Tech (India)',
+              organization: career.organization || '',
               requiredSkills: career.missingSkills || [],
-              matchPercent: career.match || 85,
+              matchPercent: career.match,
               salaryRange: { min: 0, max: 0 },
-              salaryLabel: career.salaryRange || '₹7.5L – ₹15L/year (Model Estimate)',
-              timeToAchieve: career.timeToReady || '2-4 months',
+              salaryLabel: career.salaryRange,
+              timeToAchieve: career.timeToReady,
               isRecommended: idx === 0,
-              growth: career.growth || 'High',
+              growth: career.growth,
               roadmap: career.roadmap || [],
             };
             return <CareerPathwayCard key={idx} pathway={pathway} />;
