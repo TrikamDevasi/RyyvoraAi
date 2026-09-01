@@ -4,16 +4,19 @@ import React, { useState, useEffect } from 'react';
 import { studentApi, StudentProfile } from '@/lib/api/student.api';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Sparkles, CheckCircle2, Code2 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const GOLD = '#D4A843';
-const AMBER = '#F59E0B';
 
 export default function StudentSubmissionsPage() {
     const [profile, setProfile] = useState<StudentProfile | null>(null);
     const [loading, setLoading] = useState(true);
     const [title, setTitle] = useState('');
     const [repoUrl, setRepoUrl] = useState('');
-    const [submitted, setSubmitted] = useState(false);
+    const [description, setDescription] = useState('');
+    const [submitting, setSubmitting] = useState(false);
+    const [lastScore, setLastScore] = useState<number | null>(null);
 
     useEffect(() => {
         studentApi.getMyProfile()
@@ -26,17 +29,40 @@ export default function StudentSubmissionsPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!profile || !title) return;
+        if (!title.trim()) return;
+        setSubmitting(true);
+
         try {
-            await studentApi.submitAssessment(profile._id, {
-                responses: [{ title, repoUrl, submittedAt: new Date().toISOString() }],
-                score: 85,
+            const analysis = await studentApi.analyzeSkills({
+                text: `${title}: ${description}`,
+                githubUrl: repoUrl.trim() || undefined,
+                projects: [title, description].filter(Boolean),
             });
-            setSubmitted(true);
+
+            const score = analysis.overallScore || 80;
+            setLastScore(score);
+
+            // Record assessment submission
+            if (profile?._id) {
+                await studentApi.submitAssessment(profile._id, {
+                    category: title,
+                    responses: [{ title, repoUrl, description, submittedAt: new Date().toISOString() }],
+                    score,
+                });
+            }
+
+            toast.success(`Project evaluated! AI Competency Score: ${score}%`);
             setTitle('');
             setRepoUrl('');
-        } catch {
-            // Non-blocking
+            setDescription('');
+
+            // Reload profile
+            const updated = await studentApi.getMyProfile();
+            setProfile(updated);
+        } catch (err: any) {
+            toast.error(err.response?.data?.message || 'Failed to submit and evaluate project');
+        } finally {
+            setSubmitting(false);
         }
     };
 
@@ -50,7 +76,7 @@ export default function StudentSubmissionsPage() {
                         My Project <span style={{ color: GOLD }}>Submissions</span>
                     </h1>
                     <p style={{ color: '#64748b', fontSize: 14, marginTop: 4 }}>
-                        Track verified submissions, practical evaluations, and grading feedback
+                        Submit real-world projects and code repositories for neural skill verification and portfolio grading.
                     </p>
                 </div>
 
@@ -60,22 +86,24 @@ export default function StudentSubmissionsPage() {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
                         {/* Submission Form Card */}
                         <div style={{ padding: 20, background: 'rgba(255,255,255,0.02)', borderRadius: 14, border: '1px solid rgba(245,158,11,0.2)' }}>
-                            <h3 style={{ fontSize: 16, fontWeight: 700, color: '#fff', marginBottom: 12 }}>
-                                Submit New Assessment / Practical Project
+                            <h3 style={{ fontSize: 16, fontWeight: 700, color: '#fff', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+                                <Code2 size={18} color={GOLD} /> Submit Practical Project or GitHub Repository
                             </h3>
-                            {submitted && (
-                                <div style={{ padding: 10, background: 'rgba(34,197,94,0.15)', border: '1px solid #22c55e', borderRadius: 8, color: '#86efac', marginBottom: 16, fontSize: 13 }}>
-                                    ✓ Project submitted successfully! Evaluated and added to skill ledger.
+
+                            {lastScore !== null && (
+                                <div style={{ padding: 12, background: 'rgba(34,197,94,0.12)', border: '1px solid #22c55e', borderRadius: 8, color: '#86efac', marginBottom: 16, fontSize: 13, display: 'flex', alignItems: 'center', gap: 8 }}>
+                                    <CheckCircle2 size={16} /> Latest submission evaluated! AI Score: <strong>{lastScore}%</strong> (Synced to digital passport)
                                 </div>
                             )}
+
                             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                                 <div>
-                                    <label style={{ display: 'block', fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>Project Title / Assessment Name</label>
+                                    <label style={{ display: 'block', fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>Project Title / Key Competency</label>
                                     <input
                                         type="text"
                                         value={title}
                                         onChange={e => setTitle(e.target.value)}
-                                        placeholder="e.g. Distributed Microservices Architecture"
+                                        placeholder="e.g. Microservices Auth Service & Docker Pipeline"
                                         required
                                         style={{ width: '100%', padding: '10px 14px', borderRadius: 8, background: '#0d0a1a', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', fontSize: 13 }}
                                     />
@@ -86,12 +114,31 @@ export default function StudentSubmissionsPage() {
                                         type="url"
                                         value={repoUrl}
                                         onChange={e => setRepoUrl(e.target.value)}
-                                        placeholder="https://github.com/your-username/project"
+                                        placeholder="https://github.com/your-username/project-name"
                                         style={{ width: '100%', padding: '10px 14px', borderRadius: 8, background: '#0d0a1a', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', fontSize: 13 }}
                                     />
                                 </div>
-                                <button type="submit" className="btn-gold" style={{ alignSelf: 'flex-start', padding: '10px 24px', fontSize: 13, fontWeight: 700, cursor: 'pointer', marginTop: 4 }}>
-                                    Submit for Evaluation
+                                <div>
+                                    <label style={{ display: 'block', fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>Description & Architecture Notes</label>
+                                    <textarea
+                                        value={description}
+                                        onChange={e => setDescription(e.target.value)}
+                                        placeholder="Briefly explain the libraries, database schema, APIs, and tests implemented in this project..."
+                                        rows={3}
+                                        style={{ width: '100%', padding: '10px 14px', borderRadius: 8, background: '#0d0a1a', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', fontSize: 13, resize: 'vertical' }}
+                                    />
+                                </div>
+                                <button
+                                    type="submit"
+                                    disabled={submitting || !title.trim()}
+                                    className="btn-gold"
+                                    style={{
+                                        alignSelf: 'flex-start', padding: '10px 24px', fontSize: 13, fontWeight: 700,
+                                        display: 'flex', alignItems: 'center', gap: 6, cursor: submitting ? 'not-allowed' : 'pointer',
+                                        opacity: submitting ? 0.7 : 1, marginTop: 4,
+                                    }}
+                                >
+                                    {submitting ? 'Analyzing & Scoring...' : <><Sparkles size={14} /> Submit for AI Neural Evaluation</>}
                                 </button>
                             </form>
                         </div>
@@ -102,7 +149,7 @@ export default function StudentSubmissionsPage() {
                                 Evaluated Skills & Verified Ledgers ({assessments.length})
                             </h3>
                             {assessments.length === 0 ? (
-                                <p style={{ color: '#64748b', fontSize: 13 }}>No submissions evaluated yet. Complete an assessment or project above.</p>
+                                <p style={{ color: '#64748b', fontSize: 13 }}>No submissions evaluated yet. Complete an assessment or submit a project above.</p>
                             ) : (
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                                     {assessments.map((a: any, idx: number) => (
@@ -119,7 +166,7 @@ export default function StudentSubmissionsPage() {
                                                 <span style={{ fontSize: 13, fontWeight: 800, color: GOLD, background: 'rgba(245,158,11,0.15)', padding: '4px 10px', borderRadius: 99 }}>
                                                     Score: {a.score}%
                                                 </span>
-                                                <div style={{ fontSize: 11, color: '#22c55e', marginTop: 4 }}>Verified</div>
+                                                <div style={{ fontSize: 11, color: '#22c55e', marginTop: 4 }}>✓ Verified</div>
                                             </div>
                                         </div>
                                     ))}

@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import mongoose from 'mongoose';
 import { z } from 'zod';
 import Student, { IStudent } from '../models/Student.model';
 import Assessment from '../models/Assessment.model';
@@ -113,9 +114,9 @@ export const getStudentSkills = async (req: Request, res: Response, next: NextFu
 
 export const getStudentPassport = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    let student: any = await Student.findById(req.params.id).select('passportHash overallScore nsqfLevel program');
+    let student: any = await Student.findById(req.params.id).select('passportHash overallScore nsqfLevel program enrollmentNumber');
     if (!student) {
-      student = await Student.findOne({ userId: req.params.id }).select('passportHash overallScore nsqfLevel program');
+      student = await Student.findOne({ userId: req.params.id }).select('passportHash overallScore nsqfLevel program enrollmentNumber');
     }
     if (!student) {
       res.status(404).json(buildApiResponse(null, 'Student not found', false));
@@ -127,7 +128,7 @@ export const getStudentPassport = async (req: Request, res: Response, next: Next
 
 export const submitAssessment = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const { skillId, responses, score, adaptiveLevel } = req.body;
+    const { skillId, responses, score, adaptiveLevel, category } = req.body;
     let targetStudentId = req.params.id;
 
     let student: any = await Student.findById(targetStudentId);
@@ -140,31 +141,40 @@ export const submitAssessment = async (req: Request, res: Response, next: NextFu
       return;
     }
 
+    const calculatedScore = typeof score === 'number' ? score : 80;
+    const skillName = category || skillId || 'Core Technical Assessment';
+
     // Create assessment record
     const assessment = await Assessment.create({
-      studentId: student._id,
-      skillId,
-      responses,
-      score,
-      adaptiveLevel: adaptiveLevel ?? 1,
+      studentId: student.userId || student._id,
+      category: skillName,
+      score: calculatedScore,
+      totalQuestions: Array.isArray(responses) ? responses.length : 5,
+      aiAnalysis: JSON.stringify({ category: skillName, score: calculatedScore, responses }),
     });
 
     const skillScores = await aiService.extractSkills(responses ?? []);
 
     const skillIndex = student.skills.findIndex(
-      (s: any) => String(s.skillId) === String(skillId)
+      (s: any) => String(s.skillId) === String(skillName) || (s.skillId as any)?.name === skillName
     );
     if (skillIndex >= 0) {
-      student.skills[skillIndex].score = score;
+      student.skills[skillIndex].score = calculatedScore;
       student.skills[skillIndex].lastAssessed = new Date();
-      student.skills[skillIndex].history.push({ score, date: new Date() });
-    } else if (skillId) {
-      student.skills.push({ skillId, score, lastAssessed: new Date(), history: [{ score, date: new Date() }] });
+      student.skills[skillIndex].history = student.skills[skillIndex].history || [];
+      student.skills[skillIndex].history.push({ score: calculatedScore, date: new Date() });
+    } else {
+      student.skills.push({
+        skillId: skillName as any,
+        score: calculatedScore,
+        lastAssessed: new Date(),
+        history: [{ score: calculatedScore, date: new Date() }],
+      });
     }
     
     if (student.skills.length > 0) {
       student.overallScore = Math.round(
-        student.skills.reduce((sum: number, s: any) => sum + s.score, 0) / student.skills.length
+        student.skills.reduce((sum: number, s: any) => sum + (s.score || 0), 0) / student.skills.length
       );
     }
 
@@ -220,4 +230,58 @@ export const getInterventions = async (req: Request, res: Response, next: NextFu
     }
     res.status(200).json(buildApiResponse(student.interventions ?? [], 'Interventions retrieved'));
   } catch (err) { next(err); }
+};
+
+export const analyzeStudentSkills = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const user = req.user as any;
+    let targetStudentId = req.params.id || user?._id || user?.id;
+
+    let student: any = await Student.findOne({
+      $or: [
+        mongoose.isValidObjectId(targetStudentId) ? { _id: targetStudentId } : null,
+        { userId: targetStudentId },
+      ].filter(Boolean) as any,
+    });
+
+    const { text, githubUrl, projects, skills } = req.body;
+    const analysis = await aiService.analyzeSkills({
+      text,
+      githubUrl,
+      projects,
+      skills,
+      program: student?.program,
+      nsqfLevel: student?.nsqfLevel,
+    });
+
+    if (student) {
+      const extracted = [...(analysis.technicalSkills || []), ...(analysis.softSkills || [])];
+      for (const s of extracted) {
+        const existingIdx = student.skills.findIndex(
+          (sk: any) => sk.skillId?.toString() === s.name || (sk.skillId as any)?.name === s.name
+        );
+        if (existingIdx >= 0) {
+          student.skills[existingIdx].score = s.score;
+          student.skills[existingIdx].lastAssessed = new Date();
+          student.skills[existingIdx].history = student.skills[existingIdx].history || [];
+          student.skills[existingIdx].history.push({ score: s.score, date: new Date() });
+        } else {
+          student.skills.push({
+            skillId: s.name as any,
+            score: s.score,
+            lastAssessed: new Date(),
+            history: [{ score: s.score, date: new Date() }],
+          });
+        }
+      }
+
+      student.overallScore = analysis.overallScore;
+      student.careerPathways = analysis.recommendations;
+      await student.save();
+    }
+
+    res.status(200).json(buildApiResponse(analysis, 'Skills analyzed and profile updated'));
+  } catch (err) {
+    next(err);
+  }
 };

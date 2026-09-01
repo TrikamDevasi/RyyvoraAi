@@ -1,439 +1,578 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import VerificationBanner from '@/components/shared/VerificationBanner';
 import { useAuthStore } from '@/store/authStore';
-import { Menu, X, ChevronDown, LogOut, User as UserIcon } from 'lucide-react';
+import {
+  LayoutDashboard,
+  Award,
+  Brain,
+  FileCode,
+  CheckSquare,
+  Trophy,
+  Briefcase,
+  Compass,
+  TrendingUp,
+  User,
+  Newspaper,
+  Building,
+  Landmark,
+  Shield,
+  Activity,
+  LogOut,
+  ChevronLeft,
+  ChevronRight,
+  Menu,
+  X,
+  Sparkles,
+  Zap,
+} from 'lucide-react';
 
-const GOLD = '#F59E0B';
-const AMBER = '#F59E0B';
-const GOLD_L = '#FBBF24';
+interface RouteItem {
+  label: string;
+  href: string;
+  icon: React.ElementType;
+  badge?: string;
+}
 
-const NAV = [
-    {
-        group: 'Student', accent: GOLD, routes: [
-            { label: 'Overview', href: '/student' },
-            { label: 'Skill Passport', href: '/student/passport' },
-            { label: 'AI Analyzer', href: '/student/analyzer' },
-            { label: 'Assessments', href: '/student/assessments' },
-            { label: 'Find Jobs', href: '/student/jobs', badge: 'NEW' },
-            { label: 'Leaderboard', href: '/student/leaderboard', badge: 'HOT' },
-            { label: 'Career Path', href: '/student/career' },
-            { label: 'Market Trends', href: '/student/market' },
-            { label: 'My Submissions', href: '/student/submissions' },
-            { label: 'Profile', href: '/student/profile' },
-        ],
-    },
-    {
-        group: 'Institute', accent: GOLD_L, routes: [
-            { label: 'Overview', href: '/institute' },
-            { label: 'Students', href: '/institute/students' },
-            { label: 'Evaluations', href: '/institute/evaluations' },
-            { label: 'Placements', href: '/institute/placement' },
-            { label: 'Program ROI', href: '/institute/roi' },
-            { label: 'Upload Data', href: '/institute/upload' },
-            { label: 'Latest News', href: '/institute/news' },
-        ],
-    },
-    {
-        group: 'Employer', accent: AMBER, routes: [
-            { label: 'Overview', href: '/employer' },
-            { label: 'Feedback', href: '/employer/feedback' },
-            { label: 'Skill Validation', href: '/employer/validations' },
-            { label: 'Placements', href: '/employer/placements' },
-        ],
-    },
-    {
-        group: 'Industry', accent: GOLD, routes: [
-            { label: 'Overview', href: '/industry' },
-            { label: 'Talent Pool', href: '/industry/talent' },
-            { label: 'Demand Signals', href: '/industry/demand' },
-            { label: 'Campus Connect', href: '/industry/campus' },
-            { label: 'Latest News', href: '/industry/news' },
-        ],
-    },
-    {
-        group: 'Government', accent: AMBER, routes: [
-            { label: 'Overview', href: '/government' },
-            { label: 'Region Heatmap', href: '/government/heatmap' },
-            { label: 'Fund Targeting', href: '/government/fund-targeting' },
-            { label: 'Compliance', href: '/government/compliance' },
-            { label: 'Latest News', href: '/government/news' },
-        ],
-    },
-    {
-        group: 'Admin', accent: AMBER, routes: [
-            { label: 'Overview', href: '/admin' },
-            { label: 'Users', href: '/admin/users' },
-            { label: 'Institutes', href: '/admin/institutes' },
-            { label: 'Fairness', href: '/admin/fairness' },
-            { label: 'Audit Logs', href: '/admin/audit-logs' },
-            { label: 'Reports', href: '/admin/reports' },
-        ],
-    },
+interface NavGroup {
+  group: string;
+  role: string;
+  routes: RouteItem[];
+}
+
+const NAV_GROUPS: NavGroup[] = [
+  {
+    group: 'Student Intelligence',
+    role: 'student',
+    routes: [
+      { label: 'Overview', href: '/student', icon: LayoutDashboard },
+      { label: 'AI Skill Analyzer', href: '/student/analyzer', icon: Brain, badge: 'AI' },
+      { label: 'Skill Passport', href: '/student/passport', icon: Award, badge: 'VERIFIED' },
+      { label: 'Assessments', href: '/student/assessment', icon: CheckSquare },
+      { label: 'Career Predictor', href: '/student/career', icon: Compass },
+      { label: 'My Submissions', href: '/student/submissions', icon: FileCode },
+      { label: 'Find Jobs', href: '/student/jobs', icon: Briefcase, badge: 'NEW' },
+      { label: 'Market Demand', href: '/student/market', icon: TrendingUp },
+      { label: 'Leaderboard', href: '/student/leaderboard', icon: Trophy },
+      { label: 'Profile', href: '/student/profile', icon: User },
+      { label: 'Latest News', href: '/student/news', icon: Newspaper },
+    ],
+  },
+  {
+    group: 'Institute Workspace',
+    role: 'institute',
+    routes: [
+      { label: 'Overview', href: '/institute', icon: LayoutDashboard },
+      { label: 'Students Directory', href: '/institute/students', icon: User },
+      { label: 'Evaluations Ledger', href: '/institute/evaluations', icon: CheckSquare },
+      { label: 'Placement Pipeline', href: '/institute/placement', icon: Briefcase },
+      { label: 'Program ROI', href: '/institute/roi', icon: TrendingUp },
+      { label: 'Upload Cohort Data', href: '/institute/upload', icon: FileCode },
+      { label: 'Latest News', href: '/institute/news', icon: Newspaper },
+    ],
+  },
+  {
+    group: 'Employer Hub',
+    role: 'employer',
+    routes: [
+      { label: 'Overview', href: '/employer', icon: LayoutDashboard },
+      { label: 'Feedback Ledgers', href: '/employer/feedback', icon: CheckSquare },
+      { label: 'Skill Validation', href: '/employer/validations', icon: Shield },
+      { label: 'Candidate Placement', href: '/employer/placements', icon: Briefcase },
+    ],
+  },
+  {
+    group: 'Industry Portal',
+    role: 'industry',
+    routes: [
+      { label: 'Overview', href: '/industry', icon: LayoutDashboard },
+      { label: 'Talent Pool', href: '/industry/talent', icon: User },
+      { label: 'Demand Signals', href: '/industry/demand', icon: TrendingUp },
+      { label: 'Campus Connect', href: '/industry/campus', icon: Building },
+      { label: 'Latest News', href: '/industry/news', icon: Newspaper },
+    ],
+  },
+  {
+    group: 'Government / Regulatory',
+    role: 'government',
+    routes: [
+      { label: 'Overview', href: '/government', icon: LayoutDashboard },
+      { label: 'Regional Heatmap', href: '/government/heatmap', icon: Landmark },
+      { label: 'Fund Targeting', href: '/government/fund-targeting', icon: TrendingUp },
+      { label: 'NSQF Compliance', href: '/government/compliance', icon: Shield },
+      { label: 'Latest News', href: '/government/news', icon: Newspaper },
+    ],
+  },
+  {
+    group: 'Admin Control Center',
+    role: 'admin',
+    routes: [
+      { label: 'Overview', href: '/admin', icon: LayoutDashboard },
+      { label: 'User Directory', href: '/admin/users', icon: User },
+      { label: 'Institutes', href: '/admin/institutes', icon: Building },
+      { label: 'AI Fairness Audit', href: '/admin/fairness', icon: Shield },
+      { label: 'Audit Logs', href: '/admin/audit-logs', icon: Activity },
+      { label: 'Institutional Reports', href: '/admin/reports', icon: FileCode },
+    ],
+  },
 ];
 
-const ROLE_GROUP_MAP: Record<string, string> = {
-    student: 'Student',
-    institute: 'Institute',
-    employer: 'Employer',
-    industry: 'Industry',
-    government: 'Government',
-    admin: 'Admin',
-};
-
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-    const pathname = usePathname();
-    const router = useRouter();
-    const [mounted, setMounted] = useState(false);
-    const [mobileOpen, setMobileOpen] = useState(false);
-    const [showDropdown, setShowDropdown] = useState(false);
-    const [showMoreMenu, setShowMoreMenu] = useState(false);
-    const dropdownRef = useRef<HTMLDivElement>(null);
-    const moreMenuRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
+  const router = useRouter();
+  const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-    const user = useAuthStore(s => s.user);
-    const logout = useAuthStore(s => s.logout);
-    const checkAuth = useAuthStore(s => s.checkAuth);
+  const user = useAuthStore((s) => s.user);
+  const logout = useAuthStore((s) => s.logout);
+  const checkAuth = useAuthStore((s) => s.checkAuth);
 
-    useEffect(() => {
-        setMounted(true);
-        checkAuth();
-    }, [checkAuth]);
+  const userName = user?.name || 'Candidate';
+  const userRole = user?.role || 'student';
+  const userEmail = user?.email || '';
 
-    const userName = (mounted && user?.name) ? user.name : 'User';
-    const userRole = (mounted && user?.role) ? user.role : 'student';
-    const isVerified = user?.isVerified ?? true;
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
 
-    // Close menus on route change
-    useEffect(() => {
-        setMobileOpen(false);
-        setShowMoreMenu(false);
+  // Handle responsive collapse
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 1024) {
+        setCollapsed(true);
+      } else {
+        setCollapsed(false);
+      }
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setShowDropdown(false);
-    }, [pathname]);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
 
-    // Close dropdown on outside click
-    useEffect(() => {
-        const handleClick = (e: MouseEvent) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-                setShowDropdown(false);
-            }
-            if (moreMenuRef.current && !moreMenuRef.current.contains(e.target as Node)) {
-                setShowMoreMenu(false);
-            }
-        };
-        document.addEventListener('mousedown', handleClick);
-        return () => document.removeEventListener('mousedown', handleClick);
-    }, []);
+  // Filter navigation for the user's role
+  const activeNav = NAV_GROUPS.find((n) => n.role === userRole) || NAV_GROUPS[0];
 
-    // Filter NAV based on role
-    const currentNavGroup = NAV.find(n => n.group === (ROLE_GROUP_MAP[userRole] || 'Student')) || NAV[0];
-    const routes = currentNavGroup.routes;
+  const handleLogout = async () => {
+    await logout();
+    router.push('/auth/login');
+  };
 
-    // Primary routes (first 6) and overflow routes
-    const primaryRoutes = routes.slice(0, 6);
-    const overflowRoutes = routes.slice(6);
+  const initials = userName
+    ? userName
+        .split(' ')
+        .map((w) => w[0])
+        .join('')
+        .toUpperCase()
+        .slice(0, 2)
+    : 'SK';
 
-    const initials = userName !== 'User'
-        ? userName.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2)
-        : 'U';
-
-    return (
-        <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: '#08060f', color: '#fff', fontFamily: 'Inter, sans-serif' }}>
-            
-            <style jsx>{`
-                .nav-desktop-container {
-                    display: flex;
-                    align-items: center;
-                    gap: 6px;
-                    flex-wrap: nowrap;
-                }
-                .mobile-toggle-btn {
-                    display: none;
-                }
-                @media (max-width: 990px) {
-                    .nav-desktop-container {
-                        display: none !important;
-                    }
-                    .mobile-toggle-btn {
-                        display: flex !important;
-                    }
-                }
-            `}</style>
-
-            {/* ── Proper Top Navigation Bar ── */}
-            <header style={{
-                position: 'sticky', top: 0, zIndex: 100,
-                background: 'rgba(8, 6, 15, 0.96)',
-                backdropFilter: 'blur(16px)',
-                borderBottom: '1px solid rgba(245, 158, 11, 0.15)',
-            }}>
-                <div style={{
-                    maxWidth: 1360, margin: '0 auto', padding: '0 20px',
-                    height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16
-                }}>
-                    
-                    {/* Left: Brand Logo & Role Pill */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
-                        <Link href={`/${userRole}`} style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
-                            <div style={{
-                                width: 32, height: 32, borderRadius: 8,
-                                background: 'linear-gradient(135deg, #F59E0B, #FBBF24)',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                boxShadow: '0 0 14px rgba(245, 158, 11, 0.35)'
-                            }}>
-                                <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
-                                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
-                                        stroke="#08060f" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                                </svg>
-                            </div>
-                            <span className="font-display text-gradient-gold" style={{ fontWeight: 900, fontSize: 16, color: '#fff', letterSpacing: '-0.02em' }}>
-                                SkillSense AI
-                            </span>
-                        </Link>
-
-                        {/* Active Role Badge */}
-                        <span
-                            suppressHydrationWarning
-                            className="nav-role-badge"
-                            style={{
-                                fontSize: 10, fontWeight: 800, padding: '2px 8px', borderRadius: 99,
-                                background: 'rgba(245, 158, 11, 0.12)', color: GOLD,
-                                border: '1px solid rgba(245, 158, 11, 0.25)',
-                                textTransform: 'uppercase', letterSpacing: '0.06em'
-                            }}
-                        >
-                            {currentNavGroup.group}
-                        </span>
-                    </div>
-
-                    {/* Middle: Horizontal Nav Items (Desktop) */}
-                    <nav className="desktop-only-nav">
-                        {primaryRoutes.map(({ label, href, badge }: any) => {
-                            const active = pathname === href || pathname === `${href}/`;
-                            return (
-                                <Link
-                                    key={href}
-                                    href={href}
-                                    style={{
-                                        display: 'inline-flex', alignItems: 'center', gap: 5,
-                                        padding: '6px 12px', borderRadius: 8,
-                                        fontSize: 13, textDecoration: 'none',
-                                        color: active ? '#FFFFFF' : '#94A3B8',
-                                        fontWeight: active ? 700 : 500,
-                                        background: active ? 'rgba(245, 158, 11, 0.1)' : 'transparent',
-                                        border: active ? '1px solid rgba(245, 158, 11, 0.3)' : '1px solid transparent',
-                                        transition: 'all 0.15s ease',
-                                        whiteSpace: 'nowrap',
-                                    }}
-                                    onMouseEnter={e => { if (!active) e.currentTarget.style.color = '#FFFFFF'; }}
-                                    onMouseLeave={e => { if (!active) e.currentTarget.style.color = '#94A3B8'; }}
-                                >
-                                    <span>{label}</span>
-                                    {badge && (
-                                        <span style={{
-                                            fontSize: 9, fontWeight: 800, padding: '1px 5px', borderRadius: 4,
-                                            background: badge === 'HOT' ? 'rgba(239,68,68,0.2)' : 'rgba(245,158,11,0.2)',
-                                            color: badge === 'HOT' ? '#ef4444' : GOLD,
-                                        }}>
-                                            {badge}
-                                        </span>
-                                    )}
-                                </Link>
-                            );
-                        })}
-
-                        {/* More Menu Dropdown for Overflow Routes */}
-                        {overflowRoutes.length > 0 && (
-                            <div ref={moreMenuRef} style={{ position: 'relative' }}>
-                                <button
-                                    onClick={() => setShowMoreMenu(!showMoreMenu)}
-                                    style={{
-                                        display: 'inline-flex', alignItems: 'center', gap: 4,
-                                        padding: '6px 12px', borderRadius: 8,
-                                        fontSize: 13, color: '#94A3B8', fontWeight: 500,
-                                        background: showMoreMenu ? 'rgba(245, 158, 11, 0.1)' : 'transparent',
-                                        border: '1px solid transparent', cursor: 'pointer',
-                                        whiteSpace: 'nowrap',
-                                    }}
-                                >
-                                    <span>More</span>
-                                    <ChevronDown size={13} />
-                                </button>
-
-                                {showMoreMenu && (
-                                    <div style={{
-                                        position: 'absolute', top: '100%', right: 0, marginTop: 6,
-                                        width: 190, background: '#0d0b1d', border: '1px solid rgba(245, 158, 11, 0.25)',
-                                        borderRadius: 10, padding: '6px', boxShadow: '0 12px 36px rgba(0,0,0,0.6)',
-                                        zIndex: 150,
-                                    }}>
-                                        {overflowRoutes.map(({ label, href, badge }: any) => {
-                                            const active = pathname === href;
-                                            return (
-                                                <Link
-                                                    key={href}
-                                                    href={href}
-                                                    style={{
-                                                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                                                        padding: '8px 12px', borderRadius: 6,
-                                                        fontSize: 13, textDecoration: 'none',
-                                                        color: active ? '#FFFFFF' : '#94A3B8',
-                                                        fontWeight: active ? 700 : 500,
-                                                        background: active ? 'rgba(245, 158, 11, 0.12)' : 'transparent',
-                                                    }}
-                                                >
-                                                    <span>{label}</span>
-                                                    {badge && (
-                                                        <span style={{ fontSize: 9, fontWeight: 700, padding: '1px 5px', borderRadius: 4, background: 'rgba(245,158,11,0.2)', color: GOLD }}>
-                                                            {badge}
-                                                        </span>
-                                                    )}
-                                                </Link>
-                                            );
-                                        })}
-                                    </div>
-                                )}
-                            </div>
-                        )}
-                    </nav>
-
-                    {/* Right: User Profile & Mobile Toggle */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
-                        
-                        {/* Profile Dropdown */}
-                        <div ref={dropdownRef} style={{ position: 'relative' }}>
-                            <button
-                                onClick={() => setShowDropdown(!showDropdown)}
-                                style={{
-                                    display: 'flex', alignItems: 'center', gap: 8,
-                                    background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.08)',
-                                    borderRadius: 99, padding: '4px 10px 4px 4px', cursor: 'pointer',
-                                }}
-                            >
-                                <div
-                                    suppressHydrationWarning
-                                    style={{
-                                        width: 28, height: 28, borderRadius: '50%',
-                                        background: 'linear-gradient(135deg, #F59E0B, #FBBF24)',
-                                        color: '#08060F', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                        fontSize: 11, fontWeight: 800,
-                                    }}
-                                >
-                                    {initials}
-                                </div>
-                                <span suppressHydrationWarning className="nav-username" style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>
-                                    {userName.split(' ')[0]}
-                                </span>
-                                <ChevronDown size={13} color="#94A3B8" />
-                            </button>
-
-                            {showDropdown && (
-                                <div style={{
-                                    position: 'absolute', right: 0, top: '100%', marginTop: 8,
-                                    width: 220, background: '#0d0b1d', border: '1px solid rgba(245, 158, 11, 0.25)',
-                                    borderRadius: 12, padding: '8px', boxShadow: '0 12px 36px rgba(0,0,0,0.6)',
-                                    zIndex: 150,
-                                }}>
-                                    <div style={{ padding: '8px 10px', borderBottom: '1px solid rgba(255, 255, 255, 0.06)', marginBottom: 4 }}>
-                                        <div style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>{userName}</div>
-                                        <div style={{ fontSize: 11, color: '#94A3B8', textOverflow: 'ellipsis', overflow: 'hidden' }}>{user?.email}</div>
-                                        <div style={{ fontSize: 10, color: GOLD, marginTop: 3, textTransform: 'capitalize', fontWeight: 600 }}>{userRole} Account</div>
-                                    </div>
-                                    <button
-                                        onClick={() => logout()}
-                                        style={{
-                                            width: '100%', textAlign: 'left', padding: '8px 10px',
-                                            background: 'transparent', border: 'none', color: '#ef4444',
-                                            fontSize: 12, fontWeight: 600, cursor: 'pointer', borderRadius: 6,
-                                            display: 'flex', alignItems: 'center', gap: 8,
-                                        }}
-                                        onMouseEnter={e => (e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)')}
-                                        onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-                                    >
-                                        <LogOut size={14} /> Sign Out
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Mobile Hamburger Toggle */}
-                        <button
-                            onClick={() => setMobileOpen(!mobileOpen)}
-                            aria-label="Toggle navigation menu"
-                            className="mobile-toggle-btn"
-                            style={{
-                                background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.1)',
-                                borderRadius: 8, padding: '7px', color: '#fff', cursor: 'pointer',
-                            }}
-                        >
-                            {mobileOpen ? <X size={18} /> : <Menu size={18} />}
-                        </button>
-                    </div>
+  return (
+    <div style={{ display: 'flex', minHeight: '100vh', background: 'var(--bg)', color: 'var(--text-primary)' }}>
+      {/* ── Sidebar (Desktop) ── */}
+      <aside
+        style={{
+          width: collapsed ? 72 : 248,
+          minWidth: collapsed ? 72 : 248,
+          background: 'var(--bg-surface)',
+          borderRight: '1px solid var(--border)',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          transition: 'width 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+          position: 'sticky',
+          top: 0,
+          height: '100vh',
+          zIndex: 40,
+        }}
+        className="hidden md:flex"
+      >
+        <div>
+          {/* Brand Header */}
+          <div
+            style={{
+              padding: collapsed ? '18px 12px' : '18px 16px',
+              borderBottom: '1px solid var(--border)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: collapsed ? 'center' : 'space-between',
+            }}
+          >
+            <Link
+              href={activeNav.routes[0].href}
+              style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', color: '#fff' }}
+            >
+              <div
+                style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: 8,
+                  background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: 900,
+                  fontSize: 14,
+                  color: '#090a0f',
+                  boxShadow: '0 2px 8px rgba(245,158,11,0.3)',
+                }}
+              >
+                SK
+              </div>
+              {!collapsed && (
+                <div>
+                  <div className="font-display" style={{ fontSize: 15, fontWeight: 800, letterSpacing: '-0.02em' }}>
+                    SkillSense <span style={{ color: 'var(--gold)' }}>AI</span>
+                  </div>
+                  <div style={{ fontSize: 10, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>
+                    {activeNav.role} platform
+                  </div>
                 </div>
+              )}
+            </Link>
 
-                {/* ── Mobile Navigation Dropdown ── */}
-                <AnimatePresence>
-                    {mobileOpen && (
-                        <motion.div
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: 'auto' }}
-                            exit={{ opacity: 0, height: 0 }}
+            {!collapsed && (
+              <button
+                type="button"
+                onClick={() => setCollapsed(true)}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--text-muted)',
+                  cursor: 'pointer',
+                  padding: 4,
+                  borderRadius: 4,
+                }}
+                title="Collapse sidebar"
+              >
+                <ChevronLeft size={16} />
+              </button>
+            )}
+          </div>
+
+          {/* Navigation Links */}
+          <div style={{ padding: '14px 8px', overflowY: 'auto', maxHeight: 'calc(100vh - 160px)' }}>
+            {!collapsed && (
+              <div
+                style={{
+                  fontSize: 10,
+                  fontWeight: 800,
+                  color: 'var(--text-muted)',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.06em',
+                  padding: '4px 10px 8px',
+                }}
+              >
+                {activeNav.group}
+              </div>
+            )}
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              {activeNav.routes.map((route) => {
+                const Icon = route.icon;
+                const isActive = pathname === route.href || (route.href !== '/student' && pathname.startsWith(route.href));
+
+                return (
+                  <Link
+                    key={route.href}
+                    href={route.href}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 10,
+                      padding: collapsed ? '10px 0' : '8px 12px',
+                      justifyContent: collapsed ? 'center' : 'flex-start',
+                      borderRadius: 8,
+                      fontSize: 13,
+                      fontWeight: isActive ? 700 : 500,
+                      color: isActive ? '#f8fafc' : 'var(--text-secondary)',
+                      background: isActive ? 'rgba(245, 158, 11, 0.1)' : 'transparent',
+                      borderLeft: isActive ? '3px solid var(--gold)' : '3px solid transparent',
+                      textDecoration: 'none',
+                      transition: 'all 0.15s ease',
+                      position: 'relative',
+                    }}
+                    title={collapsed ? route.label : undefined}
+                  >
+                    <Icon size={16} color={isActive ? '#f59e0b' : 'currentColor'} />
+                    {!collapsed && (
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flex: 1 }}>
+                        <span>{route.label}</span>
+                        {route.badge && (
+                          <span
                             style={{
-                                background: '#0d0b1d', borderTop: '1px solid rgba(245, 158, 11, 0.15)',
-                                padding: '12px 20px 20px', display: 'flex', flexDirection: 'column', gap: 4,
+                              fontSize: 9,
+                              fontWeight: 800,
+                              padding: '1px 5px',
+                              borderRadius: 4,
+                              background: route.badge === 'AI' ? 'rgba(245,158,11,0.2)' : 'rgba(255,255,255,0.06)',
+                              color: route.badge === 'AI' ? '#f59e0b' : 'var(--text-secondary)',
                             }}
-                        >
-                            <div style={{ fontSize: 11, fontWeight: 700, color: GOLD, textTransform: 'uppercase', padding: '4px 8px', letterSpacing: '0.06em' }}>
-                                {currentNavGroup.group} Navigation
-                            </div>
-                            {routes.map(({ label, href, badge }: any) => {
-                                const active = pathname === href || pathname === `${href}/`;
-                                return (
-                                    <Link
-                                        key={href}
-                                        href={href}
-                                        onClick={() => setMobileOpen(false)}
-                                        style={{
-                                            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                                            padding: '10px 12px', borderRadius: 8,
-                                            fontSize: 14, textDecoration: 'none',
-                                            color: active ? '#FFFFFF' : '#94A3B8',
-                                            fontWeight: active ? 700 : 500,
-                                            background: active ? 'rgba(245, 158, 11, 0.12)' : 'transparent',
-                                            borderLeft: active ? `3px solid ${GOLD}` : '3px solid transparent',
-                                        }}
-                                    >
-                                        <span>{label}</span>
-                                        {badge && (
-                                            <span style={{
-                                                fontSize: 9, fontWeight: 800, padding: '1px 6px', borderRadius: 4,
-                                                background: badge === 'HOT' ? 'rgba(239,68,68,0.2)' : 'rgba(245,158,11,0.2)',
-                                                color: badge === 'HOT' ? '#ef4444' : GOLD,
-                                            }}>
-                                                {badge}
-                                            </span>
-                                        )}
-                                    </Link>
-                                );
-                            })}
-                        </motion.div>
+                          >
+                            {route.badge}
+                          </span>
+                        )}
+                      </div>
                     )}
-                </AnimatePresence>
-            </header>
-
-            {!isVerified && <VerificationBanner />}
-
-            {/* ── Main Full-Width Content Container ── */}
-            <main style={{
-                flex: 1, width: '100%', maxWidth: 1360, margin: '0 auto',
-                padding: '24px 20px', overflowY: 'auto'
-            }}>
-                {children}
-            </main>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
         </div>
-    );
+
+        {/* Bottom User Area */}
+        <div
+          style={{
+            padding: collapsed ? '12px 6px' : '12px 12px',
+            borderTop: '1px solid var(--border)',
+            background: 'var(--bg-surface)',
+          }}
+        >
+          {collapsed ? (
+            <button
+              type="button"
+              onClick={() => setCollapsed(false)}
+              style={{
+                width: '100%',
+                padding: '8px 0',
+                background: 'transparent',
+                border: 'none',
+                color: 'var(--text-muted)',
+                cursor: 'pointer',
+                display: 'flex',
+                justifyContent: 'center',
+              }}
+              title="Expand sidebar"
+            >
+              <ChevronRight size={16} />
+            </button>
+          ) : (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, overflow: 'hidden' }}>
+                <div
+                  style={{
+                    width: 30,
+                    height: 30,
+                    borderRadius: '50%',
+                    background: 'rgba(255,255,255,0.08)',
+                    border: '1px solid var(--border)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: '#fff',
+                  }}
+                >
+                  {initials}
+                </div>
+                <div style={{ overflow: 'hidden' }}>
+                  <div style={{ fontSize: 12.5, fontWeight: 700, color: '#f8fafc', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
+                    {userName}
+                  </div>
+                  <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'capitalize' }}>
+                    {userRole}
+                  </div>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleLogout}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--text-muted)',
+                  cursor: 'pointer',
+                  padding: 6,
+                  borderRadius: 6,
+                }}
+                title="Sign out"
+              >
+                <LogOut size={15} />
+              </button>
+            </div>
+          )}
+        </div>
+      </aside>
+
+      {/* ── Main Content Area ── */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+        {/* Topbar */}
+        <header
+          style={{
+            height: 56,
+            background: 'var(--bg-surface)',
+            borderBottom: '1px solid var(--border)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '0 24px',
+            position: 'sticky',
+            top: 0,
+            zIndex: 30,
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <button
+              type="button"
+              onClick={() => setMobileOpen(!mobileOpen)}
+              className="md:hidden"
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: '#fff',
+                cursor: 'pointer',
+                padding: 4,
+              }}
+            >
+              {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'var(--text-secondary)' }}>
+              <span style={{ color: 'var(--text-muted)' }}>SkillSense</span>
+              <span>/</span>
+              <span style={{ color: '#f8fafc', fontWeight: 600, textTransform: 'capitalize' }}>
+                {pathname.split('/')[2] || 'Dashboard'}
+              </span>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            {/* Live AI Telemetry Pill */}
+            <Link
+              href="/ai-health"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '4px 10px',
+                background: 'rgba(16,185,129,0.06)',
+                border: '1px solid rgba(16,185,129,0.2)',
+                borderRadius: 99,
+                fontSize: 11,
+                fontWeight: 700,
+                color: '#34d399',
+                textDecoration: 'none',
+              }}
+            >
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10b981', animation: 'pulse-slow 2s infinite' }} />
+              <span>AI TELEMETRY LIVE</span>
+            </Link>
+
+            <Link
+              href="/student/analyzer"
+              className="btn-gold hidden sm:inline-flex"
+              style={{ fontSize: 12, padding: '5px 12px' }}
+            >
+              <Sparkles size={13} /> Analyzer
+            </Link>
+          </div>
+        </header>
+
+        {/* Verification banner if applicable */}
+        <VerificationBanner />
+
+        {/* Page View Container */}
+        <main style={{ flex: 1, padding: '24px 28px', maxWidth: 1400, width: '100%', margin: '0 auto' }}>
+          {children}
+        </main>
+      </div>
+
+      {/* ── Mobile Drawer ── */}
+      <AnimatePresence>
+        {mobileOpen && (
+          <motion.div
+            initial={{ opacity: 0, x: -260 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -260 }}
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              bottom: 0,
+              width: 260,
+              background: 'var(--bg-surface)',
+              borderRight: '1px solid var(--border)',
+              zIndex: 50,
+              padding: 16,
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+            }}
+          >
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                <div className="font-display" style={{ fontSize: 16, fontWeight: 800 }}>
+                  SkillSense <span style={{ color: 'var(--gold)' }}>AI</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setMobileOpen(false)}
+                  style={{ background: 'transparent', border: 'none', color: '#94a3b8' }}
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                {activeNav.routes.map((route) => {
+                  const Icon = route.icon;
+                  const isActive = pathname === route.href;
+                  return (
+                    <Link
+                      key={route.href}
+                      href={route.href}
+                      onClick={() => setMobileOpen(false)}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 10,
+                        padding: '10px 12px',
+                        borderRadius: 8,
+                        fontSize: 13.5,
+                        fontWeight: isActive ? 700 : 500,
+                        color: isActive ? '#f8fafc' : 'var(--text-secondary)',
+                        background: isActive ? 'rgba(245, 158, 11, 0.1)' : 'transparent',
+                        textDecoration: 'none',
+                      }}
+                    >
+                      <Icon size={16} color={isActive ? '#f59e0b' : 'currentColor'} />
+                      <span>{route.label}</span>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="btn-secondary"
+              style={{ width: '100%', justifyContent: 'center', fontSize: 13 }}
+            >
+              <LogOut size={14} /> Sign Out
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
 }

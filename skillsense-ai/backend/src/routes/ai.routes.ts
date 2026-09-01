@@ -9,27 +9,30 @@ import {
   marketTrends,
   getChatHistory,
   getAssessment,
+  analyzeSkills,
 } from '../controllers/ai.controller';
+import { aiLimiter } from '../middleware/rateLimit.middleware';
 
 const router = Router();
 
 // Public / Guest accessible routes
 router.get('/assessment/:id', getAssessment);
 router.post('/chat', optionalProtect, chat);
+router.get('/market-trends', marketTrends);
 
-// Protected routes
+// Protected AI Routes
 router.use(protect);
 
 router.get('/history', getChatHistory);
 
-// Skill Assessment
-router.post('/assess-skill',          assessSkill);
-router.post('/assess-skill/evaluate', evaluateSkill);
+// AI Skill Extraction & Analysis
+router.post('/analyze-skills', aiLimiter, analyzeSkills);
+
+// Skill Assessment & Quizzes
+router.post('/assess-skill', aiLimiter, assessSkill);
+router.post('/assess-skill/evaluate', aiLimiter, evaluateSkill);
 
 // Career Predictor
-router.post('/predict-career', predictCareer);
-
-// Market Intelligence (Perplexity)
-router.get('/market-trends', marketTrends);
+router.post('/predict-career', aiLimiter, predictCareer);
 
 export default router;

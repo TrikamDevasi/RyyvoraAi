@@ -1,16 +1,18 @@
 // backend/src/controllers/ai.controller.ts
 import { Request, Response } from 'express';
-import OpenAI from 'openai';
 import logger from '../utils/logger';
 import { aiService } from '../services/ai.service';
 import ChatSession from '../models/ChatSession.model';
 import Assessment from '../models/Assessment.model';
+import CareerPrediction from '../models/CareerPrediction.model';
+import Student from '../models/Student.model';
+import { ChatMessage } from '../services/providers';
 
 // ── In-memory market-trends cache (1-hour TTL) ───────────────────────────────
 const trendCache = new Map<string, { data: object; ts: number }>();
 const CACHE_TTL = 60 * 60 * 1000; // 1 hour
 
-// ── per-user rate limiter (30 req / hour) ────────────────────────────────────
+// ── per-user rate limiter (60 req / hour) ────────────────────────────────────
 const userReqCount = new Map<string, { count: number; resetAt: number }>();
 function checkRateLimit(userId: string): boolean {
   const now = Date.now();
@@ -19,19 +21,23 @@ function checkRateLimit(userId: string): boolean {
     userReqCount.set(userId, { count: 1, resetAt: now + 60 * 60 * 1000 });
     return false;
   }
-  if (entry.count >= 30) return true; // rate-limited
+  if (entry.count >= 60) return true;
   entry.count++;
   return false;
 }
 
 // ── 1.  POST /api/v1/ai/chat ──────────────────────────────────────────────────
 export const chat = async (req: Request, res: Response): Promise<void> => {
-  const user = req.user as unknown as { _id: { toString: () => string } } | undefined;
-  const userId = user?._id?.toString() ?? 'anon';
+  const user = req.user as any;
+  const userId = user?._id?.toString() || user?.id || 'anon';
   const isDemo = process.env.DEMO_MODE === 'true';
 
   if (!isDemo && checkRateLimit(userId)) {
-    res.status(429).json({ success: false, data: null, message: 'Rate limit reached. Please wait before sending more messages.' });
+    res.status(429).json({
+      success: false,
+      data: null,
+      message: 'Rate limit reached. Please wait a moment before sending more messages.',
+    });
     return;
   }
 
@@ -46,15 +52,31 @@ export const chat = async (req: Request, res: Response): Promise<void> => {
     return;
   }
 
-  const systemPrompt = `You are SkillSense AI — an encouraging skill development and career tutor for students in India preparing for the tech and vocational job market. 
-Answer in clear English. Give practical, India-specific guidance (companies like TCS, Infosys, Swiggy, Zerodha; salaries in INR; NSQF skill certifications). 
-Keep answers concise and actionable (under 150 words).
-Context about this candidate: ${context || 'Student on SkillSense AI platform'}`;
+  // Load student profile context if user is logged in
+  let studentContext = context || 'Student on SkillSense AI platform';
+  if (userId !== 'anon') {
+    try {
+      const student = await Student.findOne({ userId }).populate('skills.skillId', 'name');
+      if (student) {
+        const topSkills = (student.skills || [])
+          .map((s: any) => `${(s.skillId as any)?.name || 'Skill'}: ${s.score}%`)
+          .join(', ');
+        studentContext += ` | Candidate Profile: Program=${student.program}, NSQF Level=${student.nsqfLevel}, Overall Score=${student.overallScore}/100, Skills=[${topSkills}]`;
+      }
+    } catch {
+      // Ignore background fetch error
+    }
+  }
+
+  const systemPrompt = `You are SkillSense AI — an expert, encouraging skill development and career tutor for students in India preparing for the tech and vocational job market.
+Answer in clear English. Provide practical, India-specific guidance (companies like TCS, Infosys, Swiggy, Zerodha, Razorpay; salaries in INR; NSQF skill certifications).
+Keep answers concise, insightful, and actionable (under 150 words).
+Context about this candidate: ${studentContext}`;
 
   try {
-    const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [
+    const messages: ChatMessage[] = [
       { role: 'system', content: systemPrompt },
-      ...history.slice(-6),
+      ...history.slice(-6).map((h) => ({ role: h.role as 'user' | 'assistant', content: h.content })),
       { role: 'user', content: message },
     ];
 
@@ -65,7 +87,7 @@ Context about this candidate: ${context || 'Student on SkillSense AI platform'}`
 
     let fullReply = '';
     const stream = aiService.chatStream(messages, {
-      max_tokens: 400,
+      max_tokens: 500,
       temperature: 0.7,
     });
 
@@ -75,9 +97,9 @@ Context about this candidate: ${context || 'Student on SkillSense AI platform'}`
     }
 
     const suggestions = [
-      'How do I prepare for technical interviews?',
-      'What certifications are recommended for NSQF Level 5?',
-      'Which companies in India are hiring freshers for this role?',
+      'What skills should I focus on next?',
+      'How do I prepare for tech interviews in India?',
+      'Explain my skill gaps and upskilling roadmap',
     ];
 
     // Send final payload with suggestions
@@ -99,10 +121,10 @@ Context about this candidate: ${context || 'Student on SkillSense AI platform'}`
           },
         },
         { upsert: true, new: true }
-      ).catch(err => logger.error('Error saving chat session:', err));
+      ).catch((err) => logger.error('Error saving chat session:', err));
     }
-  } catch (err) {
-    logger.error('AI chat error:', err);
+  } catch (err: any) {
+    logger.error('AI chat error:', err.message);
     if (!res.headersSent) {
       res.status(200).json({
         success: true,
@@ -123,93 +145,21 @@ Context about this candidate: ${context || 'Student on SkillSense AI platform'}`
 export const assessSkill = async (req: Request, res: Response): Promise<void> => {
   const { topic, level = 'Intermediate' } = req.body as { topic: string; level?: string };
 
-  if (!topic) {
-    res.status(400).json({ success: false, data: null, message: 'topic is required' });
+  if (!topic?.trim()) {
+    res.status(400).json({ success: false, data: null, message: 'Topic is required' });
     return;
   }
 
-  const prompt = `You are a senior technical interviewer for India's tech ecosystem. Generate exactly 5 multiple-choice questions to assess ${level} knowledge of "${topic}".
-Return ONLY valid JSON:
-{
-  "questions": [
-    {
-      "question": "Clear technical question",
-      "options": ["A. Option 1", "B. Option 2", "C. Option 3", "D. Option 4"],
-      "correct": "A"
-    }
-  ]
-}`;
-
   try {
-    const result = await aiService.chatWithFallback([{ role: 'user', content: prompt }], {
-      response_format: { type: 'json_object' },
-      temperature: 0.3,
-      max_tokens: 1000,
-    });
-
-    let questions: any[] = [];
-    if (result) {
-      try {
-        const parsed = JSON.parse(result);
-        if (Array.isArray(parsed.questions) && parsed.questions.length > 0) {
-          questions = parsed.questions;
-        }
-      } catch {}
-    }
-
-    if (questions.length === 0) {
-      // Fallback questions for the specific topic
-      questions = [
-        {
-          question: `Which of the following is a primary core concept in ${topic}?`,
-          options: ['A. Modular architecture and component reuse', 'B. Monolithic single-thread blocking', 'C. Unchecked memory leaks', 'D. Hardcoded state mutations'],
-          correct: 'A',
-        },
-        {
-          question: `What is the recommended best practice for asynchronous execution in modern ${topic}?`,
-          options: ['A. Promises and async/await error handling', 'B. Blocking synchronous busy-waits', 'C. Global mutable state locking', 'D. Polling every 10 milliseconds'],
-          correct: 'A',
-        },
-        {
-          question: `How do you optimize runtime performance and reduce latency in ${topic}?`,
-          options: ['A. Caching, indexing, and memoization', 'B. Removing all indexes', 'C. Duplicating database queries', 'D. Increasing bundle payload size'],
-          correct: 'A',
-        },
-        {
-          question: `Which security vulnerability is critical to protect against when building ${topic} APIs?`,
-          options: ['A. Injection attacks & Broken Object Level Authorization (IDOR)', 'B. Strict type safety', 'C. Automated unit testing', 'D. Environment variable isolation'],
-          correct: 'A',
-        },
-        {
-          question: `In a production deployment of ${topic}, how should configuration secrets be managed?`,
-          options: ['A. Secure environment variables & KMS secrets manager', 'B. Hardcoded in public Git repositories', 'C. Embedded in client-side bundles', 'D. Plaintext in URL query parameters'],
-          correct: 'A',
-        },
-      ];
-    }
-
+    const result = await aiService.assessSkill(topic.trim(), level);
     res.status(200).json({
       success: true,
-      data: { topic, level, questions },
+      data: result,
       message: 'Assessment generated successfully',
     });
-  } catch (err) {
-    logger.error('assessSkill error:', err);
-    res.status(200).json({
-      success: true,
-      data: {
-        topic,
-        level,
-        questions: [
-          {
-            question: `Which of the following is a fundamental concept in ${topic}?`,
-            options: ['A. Structured modular components and clean code', 'B. Unstructured global state', 'C. Unauthenticated access', 'D. Unchecked resource usage'],
-            correct: 'A',
-          },
-        ],
-      },
-      message: 'OK',
-    });
+  } catch (err: any) {
+    logger.error('assessSkill error:', err.message);
+    res.status(500).json({ success: false, message: 'Failed to generate assessment' });
   }
 };
 
@@ -221,90 +171,80 @@ export const evaluateSkill = async (req: Request, res: Response): Promise<void> 
   };
 
   if (!topic || !Array.isArray(answers)) {
-    res.status(400).json({ success: false, data: null, message: 'topic and answers are required' });
+    res.status(400).json({ success: false, data: null, message: 'Topic and answers array are required' });
     return;
   }
 
-  const correct = answers.filter(a => a.userAnswer?.toUpperCase() === a.correctAnswer?.toUpperCase()).length;
-  const total   = Math.max(1, answers.length);
-  const pct     = Math.round((correct / total) * 100);
-  const level   = pct >= 80 ? 'Advanced' : pct >= 50 ? 'Intermediate' : 'Beginner';
-
-  const prompt = `A student scored ${pct}% (${correct}/${total}) on a ${topic} assessment.
-Return ONLY valid JSON:
-{
-  "weakAreas": ["Area 1", "Area 2"],
-  "strengths": ["Strength 1", "Strength 2"],
-  "improvementPlan": "Actionable 2-sentence plan for Indian tech hiring.",
-  "nextSteps": ["Step 1", "Step 2", "Step 3"]
-}`;
-
   try {
-    const result = await aiService.chatWithFallback([{ role: 'user', content: prompt }], {
-      response_format: { type: 'json_object' },
-      temperature: 0.3,
-      max_tokens: 500,
-    });
+    const evaluation = await aiService.evaluateSkill(topic, answers);
 
-    let feedback: any = {};
-    if (result) {
-      try { feedback = JSON.parse(result); } catch {}
-    }
-
-    const data = {
-      score: pct,
-      correct,
-      total,
-      level,
-      weakAreas:       feedback.weakAreas       || [`Advanced ${topic} edge-case optimization`],
-      strengths:       feedback.strengths       || [`Core principles of ${topic}`, 'Algorithmic reasoning'],
-      improvementPlan: feedback.improvementPlan || `Great progress! Strengthen your knowledge of ${topic} by building full-stack projects and preparing for technical interview problem sets.`,
-      nextSteps:       feedback.nextSteps       || ['Complete practical project submission', 'Add verified skill to Skill Passport', 'Apply for matched openings'],
-    };
-
-    // Save to database in background
+    // Save to database
     const user = req.user as any;
-    const userId = user?.id || user?._id || 'anon';
-    
+    const userId = user?._id || user?.id;
+
     let assessmentId = null;
-    if (userId !== 'anon') {
+    if (userId) {
       try {
         const newAssessment = await Assessment.create({
           studentId: userId,
           category: topic,
-          score: pct,
-          totalQuestions: total,
-          aiAnalysis: JSON.stringify(data),
+          score: evaluation.score,
+          totalQuestions: evaluation.total,
+          aiAnalysis: JSON.stringify(evaluation),
         });
         assessmentId = newAssessment._id;
-      } catch (err) {
-        logger.error('Error saving assessment:', err);
+
+        // Update Student skills
+        const student = await Student.findOne({ userId });
+        if (student) {
+          const existingSkillIndex = student.skills.findIndex(
+            (s: any) => String(s.skillId) === topic || (s.skillId as any)?.name === topic
+          );
+          if (existingSkillIndex >= 0) {
+            student.skills[existingSkillIndex].score = evaluation.score;
+            student.skills[existingSkillIndex].lastAssessed = new Date();
+            student.skills[existingSkillIndex].history.push({ score: evaluation.score, date: new Date() });
+          } else {
+            student.skills.push({
+              skillId: topic as any,
+              score: evaluation.score,
+              lastAssessed: new Date(),
+              history: [{ score: evaluation.score, date: new Date() }],
+            });
+          }
+          await student.save();
+        }
+      } catch (err: any) {
+        logger.error('Error persisting assessment evaluation:', err.message);
       }
     }
 
     res.status(200).json({
       success: true,
-      data: { ...data, id: assessmentId },
-      message: 'OK',
+      data: { ...evaluation, id: assessmentId },
+      message: 'Assessment evaluated successfully',
     });
-  } catch (err) {
-    logger.error('evaluateSkill error:', err);
-    res.status(200).json({
-      success: true,
-      data: { score: pct, correct, total, level, weakAreas: [], strengths: ['Core knowledge'], improvementPlan: 'Good job! Continue learning and building real projects.', nextSteps: ['Review concepts', 'Take another quiz'] },
-      message: 'OK',
-    });
+  } catch (err: any) {
+    logger.error('evaluateSkill error:', err.message);
+    res.status(500).json({ success: false, message: 'Failed to evaluate assessment' });
   }
 };
 
-// ── 3.1 GET /api/v1/ai/assessment/:id ───────────────────────────────────────
+// ── 4.  GET /api/v1/ai/assessment/:id ─────────────────────────────────────────
 export const getAssessment = async (req: Request, res: Response): Promise<void> => {
   const { id } = req.params;
   try {
-    const assessment = await Assessment.findById(id).populate('studentId', 'name profilePicture');
+    const assessment = await Assessment.findById(id).populate('studentId', 'name profilePicture email');
     if (!assessment) {
       res.status(404).json({ success: false, message: 'Assessment not found' });
       return;
+    }
+
+    let parsedAnalysis = {};
+    try {
+      parsedAnalysis = JSON.parse(assessment.aiAnalysis || '{}');
+    } catch {
+      parsedAnalysis = { improvementPlan: assessment.aiAnalysis };
     }
 
     res.status(200).json({
@@ -316,115 +256,81 @@ export const getAssessment = async (req: Request, res: Response): Promise<void> 
         total: assessment.totalQuestions,
         completedAt: assessment.completedAt,
         student: assessment.studentId,
-        ...(JSON.parse(assessment.aiAnalysis || '{}')),
+        ...parsedAnalysis,
       },
     });
-  } catch (err) {
-    logger.error('getAssessment error:', err);
+  } catch (err: any) {
+    logger.error('getAssessment error:', err.message);
     res.status(500).json({ success: false, message: 'Failed to retrieve assessment' });
   }
 };
 
-// ── 4.  POST /api/v1/ai/predict-career ────────────────────────────────────────
+// ── 5.  POST /api/v1/ai/predict-career ────────────────────────────────────────
 export const predictCareer = async (req: Request, res: Response): Promise<void> => {
   const { skills = [], interests = [], education = '' } = req.body;
   const user = req.user as any;
-  const userId = user?.id || user?._id || 'anon';
+  const userId = user?._id || user?.id;
 
-  const prompt = `You are an expert Indian career counselor. Based on this student profile, predict top 3 career paths in India.
-Skills: ${skills.join(', ')}
-Interests: ${interests.join(', ')}
-Education: ${education}
-
-Return ONLY valid JSON:
-{
-  "careers": [
-    {
-      "title": "Role Title",
-      "match": 92,
-      "salaryRange": "₹8L–₹16L/year",
-      "growth": "High",
-      "missingSkills": ["skill1", "skill2"],
-      "timeToReady": "2-4 months",
-      "roadmap": ["Step 1", "Step 2", "Step 3"]
-    }
-  ]
-}`;
+  const formattedSkills = Array.isArray(skills)
+    ? skills.map((s) => (typeof s === 'string' ? { skill: s, score: 80 } : s))
+    : [];
 
   try {
-    const result = await aiService.chatWithFallback([{ role: 'user', content: prompt }], {
-      response_format: { type: 'json_object' },
-      temperature: 0.3,
-      max_tokens: 800,
+    const prediction = await aiService.matchCareerPaths({
+      skills: formattedSkills,
+      interests: Array.isArray(interests) ? interests : [interests].filter(Boolean),
+      program: education || 'Computer Science & Engineering',
     });
 
-    let careers: any[] = [];
-    if (result) {
+    // Save to CareerPrediction collection
+    if (userId) {
       try {
-        const parsed = JSON.parse(result);
-        if (Array.isArray(parsed.careers) && parsed.careers.length > 0) careers = parsed.careers;
-      } catch {}
+        await CareerPrediction.create({
+          userId,
+          skills: formattedSkills.map((s: any) => s.skill),
+          interests: Array.isArray(interests) ? interests : [],
+          education: education || 'Technology',
+          careers: prediction.topCareerPaths.map((c) => ({
+            title: c.title,
+            match: c.matchPercent,
+            salaryRange: c.salaryRange,
+            growth: c.growth,
+            missingSkills: c.missingSkills,
+            timeToReady: c.timeToAchieve,
+            roadmap: c.roadmap,
+          })),
+        });
+      } catch (err: any) {
+        logger.error('Failed to save CareerPrediction:', err.message);
+      }
     }
 
-    if (careers.length === 0) {
-      careers = [
-        {
-          title: 'Full-Stack Software Engineer',
-          match: 94,
-          salaryRange: '₹8,00,000 – ₹16,00,000/year',
-          growth: 'High',
-          missingSkills: ['System Design', 'Docker/K8s'],
-          timeToReady: '2-3 months',
-          roadmap: ['Master React.js and Node.js microservices', 'Build end-to-end full-stack SaaS app', 'Complete NSQF Level 5 Certification'],
-        },
-        {
-          title: 'Cloud Solutions Architect',
-          match: 88,
-          salaryRange: '₹10,00,000 – ₹20,00,000/year',
-          growth: 'Exponential',
-          missingSkills: ['AWS Solutions Architecture', 'Terraform CI/CD'],
-          timeToReady: '3-5 months',
-          roadmap: ['Learn container orchestration with Kubernetes', 'Deploy multi-region cloud infrastructure', 'Acquire AWS Cloud Practitioner badge'],
-        },
-        {
-          title: 'AI & Data Systems Engineer',
-          match: 85,
-          salaryRange: '₹9,00,000 – ₹18,00,000/year',
-          growth: 'High',
-          missingSkills: ['PyTorch/TensorFlow', 'Vector Embeddings'],
-          timeToReady: '3-4 months',
-          roadmap: ['Build LLM powered semantic search pipelines', 'Implement RAG architectures with Redis/Pinecone', 'Deploy scalable inference microservices'],
-        },
-      ];
-    }
-
-    res.status(200).json({ success: true, data: { careers }, message: 'OK' });
-  } catch (err) {
-    logger.error('predictCareer error:', err);
     res.status(200).json({
       success: true,
       data: {
-        careers: [
-          {
-            title: 'Full-Stack Developer',
-            match: 90,
-            salaryRange: '₹7L–₹14L/year',
-            growth: 'High',
-            missingSkills: ['Microservices'],
-            timeToReady: '2-3 months',
-            roadmap: ['Build full-stack applications', 'Deploy on cloud'],
-          },
-        ],
+        careers: prediction.topCareerPaths.map((c) => ({
+          title: c.title,
+          match: c.matchPercent,
+          salaryRange: c.salaryRange,
+          growth: c.growth,
+          missingSkills: c.missingSkills,
+          timeToReady: c.timeToAchieve,
+          roadmap: c.roadmap,
+        })),
+        explanation: prediction.aiExplanation,
       },
       message: 'OK',
     });
+  } catch (err: any) {
+    logger.error('predictCareer error:', err.message);
+    res.status(500).json({ success: false, message: 'Career prediction failed' });
   }
 };
 
-// ── 5.  GET /api/v1/ai/market-trends?skill=React ─────────────────────────────
+// ── 6.  GET /api/v1/ai/market-trends?skill=React ─────────────────────────────
 export const marketTrends = async (req: Request, res: Response): Promise<void> => {
   const skill = (req.query.skill as string) ?? 'Software Engineering';
-  const cacheKey = skill.toLowerCase();
+  const cacheKey = skill.toLowerCase().trim();
 
   // Cache hit
   const cached = trendCache.get(cacheKey);
@@ -436,35 +342,24 @@ export const marketTrends = async (req: Request, res: Response): Promise<void> =
   try {
     const result = await aiService.researchIndustryDemand(skill);
     const data = {
-      skill,
-      demand:          result.trendDirection,
-      avgSalary:       result.avgSalaryRange,
-      topCompanies:    result.topEmployers,
-      trendingTopics:  [skill, `${skill} architecture`, `${skill} jobs India`, 'cloud microservices'],
-      jobCount:        '12,500+ active openings',
-      summary:         result.demandSummary,
+      skill: result.skill || skill,
+      demand: result.trendDirection,
+      avgSalary: result.avgSalaryRange,
+      topCompanies: result.topEmployers,
+      trendingTopics: result.trendingTopics,
+      jobCount: result.jobCount,
+      summary: result.demandSummary,
     };
     trendCache.set(cacheKey, { data, ts: Date.now() });
     res.status(200).json({ success: true, data, message: 'OK' });
-  } catch (err) {
-    logger.error('marketTrends error:', err);
-    res.status(200).json({
-      success: true,
-      data: {
-        skill,
-        demand: 'rising',
-        avgSalary: '₹7,00,000 – ₹15,00,000 per annum',
-        topCompanies: ['TCS', 'Infosys', 'Razorpay', 'Swiggy', 'Flipkart'],
-        trendingTopics: [skill, 'Cloud Computing', 'AI Integration'],
-        jobCount: '10,000+',
-        summary: `${skill} is one of the highest demanded competencies across Indian technology hubs.`,
-      },
-      message: 'OK',
-    });
+  } catch (err: any) {
+    logger.error('marketTrends error:', err.message);
+    res.status(500).json({ success: false, message: 'Failed to retrieve market trends' });
   }
 };
 
-export const getChatHistory = async (req: Request, res: Response) => {
+// ── 7.  GET /api/v1/ai/history ────────────────────────────────────────────────
+export const getChatHistory = async (req: Request, res: Response): Promise<void> => {
   try {
     const user = req.user as any;
     const userId = user?.id || user?._id;
@@ -473,10 +368,39 @@ export const getChatHistory = async (req: Request, res: Response) => {
       return;
     }
 
+    if (req.query.clear === 'true') {
+      await ChatSession.findOneAndDelete({ userId });
+      res.json({ success: true, message: 'Chat history cleared', data: [] });
+      return;
+    }
+
     const session = await ChatSession.findOne({ userId }).sort({ updatedAt: -1 });
     res.json({ success: true, data: session?.messages || [] });
-  } catch (err) {
-    logger.error('getChatHistory error:', err);
+  } catch (err: any) {
+    logger.error('getChatHistory error:', err.message);
     res.status(500).json({ success: false, message: 'Failed to fetch chat history' });
+  }
+};
+
+// ── 8.  POST /api/v1/ai/analyze-skills ────────────────────────────────────────
+export const analyzeSkills = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { text, githubUrl, projects, skills, program, nsqfLevel } = req.body;
+    const analysis = await aiService.analyzeSkills({
+      text,
+      githubUrl,
+      projects,
+      skills,
+      program,
+      nsqfLevel,
+    });
+    res.status(200).json({
+      success: true,
+      data: analysis,
+      message: 'AI Skill analysis complete',
+    });
+  } catch (err: any) {
+    logger.error('analyzeSkills error:', err.message);
+    res.status(500).json({ success: false, message: 'Skill analysis failed' });
   }
 };

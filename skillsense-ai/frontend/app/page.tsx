@@ -54,8 +54,6 @@ const DASHBOARDS = [
 /* ── Navbar ── */
 function Navbar() {
     const [scrolled, setScrolled] = useState(false);
-    const [mobileOpen, setMobileOpen] = useState(false);
-
     useEffect(() => {
         const h = () => setScrolled(window.scrollY > 20);
         window.addEventListener('scroll', h);
@@ -65,51 +63,29 @@ function Navbar() {
     return (
         <nav style={{
             position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
-            background: scrolled || mobileOpen ? 'rgba(8,6,15,0.95)' : 'transparent',
-            backdropFilter: scrolled || mobileOpen ? 'blur(16px)' : 'none',
-            borderBottom: scrolled || mobileOpen ? '1px solid rgba(212,168,67,0.15)' : '1px solid transparent',
+            background: scrolled ? 'rgba(8,6,15,0.88)' : 'transparent',
+            backdropFilter: scrolled ? 'blur(16px)' : 'none',
+            borderBottom: scrolled ? '1px solid rgba(212,168,67,0.1)' : '1px solid transparent',
             transition: 'all 0.3s ease',
         }}>
-            <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 20px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <div style={{ width: 34, height: 34, borderRadius: 10, background: `linear-gradient(135deg, ${GOLD}, ${GOLD_L})`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#08060f" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
                     </div>
-                    <span className="font-display" style={{ fontWeight: 800, fontSize: 16, color: '#fff' }}>SkillSense AI</span>
+                    <span className="font-display" style={{ fontWeight: 800, fontSize: 15, color: '#fff' }}>SkillSense AI</span>
                 </div>
-                <div className="hidden md:flex" style={{ gap: 24, alignItems: 'center' }}>
+                <div style={{ display: 'flex', gap: 28, alignItems: 'center' }}>
                     {['Features', 'How It Works', 'Impact', 'Pricing', 'Dashboards'].map(l => (
-                        <a key={l} href={`#${l.toLowerCase().replace(/\s/g, '-')}`} style={{ color: '#94a3b8', fontSize: 13, fontWeight: 500, textDecoration: 'none', transition: 'color 0.2s' }}
+                        <a key={l} href={`#${l.toLowerCase().replace(/\s/g, '-')}`} style={{ color: '#64748b', fontSize: 13, fontWeight: 500, textDecoration: 'none', transition: 'color 0.2s' }}
                             onMouseEnter={e => (e.currentTarget.style.color = '#fff')}
-                            onMouseLeave={e => (e.currentTarget.style.color = '#94a3b8')}>{l}</a>
+                            onMouseLeave={e => (e.currentTarget.style.color = '#64748b')}>{l}</a>
                     ))}
                 </div>
                 <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-                    <Link href="/auth" className="btn-primary" style={{ fontSize: 13, padding: '8px 18px' }}>Login</Link>
-                    <button
-                        onClick={() => setMobileOpen(!mobileOpen)}
-                        aria-label="Toggle navigation menu"
-                        className="md:hidden"
-                        style={{
-                            background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
-                            borderRadius: 8, padding: '6px 10px', color: '#fff', cursor: 'pointer', fontSize: 16,
-                        }}
-                    >
-                        {mobileOpen ? '✕' : '☰'}
-                    </button>
+                    <Link href="/auth" className="btn-primary" style={{ fontSize: 13 }}>Login</Link>
                 </div>
             </div>
-
-            {/* Mobile dropdown */}
-            {mobileOpen && (
-                <div className="md:hidden" style={{ padding: '16px 20px 24px', borderTop: '1px solid rgba(255,255,255,0.06)', background: 'rgba(8,6,15,0.98)', display: 'flex', flexDirection: 'column', gap: 14 }}>
-                    {['Features', 'How It Works', 'Impact', 'Pricing', 'Dashboards'].map(l => (
-                        <a key={l} href={`#${l.toLowerCase().replace(/\s/g, '-')}`} onClick={() => setMobileOpen(false)} style={{ color: '#fff', fontSize: 14, fontWeight: 600, textDecoration: 'none' }}>
-                            {l}
-                        </a>
-                    ))}
-                </div>
-            )}
         </nav>
     );
 }

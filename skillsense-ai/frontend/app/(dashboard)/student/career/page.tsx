@@ -2,57 +2,44 @@
 
 import React from 'react';
 import dynamic from 'next/dynamic';
-import { Rocket } from 'lucide-react';
+import { Compass, Sparkles } from 'lucide-react';
+import { FadeIn } from '@/components/shared/FadeIn';
+import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
+import { AIBadge } from '@/components/ui/AIBadge';
+import { AIInsightCard } from '@/components/ui/AIInsightCard';
 
 const CareerPredictor = dynamic(() => import('@/components/dashboard/CareerPredictor'), {
-    loading: () => <div className="h-96 w-full animate-pulse bg-white/5 rounded-2xl" />,
-    ssr: false,
+  loading: () => <div className="h-80 w-full animate-pulse-slow bg-white/5 rounded-xl border border-white/5" />,
+  ssr: false,
 });
 
-const GOLD = '#D4A843';
-const MUTED = '#A0A0A0';
-const WHITE = '#FFFFFF';
-
 export default function CareerPage() {
-    return (
-        <div style={{ color: WHITE, maxWidth: 960 }}>
-            <div style={{ marginBottom: 32 }}>
-                <h1 style={{ margin: 0, fontSize: 28, fontWeight: 800, display: 'flex', alignItems: 'center' }}>
-                    <Rocket size={32} style={{ color: GOLD, marginRight: 12 }} /> Career <span style={{ color: GOLD, marginLeft: 8 }}>Pathways</span>
-                </h1>
-                <p style={{ margin: '8px 0 0', color: MUTED, fontSize: 16 }}>
-                    AI-matched career trajectories based on your skill profile and market demand
-                </p>
-            </div>
-
-            <CareerPredictor />
-
-            {/* AI insight banner - Moved below predictor or integrated */}
-            <div
-                style={{
-                    padding: '20px',
-                    background: 'rgba(212,168,67,0.05)',
-                    border: '1px solid rgba(212,168,67,0.2)',
-                    borderRadius: 16,
-                    marginTop: 48,
-                    display: 'flex',
-                    gap: 16,
-                    alignItems: 'flex-start',
-                }}
-            >
-                <div style={{ width: 48, height: 48, borderRadius: 12, background: 'rgba(212,168,67,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <span style={{ fontSize: 20, fontWeight: 800, color: GOLD }}>AI</span>
-                </div>
-                <div>
-                    <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: WHITE }}>
-                        Precision Career Mapping
-                    </h3>
-                    <p style={{ margin: '6px 0 0', fontSize: 14, color: MUTED, lineHeight: 1.6 }}>
-                        Our AI analyzes your skills across 50+ dimensions and matches them with real-time job market data 
-                        to provide the most accurate career recommendations and specific growth roadmaps.
-                    </p>
-                </div>
-            </div>
+  return (
+    <ErrorBoundary>
+      <FadeIn style={{ maxWidth: 1040, margin: '0 auto' }}>
+        <div style={{ marginBottom: 24 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+            <AIBadge type="ai" label="PREDICTIVE CAREER ENGINE" />
+          </div>
+          <h1 className="font-display" style={{ fontSize: 26, fontWeight: 800, color: '#f8fafc', margin: 0 }}>
+            Career Pathways & Workforce Alignment
+          </h1>
+          <p style={{ color: 'var(--text-secondary)', fontSize: 13.5, marginTop: 4 }}>
+            AI-matched career trajectories calibrated against your evaluated NSQF skill profile and hiring signals across India.
+          </p>
         </div>
-    );
+
+        <CareerPredictor />
+
+        <div style={{ marginTop: 28 }}>
+          <AIInsightCard
+            title="Precision Workforce Calibration"
+            badgeText="AI METHODOLOGY"
+            insight="SkillSense neural matching compares student capability across 50+ granular competency dimensions against real-time job market requisitions from top Indian IT enterprises (TCS, Infosys, Wipro, Swiggy, Razorpay) to predict the most viable high-growth trajectories."
+            category="Algorithmic Matching"
+          />
+        </div>
+      </FadeIn>
+    </ErrorBoundary>
+  );
 }

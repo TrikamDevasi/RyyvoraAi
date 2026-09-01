@@ -21,6 +21,7 @@ import governanceRouter from './routes/governance.routes';
 import adminRouter from './routes/admin.routes';
 import aiRouter from './routes/ai.routes';
 import contactRouter from './routes/contact.routes';
+import assessmentRouter from './routes/assessment.routes';
 
 const app = express();
 
@@ -146,6 +147,7 @@ app.use('/api/v1/industry', industryRouter);
 app.use('/api/v1/analytics', analyticsRouter);
 app.use('/api/v1/governance', governanceRouter);
 app.use('/api/v1/admin', adminRouter);
+app.use('/api/v1/assessments', assessmentRouter);
 
 // ── 404 Handler ────────────────────────────────────────────────────────────
 app.use((_req, res) => {

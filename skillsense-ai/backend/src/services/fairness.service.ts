@@ -1,13 +1,6 @@
-// backend/src/services/fairness.service.ts
-
-import OpenAI from 'openai';
+import { aiService } from './ai.service';
 import logger from '../utils/logger';
 
-// ── OpenAI Client ─────────────────────────────────────────────────────────────
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
 
 // ── Interfaces ────────────────────────────────────────────────────────────────
 
@@ -247,16 +240,19 @@ Return ONLY valid JSON:
   "recommendations": ["<actionable step to mitigate each bias>"]
 }`.trim();
 
-      const completion = await openai.chat.completions.create({
-        model: 'gpt-4o-mini',
-        messages: [{ role: 'user', content: prompt }],
-        response_format: { type: 'json_object' },
-        temperature: 0.2,
-        max_tokens: 500,
-      });
+      const content = await aiService.chatWithFallback(
+        [
+          { role: 'system', content: 'You are an objective AI fairness and bias auditor. Output valid JSON only.' },
+          { role: 'user', content: prompt },
+        ],
+        {
+          response_format: { type: 'json_object' },
+          temperature: 0.2,
+          max_tokens: 500,
+        }
+      );
 
-      const content = completion.choices[0]?.message?.content ?? '{}';
-      const parsed  = JSON.parse(content);
+      const parsed = JSON.parse(content || '{}');
 
       return {
         isFair:          parsed.isFair          ?? true,

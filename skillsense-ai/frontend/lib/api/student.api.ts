@@ -21,11 +21,12 @@ export interface StudentProfile {
     skillId?: {
       _id: string;
       name: string;
-      domain: string;
-      nsqfLevel: number;
+      domain?: string;
+      nsqfLevel?: number;
     } | string;
     score: number;
     lastAssessed: string;
+    history?: { score: number; date: string }[];
   }[];
   careerPathways?: string[];
   passportHash?: string;
@@ -35,6 +36,13 @@ export interface StudentProfile {
     createdAt: string;
     isRead: boolean;
   }[];
+}
+
+export interface SkillAnalysisPayload {
+  text?: string;
+  githubUrl?: string;
+  projects?: string[];
+  skills?: string[];
 }
 
 export const studentApi = {
@@ -53,8 +61,23 @@ export const studentApi = {
     return response.data.data;
   },
 
-  submitAssessment: async (studentId: string, payload: { skillId?: string; responses: any[]; score: number }) => {
+  analyzeSkills: async (payload: SkillAnalysisPayload) => {
+    const response = await api.post('/students/analyze-skills', payload);
+    return response.data.data;
+  },
+
+  submitAssessment: async (studentId: string, payload: { skillId?: string; category?: string; responses: any[]; score?: number }) => {
     const response = await api.post(`/students/${studentId}/assessments`, payload);
+    return response.data.data;
+  },
+
+  submitAssessmentDirect: async (payload: { category: string; score: number; totalQuestions: number; aiAnalysis?: any }) => {
+    const response = await api.post('/assessments/submit', payload);
+    return response.data.data;
+  },
+
+  getAssessmentHistory: async () => {
+    const response = await api.get('/assessments/history');
     return response.data.data;
   },
 
