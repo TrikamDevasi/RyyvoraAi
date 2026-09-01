@@ -1,5 +1,5 @@
-// backend/src/services/providers/index.ts
 import { AIProvider, ChatMessage, CompletionOptions, ProviderHealth, ProviderState } from './types';
+import { GeminiProvider } from './GeminiProvider';
 import { GroqProvider } from './GroqProvider';
 import { OpenAIProvider } from './OpenAIProvider';
 import { PerplexityProvider } from './PerplexityProvider';
@@ -7,6 +7,7 @@ import logger from '../../utils/logger';
 
 export * from './types';
 export * from './jsonRepair';
+export * from './GeminiProvider';
 export * from './GroqProvider';
 export * from './OpenAIProvider';
 export * from './PerplexityProvider';
@@ -32,6 +33,7 @@ export class AIProviderManager {
 
   reloadProviders(): void {
     this.providers = [
+      new GeminiProvider(),
       new GroqProvider(),
       new OpenAIProvider(),
       new PerplexityProvider(),

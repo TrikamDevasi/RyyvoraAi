@@ -23,6 +23,7 @@ const envSchema = z.object({
   GMAIL_APP_PASSWORD: z.string().optional(),
   
   // AI Keys
+  GEMINI_API_KEY: z.string().optional(),
   OPENAI_API_KEY: z.string().optional(),
   PERPLEXITY_API_KEY: z.string().optional(),
   GROQ_API_KEY: z.string().optional(),
