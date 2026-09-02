@@ -28,7 +28,9 @@ import {
   Bot,
   ExternalLink,
   Briefcase,
+  Milestone,
 } from 'lucide-react';
+
 import { AIBadge } from '@/components/ui/AIBadge';
 
 export default function LandingPage() {
@@ -148,8 +150,8 @@ export default function LandingPage() {
             transition={{ duration: 0.5 }}
             style={{ display: 'inline-flex', alignItems: 'center', gap: 8, marginBottom: 20 }}
           >
-            <AIBadge type="live" label="NEXT-GEN WORKFORCE INTELLIGENCE" />
-            <AIBadge type="nsqf" label="NSQF LEVEL ALIGNED" />
+            <AIBadge type="live" label="SMART INDIA HACKATHON 2026 · PS SIH26135" />
+            <AIBadge type="nsqf" label="GOVERNMENT OF MAHARASHTRA" />
           </motion.div>
 
           {/* Main Headline */}
@@ -159,17 +161,17 @@ export default function LandingPage() {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="font-display"
             style={{
-              fontSize: 'clamp(32px, 5.5vw, 62px)',
+              fontSize: 'clamp(32px, 5.5vw, 60px)',
               fontWeight: 900,
               lineHeight: 1.12,
               letterSpacing: '-0.03em',
-              maxWidth: 960,
+              maxWidth: 980,
               margin: '0 auto 20px',
               color: '#f8fafc',
             }}
           >
-            AI-Powered Skill Intelligence Connecting{' '}
-            <span className="text-gradient-gold">Education, Careers & Industry</span>
+            From Training Data to{' '}
+            <span className="text-gradient-gold">Real Employment Outcomes</span>
           </motion.h1>
 
           {/* Subheadline */}
@@ -180,37 +182,46 @@ export default function LandingPage() {
             style={{
               fontSize: 'clamp(15px, 1.8vw, 18px)',
               color: 'var(--text-secondary)',
-              maxWidth: 720,
+              maxWidth: 780,
               margin: '0 auto 36px',
               lineHeight: 1.6,
             }}
           >
-            Extract granular competencies from code and resumes, predict high-growth career trajectories in India, and issue cryptographically verifiable NSQF Skill Passports.
+            SkillSense connects vocational training, NSQF assessments, employment transitions, 365-day retention, and longitudinal wage growth into one privacy-conscious intelligence platform.
           </motion.p>
 
-          {/* CTA Buttons */}
+          {/* CTA Buttons & Role Portals */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            style={{ display: 'flex', justifyContent: 'center', gap: 14, flexWrap: 'wrap', marginBottom: 50 }}
+            style={{ display: 'flex', justifyContent: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 40 }}
           >
             <Link
-              href="/student/analyzer"
+              href="/government"
               className="btn-gold"
-              style={{ fontSize: 14, padding: '12px 28px', boxShadow: '0 4px 20px rgba(245,158,11,0.3)' }}
+              style={{ fontSize: 13.5, padding: '12px 24px', boxShadow: '0 4px 20px rgba(245,158,11,0.3)' }}
             >
-              <Brain size={16} /> Analyze My Skills Free <ArrowRight size={15} />
+              <Landmark size={16} /> Government State Cockpit <ArrowRight size={15} />
             </Link>
 
             <Link
-              href="/student"
+              href="/student/journey"
               className="btn-secondary"
-              style={{ fontSize: 14, padding: '12px 26px' }}
+              style={{ fontSize: 13.5, padding: '12px 22px' }}
             >
-              Explore Live Intelligence Dashboard
+              <Milestone size={16} /> Trainee Outcome Journey
+            </Link>
+
+            <Link
+              href="/employer/validations"
+              className="btn-secondary"
+              style={{ fontSize: 13.5, padding: '12px 22px' }}
+            >
+              <ShieldCheck size={16} /> Employer Verification Ledger
             </Link>
           </motion.div>
+
 
           {/* ── Realistic Product Dashboard Preview ── */}
           <motion.div

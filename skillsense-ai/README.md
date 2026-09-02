@@ -2,9 +2,11 @@
 
 # ⚡ SkillSense AI
 
-### **Next-Gen AI-Powered Skill Assessment, Career Prediction & Workforce Intelligence Platform**
+### **Smart India Hackathon 2026 · Problem Statement SIH26135**
+#### **Organization:** Government of Maharashtra  
+#### **Theme:** Miscellaneous | **Category:** Software
 
-*Bridging the gap between Education, Industry, and Governance with verifiable competencies, multi-provider AI reasoning, and premium workforce analytics.*
+> *"Difficulties in tracking employment outcomes, skill gaps, and the impact of skilling initiatives"*
 
 [![Next.js](https://img.shields.io/badge/Next.js-16.x-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-19.x-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://react.dev/)
@@ -13,9 +15,8 @@
 [![Express](https://img.shields.io/badge/Express-5.x-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
 [![MongoDB](https://img.shields.io/badge/MongoDB-Mongoose-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
 [![Redis](https://img.shields.io/badge/Redis-ioredis-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 
-**Developed with 💡 by Team Quantum Coders**
+**Developed with 💡 by Team Quantum Coders for Smart India Hackathon 2026**
 
 ---
 
@@ -23,333 +24,253 @@
 
 ## 📌 Table of Contents
 
-- [🌟 Executive Summary](#-executive-summary)
-- [✨ Key Capabilities](#-key-capabilities)
-- [🎨 Modern SaaS Design System](#-modern-saas-design-system)
-- [🤖 Multi-Provider AI Architecture](#-multi-provider-ai-architecture)
-- [👥 Multi-Stakeholder Ecosystem](#-multi-stakeholder-ecosystem)
+- [🏛️ The Problem & SIH26135 Alignment](#️-the-problem--sih26135-alignment)
+- [🌟 Longitudinal Skilling Outcome Pipeline](#-longitudinal-skilling-outcome-pipeline)
+- [✨ Key Platform Capabilities](#-key-platform-capabilities)
+- [👥 Four Stakeholder Cockpits](#-four-stakeholder-cockpits)
+- [🛡️ DPDP Act 2023 Consent & Privacy Center](#️-dpdp-act-2023-consent--privacy-center)
+- [🤖 Multi-Provider AI Architecture & Policy Copilot](#-multi-provider-ai-architecture--policy-copilot)
 - [🏗️ System Architecture](#️-system-architecture)
-- [🛠️ Tech Stack](#️-tech-stack)
-- [🚀 Getting Started](#-getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-  - [Environment Configuration](#environment-configuration)
-  - [Database Seeding & Demo Accounts](#database-seeding--demo-accounts)
-  - [Running the Application](#running-the-application)
-- [🧪 Testing & Quality Assurance](#-testing--quality-assurance)
-- [🛡️ Security, Fairness & Governance](#️-security-fairness--governance)
-- [📡 API Reference](#-api-reference)
+- [🔑 Hackathon Demo Credentials](#-hackathon-demo-credentials)
+- [🚀 Getting Started (Local Development)](#-getting-started-local-development)
+- [🧪 Automated Test Suites & Verification](#-automated-test-suites--verification)
+- [🌐 Production Deployment Guide (Vercel + Render)](#-production-deployment-guide-vercel--render)
 - [📂 Project Structure](#-project-structure)
-- [📄 License & Credits](#-license--credits)
 
 ---
 
-## 🌟 Executive Summary
+## 🏛️ The Problem & SIH26135 Alignment
 
-**SkillSense AI** is a comprehensive workforce intelligence and skill analytics platform engineered to eliminate the disconnect between academia and industry in India. By leveraging resilient multi-provider Large Language Models (Groq Cloud, OpenAI GPT-4o, Perplexity Sonar), multi-factor competency modeling, real-time assessment sandboxes, and cryptographic digital passports, SkillSense delivers transparent, verifiable, and bias-audited skill pathways for learners, academic institutions, enterprises, and policymakers.
+Traditional vocational training tracking in India ends at course completion or initial placement numbers. State directorates lack **longitudinal verification**, resulting in:
+1. **Unverified Placement Claims**: Self-reported numbers inflated without employer validation.
+2. **Invisible Career Trajectories**: Zero visibility into 90-day, 180-day, and 365-day job retention or wage growth.
+3. **Curriculum & Geographic Disconnect**: High training numbers in trades that lack local industry demand.
+4. **Data Privacy Deficits**: Lack of explicit consent handling required under India's **DPDP Act 2023**.
 
----
-
-## ✨ Key Capabilities
-
-- **🧠 Deep Semantic AI Skill Analyzer**: Performs deep neural extraction across resumes, GitHub repositories, and submitted code/projects across 50+ competency vectors calibrated to NSQF levels.
-- **📜 Cryptographic Skill Passport**: Generates SHA-256 HMAC-signed, tamper-proof digital credentials that can be verified and shared publicly.
-- **🎯 Predictive Career Pathways & Salary Mapping**: ML-backed role matching and transparent compensation forecasting in INR aligned with Indian IT benchmarks.
-- **📊 Dynamic Gap Analysis & Roadmap Engine**: Pinpoints missing skills against targeted job descriptions and generates step-by-step upskilling roadmaps.
-- **⚖️ Algorithmic Fairness & Bias Governance Engine**: Monitors disparate impact ratios (80% / 4/5ths rule), demographic parity, and regional/gender equity.
-- **💬 Real-Time AI Copilot**: Native conversational assistant embedded in the student dashboard with streaming typewriter responses and session history.
-- **⚡ Distraction-Free Assessment Engine**: Adaptive topic quizzes, keyboard navigation (`A`, `B`, `C`, `D`), instant grading, and automated passport ledger updates.
+**SkillSense AI** solves this by creating a unified, privacy-first **Longitudinal Skilling & Outcome Intelligence Platform** for the Government of Maharashtra.
 
 ---
 
-## 🎨 Modern SaaS Design System
+## 🌟 Longitudinal Skilling Outcome Pipeline
 
-SkillSense AI features a **Linear/Vercel/Stripe-inspired** dark-first design system:
-- **Obsidian Dark Palette**: `#090A0F` background, `#0F111A` card surfaces, and `#151824` elevated popovers.
-- **Linear Borders & Restrained Accents**: 1px crisp borders (`rgba(255, 255, 255, 0.08)`) with refined amber accents (`#F59E0B` / `#D97706`).
-- **Typography Hierarchy**: `Inter` body text, `Space Grotesk` metric display headers, and `JetBrains Mono` for hash signatures and telemetry.
-- **Specialized AI Visual Language**:
-  - `AIInsightCard`: Prominent intelligence briefing banner with actionable next steps.
-  - `ConfidenceScore`: Model confidence rating (0-100%) indicator.
-  - `ScanningState`: Laser scan pulse animation during active AI inference.
-  - `AIBadge`: Subtle status tags (`AI ASSISTED`, `VERIFIED CREDENTIAL`, `LIVE TELEMETRY`, `NSQF LEVEL 4`).
-  - `EmptyState` & `ErrorState`: Purposeful contextual error diagnosis and recovery actions.
-
----
-
-## 🤖 Multi-Provider AI Architecture
+SkillSense connects every phase of the vocational lifecycle:
 
 ```
-User Prompt / Assessment / Profile
-              │
-              ▼
-   [ AIProviderManager ]
-              │
-   ┌──────────┼──────────┐
-   ▼          ▼          ▼
-[ Groq ]  [ OpenAI ]  [ Perplexity ]
- (Llama)   (GPT-4o)     (Sonar)
-   │          │          │
-   └──────────┼──────────┘
-              ▼
-    [ jsonRepair & Zod ]
-   (Markdown Strip, Regex,
-    Trailing Comma Fix)
-              │
-              ▼
-  Typed Verified Result
-```
-
-- **Resilient Fallback**: Automatic failover chain from Groq $\to$ OpenAI $\to$ Perplexity $\to$ typed fallback.
-- **Safe JSON Repair**: Strips markdown backticks (````json ... ````), isolates JSON boundaries, and fixes trailing commas.
-- **Strict Zod Validation**: Validates all structured LLM responses against runtime schemas.
-
----
-
-## 👥 Multi-Stakeholder Ecosystem
-
-| Role | Core Capabilities |
-| :--- | :--- |
-| **🎓 Students** | Skill scoring, verified Skill Passport, AI resume parser, gap roadmaps, career predictions, interactive quizzes, job recommendations. |
-| **🏛️ Institutions** | Cohort skill benchmarking, curriculum gap detection, batch analytics, placement readiness index, automated institutional reports. |
-| **🏢 Industry / Employers** | Precision skill search, verified candidate talent pools, automated candidate matching, direct inquiry & contact workflow. |
-| **🏛️ Government** | Macro-economic skill intelligence, regional talent supply/demand heatmaps, policy impact simulation, national workforce forecasting. |
-| **🛡️ Administrators** | System health diagnostics, multi-provider AI latency tracking, audit logs, user management, and security governance. |
-
----
-
-## 🏗️ System Architecture
-
-```mermaid
-graph TD
-    Client["Next.js 16 Client App (Turbopack + Tailwind + Framer Motion)"]
-    
-    subgraph Gateway & Middleware
-        RateLimit["Rate Limiter (ioredis)"]
-        HelmetCors["Helmet + Strict CORS"]
-        AuthMid["JWT & Passport Authentication"]
-    end
-    
-    subgraph Express.js Backend API
-        AuthRoutes["/api/v1/auth"]
-        StudentRoutes["/api/v1/students"]
-        InstituteRoutes["/api/v1/institutes"]
-        IndustryRoutes["/api/v1/industry"]
-        GovRoutes["/api/v1/governance"]
-        AIRoutes["/api/v1/ai"]
-        AssessmentRoutes["/api/v1/assessments"]
-        AnalyticsRoutes["/api/v1/analytics"]
-    end
-
-    subgraph Intelligence & Services
-        AIService["AI Engine (Groq / OpenAI / Perplexity)"]
-        PassportService["Skill Passport (SHA-256 Signing)"]
-        FairnessService["Fairness & Disparate Impact Engine"]
-    end
-
-    subgraph Data Layer
-        MongoDB[(MongoDB Database)]
-        Redis[(Redis Cache)]
-    end
-
-    Client --> Gateway
-    Gateway --> Express.js Backend API
-    Express.js Backend API --> Intelligence & Services
-    Express.js Backend API --> Data Layer
-    Intelligence & Services --> Data Layer
+TRAINEE ──► TRAINING PROGRAM ──► ASSESSMENT ──► CERTIFICATION (SHA-256)
+                                                        │
+┌───────────────────────────────────────────────────────┘
+▼
+PLACEMENT / SELF-EMPLOYMENT / APPRENTICESHIP ──► EMPLOYER VERIFICATION LEDGER
+                                                        │
+┌───────────────────────────────────────────────────────┘
+▼
+30d-365d FOLLOW-UPS ──► 90d RETENTION ──► WAGE PROGRESSION (+22%) ──► AI POLICY COPILOT
 ```
 
 ---
 
-## 🛠️ Tech Stack
+## ✨ Key Platform Capabilities
 
-### Frontend
-- **Framework**: Next.js 16 (App Router, Turbopack)
-- **UI Library**: React 19
-- **Language**: TypeScript 5
-- **Styling**: Tailwind CSS & Vanilla CSS Design System
-- **State Management**: Zustand
-- **Data Fetching**: TanStack React Query + Axios
-- **Animations**: Framer Motion
-- **Visualizations**: Recharts (Radar, Area, Bar, Composed charts)
-- **Icons**: Lucide React
+1. **📜 Verifiable NSQF Skill Passport**:
+   - Cryptographic SHA-256 HMAC-signed credentials verifiable publicly via URL and QR code.
+   - Transparent competency breakdowns linked to NSQF qualification tiers.
 
-### Backend
-- **Runtime**: Node.js 20+
-- **Framework**: Express 5
-- **Language**: TypeScript 5
-- **Database**: MongoDB + Mongoose 8
-- **Cache & Rate Limiting**: Redis (ioredis)
-- **Authentication**: JWT (JSON Web Tokens) + Bcrypt.js + Passport
-- **AI Integrations**: Groq SDK (`llama-3.3-70b-versatile`, `llama-3.1-8b-instant`), OpenAI SDK (`gpt-4o-mini`, `gpt-4o`), Perplexity API (`sonar`)
-- **Validation**: Zod
-- **Security**: Helmet, CORS, Express Rate Limit, Mongo Sanitize
+2. **⏳ Trainee Longitudinal Milestone Ledger (`/student/journey`)**:
+   - Visual milestone timeline tracing Enrollment $\to$ Assessment $\to$ Certification $\to$ Placement $\to$ Retention Checks.
+   - Interactive self-reporting modal for Salaried Employment, Self-Employment, Apprenticeship, or Non-Placement Barriers.
+   - Automated 30d, 90d, and 365d survey submission modals.
+
+3. **🏛️ Maharashtra State Skilling Intelligence Cockpit (`/government`)**:
+   - **9-Stage Outcome Funnel**: Live MongoDB conversion telemetry from enrolled to 365-day retention.
+   - **9-District Intelligence Drilldown**: Real-time metrics across Pune, Mumbai Suburban, Nagpur, Nashik, Chhatrapati Sambhaji Nagar, Thane, Solapur, Kolhapur, and Amravati.
+   - **Small-Sample Protection ($N < 5$)**: Suppresses unreliable micro-rankings to protect candidate privacy and statistical validity.
+   - **Longitudinal Wage Progression Curve**: Visualizes salary growth (+22% average increase from ₹25,174 to ₹34,200).
+   - **Evidence-Based Policy Interventions**: Actionable directives for local industrial clusters.
+
+4. **💼 Employer Validation Queue (`/employer/validations`)**:
+   - 1-click **Verify Placement**, **Reject Claim**, and **Request Correction** workflows that upgrade claim confidence to 98%+.
+
+5. **🤖 Grounded AI Policy Copilot (`/api/v1/ai/policy-copilot`)**:
+   - Query engine grounded strictly in live MongoDB aggregation metrics with zero hallucinations.
 
 ---
 
-## 🚀 Getting Started
+## 👥 Four Stakeholder Cockpits
 
-### Prerequisites
+| Persona | Role Key | Dashboard Route | Core Capability |
+| :--- | :--- | :--- | :--- |
+| **State Government** | `government` | `/government` | Outcome funnel, district intelligence, wage curve, AI policy copilot. |
+| **Training Institute** | `institute` | `/institute` | Batch upload, cohort retention rates, curriculum relevance analytics. |
+| **Trainee / Student** | `student` | `/student/journey` | Verifiable milestone timeline, self-report modal, DPDP privacy center. |
+| **Hiring Employer** | `employer` | `/employer/validations`| Candidate verification ledger, skill-matched talent pool. |
 
-- **Node.js**: v20.x or later
-- **npm**: v10.x or later
-- **MongoDB**: Local instance running on port 27017 or a MongoDB Atlas URI
-- **Redis**: Local instance on port 6379 or Redis Cloud instance
+---
 
-### Installation
+## 🛡️ DPDP Act 2023 Consent & Privacy Center
 
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/TrikamDevasi/TEAM_QUANTUM_CODERS-SU-.git
-   cd TEAM_QUANTUM_CODERS-SU-/skillsense-ai
-   ```
+Built directly to comply with India's **Digital Personal Data Protection (DPDP) Act 2023**:
+- **5-Pillar Transparency**: Explains WHAT is collected, WHY, WHO has access, HOW long it is retained, and HOW consent can be withdrawn.
+- **Granular Consent Toggles**:
+  - `outcome_tracking`: Longitudinal career tracking.
+  - `employer_verification`: Employer verification access.
+  - `longitudinal_followup`: Post-certification surveys.
+  - `salary_benchmarking`: Anonymized wage analytics.
+  - `policy_analytics`: State policy feedback.
+- **Audit Trail**: Full cryptographic history of every grant and withdrawal event.
 
-2. **Install Root, Backend, and Frontend Dependencies**:
-   ```bash
-   # Install backend dependencies
-   cd backend
-   npm install
+---
 
-   # Install frontend dependencies
-   cd ../frontend
-   npm install
-   ```
+## 🤖 Multi-Provider AI Architecture & Policy Copilot
 
-### Environment Configuration
+SkillSense features an intelligent multi-provider LLM manager with automated runtime health probes, strict Zod validation, and zero-hallucination guarantees:
 
-Configure environment variables in both `backend/.env` and `frontend/.env.local`.
+```
+Request ──► AIProviderManager ──► [ Groq Cloud (Primary) ] ──► Healthy (788ms)
+                                       │ (if failed)
+                                       ▼
+                                [ Google Gemini ]
+                                       │ (if failed)
+                                       ▼
+                                [ OpenAI GPT-4o ]
+                                       │ (if failed)
+                                       ▼
+                               [ Perplexity Sonar ]
+```
 
-#### Backend (`backend/.env`):
+---
+
+## 🔑 Hackathon Demo Credentials
+
+Pre-seeded accounts ready for jury evaluation:
+
+| Role | Email | Password | Access URL |
+| :--- | :--- | :--- | :--- |
+| **State Government** | `government@skillsense.demo` | `Demo@1234` | `/government` |
+| **Training Provider** | `provider@skillsense.demo` | `Demo@1234` | `/institute` |
+| **Trainee** | `trainee@skillsense.demo` | `Demo@1234` | `/student/journey` |
+| **Employer** | `employer@skillsense.demo` | `Demo@1234` | `/employer/validations` |
+| **System Admin** | `admin@skillsense.demo` | `Demo@1234` | `/admin` |
+
+*(OAuth with **GitHub** and **Google** is also supported on `/auth`).*
+
+---
+
+## 🚀 Getting Started (Local Development)
+
+### 1. Clone & Install Dependencies
+```bash
+git clone https://github.com/TrikamDevasi/TEAM_QUANTUM_CODERS-SU-.git
+cd TEAM_QUANTUM_CODERS-SU-/skillsense-ai
+
+# Install root, backend, and frontend dependencies
+npm run install:all
+```
+
+### 2. Configure Environment Variables
+- In `backend/.env`:
 ```env
 PORT=5000
 NODE_ENV=development
-CLIENT_URL=http://localhost:5173
-ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3000
-MONGODB_URI=mongodb://localhost:27017/skillsense
-REDIS_URL=redis://localhost:6379
-JWT_SECRET=your_super_secret_jwt_key_here
-JWT_EXPIRES_IN=7d
-PASSPORT_SECRET=your_passport_hmac_secret_here
-
-# AI Provider Keys
-GROQ_API_KEY=your_groq_api_key_here
-OPENAI_API_KEY=your_openai_api_key_here
-PERPLEXITY_API_KEY=your_perplexity_api_key_here
+MONGODB_URI=mongodb://127.0.0.1:27017/skillsense
+FRONTEND_URL=http://localhost:3000
+CORS_ORIGIN=http://localhost:3000,http://localhost:5173
+JWT_SECRET=skillsense_jwt_secret_key_32_chars_min
+SESSION_SECRET=skillsense_session_secret_key_32_chars
+PASSPORT_SECRET=skillsense-passport-verification-secret
+GROQ_API_KEY=your_groq_api_key
+GITHUB_CLIENT_ID=your_github_client_id
+GITHUB_CLIENT_SECRET=your_github_client_secret
 ```
-
-#### Frontend (`frontend/.env.local`):
+- In `frontend/.env.local`:
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:5000/api/v1
+NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
-### Running the Application
-
-In separate terminal windows:
-
+### 3. Seed Realistic Maharashtra Outcome Data
 ```bash
-# Start Backend (Port 5000)
-cd backend
-npm run dev
+npm --prefix backend run seed:outcomes
+```
 
-# Start Frontend (Port 5173 with Turbopack)
-cd frontend
+### 4. Run Development Servers
+```bash
 npm run dev
 ```
-
-Navigate to `http://localhost:5173` to explore SkillSense AI.
+- **Frontend App**: [http://localhost:3000](http://localhost:3000)
+- **Backend API**: [http://localhost:5000/health](http://localhost:5000/health)
+- **AI Diagnostics**: [http://localhost:3000/ai-health](http://localhost:3000/ai-health)
 
 ---
 
-## 🧪 Testing & Quality Assurance
+## 🧪 Automated Test Suites & Verification
 
-SkillSense AI includes an end-to-end automated test runner covering all architectural layers:
-
+Run the comprehensive 6-stage backend automated test runner:
 ```bash
-cd backend
-npm test
+npm --prefix backend test
 ```
 
-### Test Matrix
+### Verified Test Suites (6/6 Passing):
+1. **Authentication Tests**: Argon2 password hashing, JWT generation, demo role verification.
+2. **Authorization & RBAC Tests**: Role access control, multi-tenant institute isolation, IDOR guards.
+3. **Algorithmic Fairness & Bias Tests**: 4/5ths Rule (80% Disparate Impact Ratio) across genders and districts.
+4. **AI Multi-Provider Fallback Tests**: Groq, Gemini, OpenAI, Perplexity failover checks.
+5. **SIH26135 Longitudinal Outcomes & Policy Copilot Tests**: 9-stage funnel, district intelligence with small-sample protection, wage curves, and grounded citations.
+6. **Express Route & Security Integration Tests**: CORS security, Helmet headers, mass-assignment Zod validation.
+
+---
+
+## 🌐 Production Deployment Guide (Vercel + Render)
+
+- **Frontend Deployment (Vercel)**:
+  - Framework: Next.js (App Router)
+  - `NEXT_PUBLIC_API_URL=https://skillsense-backend.onrender.com/api/v1`
+  - `NEXT_PUBLIC_APP_URL=https://skillsense-ai-seven.vercel.app`
+- **Backend Deployment (Render / Railway)**:
+  - Build Command: `npm install && npm run build`
+  - Start Command: `npm start`
+  - `FRONTEND_URL=https://skillsense-ai-seven.vercel.app`
+  - `CORS_ORIGIN=https://skillsense-ai-seven.vercel.app`
+  - `GITHUB_CALLBACK_URL=https://skillsense-backend.onrender.com/api/v1/auth/github/callback`
+
+---
+
+## 📂 Project Structure
 
 ```
-====================================================
-🚀 SkillSense AI Backend Automated Test Runner
-====================================================
-
-🧪 Running Authentication & Password Security Tests...
-  ✅ Password hashing & verification working
-  ✅ JWT token signing & verification working
-  ✅ Auth token extraction & decoding working
-
-🧪 Running Role-Based Authorization Tests...
-  ✅ Student role permissions enforced
-  ✅ Institute multi-tenant isolation enforced
-  ✅ Government role policy checks verified
-  ✅ Admin privileged access verified
-
-🧪 Running NSQF Alignment & Fairness Math Tests...
-  ✅ NSQF Level 4 mapped to Advanced Diploma tier
-  ✅ Demographic parity metric computed
-  ✅ Disparate impact ratio 4/5ths rule verified
-
-🧪 Running AI Provider, Schemas, Fallback & Service Tests...
-  ✅ AI Provider hierarchy registered (Groq, OpenAI, Perplexity)
-  ✅ Markdown code fence extraction & stripping passed
-  ✅ Trailing comma cleanup passed
-  ✅ SkillAnalysisSchema Zod validation passed
-  ✅ CareerPredictionSchema Zod validation passed
-  ✅ GapAnalysisSchema Zod validation passed
-  ✅ AssessmentGenerationSchema Zod validation passed
-  ✅ AssessmentEvaluationSchema Zod validation passed
-  ✅ AIService.analyzeSkills returned score: 78/100 with 4 competencies
-  ✅ AIService.testConnectivity reports all 3 provider telemetries
-
-🧪 Running Express Route, Security & Authorization Integration Tests...
-  ✅ Root & Health endpoints operational
-  ✅ Trusted CORS origin accepted with Access-Control-Allow-Origin
-  ✅ Untrusted CORS origin blocked from credentialed access
-  ✅ Public privilege escalation (admin self-registration) blocked with 400
-  ✅ Unauthenticated request blocked with 401
-  ✅ Student accessing admin route blocked with 403
-  ✅ Analytics student IDOR guarded with 403 Forbidden
-  ✅ Institute multi-tenancy isolation enforced (403 Forbidden)
-  ✅ Mass assignment attack rejected with 400 (strict schema validation)
-
-====================================================
-🎉 ALL AUTOMATED INTEGRATION, UNIT & AI TESTS PASSED! (5/5)
-====================================================
+skillsense-ai/
+├── backend/
+│   ├── src/
+│   │   ├── config/          # Database, Redis, Passport, Cloudinary, Env schemas
+│   │   ├── controllers/     # Outcome, Consent, Followup, Verification, AI, Auth
+│   │   ├── models/          # OutcomeTimeline, EmploymentOutcome, Consent, FollowUp, PolicyIntervention
+│   │   ├── services/        # outcome.service, policyCopilot.service, consent.service, followup.service
+│   │   ├── routes/          # Express API route definitions (/api/v1/...)
+│   │   ├── scripts/         # seedLongitudinalOutcomes.ts (Realistic Maharashtra dataset)
+│   │   └── utils/           # Logger, JWT, fairness auditor
+│   └── tests/               # 6-suite automated test runner
+├── frontend/
+│   ├── app/
+│   │   ├── (dashboard)/
+│   │   │   ├── government/  # Maharashtra State Outcome Cockpit & Funnel
+│   │   │   ├── student/
+│   │   │   │   ├── journey/ # Trainee Longitudinal Milestones & Self-Report
+│   │   │   │   └── consent/ # DPDP Act 2023 Consent Center
+│   │   │   ├── employer/
+│   │   │   │   └── validations/ # Employer Candidate Verification Queue
+│   │   │   └── institute/   # Training Provider Analytics & Upload
+│   │   ├── ai-health/       # Real-Time Multi-Provider Telemetry & Latency
+│   │   ├── verify/[hash]/   # Public Cryptographic Skill Passport Verifier
+│   │   ├── auth/            # Auth & OAuth Callback handler
+│   │   └── page.tsx         # SIH26135 Public Landing Page
+│   └── components/          # UI design system components, charts, and widgets
+└── README.md
 ```
 
 ---
 
-## 🛡️ Security, Fairness & Governance
+<div align="center">
 
-- **Credential Isolation**: All LLM API keys remain strictly on the backend.
-- **Rate Limiting**: Tiered endpoint rate limiting with Redis backing (`100 req/15min` general, `30 req/min` AI inference).
-- **IDOR Protection**: Strict student ownership middleware ensuring candidates can only access/modify their own ledgers.
-- **Fairness Governance**: Automated bias auditing tracking demographic parity across Indian states, genders, and institutional categories.
+**Smart India Hackathon 2026 · Problem Statement SIH26135 · Government of Maharashtra**  
+*SkillSense AI — From Training Data to Real Employment Outcomes.*
 
----
-
-## 📡 API Reference
-
-| Method | Endpoint | Description | Auth Required |
-| :--- | :--- | :--- | :--- |
-| `POST` | `/api/v1/auth/register` | Register a new user | No |
-| `POST` | `/api/v1/auth/login` | Authenticate user & get JWT | No |
-| `GET` | `/api/v1/students/me` | Fetch authenticated student profile | Yes (`student`) |
-| `POST` | `/api/v1/students/analyze-skills` | Extract competencies from text/GitHub/projects | Yes (`student`) |
-| `GET` | `/api/v1/students/:id/passport` | Retrieve cryptographic Skill Passport | Yes |
-| `POST` | `/api/v1/assessments/submit` | Submit diagnostic assessment result | Yes (`student`) |
-| `GET` | `/api/v1/assessments/history` | Retrieve student assessment history | Yes (`student`) |
-| `POST` | `/api/v1/ai/predict-career` | AI career matching & salary estimation | Yes |
-| `POST` | `/api/v1/ai/chat` | AI Career Copilot SSE stream | Optional |
-| `GET` | `/api/v1/ai-health` | Multi-provider latency & telemetry check | No |
-| `GET` | `/api/v1/analytics/skill-gaps/:id` | Detailed gap analysis & roadmap | Yes |
-
----
-
-## 📄 License & Credits
-
-Developed with ❤️ by **Team Quantum Coders**.
-Licensed under the [MIT License](LICENSE).
+</div>

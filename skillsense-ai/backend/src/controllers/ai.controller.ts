@@ -423,3 +423,44 @@ export const analyzeSkills = async (req: Request, res: Response): Promise<void> 
     res.status(500).json({ success: false, message: 'Skill analysis failed' });
   }
 };
+
+// ── 9. POST /api/v1/ai/policy-copilot ────────────────────────────────────────
+export const policyCopilot = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { query } = req.body;
+    if (!query) {
+      res.status(400).json({ success: false, message: 'Query string is required' });
+      return;
+    }
+
+    const { policyCopilotService } = await import('../services/policyCopilot.service');
+    const result = await policyCopilotService.queryPolicyCopilot(query);
+
+    res.status(200).json({
+      success: true,
+      data: result,
+      message: 'AI Policy intelligence response generated',
+    });
+  } catch (err: any) {
+    logger.error('policyCopilot error:', err.message);
+    res.status(500).json({ success: false, message: 'Policy copilot query failed' });
+  }
+};
+
+// ── 10. GET /api/v1/ai/interventions ─────────────────────────────────────────
+export const getPolicyInterventions = async (_req: Request, res: Response): Promise<void> => {
+  try {
+    const { policyCopilotService } = await import('../services/policyCopilot.service');
+    const interventions = await policyCopilotService.getActiveInterventions();
+
+    res.status(200).json({
+      success: true,
+      data: interventions,
+      message: 'Active policy interventions retrieved',
+    });
+  } catch (err: any) {
+    logger.error('getPolicyInterventions error:', err.message);
+    res.status(500).json({ success: false, message: 'Failed to retrieve policy interventions' });
+  }
+};
+

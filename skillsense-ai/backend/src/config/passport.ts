@@ -27,12 +27,38 @@ passport.use(
 );
 
 // ── Google OAuth Strategy ─────────────────────────────────────────────────────
-if (env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET) {
+import Student from '../models/Student.model';
+
+const ensureStudentProfile = async (userId: any) => {
+  try {
+    const existing = await Student.findOne({ userId });
+    if (!existing) {
+      await Student.create({
+        userId,
+        enrollmentNumber: `SKP-${userId.toString().slice(-6).toUpperCase()}`,
+        program: 'Software Engineering & AI',
+        nsqfLevel: 5,
+        state: 'Maharashtra',
+        gender: 'male',
+        skills: [],
+        overallScore: 78,
+        placementStatus: 'studying',
+        interventions: [],
+      });
+    }
+  } catch (err) {
+    logger.warn('Failed to ensure student profile for OAuth user:', err);
+  }
+};
+
+// ── Google OAuth Strategy ─────────────────────────────────────────────────────
+const isGoogleConfigured = env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET && !env.GOOGLE_CLIENT_ID.includes('your_');
+if (isGoogleConfigured) {
   passport.use(
     new GoogleStrategy(
       {
-        clientID: env.GOOGLE_CLIENT_ID,
-        clientSecret: env.GOOGLE_CLIENT_SECRET,
+        clientID: env.GOOGLE_CLIENT_ID!,
+        clientSecret: env.GOOGLE_CLIENT_SECRET!,
         callbackURL: env.GOOGLE_CALLBACK_URL || `${env.FRONTEND_URL.replace(':3000', ':5000')}/api/v1/auth/google/callback`,
       },
       async (_accessToken, _refreshToken, profile, done) => {
@@ -41,7 +67,9 @@ if (env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET) {
 
           if (!user) {
             const email = profile.emails?.[0]?.value;
-            user = await User.findOne({ email });
+            if (email) {
+              user = await User.findOne({ email });
+            }
             if (user) {
               user.googleId = profile.id;
               if (!user.avatar && profile.photos?.[0]?.value) {
@@ -52,7 +80,7 @@ if (env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET) {
               user = new User({
                 googleId: profile.id,
                 name: profile.displayName || 'Google User',
-                email,
+                email: email || `google_${profile.id}@users.noreply.google.com`,
                 avatar: profile.photos?.[0]?.value,
                 role: 'student',
                 isVerified: true,
@@ -61,6 +89,10 @@ if (env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET) {
               });
               await user.save();
             }
+          }
+
+          if (user && user.role === 'student') {
+            await ensureStudentProfile(user._id);
           }
 
           return done(null, user);
@@ -76,12 +108,13 @@ if (env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET) {
 }
 
 // ── GitHub OAuth Strategy ─────────────────────────────────────────────────────
-if (env.GITHUB_CLIENT_ID && env.GITHUB_CLIENT_SECRET) {
+const isGitHubConfigured = env.GITHUB_CLIENT_ID && env.GITHUB_CLIENT_SECRET && !env.GITHUB_CLIENT_ID.includes('your_');
+if (isGitHubConfigured) {
   passport.use(
     new GitHubStrategy(
       {
-        clientID: env.GITHUB_CLIENT_ID,
-        clientSecret: env.GITHUB_CLIENT_SECRET,
+        clientID: env.GITHUB_CLIENT_ID!,
+        clientSecret: env.GITHUB_CLIENT_SECRET!,
         callbackURL: env.GITHUB_CALLBACK_URL || `${env.FRONTEND_URL.replace(':3000', ':5000')}/api/v1/auth/github/callback`,
         scope: ['user:email'],
       },
@@ -90,12 +123,14 @@ if (env.GITHUB_CLIENT_ID && env.GITHUB_CLIENT_SECRET) {
           let user = await User.findOne({ githubId: profile.id });
 
           if (!user) {
-            const email = profile.emails?.[0]?.value;
+            const email = profile.emails?.[0]?.value || (profile.username ? `${profile.username}@users.noreply.github.com` : `github_${profile.id}@users.noreply.github.com`);
             user = await User.findOne({ email });
+            const avatar = profile.photos?.[0]?.value || profile._json?.avatar_url;
+
             if (user) {
               user.githubId = profile.id;
-              if (!user.avatar && profile.photos?.[0]?.value) {
-                user.avatar = profile.photos[0].value;
+              if (!user.avatar && avatar) {
+                user.avatar = avatar;
               }
               await user.save();
             } else {
@@ -103,7 +138,7 @@ if (env.GITHUB_CLIENT_ID && env.GITHUB_CLIENT_SECRET) {
                 githubId: profile.id,
                 name: profile.displayName || profile.username || 'GitHub User',
                 email,
-                avatar: profile.photos?.[0]?.value,
+                avatar,
                 role: 'student',
                 isVerified: true,
                 authProvider: 'github',
@@ -111,6 +146,10 @@ if (env.GITHUB_CLIENT_ID && env.GITHUB_CLIENT_SECRET) {
               });
               await user.save();
             }
+          }
+
+          if (user && user.role === 'student') {
+            await ensureStudentProfile(user._id);
           }
 
           return done(null, user);
@@ -121,8 +160,10 @@ if (env.GITHUB_CLIENT_ID && env.GITHUB_CLIENT_SECRET) {
       }
     )
   );
+  logger.info('GitHub OAuth strategy initialized successfully ✓');
 } else {
-  logger.warn('GitHub OAuth disabled — GITHUB_CLIENT_ID / GITHUB_CLIENT_SECRET not set');
+  logger.warn('GitHub OAuth disabled — GITHUB_CLIENT_ID / GITHUB_CLIENT_SECRET not set or is placeholder');
 }
 
 export default passport;
+

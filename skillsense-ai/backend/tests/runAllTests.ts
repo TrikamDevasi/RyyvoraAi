@@ -6,6 +6,7 @@ import { runAuthorizationTests } from './authorization.test';
 import { runFairnessTests } from './fairness.test';
 import { runIntegrationTests } from './integration.test';
 import { runAITests } from './ai.test';
+import { runOutcomeTests } from './outcome.test';
 
 async function main() {
   console.log('====================================================');
@@ -21,10 +22,12 @@ async function main() {
     console.log('');
     await runAITests();
     console.log('');
+    await runOutcomeTests();
+    console.log('');
     await runIntegrationTests();
     console.log('');
     console.log('====================================================');
-    console.log('🎉 ALL AUTOMATED INTEGRATION, UNIT & AI TESTS PASSED! (5/5)');
+    console.log('🎉 ALL AUTOMATED INTEGRATION, UNIT & AI TESTS PASSED! (6/6)');
     console.log('====================================================');
     process.exit(0);
   } catch (error) {
@@ -32,5 +35,6 @@ async function main() {
     process.exit(1);
   }
 }
+
 
 main();

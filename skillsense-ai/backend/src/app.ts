@@ -22,6 +22,12 @@ import adminRouter from './routes/admin.routes';
 import aiRouter from './routes/ai.routes';
 import contactRouter from './routes/contact.routes';
 import assessmentRouter from './routes/assessment.routes';
+import outcomeRouter from './routes/outcome.routes';
+import consentRouter from './routes/consent.routes';
+import followupRouter from './routes/followup.routes';
+import verificationRouter from './routes/verification.routes';
+import dataQualityRouter from './routes/dataQuality.routes';
+
 
 const app = express();
 
@@ -148,6 +154,12 @@ app.use('/api/v1/analytics', analyticsRouter);
 app.use('/api/v1/governance', governanceRouter);
 app.use('/api/v1/admin', adminRouter);
 app.use('/api/v1/assessments', assessmentRouter);
+app.use('/api/v1/outcomes', outcomeRouter);
+app.use('/api/v1/consent', consentRouter);
+app.use('/api/v1/followups', followupRouter);
+app.use('/api/v1/verification', verificationRouter);
+app.use('/api/v1/data-quality', dataQualityRouter);
+
 
 // ── 404 Handler ────────────────────────────────────────────────────────────
 app.use((_req, res) => {

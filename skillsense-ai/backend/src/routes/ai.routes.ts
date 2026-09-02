@@ -10,6 +10,8 @@ import {
   getChatHistory,
   getAssessment,
   analyzeSkills,
+  policyCopilot,
+  getPolicyInterventions,
 } from '../controllers/ai.controller';
 import { aiLimiter } from '../middleware/rateLimit.middleware';
 
@@ -19,6 +21,8 @@ const router = Router();
 router.get('/assessment/:id', getAssessment);
 router.post('/chat', optionalProtect, chat);
 router.get('/market-trends', marketTrends);
+router.post('/policy-copilot', optionalProtect, policyCopilot);
+router.get('/interventions', getPolicyInterventions);
 
 // Protected AI Routes
 router.use(protect);
@@ -36,3 +40,4 @@ router.post('/assess-skill/evaluate', aiLimiter, evaluateSkill);
 router.post('/predict-career', aiLimiter, predictCareer);
 
 export default router;
+

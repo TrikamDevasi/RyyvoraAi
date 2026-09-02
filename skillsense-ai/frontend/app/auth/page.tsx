@@ -39,10 +39,25 @@ export default function AuthPage() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const params = new URLSearchParams(window.location.search);
+            const err = params.get('error');
+            if (err) {
+                if (err === 'github_failed') setError('GitHub authentication could not be completed. Please try again.');
+                else if (err === 'google_failed') setError('Google authentication could not be completed. Please try again.');
+                else if (err === 'account_suspended') setError('Your account is suspended.');
+                else setError(`Authentication notice: ${err.replace(/_/g, ' ')}`);
+                setTimeout(() => setError(null), 5000);
+            }
+        }
+    }, []);
+
     const handleOAuth = (provider: 'google' | 'github') => {
         const backendUrl = process.env.NEXT_PUBLIC_API_URL?.replace('/api/v1', '') || 'http://localhost:5000';
         window.location.href = `${backendUrl}/api/v1/auth/${provider}`;
     };
+
 
     const handleSignIn = async (e: React.FormEvent) => {
         e.preventDefault();

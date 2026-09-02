@@ -19,6 +19,8 @@ import {
   Users,
   Layers,
   Sparkles,
+  Milestone,
+  Lock,
 } from 'lucide-react';
 import React from 'react';
 
@@ -38,29 +40,29 @@ export interface NavGroup {
 export const NAVIGATION_CONFIG: Record<string, NavGroup[]> = {
   student: [
     {
-      group: 'Intelligence & Skills',
+      group: 'Longitudinal Journey & Outcomes',
       routes: [
         { label: 'Overview', href: '/student', icon: LayoutDashboard },
-        { label: 'AI Skill Analyzer', href: '/student/analyzer', icon: Brain, badge: 'AI' },
+        { label: 'Employment Journey', href: '/student/journey', icon: Milestone, badge: 'TIMELINE' },
         { label: 'Skill Passport', href: '/student/passport', icon: Award, badge: 'VERIFIED' },
-        { label: 'Evaluations & Tests', href: '/student/assessment', icon: CheckSquare },
+        { label: 'Consent & Privacy', href: '/student/consent', icon: Lock, badge: 'DPDP' },
       ],
     },
     {
-      group: 'Career & Growth',
+      group: 'Intelligence & Skills',
       routes: [
+        { label: 'AI Skill Analyzer', href: '/student/analyzer', icon: Brain, badge: 'AI' },
+        { label: 'Evaluations & Tests', href: '/student/assessment', icon: CheckSquare },
         { label: 'Career Predictor', href: '/student/career', icon: Compass },
         { label: 'Market Demand', href: '/student/market', icon: TrendingUp },
-        { label: 'Find Jobs', href: '/student/jobs', icon: Briefcase, badge: 'NEW' },
-        { label: 'My Submissions', href: '/student/submissions', icon: FileCode },
       ],
     },
     {
       group: 'Community & Profile',
       routes: [
+        { label: 'Find Jobs', href: '/student/jobs', icon: Briefcase, badge: 'NEW' },
         { label: 'Leaderboard', href: '/student/leaderboard', icon: Trophy },
         { label: 'Profile & Settings', href: '/student/profile', icon: User },
-        { label: 'Tech News', href: '/student/news', icon: Newspaper },
       ],
     },
   ],
@@ -71,9 +73,9 @@ export const NAVIGATION_CONFIG: Record<string, NavGroup[]> = {
       routes: [
         { label: 'Dashboard', href: '/institute', icon: LayoutDashboard },
         { label: 'Student Roster', href: '/institute/students', icon: Users },
+        { label: 'Placement & Outcomes', href: '/institute/placement', icon: TrendingUp },
+        { label: 'Upload Cohort', href: '/institute/upload', icon: FileCode, badge: 'BATCH' },
         { label: 'Curriculum & ROI', href: '/institute/roi', icon: BarChart3 },
-        { label: 'Placement Trends', href: '/institute/placement', icon: TrendingUp },
-        { label: 'Upload Cohort', href: '/institute/upload', icon: FileCode },
         { label: 'AI Evaluations', href: '/institute/evaluations', icon: Brain },
       ],
     },
@@ -94,9 +96,9 @@ export const NAVIGATION_CONFIG: Record<string, NavGroup[]> = {
 
   government: [
     {
-      group: 'National Workforce Intelligence',
+      group: 'State Workforce Intelligence (Maharashtra)',
       routes: [
-        { label: 'Macro Dashboard', href: '/government', icon: Landmark },
+        { label: 'State Macro Dashboard', href: '/government', icon: Landmark, badge: 'LIVE' },
         { label: 'Regional Heatmap', href: '/government/heatmap', icon: BarChart3 },
         { label: 'NSQF Compliance', href: '/government/compliance', icon: Shield },
         { label: 'Fund Targeting', href: '/government/fund-targeting', icon: TrendingUp },
@@ -107,12 +109,12 @@ export const NAVIGATION_CONFIG: Record<string, NavGroup[]> = {
 
   employer: [
     {
-      group: 'Employer Portal',
+      group: 'Employer Verification Portal',
       routes: [
         { label: 'Overview', href: '/employer', icon: LayoutDashboard },
+        { label: 'Candidate Validations', href: '/employer/validations', icon: Award, badge: 'LEDGER' },
         { label: 'Placements', href: '/employer/placements', icon: Briefcase },
-        { label: 'Feedback', href: '/employer/feedback', icon: CheckSquare },
-        { label: 'Validations', href: '/employer/validations', icon: Award },
+        { label: 'Feedback & Demand', href: '/employer/feedback', icon: CheckSquare },
       ],
     },
   ],
@@ -131,3 +133,4 @@ export const NAVIGATION_CONFIG: Record<string, NavGroup[]> = {
     },
   ],
 };
+
