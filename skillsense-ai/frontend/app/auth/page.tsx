@@ -167,26 +167,18 @@ export default function AuthPage() {
   };
 
   // ── Instant 1-Click Demo Login ──────────────────────────────────────────────
-  const handleInstantDemoLogin = (role: UserRole) => {
+  const { demoLogin } = useAuthStore();
+
+  const handleInstantDemoLogin = async (role: UserRole) => {
     const demo = DEMO_ACCOUNTS[role];
-    const demoToken = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.${btoa(
-      JSON.stringify({ id: `demo_${role}`, role, email: demo.email, iat: Date.now() })
-    )}.signature`;
-
-    const authUser = {
-      _id: `demo_${role}_001`,
-      id: `demo_${role}_001`,
-      name: demo.name,
-      email: demo.email,
-      role: demo.role,
-      isVerified: true,
-      authProvider: 'local' as const,
-    };
-
-    setAuth(authUser, demoToken);
-    setTokens(demoToken, role);
-    toast.success(`Logged in as ${demo.name} (${demo.role.toUpperCase()})`);
-    router.push(demo.defaultRoute);
+    setLoading(true);
+    try {
+      const user = await demoLogin(role);
+      toast.success(`Logged in as ${user.name || demo.name} (${role.toUpperCase()})`);
+      window.location.href = demo.defaultRoute;
+    } catch {
+      window.location.href = demo.defaultRoute;
+    }
   };
 
   return (

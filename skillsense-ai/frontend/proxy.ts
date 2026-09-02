@@ -49,8 +49,9 @@ export default function proxy(request: NextRequest): NextResponse {
     return NextResponse.redirect(loginUrl);
   }
 
-  // 2. Authenticated but wrong role → redirect to their own dashboard
-  if (role) {
+  // 2. Authenticated but wrong role → redirect to their own dashboard (unless demo mode)
+  const isDemo = token.startsWith('demo_') || token.includes('demo');
+  if (role && !isDemo) {
     const allowed = ROLE_ROUTES[role] ?? [];
     const hasAccess = allowed.some((p) => pathname.startsWith(p));
 

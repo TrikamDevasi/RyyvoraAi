@@ -22,23 +22,29 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Handle 401 Unauthorized globally
+// Handle 401 Unauthorized globally without breaking demo sessions or loops
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (typeof window !== 'undefined' && error.response?.status === 401) {
-      removeTokens();
+      const token = localStorage.getItem('skillsense_token');
+      const isDemo = token?.startsWith('demo_') || token?.includes('demo');
+      const pathname = window.location.pathname;
 
-      const isProtectedRoute =
-        window.location.pathname.startsWith('/student') ||
-        window.location.pathname.startsWith('/admin') ||
-        window.location.pathname.startsWith('/employer') ||
-        window.location.pathname.startsWith('/institute') ||
-        window.location.pathname.startsWith('/industry') ||
-        window.location.pathname.startsWith('/government');
+      if (!isDemo && !pathname.startsWith('/auth')) {
+        const isProtectedRoute =
+          pathname.startsWith('/student') ||
+          pathname.startsWith('/admin') ||
+          pathname.startsWith('/employer') ||
+          pathname.startsWith('/institute') ||
+          pathname.startsWith('/industry') ||
+          pathname.startsWith('/government');
 
-      if (isProtectedRoute && !window.location.pathname.startsWith('/auth')) {
-        window.location.href = `/auth?redirect=${encodeURIComponent(window.location.pathname)}`;
+        // Only redirect if explicit auth failure on protected routes
+        if (isProtectedRoute && error.config?.url?.includes('/auth/me')) {
+          removeTokens();
+          window.location.href = `/auth?redirect=${encodeURIComponent(pathname)}`;
+        }
       }
     }
     return Promise.reject(error);

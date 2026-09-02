@@ -31,6 +31,86 @@ const encodeUser = (user: IUser): string => {
 // ── Local Auth ─────────────────────────────────────────────────────────────────
 router.post('/register', authLimiter, register);
 router.post('/login', authLimiter, login);
+router.post('/demo-login', async (req: Request, res: Response) => {
+  try {
+    const role = (req.body.role || 'student').toLowerCase();
+    const demoEmails: Record<string, string> = {
+      student: 'arjun.student@skillsense.gov.in',
+      employer: 'priya.talent@tcs.com',
+      institute: 'dean@iitb.ac.in',
+      government: 'officer@msde.gov.in',
+      industry: 'intelligence@nasscom.in',
+      admin: 'admin@skillsense.gov.in',
+    };
+    const demoNames: Record<string, string> = {
+      student: 'Arjun Mehta',
+      employer: 'Priya Verma (TCS Talent Lead)',
+      institute: 'Dr. Ramesh Kulkarni (Dean, IIT-B)',
+      government: 'National Skill Development Officer',
+      industry: 'NASSCOM Sector Intelligence Lead',
+      admin: 'SkillSense Chief Administrator',
+    };
+
+    const email = demoEmails[role] || `${role}.demo@skillsense.gov.in`;
+    const name = demoNames[role] || `Demo ${role.charAt(0).toUpperCase() + role.slice(1)}`;
+
+    let user = await User.findOne({ email });
+    if (!user) {
+      user = await User.create({
+        name,
+        email,
+        role,
+        isVerified: true,
+        authProvider: 'local',
+        password: crypto.randomBytes(32).toString('hex'),
+      });
+    }
+
+    if (role === 'student') {
+      let student = await Student.findOne({ userId: user._id });
+      if (!student) {
+        await Student.create({
+          userId: user._id,
+          enrollmentNumber: `SKP-${user._id.toString().slice(-6).toUpperCase()}`,
+          program: 'Full-Stack Software Engineering',
+          nsqfLevel: 5,
+          state: 'Maharashtra',
+          gender: 'male',
+          skills: [
+            { skillId: 'React.js & Next.js' as any, score: 88, lastAssessed: new Date() },
+            { skillId: 'Node.js & Express' as any, score: 82, lastAssessed: new Date() },
+            { skillId: 'PostgreSQL & Prisma' as any, score: 79, lastAssessed: new Date() },
+            { skillId: 'Docker & Microservices' as any, score: 75, lastAssessed: new Date() },
+            { skillId: 'TypeScript Systems' as any, score: 85, lastAssessed: new Date() },
+          ],
+          overallScore: 84,
+          placementStatus: 'studying',
+          passportHash: `SKP-${user._id.toString().slice(-8).toUpperCase()}-VERIFIED`,
+        });
+      }
+    }
+
+    const token = signToken({ id: String(user._id), role: user.role, email: user.email });
+    res.status(200).json({
+      success: true,
+      message: `Logged in as demo ${role}`,
+      data: {
+        token,
+        user: {
+          id: String(user._id),
+          _id: String(user._id),
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          isVerified: user.isVerified,
+          avatar: user.avatar,
+        },
+      },
+    });
+  } catch (err: any) {
+    res.status(500).json({ success: false, message: err.message || 'Demo login failed' });
+  }
+});
 router.get('/me', protect, getMe);
 router.get('/preferences', protect, getPreferences);
 router.patch('/preferences', protect, updatePreferences);
