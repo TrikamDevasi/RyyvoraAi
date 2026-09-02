@@ -38,6 +38,15 @@ const envSchema = z.object({
   
   // Passport secret
   PASSPORT_SECRET: z.string().default('skillsense-passport-verification-secret'),
+
+  // ── Billing Configuration ───────────────────────────────────────────────────
+  // BILLING_MODE: 'demo' (default, no real payment) | 'razorpay' | 'stripe'
+  BILLING_MODE: z.enum(['demo', 'razorpay', 'stripe']).default('demo'),
+  // Razorpay (only needed when BILLING_MODE=razorpay)
+  RAZORPAY_KEY_ID: z.string().optional(),
+  RAZORPAY_KEY_SECRET: z.string().optional(),
+  // Generic webhook signature secret (used by any real provider)
+  BILLING_WEBHOOK_SECRET: z.string().optional(),
 });
 
 const parseEnv = () => {

@@ -27,6 +27,7 @@ import consentRouter from './routes/consent.routes';
 import followupRouter from './routes/followup.routes';
 import verificationRouter from './routes/verification.routes';
 import dataQualityRouter from './routes/dataQuality.routes';
+import billingRouter from './routes/billing.routes';
 
 
 const app = express();
@@ -162,6 +163,7 @@ app.use('/api/v1/consent', consentRouter);
 app.use('/api/v1/followups', followupRouter);
 app.use('/api/v1/verification', verificationRouter);
 app.use('/api/v1/data-quality', dataQualityRouter);
+app.use('/api/v1/billing', billingRouter);
 
 
 // ── 404 Handler ────────────────────────────────────────────────────────────

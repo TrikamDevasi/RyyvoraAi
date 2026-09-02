@@ -42,6 +42,7 @@ import {
 } from 'lucide-react';
 
 import { AIBadge } from '@/components/ui/AIBadge';
+import PricingSection from '@/components/sections/PricingSection';
 
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
@@ -120,6 +121,7 @@ export default function LandingPage() {
             <a href="#features" style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none' }}>Core Capabilities</a>
             <a href="#how-it-works" style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none' }}>How It Works</a>
             <a href="#passport" style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none' }}>Skill Passport</a>
+            <a href="#pricing" style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none' }}>Pricing</a>
             <a href="#faq" style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none' }}>FAQ</a>
             <a href="#trust" style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none' }}>DPDP Trust</a>
           </div>
@@ -1438,6 +1440,9 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* ── Pricing Section ── */}
+      <PricingSection />
 
       {/* ── 11. High-Conversion Final CTA ── */}
       <section style={{ padding: '80px 24px', background: 'radial-gradient(ellipse at 50% 50%, rgba(245, 158, 11, 0.1) 0%, transparent 70%)' }}>
