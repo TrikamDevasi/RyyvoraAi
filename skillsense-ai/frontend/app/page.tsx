@@ -27,18 +27,27 @@ import {
   Check,
   Bot,
   ExternalLink,
-  Briefcase,
-  Milestone,
   GraduationCap,
   School,
+  Milestone,
+  Briefcase,
+  ChevronDown,
+  HelpCircle,
+  FileText,
+  CheckCheck,
+  BarChart3,
+  Database,
+  Target,
+  Code,
 } from 'lucide-react';
 
 import { AIBadge } from '@/components/ui/AIBadge';
 
-
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
   const [activeShowcaseTab, setActiveShowcaseTab] = useState<'dashboard' | 'analyzer' | 'gaps' | 'career' | 'copilot' | 'passport'>('dashboard');
+  const [activeRoleTab, setActiveRoleTab] = useState<'student' | 'employer' | 'institute' | 'government' | 'industry' | 'admin'>('student');
+  const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [copiedHash, setCopiedHash] = useState(false);
 
   useEffect(() => {
@@ -106,14 +115,13 @@ export default function LandingPage() {
           </Link>
 
           {/* Links */}
-          <div className="hidden md:flex" style={{ gap: 28, alignItems: 'center' }}>
-            <a href="#features" style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none' }}>Features</a>
+          <div className="hidden md:flex" style={{ gap: 24, alignItems: 'center' }}>
+            <a href="#roles" style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none' }}>Role Features</a>
+            <a href="#features" style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none' }}>Core Capabilities</a>
             <a href="#how-it-works" style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none' }}>How It Works</a>
-            <a href="#showcase" style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none' }}>Platform Showcase</a>
-            <a href="#target-audience" style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none' }}>Target Audience</a>
             <a href="#passport" style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none' }}>Skill Passport</a>
-            <a href="#trust" style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none' }}>Fairness & Trust</a>
-
+            <a href="#faq" style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none' }}>FAQ</a>
+            <a href="#trust" style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none' }}>DPDP Trust</a>
           </div>
 
           {/* Auth Actions */}
@@ -694,14 +702,14 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── 8. Target Audience: Ecosystem Stakeholders ── */}
-      <section id="target-audience" style={{ padding: '90px 24px', position: 'relative' }}>
-
+      {/* ── 8. Role-Based Features Matrix & Capabilities Deep-Dive ── */}
+      <section id="roles" style={{ padding: '90px 24px', position: 'relative' }}>
         <div style={{ maxWidth: 1240, margin: '0 auto' }}>
           {/* Section Header */}
-          <div style={{ textAlign: 'center', marginBottom: 54 }}>
+          <div style={{ textAlign: 'center', marginBottom: 40 }}>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-              <AIBadge type="live" label="TARGET AUDIENCE" />
+              <AIBadge type="live" label="ROLE-BASED WORKSPACES" />
+              <AIBadge type="nsqf" label="6 STAKEHOLDER PORTALS" />
             </div>
             <h2
               className="font-display"
@@ -711,11 +719,11 @@ export default function LandingPage() {
                 color: '#f8fafc',
                 letterSpacing: '-0.03em',
                 margin: '0 auto 14px',
-                maxWidth: 820,
+                maxWidth: 860,
               }}
             >
-              Built for Every Stakeholder in the{' '}
-              <span className="text-gradient-gold">Skilling Ecosystem</span>
+              Tailored Workspaces for Every{' '}
+              <span className="text-gradient-gold">Registered Stakeholder</span>
             </h2>
             <p
               style={{
@@ -726,425 +734,608 @@ export default function LandingPage() {
                 lineHeight: 1.6,
               }}
             >
-              From policy decisions to individual careers, SkillSense AI connects the people responsible for creating, delivering, validating and benefiting from skilling outcomes.
+              Every role receives a dedicated, proctored command center equipped with specialized neural diagnostics, cryptographic ledgers, and automated workflows.
             </p>
           </div>
 
-          {/* 4 Audience Cards Grid */}
+          {/* Role Tab Navigation Pills */}
           <div
             style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(270px, 1fr))',
-              gap: 20,
+              display: 'flex',
+              justifyContent: 'center',
+              gap: 8,
+              flexWrap: 'wrap',
+              marginBottom: 32,
             }}
           >
-            {/* 1. Government & Policy Makers */}
-            <div
-              className="card-linear"
-              style={{
-                padding: 24,
-                borderRadius: 16,
-                borderTop: '3px solid #F59E0B',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
-                background: '#10131E',
-                boxShadow: '0 8px 30px rgba(0,0,0,0.4)',
-                transition: 'transform 0.2s ease, border-color 0.2s ease',
-              }}
-            >
-              <div>
-                {/* Header row with Icon & Tag */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                  <div
-                    style={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: 10,
-                      background: 'rgba(245,158,11,0.12)',
-                      border: '1px solid rgba(245,158,11,0.25)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: '#F59E0B',
-                    }}
-                  >
-                    <Landmark size={20} />
-                  </div>
-                  <span
-                    style={{
-                      fontSize: 11,
-                      fontWeight: 800,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.06em',
-                      padding: '3px 9px',
-                      borderRadius: 99,
-                      background: 'rgba(245,158,11,0.12)',
-                      color: '#F59E0B',
-                      border: '1px solid rgba(245,158,11,0.25)',
-                    }}
-                  >
-                    Policy & Impact
-                  </span>
-                </div>
-
-                <h3 className="font-display" style={{ fontSize: 18, fontWeight: 800, color: '#f8fafc', margin: '0 0 6px' }}>
-                  Government & Policy Makers
-                </h3>
-
-                <p style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.45, marginBottom: 16 }}>
-                  Maharashtra Government departments, skill development authorities, district policymakers, and programme administrators.
-                </p>
-
-                {/* Bullet Points */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
-                  {[
-                    'Track longitudinal employment outcomes after training',
-                    'Monitor placement, 365d retention, wages and self-employment',
-                    'Identify district-wise skill gaps across Maharashtra',
-                    'Evaluate training providers & use AI-assisted evidence for policy interventions',
-                  ].map((pt, i) => (
-                    <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 12.5, color: '#cbd5e1', lineHeight: 1.45 }}>
-                      <CheckCircle2 size={15} style={{ color: '#F59E0B', marginTop: 2, flexShrink: 0 }} />
-                      <span>{pt}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <Link
-                href="/government"
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: '10px 14px',
-                  borderRadius: 10,
-                  background: 'rgba(245, 158, 11, 0.08)',
-                  border: '1px solid rgba(245, 158, 11, 0.2)',
-                  color: '#F59E0B',
-                  fontSize: 12.5,
-                  fontWeight: 700,
-                  textDecoration: 'none',
-                  transition: 'background 0.2s ease',
-                }}
-              >
-                <span>Open Government Cockpit</span>
-                <ArrowRight size={14} />
-              </Link>
-            </div>
-
-            {/* 2. Training Providers / Institutes */}
-            <div
-              className="card-linear"
-              style={{
-                padding: 24,
-                borderRadius: 16,
-                borderTop: '3px solid #60A5FA',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
-                background: '#10131E',
-                boxShadow: '0 8px 30px rgba(0,0,0,0.4)',
-                transition: 'transform 0.2s ease, border-color 0.2s ease',
-              }}
-            >
-              <div>
-                {/* Header row with Icon & Tag */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                  <div
-                    style={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: 10,
-                      background: 'rgba(59,130,246,0.12)',
-                      border: '1px solid rgba(59,130,246,0.25)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: '#60A5FA',
-                    }}
-                  >
-                    <Building2 size={20} />
-                  </div>
-                  <span
-                    style={{
-                      fontSize: 11,
-                      fontWeight: 800,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.06em',
-                      padding: '3px 9px',
-                      borderRadius: 99,
-                      background: 'rgba(59,130,246,0.12)',
-                      color: '#60A5FA',
-                      border: '1px solid rgba(59,130,246,0.25)',
-                    }}
-                  >
-                    Training & Outcomes
-                  </span>
-                </div>
-
-                <h3 className="font-display" style={{ fontSize: 18, fontWeight: 800, color: '#f8fafc', margin: '0 0 6px' }}>
-                  Training Providers & ITIs
-                </h3>
-
-                <p style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.45, marginBottom: 16 }}>
-                  ITIs, polytechnics, skill development centres, and government & private vocational training partners.
-                </p>
-
-                {/* Bullet Points */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
-                  {[
-                    'Track trainee progress from enrolment to assessment & placement',
-                    'Identify learners at risk of non-placement early with AI indicators',
-                    'Understand curriculum skill gaps vs real industry hiring demand',
-                    'Monitor long-term cohort placement & prove institutional ROI',
-                  ].map((pt, i) => (
-                    <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 12.5, color: '#cbd5e1', lineHeight: 1.45 }}>
-                      <CheckCircle2 size={15} style={{ color: '#60A5FA', marginTop: 2, flexShrink: 0 }} />
-                      <span>{pt}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <Link
-                href="/institute"
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: '10px 14px',
-                  borderRadius: 10,
-                  background: 'rgba(59, 130, 246, 0.08)',
-                  border: '1px solid rgba(59, 130, 246, 0.2)',
-                  color: '#60A5FA',
-                  fontSize: 12.5,
-                  fontWeight: 700,
-                  textDecoration: 'none',
-                  transition: 'background 0.2s ease',
-                }}
-              >
-                <span>Open Provider Dashboard</span>
-                <ArrowRight size={14} />
-              </Link>
-            </div>
-
-            {/* 3. Trainees & Students */}
-            <div
-              className="card-linear"
-              style={{
-                padding: 24,
-                borderRadius: 16,
-                borderTop: '3px solid #10B981',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
-                background: '#10131E',
-                boxShadow: '0 8px 30px rgba(0,0,0,0.4)',
-                transition: 'transform 0.2s ease, border-color 0.2s ease',
-              }}
-            >
-              <div>
-                {/* Header row with Icon & Tag */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                  <div
-                    style={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: 10,
-                      background: 'rgba(16,185,129,0.12)',
-                      border: '1px solid rgba(16,185,129,0.25)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: '#10B981',
-                    }}
-                  >
-                    <GraduationCap size={20} />
-                  </div>
-                  <span
-                    style={{
-                      fontSize: 11,
-                      fontWeight: 800,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.06em',
-                      padding: '3px 9px',
-                      borderRadius: 99,
-                      background: 'rgba(16,185,129,0.12)',
-                      color: '#10B981',
-                      border: '1px solid rgba(16,185,129,0.25)',
-                    }}
-                  >
-                    Career & Growth
-                  </span>
-                </div>
-
-                <h3 className="font-display" style={{ fontSize: 18, fontWeight: 800, color: '#f8fafc', margin: '0 0 6px' }}>
-                  Trainees & Students
-                </h3>
-
-                <p style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.45, marginBottom: 16 }}>
-                  Vocational learners, ITI students, skilling scheme beneficiaries, and technical job seekers.
-                </p>
-
-                {/* Bullet Points */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
-                  {[
-                    'Maintain a verifiable longitudinal skill & career milestone journey',
-                    'Complete diagnostic assessments & earn NSQF Skill Passports',
-                    'Receive AI-assisted career insights, gap roadmaps & wage forecasts',
-                    'Report employment outcomes & manage DPDP Act 2023 consent',
-                  ].map((pt, i) => (
-                    <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 12.5, color: '#cbd5e1', lineHeight: 1.45 }}>
-                      <CheckCircle2 size={15} style={{ color: '#10B981', marginTop: 2, flexShrink: 0 }} />
-                      <span>{pt}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <Link
-                href="/student/journey"
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: '10px 14px',
-                  borderRadius: 10,
-                  background: 'rgba(16, 185, 129, 0.08)',
-                  border: '1px solid rgba(16, 185, 129, 0.2)',
-                  color: '#10B981',
-                  fontSize: 12.5,
-                  fontWeight: 700,
-                  textDecoration: 'none',
-                  transition: 'background 0.2s ease',
-                }}
-              >
-                <span>View Trainee Journey</span>
-                <ArrowRight size={14} />
-              </Link>
-            </div>
-
-            {/* 4. Employers & Industry */}
-            <div
-              className="card-linear"
-              style={{
-                padding: 24,
-                borderRadius: 16,
-                borderTop: '3px solid #C084FC',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
-                background: '#10131E',
-                boxShadow: '0 8px 30px rgba(0,0,0,0.4)',
-                transition: 'transform 0.2s ease, border-color 0.2s ease',
-              }}
-            >
-              <div>
-                {/* Header row with Icon & Tag */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                  <div
-                    style={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: 10,
-                      background: 'rgba(168,85,247,0.12)',
-                      border: '1px solid rgba(168,85,247,0.25)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: '#C084FC',
-                    }}
-                  >
-                    <ShieldCheck size={20} />
-                  </div>
-                  <span
-                    style={{
-                      fontSize: 11,
-                      fontWeight: 800,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.06em',
-                      padding: '3px 9px',
-                      borderRadius: 99,
-                      background: 'rgba(168,85,247,0.12)',
-                      color: '#C084FC',
-                      border: '1px solid rgba(168,85,247,0.25)',
-                    }}
-                  >
-                    Employment Verification
-                  </span>
-                </div>
-
-                <h3 className="font-display" style={{ fontSize: 18, fontWeight: 800, color: '#f8fafc', margin: '0 0 6px' }}>
-                  Hiring Employers & MSMEs
-                </h3>
-
-                <p style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.45, marginBottom: 16 }}>
-                  Enterprises, MSMEs, hiring organisations, and national apprenticeship partners.
-                </p>
-
-                {/* Bullet Points */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
-                  {[
-                    'Validate candidate placement & employment claims in 1 click',
-                    'Verify candidate credentials via tamper-proof state ledger hashes',
-                    'Request corrections where necessary to build trusted records',
-                    'Access pre-assessed, competency-verified candidate talent pools',
-                  ].map((pt, i) => (
-                    <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 12.5, color: '#cbd5e1', lineHeight: 1.45 }}>
-                      <CheckCircle2 size={15} style={{ color: '#C084FC', marginTop: 2, flexShrink: 0 }} />
-                      <span>{pt}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <Link
-                href="/employer/validations"
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: '10px 14px',
-                  borderRadius: 10,
-                  background: 'rgba(168, 85, 247, 0.08)',
-                  border: '1px solid rgba(168, 85, 247, 0.2)',
-                  color: '#C084FC',
-                  fontSize: 12.5,
-                  fontWeight: 700,
-                  textDecoration: 'none',
-                  transition: 'background 0.2s ease',
-                }}
-              >
-                <span>Open Employer Ledger</span>
-                <ArrowRight size={14} />
-              </Link>
-            </div>
+            {[
+              { id: 'student', name: '🎓 Student / Trainee', color: '#10B981' },
+              { id: 'employer', name: '💼 Hiring Employer', color: '#C084FC' },
+              { id: 'institute', name: '🏛️ Training Institute', color: '#60A5FA' },
+              { id: 'government', name: '🌐 State Government', color: '#F59E0B' },
+              { id: 'industry', name: '🏭 Sector Council (SSC)', color: '#EC4899' },
+              { id: 'admin', name: '⚙️ Platform Admin', color: '#94A3B8' },
+            ].map((tab) => {
+              const isActive = activeRoleTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setActiveRoleTab(tab.id as any)}
+                  style={{
+                    padding: '9px 18px',
+                    borderRadius: 99,
+                    fontSize: 13,
+                    fontWeight: 700,
+                    background: isActive ? 'var(--gold)' : 'rgba(255,255,255,0.03)',
+                    border: `1px solid ${isActive ? 'var(--gold)' : 'var(--border)'}`,
+                    color: isActive ? '#090a0f' : '#cbd5e1',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                    boxShadow: isActive ? '0 4px 18px rgba(245,158,11,0.25)' : 'none',
+                  }}
+                >
+                  {tab.name}
+                </button>
+              );
+            })}
           </div>
 
-          {/* ── Contextual Ecosystem Connector CTA ── */}
-          <div style={{ textAlign: 'center', marginTop: 44 }}>
-            <a
-              href="#how-it-works"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 8,
-                fontSize: 13.5,
-                fontWeight: 700,
-                color: 'var(--gold)',
-                textDecoration: 'none',
-                padding: '11px 22px',
-                borderRadius: 12,
-                background: 'rgba(245, 158, 11, 0.08)',
-                border: '1px solid rgba(245, 158, 11, 0.25)',
-                boxShadow: '0 4px 16px rgba(0,0,0,0.3)',
-                transition: 'all 0.2s ease',
-              }}
-            >
-              See How SkillSense AI Connects the Ecosystem <ArrowRight size={15} />
-            </a>
+          {/* Active Role Card Feature Grid */}
+          <div className="card-accent" style={{ padding: 32, borderRadius: 20 }}>
+            {activeRoleTab === 'student' && (
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16, marginBottom: 24, borderBottom: '1px solid var(--border)', paddingBottom: 20 }}>
+                  <div>
+                    <span style={{ fontSize: 11, fontWeight: 800, color: '#10b981', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                      Registered Candidate Workspace
+                    </span>
+                    <h3 className="font-display" style={{ fontSize: 24, fontWeight: 900, color: '#f8fafc', margin: '4px 0 6px' }}>
+                      Student & Vocational Trainee Cockpit
+                    </h3>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: 13.5, margin: 0, maxWidth: 640 }}>
+                      Empowering learners with AI skill auditing, timed NSQF diagnostic quizzes, tamper-proof passports, and personalized wage progression trajectories.
+                    </p>
+                  </div>
+                  <Link
+                    href="/student"
+                    className="btn-gold"
+                    style={{ fontSize: 13, padding: '10px 22px', display: 'flex', alignItems: 'center', gap: 8 }}
+                  >
+                    <span>Launch Student Cockpit</span>
+                    <ArrowRight size={15} />
+                  </Link>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
+                  {[
+                    { title: 'Multi-Modal Code & GitHub Analyzer', desc: 'Scan live GitHub repos, paste source code, or upload resumes for 6-axis NSQF radar evaluation.', href: '/student/analyzer', icon: Code, badge: 'Neural AI' },
+                    { title: 'AI Diagnostic Timed Quizzes', desc: 'Proctored evaluations across 8 technical domains with instant concept explanations and score seals.', href: '/student/assessment', icon: Zap, badge: 'Proctored' },
+                    { title: 'Cryptographic Skill Passport', desc: 'Tamper-proof digital credentials backed by SHA-256 ledger signatures and public QR validation.', href: '/student/passport', icon: ShieldCheck, badge: 'SHA-256' },
+                    { title: 'Predictive Career & Wage Roadmap', desc: 'Forecast 3-year salary growth curve (₹7.8L → ₹18.0L) and discover target skill gap bridges.', href: '/student/career', icon: TrendingUp, badge: 'Predictive' },
+                    { title: 'Longitudinal Outcome Journey', desc: 'Log verified milestones from enrollment to campus hiring, 30d/90d retention, and promotions.', href: '/student/journey', icon: Milestone, badge: 'Tracking' },
+                    { title: 'DPDP Act 2023 Consent Center', desc: 'Sovereign control to toggle specific data processing purposes and export private data in JSON.', href: '/student/consent', icon: Lock, badge: 'DPDP Compliant' },
+                  ].map((feat, idx) => {
+                    const Icon = feat.icon;
+                    return (
+                      <Link
+                        key={idx}
+                        href={feat.href}
+                        style={{
+                          padding: 18,
+                          borderRadius: 14,
+                          background: 'rgba(255,255,255,0.02)',
+                          border: '1px solid var(--border)',
+                          textDecoration: 'none',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          justifyContent: 'space-between',
+                          transition: 'all 0.15s ease',
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.borderColor = 'var(--gold)';
+                          e.currentTarget.style.background = 'rgba(245,158,11,0.03)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.borderColor = 'var(--border)';
+                          e.currentTarget.style.background = 'rgba(255,255,255,0.02)';
+                        }}
+                      >
+                        <div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                            <div style={{ padding: 8, borderRadius: 8, background: 'rgba(16,185,129,0.12)', color: '#10b981' }}>
+                              <Icon size={18} />
+                            </div>
+                            <span style={{ fontSize: 10.5, fontWeight: 800, padding: '2px 8px', borderRadius: 99, background: 'rgba(255,255,255,0.05)', color: 'var(--gold)' }}>
+                              {feat.badge}
+                            </span>
+                          </div>
+                          <h4 style={{ fontSize: 14.5, fontWeight: 800, color: '#f8fafc', margin: '0 0 6px' }}>{feat.title}</h4>
+                          <p style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5, margin: 0 }}>{feat.desc}</p>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 700, color: 'var(--gold)', marginTop: 14 }}>
+                          <span>Access Feature</span>
+                          <ChevronRight size={13} />
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {activeRoleTab === 'employer' && (
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16, marginBottom: 24, borderBottom: '1px solid var(--border)', paddingBottom: 20 }}>
+                  <div>
+                    <span style={{ fontSize: 11, fontWeight: 800, color: '#C084FC', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                      Enterprise Recruiter Workspace
+                    </span>
+                    <h3 className="font-display" style={{ fontSize: 24, fontWeight: 900, color: '#f8fafc', margin: '4px 0 6px' }}>
+                      Hiring Employer & Talent Validation Suite
+                    </h3>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: 13.5, margin: 0, maxWidth: 640 }}>
+                      Streamline hiring with instant cryptographic credential verification, pre-assessed candidate talent pools, and automated 30d/90d retention telemetry.
+                    </p>
+                  </div>
+                  <Link
+                    href="/employer"
+                    className="btn-gold"
+                    style={{ fontSize: 13, padding: '10px 22px', display: 'flex', alignItems: 'center', gap: 8 }}
+                  >
+                    <span>Launch Employer Suite</span>
+                    <ArrowRight size={15} />
+                  </Link>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
+                  {[
+                    { title: '1-Click SHA-256 Hash Verification', desc: 'Instantly validate candidate passport authenticity directly against the state ledger to eliminate resume fraud.', href: '/employer/validations', icon: ShieldCheck, badge: 'Anti-Fraud' },
+                    { title: 'Pre-Assessed Candidate Search', desc: 'Filter verified talent by NSQF certification tier, technical score percentiles, and regional district availability.', href: '/employer/candidates', icon: Users, badge: 'Verified Pool' },
+                    { title: 'Direct Job Postings & Hiring Drives', desc: 'Publish open tech requisitions with automated skill match scoring against registered state candidates.', href: '/employer/post-job', icon: Briefcase, badge: 'Fast Track' },
+                    { title: 'Retention & Verification Ledger', desc: 'Confirm employee onboarding and 90-day retention to earn enterprise compliance badges and government incentives.', href: '/employer/validations', icon: Award, badge: 'Retention' },
+                  ].map((feat, idx) => {
+                    const Icon = feat.icon;
+                    return (
+                      <Link
+                        key={idx}
+                        href={feat.href}
+                        style={{
+                          padding: 18,
+                          borderRadius: 14,
+                          background: 'rgba(255,255,255,0.02)',
+                          border: '1px solid var(--border)',
+                          textDecoration: 'none',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          justifyContent: 'space-between',
+                          transition: 'all 0.15s ease',
+                        }}
+                      >
+                        <div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                            <div style={{ padding: 8, borderRadius: 8, background: 'rgba(192,132,252,0.12)', color: '#C084FC' }}>
+                              <Icon size={18} />
+                            </div>
+                            <span style={{ fontSize: 10.5, fontWeight: 800, padding: '2px 8px', borderRadius: 99, background: 'rgba(255,255,255,0.05)', color: 'var(--gold)' }}>
+                              {feat.badge}
+                            </span>
+                          </div>
+                          <h4 style={{ fontSize: 14.5, fontWeight: 800, color: '#f8fafc', margin: '0 0 6px' }}>{feat.title}</h4>
+                          <p style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5, margin: 0 }}>{feat.desc}</p>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 700, color: 'var(--gold)', marginTop: 14 }}>
+                          <span>Access Feature</span>
+                          <ChevronRight size={13} />
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {activeRoleTab === 'institute' && (
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16, marginBottom: 24, borderBottom: '1px solid var(--border)', paddingBottom: 20 }}>
+                  <div>
+                    <span style={{ fontSize: 11, fontWeight: 800, color: '#60A5FA', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                      Vocational Training Partner Workspace
+                    </span>
+                    <h3 className="font-display" style={{ fontSize: 24, fontWeight: 900, color: '#f8fafc', margin: '4px 0 6px' }}>
+                      Training Institute & ITI Performance Portal
+                    </h3>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: 13.5, margin: 0, maxWidth: 640 }}>
+                      Monitor cohort skill mastery, pinpoint curriculum deficiencies vs industry demand, and track longitudinal graduate placement outcomes.
+                    </p>
+                  </div>
+                  <Link
+                    href="/institute"
+                    className="btn-gold"
+                    style={{ fontSize: 13, padding: '10px 22px', display: 'flex', alignItems: 'center', gap: 8 }}
+                  >
+                    <span>Launch Institute Portal</span>
+                    <ArrowRight size={15} />
+                  </Link>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
+                  {[
+                    { title: 'Batch Competency Matrix', desc: 'Real-time telemetry on student test participation, average NSQF tier attainments, and pass percentages.', href: '/institute/cohorts', icon: Layers, badge: 'Real-Time' },
+                    { title: 'Curriculum Skill Gap Auditing', desc: 'Identify which modules (e.g. Next.js vs Docker vs Microservices) lag behind current enterprise hiring requirements.', href: '/institute/curriculum', icon: Target, badge: 'Optimization' },
+                    { title: 'Graduate Placement Ledger', desc: 'Track verified job placements, average starting packages (LPA), and long-term 365-day retention metrics.', href: '/institute/analytics', icon: TrendingUp, badge: 'ROI Auditing' },
+                    { title: 'Automated Credential Minting', desc: 'Issue cryptographically signed NSQF course completion certificates linked to the state skill registry.', href: '/institute/credentials', icon: FileCheck, badge: 'Ledger Signed' },
+                  ].map((feat, idx) => {
+                    const Icon = feat.icon;
+                    return (
+                      <Link
+                        key={idx}
+                        href={feat.href}
+                        style={{
+                          padding: 18,
+                          borderRadius: 14,
+                          background: 'rgba(255,255,255,0.02)',
+                          border: '1px solid var(--border)',
+                          textDecoration: 'none',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          justifyContent: 'space-between',
+                          transition: 'all 0.15s ease',
+                        }}
+                      >
+                        <div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                            <div style={{ padding: 8, borderRadius: 8, background: 'rgba(96,165,250,0.12)', color: '#60A5FA' }}>
+                              <Icon size={18} />
+                            </div>
+                            <span style={{ fontSize: 10.5, fontWeight: 800, padding: '2px 8px', borderRadius: 99, background: 'rgba(255,255,255,0.05)', color: 'var(--gold)' }}>
+                              {feat.badge}
+                            </span>
+                          </div>
+                          <h4 style={{ fontSize: 14.5, fontWeight: 800, color: '#f8fafc', margin: '0 0 6px' }}>{feat.title}</h4>
+                          <p style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5, margin: 0 }}>{feat.desc}</p>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 700, color: 'var(--gold)', marginTop: 14 }}>
+                          <span>Access Feature</span>
+                          <ChevronRight size={13} />
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {activeRoleTab === 'government' && (
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16, marginBottom: 24, borderBottom: '1px solid var(--border)', paddingBottom: 20 }}>
+                  <div>
+                    <span style={{ fontSize: 11, fontWeight: 800, color: '#F59E0B', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                      State Policy & Governance Workspace
+                    </span>
+                    <h3 className="font-display" style={{ fontSize: 24, fontWeight: 900, color: '#f8fafc', margin: '4px 0 6px' }}>
+                      Government of Maharashtra · Skilling Intelligence Cockpit
+                    </h3>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: 13.5, margin: 0, maxWidth: 640 }}>
+                      Macro workforce analytics, 9-stage longitudinal outcome pipelines, grounded AI policy copilots, and district-level economic ROI monitoring.
+                    </p>
+                  </div>
+                  <Link
+                    href="/government"
+                    className="btn-gold"
+                    style={{ fontSize: 13, padding: '10px 22px', display: 'flex', alignItems: 'center', gap: 8 }}
+                  >
+                    <span>Launch Government Cockpit</span>
+                    <ArrowRight size={15} />
+                  </Link>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
+                  {[
+                    { title: '9-Stage Conversion Pipeline', desc: 'Track student conversion from Enrolled to Certified, Placed, 30d, 90d, 180d, and 365d Long-term Retention.', href: '/government', icon: Layers, badge: 'Longitudinal' },
+                    { title: 'Grounded AI Policy Copilot', desc: 'Query natural language policy recommendations backed by real-time district evidence and budget metrics.', href: '/government', icon: Bot, badge: 'AI Copilot' },
+                    { title: 'District Drill-Down Intelligence', desc: 'Compare employment metrics across all 36 Maharashtra districts (Pune, Mumbai, Nagpur, Nashik, etc.).', href: '/government', icon: Landmark, badge: '36 Districts' },
+                    { title: 'Macro Wage Progression Curves', desc: 'Monitor wage growth trajectories from ₹26k baseline to ₹49k/mo at Month 24 to optimize funding allocations.', href: '/government', icon: TrendingUp, badge: 'Wage Growth' },
+                  ].map((feat, idx) => {
+                    const Icon = feat.icon;
+                    return (
+                      <Link
+                        key={idx}
+                        href={feat.href}
+                        style={{
+                          padding: 18,
+                          borderRadius: 14,
+                          background: 'rgba(255,255,255,0.02)',
+                          border: '1px solid var(--border)',
+                          textDecoration: 'none',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          justifyContent: 'space-between',
+                          transition: 'all 0.15s ease',
+                        }}
+                      >
+                        <div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                            <div style={{ padding: 8, borderRadius: 8, background: 'rgba(245,158,11,0.12)', color: '#F59E0B' }}>
+                              <Icon size={18} />
+                            </div>
+                            <span style={{ fontSize: 10.5, fontWeight: 800, padding: '2px 8px', borderRadius: 99, background: 'rgba(255,255,255,0.05)', color: 'var(--gold)' }}>
+                              {feat.badge}
+                            </span>
+                          </div>
+                          <h4 style={{ fontSize: 14.5, fontWeight: 800, color: '#f8fafc', margin: '0 0 6px' }}>{feat.title}</h4>
+                          <p style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5, margin: 0 }}>{feat.desc}</p>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 700, color: 'var(--gold)', marginTop: 14 }}>
+                          <span>Access Feature</span>
+                          <ChevronRight size={13} />
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {activeRoleTab === 'industry' && (
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16, marginBottom: 24, borderBottom: '1px solid var(--border)', paddingBottom: 20 }}>
+                  <div>
+                    <span style={{ fontSize: 11, fontWeight: 800, color: '#EC4899', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                      Sector Skill Council (SSC) Workspace
+                    </span>
+                    <h3 className="font-display" style={{ fontSize: 24, fontWeight: 900, color: '#f8fafc', margin: '4px 0 6px' }}>
+                      Industry & Sector Skill Demand Intelligence
+                    </h3>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: 13.5, margin: 0, maxWidth: 640 }}>
+                      Calibrate National Occupational Standards (NOS), forecast emerging tech surges (GenAI, Cloud), and map talent availability heatmaps.
+                    </p>
+                  </div>
+                  <Link
+                    href="/industry"
+                    className="btn-gold"
+                    style={{ fontSize: 13, padding: '10px 22px', display: 'flex', alignItems: 'center', gap: 8 }}
+                  >
+                    <span>Launch Industry Suite</span>
+                    <ArrowRight size={15} />
+                  </Link>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
+                  {[
+                    { title: 'Skill Demand vs Supply Radar', desc: 'Detect real-time hiring demand spikes across Indian IT corridors vs active training batch supply.', href: '/industry/demand-matrix', icon: BarChart3, badge: 'Real-Time' },
+                    { title: 'National Occupational Standards (NOS)', desc: 'Align qualification packs with modern industry workflows and micro-credential prerequisites.', href: '/industry/standards', icon: Target, badge: 'NOS Calibrated' },
+                    { title: 'Regional Talent Heatmaps', desc: 'Identify surplus vs deficit technical skill regions across Maharashtra to guide corporate CSR & hiring.', href: '/industry/heatmaps', icon: Landmark, badge: 'Geo Spatial' },
+                  ].map((feat, idx) => {
+                    const Icon = feat.icon;
+                    return (
+                      <Link
+                        key={idx}
+                        href={feat.href}
+                        style={{
+                          padding: 18,
+                          borderRadius: 14,
+                          background: 'rgba(255,255,255,0.02)',
+                          border: '1px solid var(--border)',
+                          textDecoration: 'none',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          justifyContent: 'space-between',
+                          transition: 'all 0.15s ease',
+                        }}
+                      >
+                        <div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                            <div style={{ padding: 8, borderRadius: 8, background: 'rgba(236,72,153,0.12)', color: '#EC4899' }}>
+                              <Icon size={18} />
+                            </div>
+                            <span style={{ fontSize: 10.5, fontWeight: 800, padding: '2px 8px', borderRadius: 99, background: 'rgba(255,255,255,0.05)', color: 'var(--gold)' }}>
+                              {feat.badge}
+                            </span>
+                          </div>
+                          <h4 style={{ fontSize: 14.5, fontWeight: 800, color: '#f8fafc', margin: '0 0 6px' }}>{feat.title}</h4>
+                          <p style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5, margin: 0 }}>{feat.desc}</p>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 700, color: 'var(--gold)', marginTop: 14 }}>
+                          <span>Access Feature</span>
+                          <ChevronRight size={13} />
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {activeRoleTab === 'admin' && (
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16, marginBottom: 24, borderBottom: '1px solid var(--border)', paddingBottom: 20 }}>
+                  <div>
+                    <span style={{ fontSize: 11, fontWeight: 800, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                      System Governance & Audit Workspace
+                    </span>
+                    <h3 className="font-display" style={{ fontSize: 24, fontWeight: 900, color: '#f8fafc', margin: '4px 0 6px' }}>
+                      Platform Administrator & Audit Center
+                    </h3>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: 13.5, margin: 0, maxWidth: 640 }}>
+                      Manage decentralized ledger integrity, audit algorithmic fairness models, monitor LLM telemetry, and oversee DPDP compliance.
+                    </p>
+                  </div>
+                  <Link
+                    href="/admin"
+                    className="btn-gold"
+                    style={{ fontSize: 13, padding: '10px 22px', display: 'flex', alignItems: 'center', gap: 8 }}
+                  >
+                    <span>Launch Admin Center</span>
+                    <ArrowRight size={15} />
+                  </Link>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
+                  {[
+                    { title: 'Algorithmic Fairness & Bias Auditing', desc: 'Continuous demographic parity monitoring enforcing the 80% (4/5ths) rule across gender and rural cohorts.', href: '/admin/fairness', icon: ShieldCheck, badge: 'Fairness Engine' },
+                    { title: 'Decentralized Ledger Audit Trail', desc: 'Inspect HMAC SHA-256 passport minting logs and external employer verification requests in real-time.', href: '/admin/ledger', icon: Database, badge: 'Immutable' },
+                    { title: 'Role & User Access Control (RBAC)', desc: 'Manage permissions, API rate limit quotas, and enterprise partner verification credentials.', href: '/admin/users', icon: Users, badge: 'RBAC' },
+                    { title: 'System Health & LLM Telemetry', desc: 'Real-time monitoring of inference latency, model fallback availability, and server cluster uptimes.', href: '/ai-health', icon: Zap, badge: 'Telemetry' },
+                  ].map((feat, idx) => {
+                    const Icon = feat.icon;
+                    return (
+                      <Link
+                        key={idx}
+                        href={feat.href}
+                        style={{
+                          padding: 18,
+                          borderRadius: 14,
+                          background: 'rgba(255,255,255,0.02)',
+                          border: '1px solid var(--border)',
+                          textDecoration: 'none',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          justifyContent: 'space-between',
+                          transition: 'all 0.15s ease',
+                        }}
+                      >
+                        <div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                            <div style={{ padding: 8, borderRadius: 8, background: 'rgba(148,163,184,0.12)', color: '#94A3B8' }}>
+                              <Icon size={18} />
+                            </div>
+                            <span style={{ fontSize: 10.5, fontWeight: 800, padding: '2px 8px', borderRadius: 99, background: 'rgba(255,255,255,0.05)', color: 'var(--gold)' }}>
+                              {feat.badge}
+                            </span>
+                          </div>
+                          <h4 style={{ fontSize: 14.5, fontWeight: 800, color: '#f8fafc', margin: '0 0 6px' }}>{feat.title}</h4>
+                          <p style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5, margin: 0 }}>{feat.desc}</p>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 700, color: 'var(--gold)', marginTop: 14 }}>
+                          <span>Access Feature</span>
+                          <ChevronRight size={13} />
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* ── 8B. National Skilling Telemetry & Macro Impact ── */}
+      <section style={{ padding: '60px 24px', background: 'rgba(245,158,11,0.03)', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}>
+        <div style={{ maxWidth: 1240, margin: '0 auto' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 20, textAlign: 'center' }}>
+            {[
+              { label: 'Districts Monitored', value: '36 Districts', sub: 'Across Maharashtra State', color: 'var(--gold)' },
+              { label: 'Verified Skill Passports', value: '1,240,000+', sub: 'Cryptographically Minted', color: '#10B981' },
+              { label: 'Diagnostic Precision', value: '94.2%', sub: 'NSQF Calibrated Neural Engine', color: '#60A5FA' },
+              { label: 'Average Placed Salary', value: '₹7.80 LPA', sub: '+38% Longitudinal Wage Boost', color: '#C084FC' },
+            ].map((stat, idx) => (
+              <div key={idx} style={{ padding: '14px 20px' }}>
+                <div className="font-display" style={{ fontSize: 32, fontWeight: 900, color: stat.color, letterSpacing: '-0.02em' }}>
+                  {stat.value}
+                </div>
+                <div style={{ fontSize: 13, fontWeight: 800, color: '#f8fafc', marginTop: 4 }}>
+                  {stat.label}
+                </div>
+                <div style={{ fontSize: 11.5, color: 'var(--text-secondary)', marginTop: 2 }}>
+                  {stat.sub}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── 8C. Frequently Asked Questions (FAQ) Section ── */}
+      <section id="faq" style={{ padding: '80px 24px', background: 'var(--bg)' }}>
+        <div style={{ maxWidth: 880, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 44 }}>
+            <AIBadge type="verified" label="FREQUENTLY ASKED QUESTIONS" />
+            <h2 className="font-display" style={{ fontSize: 'clamp(24px, 3.2vw, 36px)', fontWeight: 800, color: '#f8fafc', margin: '8px 0 10px' }}>
+              Everything You Need to Know About <span style={{ color: 'var(--gold)' }}>SkillSense AI</span>
+            </h2>
+            <p style={{ color: 'var(--text-secondary)', fontSize: 14, margin: 0 }}>
+              Transparent answers regarding algorithmic scoring, NSQF mapping, cryptographic passports, and DPDP compliance.
+            </p>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {[
+              {
+                q: 'How does SkillSense AI evaluate candidate competency without bias?',
+                a: 'SkillSense utilizes a multi-modal analysis engine that evaluates source code architecture, test coverage, algorithmic efficiency, and timed diagnostic quizzes. All scoring models are continuously audited against disparate impact metrics enforcing the 80% rule across gender, institution, and geographical demographics.',
+              },
+              {
+                q: 'What is a Cryptographic Skill Passport and how do recruiters verify it?',
+                a: 'The Skill Passport is an immutable digital credential containing verified technical competency percentiles and NSQF certification tiers. Each credential is authenticated with a SHA-256 HMAC ledger signature. Employers can verify claims in one click by scanning the QR code or querying the public endpoint (/verify/:hash).',
+              },
+              {
+                q: 'How does the platform align with National Skills Qualifications Framework (NSQF)?',
+                a: 'Assessments and career pathways are directly calibrated against NSQF Levels 4 through 7. Each level establishes concrete proficiency thresholds for knowledge, core skills, autonomy, and vocational applicability recognized by the Ministry of Skill Development and Entrepreneurship (MSDE).',
+              },
+              {
+                q: 'How is candidate privacy protected under the India DPDP Act 2023?',
+                a: 'SkillSense implements sovereign consent governance. Candidates have granular control to grant or revoke specific processing purposes (e.g. longitudinal tracking vs wage benchmarking). All personal identifying information is masked in government macro views, and trainees can export or request deletion of their data under DPDP Article 12.',
+              },
+              {
+                q: 'Can institutions and ITIs integrate their existing learning management systems?',
+                a: 'Yes. SkillSense provides open REST APIs and batch CSV integration tools allowing vocational training providers to bulk enroll cohorts, synchronize exam results, and monitor longitudinal graduate retention without replacing existing LMS tools.',
+              },
+              {
+                q: 'How does the Grounded AI Policy Copilot assist government officers?',
+                a: 'The Policy Copilot interfaces directly with Maharashtra district outcome databases. When queried, it synthesizes empirical evidence on completion rates, drop-off barriers, and post-training wage growth to recommend targeted budget allocations and curriculum interventions.',
+              },
+            ].map((faq, idx) => {
+              const isOpen = openFaq === idx;
+              return (
+                <div
+                  key={idx}
+                  className="card-linear"
+                  style={{
+                    borderRadius: 12,
+                    overflow: 'hidden',
+                    border: `1px solid ${isOpen ? 'var(--gold)' : 'var(--border)'}`,
+                    transition: 'border-color 0.15s ease',
+                  }}
+                >
+                  <button
+                    type="button"
+                    onClick={() => setOpenFaq(isOpen ? null : idx)}
+                    style={{
+                      width: '100%',
+                      padding: '16px 20px',
+                      background: 'transparent',
+                      border: 'none',
+                      textAlign: 'left',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      gap: 12,
+                      cursor: 'pointer',
+                      color: '#f8fafc',
+                    }}
+                  >
+                    <span style={{ fontSize: 14.5, fontWeight: 700 }}>{faq.q}</span>
+                    <ChevronDown
+                      size={16}
+                      color="var(--gold)"
+                      style={{
+                        transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                        transition: 'transform 0.2s ease',
+                        flexShrink: 0,
+                      }}
+                    />
+                  </button>
+
+                  {isOpen && (
+                    <div style={{ padding: '0 20px 16px', fontSize: 13.5, color: '#cbd5e1', lineHeight: 1.6, borderTop: '1px solid rgba(255,255,255,0.04)', paddingTop: 12 }}>
+                      {faq.a}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
