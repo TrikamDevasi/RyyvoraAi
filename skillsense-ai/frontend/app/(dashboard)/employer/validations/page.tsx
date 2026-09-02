@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import api from '@/lib/api';
 import {
   ShieldCheck,
@@ -13,6 +14,8 @@ import {
   RefreshCw,
   ExternalLink,
   Award,
+  ArrowLeft,
+  UserCheck,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -58,126 +61,196 @@ export default function EmployerValidationsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#090A0F] text-slate-100 p-4 sm:p-6 lg:p-8 space-y-8">
-      {/* Header */}
-      <div className="rounded-2xl bg-gradient-to-r from-[#111624] via-[#161D30] to-[#121726] border border-amber-500/25 p-6 sm:p-8 shadow-2xl relative overflow-hidden">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+    <div
+      style={{
+        minHeight: '100vh',
+        background: '#090A0F',
+        color: '#F8FAFC',
+        padding: '24px 20px 60px',
+        fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+      }}
+    >
+      <div style={{ maxWidth: 1140, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 24 }}>
+
+        {/* ── Header Banner ── */}
+        <div
+          style={{
+            borderRadius: 20,
+            padding: '28px 32px',
+            background: 'linear-gradient(135deg, #111422 0%, #171D30 50%, #101424 100%)',
+            border: '1px solid rgba(245, 158, 11, 0.25)',
+            boxShadow: '0 16px 40px rgba(0,0,0,0.6)',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'flex-start',
+            flexWrap: 'wrap',
+            gap: 20,
+          }}
+        >
           <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="px-3 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center gap-1.5">
-                <ShieldCheck className="w-3.5 h-3.5" /> Employer Verification Ledger
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 5,
+                  padding: '3px 9px',
+                  borderRadius: 99,
+                  fontSize: 11,
+                  fontWeight: 800,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.06em',
+                  background: 'rgba(245, 158, 11, 0.12)',
+                  color: '#F59E0B',
+                  border: '1px solid rgba(245, 158, 11, 0.25)',
+                }}
+              >
+                <ShieldCheck size={13} /> Employer Verification Ledger
               </span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+
+            <h1
+              style={{
+                fontSize: 'clamp(22px, 3vw, 30px)',
+                fontWeight: 900,
+                color: '#FFFFFF',
+                letterSpacing: '-0.03em',
+                margin: '4px 0 8px',
+              }}
+            >
               Candidate Placement & Outcome Validations
             </h1>
-            <p className="text-slate-400 text-sm max-w-2xl mt-1">
-              Review and verify candidate self-reported placement claims. Verified records receive state cryptographic accreditation and 96%+ confidence rating.
+
+            <p style={{ color: '#94A3B8', fontSize: 14, maxWidth: 680, lineHeight: 1.6, margin: 0 }}>
+              Review and verify candidate self-reported placement claims. Verified records receive state cryptographic accreditation and 96%+ confidence rating on state dashboards.
             </p>
           </div>
 
           <button
             onClick={loadPending}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-bold transition-all shrink-0"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              padding: '10px 18px',
+              borderRadius: 10,
+              background: 'rgba(255, 255, 255, 0.05)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              color: '#F8FAFC',
+              fontSize: 12,
+              fontWeight: 700,
+              cursor: 'pointer',
+            }}
           >
-            <RefreshCw className="w-3.5 h-3.5" /> Refresh Queue
+            <RefreshCw size={14} className={loading ? 'animate-spin' : ''} /> Refresh Queue
           </button>
         </div>
-      </div>
 
-      {/* Pending Verifications Queue */}
-      <div className="rounded-2xl bg-[#11141E] border border-slate-800 p-6 sm:p-8 space-y-6 shadow-xl">
-        <div className="flex items-center justify-between border-b border-slate-800 pb-4">
-          <div>
-            <h2 className="text-lg font-bold text-white">Pending Verification Queue</h2>
-            <p className="text-xs text-slate-400 mt-0.5">Candidates awaiting formal employer confirmation.</p>
+        {/* ── Pending Verifications Queue ── */}
+        <div style={{ background: '#10131E', borderRadius: 18, border: '1px solid rgba(255,255,255,0.08)', padding: 28, boxShadow: '0 8px 30px rgba(0,0,0,0.5)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: 16, marginBottom: 20 }}>
+            <div>
+              <h2 style={{ fontSize: 17, fontWeight: 800, color: '#FFFFFF', margin: '0 0 4px' }}>Pending Verification Queue</h2>
+              <p style={{ fontSize: 13, color: '#94A3B8', margin: 0 }}>Candidates awaiting formal employer confirmation.</p>
+            </div>
+            <span style={{ fontSize: 11, fontWeight: 800, padding: '4px 10px', borderRadius: 99, background: 'rgba(245,158,11,0.12)', color: '#F59E0B', border: '1px solid rgba(245,158,11,0.25)' }}>
+              {pendingList.length} Pending Actions
+            </span>
           </div>
-          <span className="text-xs font-bold px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
-            {pendingList.length} Pending Actions
-          </span>
+
+          {loading ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {[1, 2, 3].map((n) => (
+                <div key={n} style={{ height: 120, borderRadius: 14, background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }} />
+              ))}
+            </div>
+          ) : pendingList.length === 0 ? (
+            <div style={{ padding: '48px 24px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+              <CheckCircle2 size={44} style={{ color: '#10B981' }} />
+              <h3 style={{ fontSize: 16, fontWeight: 800, color: '#FFFFFF', margin: 0 }}>Queue is Clear</h3>
+              <p style={{ fontSize: 13, color: '#94A3B8', maxWidth: 420, margin: 0 }}>
+                All candidate claims submitted under your enterprise name have been validated.
+              </p>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              {pendingList.map((item) => (
+                <div
+                  key={item._id}
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.02)',
+                    borderRadius: 14,
+                    border: '1px solid rgba(255, 255, 255, 0.06)',
+                    padding: 20,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 16,
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                        <h3 style={{ fontSize: 16, fontWeight: 800, color: '#FFFFFF', margin: 0 }}>
+                          {item.studentId?.userId?.name || 'Candidate Claim'}
+                        </h3>
+                        <span style={{ fontSize: 11, color: '#94A3B8', fontFamily: "'JetBrains Mono', monospace" }}>
+                          {item.studentId?.enrollmentNumber || 'ENR-9921'}
+                        </span>
+                      </div>
+                      <p style={{ fontSize: 13, color: '#CBD5E1', margin: 0 }}>
+                        Claimed Role: <strong style={{ color: '#F59E0B' }}>{item.jobRole || 'Software Engineer'}</strong>
+                      </p>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{ fontSize: 12, color: '#10B981', fontWeight: 700, padding: '4px 10px', borderRadius: 8, background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.25)' }}>
+                        ₹{item.monthlySalary ? item.monthlySalary.toLocaleString('en-IN') : '25,000'}/mo
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, paddingTop: 14, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                    <button
+                      onClick={() => handleAction(item._id, 'REJECT')}
+                      disabled={actionLoading === item._id}
+                      style={{
+                        padding: '8px 16px',
+                        borderRadius: 8,
+                        background: 'rgba(239, 68, 68, 0.1)',
+                        border: '1px solid rgba(239, 68, 68, 0.25)',
+                        color: '#F87171',
+                        fontSize: 12,
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      Reject Claim
+                    </button>
+                    <button
+                      onClick={() => handleAction(item._id, 'VERIFY')}
+                      disabled={actionLoading === item._id}
+                      style={{
+                        padding: '8px 20px',
+                        borderRadius: 8,
+                        background: 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
+                        border: 'none',
+                        color: '#FFFFFF',
+                        fontSize: 12,
+                        fontWeight: 800,
+                        cursor: 'pointer',
+                        boxShadow: '0 4px 14px rgba(16, 185, 129, 0.3)',
+                      }}
+                    >
+                      Confirm Placement (Verify)
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
-        {loading ? (
-          <div className="space-y-4">
-            {[1, 2, 3].map((n) => (
-              <div key={n} className="h-28 rounded-xl bg-slate-800/40 animate-pulse border border-slate-800" />
-            ))}
-          </div>
-        ) : pendingList.length === 0 ? (
-          <div className="rounded-xl border border-slate-800/80 bg-slate-900/40 p-12 text-center space-y-3">
-            <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto" />
-            <h3 className="text-base font-bold text-white">All Pending Claims Verified</h3>
-            <p className="text-xs text-slate-400 max-w-md mx-auto">
-              No unconfirmed placement records currently pending for your enterprise.
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {pendingList.map((item) => (
-              <div
-                key={item._id}
-                className="p-5 rounded-xl bg-slate-900/80 border border-slate-800 hover:border-amber-500/30 transition-all flex flex-col md:flex-row items-start md:items-center justify-between gap-6"
-              >
-                <div className="space-y-2">
-                  <div className="flex items-center gap-3">
-                    <span className="text-sm font-bold text-white">
-                      {item.traineeId?.name || 'Aarav Deshmukh'}
-                    </span>
-                    <span className="text-xs text-slate-400 font-mono">
-                      {item.traineeId?.email || 'trainee@skillsense.demo'}
-                    </span>
-                    <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                      {item.status}
-                    </span>
-                  </div>
-
-                  <div className="flex flex-wrap items-center gap-4 text-xs text-slate-300">
-                    <span className="flex items-center gap-1">
-                      <Briefcase className="w-3.5 h-3.5 text-amber-400" />
-                      Role: <strong className="text-white">{item.jobRole || 'Technical Associate'}</strong>
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Building className="w-3.5 h-3.5 text-slate-400" />
-                      Program: {item.program}
-                    </span>
-                    {item.currentSalary && (
-                      <span className="flex items-center gap-1 text-emerald-400 font-semibold">
-                        <DollarSign className="w-3.5 h-3.5" />
-                        ₹{item.currentSalary.toLocaleString('en-IN')}/mo
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2.5 shrink-0">
-                  <button
-                    onClick={() => handleAction(item._id, 'VERIFY')}
-                    disabled={actionLoading === item._id}
-                    className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs shadow-md shadow-emerald-500/20 transition-all flex items-center gap-1.5"
-                  >
-                    <CheckCircle2 className="w-3.5 h-3.5" />
-                    Verify Placement
-                  </button>
-                  <button
-                    onClick={() => handleAction(item._id, 'CORRECTION_REQUESTED')}
-                    disabled={actionLoading === item._id}
-                    className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold border border-slate-700 transition-all"
-                  >
-                    Request Correction
-                  </button>
-                  <button
-                    onClick={() => handleAction(item._id, 'REJECT')}
-                    disabled={actionLoading === item._id}
-                    className="p-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 transition-all"
-                    title="Reject Placement Claim"
-                  >
-                    <XCircle className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
 import api from '@/lib/api';
 import {
@@ -15,6 +16,8 @@ import {
   AlertTriangle,
   RefreshCw,
   UserCheck,
+  ArrowLeft,
+  Check,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -117,188 +120,245 @@ export default function TraineeConsentPage() {
   const isGranted = consent?.status === 'GRANTED';
 
   return (
-    <div className="min-h-screen bg-[#090A0F] text-slate-100 p-4 sm:p-6 lg:p-8 space-y-8 max-w-6xl mx-auto">
-      {/* Header */}
-      <div className="rounded-2xl bg-gradient-to-r from-[#131722] to-[#1A2030] border border-amber-500/20 p-6 sm:p-8 shadow-2xl relative overflow-hidden">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
+    <div
+      style={{
+        minHeight: '100vh',
+        background: '#090A0F',
+        color: '#F8FAFC',
+        padding: '24px 20px 60px',
+        fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+      }}
+    >
+      <div style={{ maxWidth: 1080, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 24 }}>
+
+        {/* ── Top Nav ── */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Link
+            href="/student/journey"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              color: '#94A3B8',
+              textDecoration: 'none',
+              fontSize: 13,
+              fontWeight: 600,
+              padding: '6px 12px',
+              borderRadius: 8,
+              background: 'rgba(255, 255, 255, 0.03)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+            }}
+          >
+            <ArrowLeft size={14} /> Back to Outcome Journey
+          </Link>
+        </div>
+
+        {/* ── Header Banner ── */}
+        <div
+          style={{
+            borderRadius: 20,
+            padding: '28px 32px',
+            background: 'linear-gradient(135deg, #111422 0%, #171D30 50%, #101424 100%)',
+            border: '1px solid rgba(245, 158, 11, 0.25)',
+            boxShadow: '0 16px 40px rgba(0,0,0,0.6)',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'flex-start',
+            flexWrap: 'wrap',
+            gap: 20,
+          }}
+        >
           <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="px-3 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1.5">
-                <Lock className="w-3.5 h-3.5" /> India DPDP Act 2023 Compliant
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 5,
+                  padding: '3px 9px',
+                  borderRadius: 99,
+                  fontSize: 11,
+                  fontWeight: 800,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.06em',
+                  background: 'rgba(16, 185, 129, 0.12)',
+                  color: '#10B981',
+                  border: '1px solid rgba(16, 185, 129, 0.25)',
+                }}
+              >
+                <Lock size={12} /> India DPDP Act 2023 Compliant
               </span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+
+            <h1
+              style={{
+                fontSize: 'clamp(22px, 3vw, 30px)',
+                fontWeight: 900,
+                color: '#FFFFFF',
+                letterSpacing: '-0.03em',
+                margin: '4px 0 8px',
+              }}
+            >
               Consent & Privacy Management Center
             </h1>
-            <p className="text-slate-400 text-sm max-w-2xl mt-1">
-              You maintain sovereign ownership of your skilling and outcome data. Choose transparently how your records are stored, verified, and used.
+
+            <p style={{ color: '#94A3B8', fontSize: 14, maxWidth: 680, lineHeight: 1.6, margin: 0 }}>
+              You maintain sovereign ownership of your skilling and outcome data. Choose transparently how your records are stored, verified, and used across the state ecosystem.
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div
-              className={`px-4 py-2.5 rounded-xl border font-bold text-xs flex items-center gap-2 ${
-                isGranted
-                  ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
-                  : 'bg-rose-500/10 border-rose-500/30 text-rose-400'
-              }`}
-            >
-              {isGranted ? (
-                <>
-                  <ShieldCheck className="w-4 h-4" />
-                  Consent Status: GRANTED
-                </>
-              ) : (
-                <>
-                  <ShieldAlert className="w-4 h-4" />
-                  Consent Status: WITHDRAWN
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* DPDP 5-Pillar Transparency Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="rounded-xl bg-[#11141E] border border-slate-800 p-5 space-y-2">
-          <div className="p-2 w-fit rounded-lg bg-amber-500/10 text-amber-400">
-            <Eye className="w-4 h-4" />
-          </div>
-          <h3 className="text-sm font-bold text-white">WHAT & WHY We Collect</h3>
-          <p className="text-xs text-slate-400 leading-relaxed">
-            We store assessment scores, certificate hashes, and voluntary employment milestones to track long-term vocational impact.
-          </p>
-        </div>
-
-        <div className="rounded-xl bg-[#11141E] border border-slate-800 p-5 space-y-2">
-          <div className="p-2 w-fit rounded-lg bg-emerald-500/10 text-emerald-400">
-            <UserCheck className="w-4 h-4" />
-          </div>
-          <h3 className="text-sm font-bold text-white">WHO Has Access</h3>
-          <p className="text-xs text-slate-400 leading-relaxed">
-            Only your affiliated training institute and authorized employers verify claims. Government analytics receive masked, aggregated metrics.
-          </p>
-        </div>
-
-        <div className="rounded-xl bg-[#11141E] border border-slate-800 p-5 space-y-2">
-          <div className="p-2 w-fit rounded-lg bg-cyan-500/10 text-cyan-400">
-            <Lock className="w-4 h-4" />
-          </div>
-          <h3 className="text-sm font-bold text-white">Right to Withdraw</h3>
-          <p className="text-xs text-slate-400 leading-relaxed">
-            You can revoke or modify consent at any time. Revocation immediately suspends optional longitudinal follow-up surveys.
-          </p>
-        </div>
-      </div>
-
-      {/* Purpose Toggles Section */}
-      <div className="rounded-2xl bg-[#11141E] border border-slate-800 p-6 sm:p-8 space-y-6 shadow-xl">
-        <div className="flex items-center justify-between border-b border-slate-800 pb-4">
           <div>
-            <h2 className="text-lg font-bold text-white">Granular Consent Permissions</h2>
-            <p className="text-xs text-slate-400 mt-0.5">Toggle specific processing purposes according to your privacy preference.</p>
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '8px 16px',
+                borderRadius: 12,
+                fontSize: 12,
+                fontWeight: 800,
+                background: isGranted ? 'rgba(16, 185, 129, 0.12)' : 'rgba(239, 68, 68, 0.12)',
+                color: isGranted ? '#10B981' : '#F87171',
+                border: isGranted ? '1px solid rgba(16, 185, 129, 0.3)' : '1px solid rgba(239, 68, 68, 0.3)',
+              }}
+            >
+              {isGranted ? <ShieldCheck size={16} /> : <ShieldAlert size={16} />}
+              Consent Status: {isGranted ? 'GRANTED' : 'WITHDRAWN'}
+            </span>
           </div>
-          <button
-            onClick={loadConsent}
-            className="p-2 rounded-lg bg-slate-800 text-slate-400 hover:text-white"
-          >
-            <RefreshCw className="w-4 h-4" />
-          </button>
         </div>
 
-        <div className="space-y-4">
-          {PURPOSES.map((purpose) => {
-            const isChecked = selectedPurposes.includes(purpose.id);
-            return (
-              <div
-                key={purpose.id}
-                onClick={() => handlePurposeToggle(purpose.id)}
-                className={`p-4 rounded-xl border transition-all cursor-pointer flex items-start justify-between gap-4 ${
-                  isChecked
-                    ? 'bg-amber-500/5 border-amber-500/30'
-                    : 'bg-slate-900/50 border-slate-800 opacity-60'
-                }`}
-              >
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2
-                      className={`w-4 h-4 ${isChecked ? 'text-amber-400' : 'text-slate-600'}`}
-                    />
-                    <h4 className="text-sm font-bold text-white">{purpose.title}</h4>
-                  </div>
-                  <p className="text-xs text-slate-400 pl-6">{purpose.desc}</p>
-                </div>
+        {/* ── DPDP 3-Pillar Grid ── */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 18 }}>
+          <div style={{ background: '#10131E', borderRadius: 14, border: '1px solid rgba(255,255,255,0.08)', padding: 20 }}>
+            <div style={{ width: 34, height: 34, borderRadius: 8, background: 'rgba(245,158,11,0.12)', color: '#F59E0B', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
+              <Eye size={17} />
+            </div>
+            <h3 style={{ fontSize: 14, fontWeight: 800, color: '#FFFFFF', margin: '0 0 6px' }}>WHAT & WHY We Collect</h3>
+            <p style={{ fontSize: 12, color: '#94A3B8', lineHeight: 1.55, margin: 0 }}>
+              We store assessment scores, certificate hashes, and voluntary employment milestones to track long-term vocational impact.
+            </p>
+          </div>
 
+          <div style={{ background: '#10131E', borderRadius: 14, border: '1px solid rgba(255,255,255,0.08)', padding: 20 }}>
+            <div style={{ width: 34, height: 34, borderRadius: 8, background: 'rgba(16,185,129,0.12)', color: '#10B981', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
+              <UserCheck size={17} />
+            </div>
+            <h3 style={{ fontSize: 14, fontWeight: 800, color: '#FFFFFF', margin: '0 0 6px' }}>WHO Has Access</h3>
+            <p style={{ fontSize: 12, color: '#94A3B8', lineHeight: 1.55, margin: 0 }}>
+              Only your affiliated training institute and authorized employers verify claims. Government analytics receive masked, aggregated metrics.
+            </p>
+          </div>
+
+          <div style={{ background: '#10131E', borderRadius: 14, border: '1px solid rgba(255,255,255,0.08)', padding: 20 }}>
+            <div style={{ width: 34, height: 34, borderRadius: 8, background: 'rgba(99,102,241,0.12)', color: '#818CF8', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
+              <Lock size={17} />
+            </div>
+            <h3 style={{ fontSize: 14, fontWeight: 800, color: '#FFFFFF', margin: '0 0 6px' }}>Right to Revoke</h3>
+            <p style={{ fontSize: 12, color: '#94A3B8', lineHeight: 1.55, margin: 0 }}>
+              You can revoke or modify consent at any time. Revocation immediately suspends optional longitudinal follow-up surveys.
+            </p>
+          </div>
+        </div>
+
+        {/* ── Granular Consent Permissions ── */}
+        <div style={{ background: '#10131E', borderRadius: 18, border: '1px solid rgba(255,255,255,0.08)', padding: 28, boxShadow: '0 8px 30px rgba(0,0,0,0.5)' }}>
+          <div style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', paddingBottom: 16, marginBottom: 20 }}>
+            <h2 style={{ fontSize: 17, fontWeight: 800, color: '#FFFFFF', margin: '0 0 4px' }}>Granular Consent Permissions</h2>
+            <p style={{ fontSize: 13, color: '#94A3B8', margin: 0 }}>Toggle specific processing purposes according to your privacy preferences.</p>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            {PURPOSES.map((p) => {
+              const isChecked = selectedPurposes.includes(p.id);
+
+              return (
                 <div
-                  className={`w-11 h-6 rounded-full transition-colors relative flex items-center px-1 shrink-0 ${
-                    isChecked ? 'bg-amber-500' : 'bg-slate-700'
-                  }`}
+                  key={p.id}
+                  onClick={() => handlePurposeToggle(p.id)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: 14,
+                    padding: 16,
+                    borderRadius: 12,
+                    background: isChecked ? 'rgba(245, 158, 11, 0.04)' : 'rgba(255, 255, 255, 0.02)',
+                    border: isChecked ? '1px solid rgba(245, 158, 11, 0.25)' : '1px solid rgba(255, 255, 255, 0.05)',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                  }}
                 >
                   <div
-                    className={`w-4 h-4 rounded-full bg-white transition-transform ${
-                      isChecked ? 'translate-x-5' : 'translate-x-0'
-                    }`}
-                  />
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        <div className="flex flex-wrap items-center justify-between gap-4 pt-6 border-t border-slate-800">
-          <button
-            onClick={() => handleSaveConsent('WITHDRAWN')}
-            disabled={saving || !isGranted}
-            className="px-5 py-2.5 rounded-xl border border-rose-500/40 text-rose-400 hover:bg-rose-500/10 text-xs font-bold transition-all disabled:opacity-40"
-          >
-            Withdraw All Consent
-          </button>
-
-          <button
-            onClick={() => handleSaveConsent('GRANTED')}
-            disabled={saving}
-            className="px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs shadow-lg shadow-amber-500/20 transition-all disabled:opacity-50"
-          >
-            {saving ? 'Saving...' : 'Save & Confirm Consent'}
-          </button>
-        </div>
-      </div>
-
-      {/* Audit History Log */}
-      {consent?.consentHistory && consent.consentHistory.length > 0 && (
-        <div className="rounded-2xl bg-[#11141E] border border-slate-800 p-6 space-y-4">
-          <h3 className="text-sm font-bold text-white flex items-center gap-2">
-            <Clock className="w-4 h-4 text-amber-400" />
-            Consent Audit Trail
-          </h3>
-          <div className="divide-y divide-slate-800">
-            {consent.consentHistory.map((h, i) => (
-              <div key={i} className="py-3 flex items-center justify-between text-xs">
-                <div className="flex items-center gap-3">
-                  <span
-                    className={`px-2 py-0.5 rounded font-bold text-[10px] ${
-                      h.action === 'GRANT'
-                        ? 'bg-emerald-500/10 text-emerald-400'
-                        : h.action === 'WITHDRAW'
-                        ? 'bg-rose-500/10 text-rose-400'
-                        : 'bg-amber-500/10 text-amber-400'
-                    }`}
+                    style={{
+                      width: 20,
+                      height: 20,
+                      borderRadius: 6,
+                      background: isChecked ? '#F59E0B' : 'rgba(255,255,255,0.05)',
+                      border: isChecked ? 'none' : '1px solid rgba(255,255,255,0.2)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#090A0F',
+                      marginTop: 2,
+                      flexShrink: 0,
+                    }}
                   >
-                    {h.action}
-                  </span>
-                  <span className="text-slate-300">
-                    {h.purposes?.length || 0} Purposes Approved
-                  </span>
+                    {isChecked && <Check size={14} strokeWidth={3} />}
+                  </div>
+
+                  <div>
+                    <h4 style={{ fontSize: 14, fontWeight: 700, color: isChecked ? '#FFFFFF' : '#CBD5E1', margin: '0 0 4px' }}>
+                      {p.title}
+                    </h4>
+                    <p style={{ fontSize: 12, color: '#94A3B8', lineHeight: 1.5, margin: 0 }}>
+                      {p.desc}
+                    </p>
+                  </div>
                 </div>
-                <span className="text-slate-500 font-mono">
-                  {new Date(h.timestamp).toLocaleString('en-IN')}
-                </span>
-              </div>
-            ))}
+              );
+            })}
+          </div>
+
+          {/* Action Buttons */}
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, marginTop: 24, paddingTop: 20, borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+            <button
+              onClick={() => handleSaveConsent('WITHDRAWN')}
+              disabled={saving}
+              style={{
+                padding: '11px 20px',
+                borderRadius: 10,
+                background: 'rgba(239, 68, 68, 0.1)',
+                border: '1px solid rgba(239, 68, 68, 0.25)',
+                color: '#F87171',
+                fontSize: 13,
+                fontWeight: 700,
+                cursor: 'pointer',
+              }}
+            >
+              Withdraw All Consent
+            </button>
+
+            <button
+              onClick={() => handleSaveConsent('GRANTED')}
+              disabled={saving}
+              style={{
+                padding: '11px 24px',
+                borderRadius: 10,
+                background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
+                border: 'none',
+                color: '#090A0F',
+                fontSize: 13,
+                fontWeight: 800,
+                cursor: saving ? 'not-allowed' : 'pointer',
+                boxShadow: '0 4px 18px rgba(245, 158, 11, 0.3)',
+              }}
+            >
+              {saving ? 'Saving...' : 'Save DPDP Preferences'}
+            </button>
           </div>
         </div>
-      )}
+
+      </div>
     </div>
   );
 }

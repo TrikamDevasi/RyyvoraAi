@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '@/lib/api';
 import { useAuth } from '@/hooks/useAuth';
@@ -22,9 +23,11 @@ import {
   RefreshCw,
   HelpCircle,
   ExternalLink,
+  BookOpen,
+  MapPin,
+  Check,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { AIBadge } from '@/components/ui/AIBadge';
 
 interface TimelineEvent {
   _id: string;
@@ -101,29 +104,33 @@ export default function TraineeJourneyPage() {
     try {
       const payload: any = {
         status,
-        jobRole,
         trainingRelevance,
       };
 
       if (status === 'EMPLOYED' || status === 'APPRENTICESHIP') {
         payload.employerName = employerName;
         payload.employerContact = employerContact;
+        payload.jobRole = jobRole;
         if (monthlySalary) payload.monthlySalary = Number(monthlySalary);
       } else if (status === 'SELF_EMPLOYED') {
-        payload.employerName = 'Self-Employed Venture';
+        payload.jobRole = jobRole || 'Independent Practitioner';
         if (monthlySalary) payload.monthlySalary = Number(monthlySalary);
-      } else if (status === 'SEEKING' || status === 'UNEMPLOYED') {
+      } else {
         payload.nonPlacementReason = nonPlacementReason;
       }
 
       const res = await api.post('/outcomes/self-report', payload);
       if (res.data?.success) {
-        toast.success('Employment status recorded in longitudinal ledger!');
+        toast.success('Employment outcome submitted for state verification!');
         setShowSelfReportModal(false);
+        setEmployerName('');
+        setEmployerContact('');
+        setJobRole('');
+        setMonthlySalary('');
         loadData();
       }
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || 'Failed to submit status update');
+      toast.error(err?.response?.data?.message || 'Failed to submit milestone');
     } finally {
       setSubmitting(false);
     }
@@ -134,19 +141,16 @@ export default function TraineeJourneyPage() {
     if (!showFollowUpModal) return;
     setSubmitting(true);
     try {
-      const res = await api.post('/followups/submit', {
-        followUpId: showFollowUpModal._id,
-        responses: {
-          isEmployed: fuEmployed,
-          employerName: fuEmployed ? fuEmployer : undefined,
-          currentSalary: fuEmployed && fuSalary ? Number(fuSalary) : undefined,
-          trainingRelevance: fuEmployed ? fuRelevance : undefined,
-          feedback: fuFeedback,
-        },
+      const res = await api.post(`/followups/${showFollowUpModal._id}/submit`, {
+        isCurrentlyEmployed: fuEmployed,
+        currentEmployer: fuEmployer,
+        currentSalary: fuSalary ? Number(fuSalary) : undefined,
+        trainingRelevance: fuRelevance,
+        feedback: fuFeedback,
       });
 
       if (res.data?.success) {
-        toast.success('Longitudinal follow-up survey submitted!');
+        toast.success('Longitudinal outcome survey completed!');
         setShowFollowUpModal(null);
         loadData();
       }
@@ -160,587 +164,699 @@ export default function TraineeJourneyPage() {
   const getEventBadge = (status: string, conf: number) => {
     if (status === 'VERIFIED') {
       return (
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-          <ShieldCheck className="w-3.5 h-3.5" />
+        <span
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 5,
+            padding: '3px 9px',
+            borderRadius: 99,
+            fontSize: 11,
+            fontWeight: 700,
+            background: 'rgba(16, 185, 129, 0.12)',
+            color: '#10B981',
+            border: '1px solid rgba(16, 185, 129, 0.25)',
+          }}
+        >
+          <ShieldCheck size={13} />
           Employer Verified ({Math.round(conf * 100)}%)
         </span>
       );
     }
     return (
-      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
-        <Clock className="w-3.5 h-3.5" />
+      <span
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 5,
+          padding: '3px 9px',
+          borderRadius: 99,
+          fontSize: 11,
+          fontWeight: 700,
+          background: 'rgba(245, 158, 11, 0.12)',
+          color: '#F59E0B',
+          border: '1px solid rgba(245, 158, 11, 0.25)',
+        }}
+      >
+        <Clock size={13} />
         Self-Reported ({Math.round(conf * 100)}%)
       </span>
     );
   };
 
   return (
-    <div className="min-h-screen bg-[#090A0F] text-slate-100 p-4 sm:p-6 lg:p-8 space-y-8">
-      {/* Header Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#131722] to-[#1A2030] border border-amber-500/20 p-6 sm:p-8 shadow-2xl">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl pointer-events-none" />
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
-          <div>
-            <div className="flex items-center gap-3 mb-2">
-              <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-500/10 text-amber-400 border border-amber-500/30">
-                Government of Maharashtra · NSQF Ledger
-              </span>
-              <AIBadge type="live" label="OUTCOME TIMELINE" />
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+    <div
+      style={{
+        minHeight: '100vh',
+        background: '#090A0F',
+        color: '#F8FAFC',
+        padding: '24px 20px 60px',
+        fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+      }}
+    >
+      <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 24 }}>
 
-              Longitudinal Skilling & Outcome Journey
-            </h1>
-            <p className="text-slate-400 text-sm sm:text-base max-w-2xl mt-1">
-              Verifiable timeline tracing your trajectory from training enrollment to assessment, certification, job placement, salary progression, and longitudinal retention.
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-3">
-            <button
-              onClick={() => setShowSelfReportModal(true)}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold text-sm shadow-lg shadow-amber-500/20 transition-all active:scale-95"
-            >
-              <Plus className="w-4 h-4" />
-              Update Employment Status
-            </button>
-            <button
-              onClick={loadData}
-              className="p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 text-slate-300 transition-colors"
-              title="Refresh Timeline"
-            >
-              <RefreshCw className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Pending Follow-Up Survey Banner if any */}
-      {pendingFollowUps.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="rounded-xl bg-amber-500/10 border border-amber-500/30 p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+        {/* ── Header Banner ── */}
+        <div
+          style={{
+            position: 'relative',
+            overflow: 'hidden',
+            borderRadius: 20,
+            padding: '28px 32px',
+            background: 'linear-gradient(135deg, #111422 0%, #171D30 50%, #101424 100%)',
+            border: '1px solid rgba(245, 158, 11, 0.25)',
+            boxShadow: '0 16px 40px rgba(0,0,0,0.6)',
+          }}
         >
-          <div className="flex items-start gap-3">
-            <div className="p-2 rounded-lg bg-amber-500/20 text-amber-400 mt-0.5 sm:mt-0">
-              <AlertCircle className="w-5 h-5" />
-            </div>
+          <div
+            style={{
+              position: 'absolute',
+              top: -60,
+              right: -60,
+              width: 260,
+              height: 260,
+              borderRadius: '50%',
+              background: 'radial-gradient(circle, rgba(245,158,11,0.12) 0%, transparent 70%)',
+              pointerEvents: 'none',
+            }}
+          />
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 20, position: 'relative', zIndex: 2 }}>
             <div>
-              <h4 className="text-sm font-bold text-amber-300">
-                Action Required: {pendingFollowUps[0].scheduleDays}-Day Longitudinal Outcome Survey
-              </h4>
-              <p className="text-xs text-slate-300 mt-0.5">
-                The Maharashtra Skilling Directorate requires periodic outcome verification to benchmark course retention and wage progression.
-              </p>
-            </div>
-          </div>
-          <button
-            onClick={() => setShowFollowUpModal(pendingFollowUps[0])}
-            className="px-4 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs shadow-md transition-all shrink-0"
-          >
-            Complete Survey (2 mins) →
-          </button>
-        </motion.div>
-      )}
-
-      {/* Timeline Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Left 2 Cols: Main Timeline */}
-        <div className="lg:col-span-2 space-y-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-bold text-white flex items-center gap-2">
-              <Milestone className="w-5 h-5 text-amber-400" />
-              Verifiable Career Milestones
-            </h2>
-            <span className="text-xs text-slate-400 font-medium">
-              {timeline.length} Milestones Logged
-            </span>
-          </div>
-
-          {loading ? (
-            <div className="space-y-4">
-              {[1, 2, 3, 4].map((n) => (
-                <div key={n} className="h-28 rounded-xl bg-slate-800/40 animate-pulse border border-slate-800" />
-              ))}
-            </div>
-          ) : timeline.length === 0 ? (
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-12 text-center space-y-4">
-              <HelpCircle className="w-12 h-12 text-slate-600 mx-auto" />
-              <h3 className="text-lg font-bold text-white">No Timeline Events Recorded</h3>
-              <p className="text-sm text-slate-400 max-w-md mx-auto">
-                Once enrolled in an approved training program or when reporting employment, your cryptographic ledger milestones will appear here.
-              </p>
-              <button
-                onClick={() => setShowSelfReportModal(true)}
-                className="px-4 py-2 rounded-xl bg-amber-500 text-slate-950 font-bold text-xs hover:bg-amber-400"
-              >
-                Self-Report Employment Milestone
-              </button>
-            </div>
-          ) : (
-            <div className="relative pl-6 sm:pl-8 border-l-2 border-amber-500/20 space-y-8 my-4">
-              {timeline.map((event, idx) => {
-                const isCertified = event.eventType === 'CERTIFIED';
-                const isEmployed = ['EMPLOYED', 'SELF_EMPLOYED', 'APPRENTICESHIP'].includes(event.eventType);
-                const isSalary = event.eventType === 'SALARY_UPDATED';
-                const isRetention = event.eventType.includes('FOLLOW_UP_') || event.eventType === 'RETENTION_CHECK';
-
-                return (
-                  <motion.div
-                    key={event._id || idx}
-                    initial={{ opacity: 0, x: -15 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: idx * 0.05 }}
-                    className="relative group"
-                  >
-                    {/* Node Dot */}
-                    <div
-                      className={`absolute -left-[31px] sm:-left-[39px] top-1.5 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
-                        isEmployed
-                          ? 'bg-emerald-500 border-emerald-400 text-slate-950 shadow-lg shadow-emerald-500/30'
-                          : isCertified
-                          ? 'bg-amber-500 border-amber-400 text-slate-950 shadow-lg shadow-amber-500/30'
-                          : isSalary
-                          ? 'bg-cyan-500 border-cyan-400 text-slate-950 shadow-lg shadow-cyan-500/30'
-                          : 'bg-slate-800 border-slate-600 text-slate-300'
-                      }`}
-                    >
-                      {isEmployed ? (
-                        <Briefcase className="w-3 h-3" />
-                      ) : isCertified ? (
-                        <Award className="w-3 h-3" />
-                      ) : isSalary ? (
-                        <TrendingUp className="w-3 h-3" />
-                      ) : (
-                        <CheckCircle2 className="w-3 h-3" />
-                      )}
-                    </div>
-
-                    {/* Event Card */}
-                    <div className="rounded-xl bg-[#11141E] border border-slate-800/80 hover:border-amber-500/30 p-5 shadow-lg transition-all space-y-3">
-                      <div className="flex flex-wrap items-center justify-between gap-2">
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs font-mono text-slate-400">
-                            {new Date(event.date).toLocaleDateString('en-IN', {
-                              month: 'short',
-                              year: 'numeric',
-                              day: 'numeric',
-                            })}
-                          </span>
-                          <span className="text-slate-600">•</span>
-                          <span className="text-xs font-bold uppercase tracking-wide text-amber-400/90">
-                            {event.eventType.replace(/_/g, ' ')}
-                          </span>
-                        </div>
-                        {getEventBadge(event.verificationStatus, event.confidence)}
-                      </div>
-
-                      <h3 className="text-base font-bold text-white group-hover:text-amber-300 transition-colors">
-                        {event.title}
-                      </h3>
-
-                      <p className="text-sm text-slate-300 leading-relaxed">
-                        {event.description}
-                      </p>
-
-                      {/* Metadata Pill Tags */}
-                      {event.metadata && Object.keys(event.metadata).length > 0 && (
-                        <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-800/60">
-                          {event.metadata.salary && (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
-                              <DollarSign className="w-3 h-3" /> ₹{Number(event.metadata.salary).toLocaleString('en-IN')}/mo
-                            </span>
-                          )}
-                          {event.metadata.employer && (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium bg-slate-800 text-slate-300 border border-slate-700">
-                              <Building className="w-3 h-3 text-slate-400" /> {event.metadata.employer}
-                            </span>
-                          )}
-                          {event.metadata.role && (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium bg-slate-800 text-slate-300 border border-slate-700">
-                              <Briefcase className="w-3 h-3 text-slate-400" /> {event.metadata.role}
-                            </span>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-        {/* Right 1 Col: Outcome Passport & Trust Summary */}
-        <div className="space-y-6">
-          <div className="rounded-2xl bg-[#11141E] border border-amber-500/20 p-6 space-y-5 shadow-xl">
-            <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-white flex items-center gap-2">
-                <Award className="w-5 h-5 text-amber-400" />
-                Verified Skill Passport
-              </h3>
-              <span className="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                ACTIVE
-              </span>
-            </div>
-
-            <p className="text-xs text-slate-300 leading-relaxed">
-              Your credentials and employment milestones are anchored to a verifiable state cryptographic ledger. Employers and government verification agents can validate authenticity instantly.
-            </p>
-
-            <div className="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800 space-y-2">
-              <div className="text-[11px] font-mono text-slate-400">PUBLIC VERIFIER HASH</div>
-              <div className="text-xs font-mono text-amber-300 break-all select-all font-semibold">
-                0x8f4c2e91b5a3d76e48c10927fa118239cb72e01a
-              </div>
-            </div>
-
-            <div className="space-y-2.5 pt-2">
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-slate-400">Candidate Name</span>
-                <span className="font-semibold text-white">{user?.name || 'Aarav Deshmukh'}</span>
-              </div>
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-slate-400">Target NSQF Level</span>
-                <span className="font-semibold text-white">Level 5 (Advanced Technical)</span>
-              </div>
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-slate-400">Verification Ledger</span>
-                <span className="font-semibold text-emerald-400 flex items-center gap-1">
-                  <ShieldCheck className="w-3.5 h-3.5" /> State Validated
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                <span
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 800,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.08em',
+                    padding: '3px 9px',
+                    borderRadius: 6,
+                    background: 'rgba(245,158,11,0.15)',
+                    color: '#F59E0B',
+                    border: '1px solid rgba(245,158,11,0.3)',
+                  }}
+                >
+                  Government of Maharashtra · NSQF Ledger
+                </span>
+                <span style={{ fontSize: 12, color: '#64748B' }}>•</span>
+                <span
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    padding: '3px 8px',
+                    borderRadius: 99,
+                    fontSize: 11,
+                    fontWeight: 700,
+                    background: 'rgba(16, 185, 129, 0.1)',
+                    color: '#10B981',
+                    border: '1px solid rgba(16, 185, 129, 0.25)',
+                  }}
+                >
+                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10B981', boxShadow: '0 0 6px #10B981' }} />
+                  OUTCOME TIMELINE
                 </span>
               </div>
+
+              <h1
+                style={{
+                  fontSize: 'clamp(22px, 3vw, 32px)',
+                  fontWeight: 900,
+                  color: '#FFFFFF',
+                  letterSpacing: '-0.03em',
+                  margin: '4px 0 8px',
+                }}
+              >
+                Longitudinal Skilling & Outcome Journey
+              </h1>
+
+              <p style={{ color: '#94A3B8', fontSize: 14, maxWidth: 680, lineHeight: 1.6, margin: 0 }}>
+                Verifiable timeline tracing your trajectory from training enrollment to assessment, certification, job placement, salary progression, and longitudinal retention.
+              </p>
             </div>
 
-            <a
-              href="/verify/0x8f4c2e91b5a3d76e48c10927fa118239cb72e01a"
-              target="_blank"
-              rel="noreferrer"
-              className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs border border-slate-700 transition-colors"
-            >
-              <ExternalLink className="w-3.5 h-3.5 text-amber-400" />
-              Open Public Verification URL
-            </a>
-          </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+              <button
+                onClick={() => setShowSelfReportModal(true)}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  padding: '11px 20px',
+                  borderRadius: 12,
+                  fontSize: 13,
+                  fontWeight: 800,
+                  color: '#090A0F',
+                  background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
+                  border: 'none',
+                  boxShadow: '0 4px 18px rgba(245, 158, 11, 0.35)',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                }}
+              >
+                <Plus size={16} />
+                Update Employment Status
+              </button>
 
-          {/* Longitudinal Skilling Guarantee Card */}
-          <div className="rounded-2xl bg-gradient-to-br from-slate-900 to-[#121522] border border-slate-800 p-6 space-y-4">
-            <h4 className="text-sm font-bold text-white flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-amber-400" />
-              Outcome Tracking & Retention
-            </h4>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Periodic 30d, 90d, and 365d follow-ups ensure accurate employment attribution, helping Maharashtra target infrastructure and funding toward high-performing courses.
-            </p>
-            <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
-              <span>DPDP Compliance</span>
-              <span className="text-amber-400 font-semibold">Consent Granted</span>
+              <button
+                onClick={loadData}
+                style={{
+                  padding: 10,
+                  borderRadius: 12,
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  color: '#94A3B8',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+                title="Refresh Timeline"
+              >
+                <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
+              </button>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* ── Modal: Self-Report Employment Status ── */}
-      <AnimatePresence>
-        {showSelfReportModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-[#11141E] border border-amber-500/30 rounded-2xl p-6 sm:p-8 max-w-lg w-full shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto"
+        {/* ── Pending Follow-Up Survey Banner ── */}
+        {pendingFollowUps.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            style={{
+              borderRadius: 16,
+              background: 'rgba(245, 158, 11, 0.1)',
+              border: '1px solid rgba(245, 158, 11, 0.3)',
+              padding: '16px 20px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: 16,
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div
+                style={{
+                  width: 38,
+                  height: 38,
+                  borderRadius: 10,
+                  background: 'rgba(245, 158, 11, 0.2)',
+                  color: '#F59E0B',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                }}
+              >
+                <AlertCircle size={20} />
+              </div>
+              <div>
+                <h4 style={{ fontSize: 14, fontWeight: 800, color: '#FDE68A', margin: '0 0 2px' }}>
+                  Action Required: {pendingFollowUps[0].scheduleDays}-Day Longitudinal Outcome Survey
+                </h4>
+                <p style={{ fontSize: 12, color: '#CBD5E1', margin: 0 }}>
+                  The Maharashtra Skilling Directorate requires periodic outcome verification to benchmark course retention and wage progression.
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setShowFollowUpModal(pendingFollowUps[0])}
+              style={{
+                padding: '9px 18px',
+                borderRadius: 10,
+                fontSize: 12,
+                fontWeight: 800,
+                color: '#090A0F',
+                background: '#F59E0B',
+                border: 'none',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+              }}
             >
-              <div className="flex items-center justify-between border-b border-slate-800 pb-4">
-                <div className="flex items-center gap-2.5">
-                  <Briefcase className="w-5 h-5 text-amber-400" />
-                  <h3 className="text-lg font-bold text-white">Update Employment Status</h3>
-                </div>
+              Complete Survey (2 mins) →
+            </button>
+          </motion.div>
+        )}
+
+        {/* ── Main 2-Column Grid ── */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: 24, alignItems: 'start' }}>
+          
+          {/* Left: Milestone Timeline */}
+          <div style={{ gridColumn: 'span 2', display: 'flex', flexDirection: 'column', gap: 20 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h2 style={{ fontSize: 18, fontWeight: 800, color: '#FFFFFF', display: 'flex', alignItems: 'center', gap: 8, margin: 0 }}>
+                <Milestone size={20} style={{ color: '#F59E0B' }} />
+                Verifiable Career Milestones
+              </h2>
+              <span style={{ fontSize: 12, color: '#64748B', fontWeight: 600 }}>
+                {timeline.length} Milestones Logged
+              </span>
+            </div>
+
+            {loading ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                {[1, 2, 3, 4].map((n) => (
+                  <div
+                    key={n}
+                    style={{
+                      height: 100,
+                      borderRadius: 14,
+                      background: 'rgba(255, 255, 255, 0.02)',
+                      border: '1px solid rgba(255, 255, 255, 0.05)',
+                      animation: 'pulse 1.5s infinite',
+                    }}
+                  />
+                ))}
+              </div>
+            ) : timeline.length === 0 ? (
+              <div
+                style={{
+                  borderRadius: 16,
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  background: '#10131E',
+                  padding: '48px 24px',
+                  textAlign: 'center',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: 12,
+                }}
+              >
+                <HelpCircle size={44} style={{ color: '#475569' }} />
+                <h3 style={{ fontSize: 16, fontWeight: 800, color: '#FFFFFF', margin: 0 }}>No Timeline Events Recorded</h3>
+                <p style={{ fontSize: 13, color: '#94A3B8', maxWidth: 420, margin: 0, lineHeight: 1.5 }}>
+                  Once enrolled in an approved training program or when reporting employment, your cryptographic ledger milestones will appear here.
+                </p>
                 <button
-                  onClick={() => setShowSelfReportModal(false)}
-                  className="p-1 rounded-lg text-slate-400 hover:text-white"
+                  onClick={() => setShowSelfReportModal(true)}
+                  style={{
+                    marginTop: 8,
+                    padding: '9px 18px',
+                    borderRadius: 10,
+                    background: '#F59E0B',
+                    color: '#090A0F',
+                    fontSize: 12,
+                    fontWeight: 800,
+                    border: 'none',
+                    cursor: 'pointer',
+                  }}
                 >
-                  <X className="w-5 h-5" />
+                  Self-Report Employment Milestone
                 </button>
               </div>
+            ) : (
+              <div
+                style={{
+                  position: 'relative',
+                  paddingLeft: 28,
+                  borderLeft: '2px solid rgba(245, 158, 11, 0.25)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 24,
+                  margin: '8px 0',
+                }}
+              >
+                {timeline.map((event, idx) => {
+                  const isCertified = event.eventType === 'CERTIFIED';
+                  const isEmployed = ['EMPLOYED', 'SELF_EMPLOYED', 'APPRENTICESHIP'].includes(event.eventType);
+                  const isSalary = event.eventType === 'SALARY_UPDATED';
 
-              <form onSubmit={handleSelfReportSubmit} className="space-y-4">
+                  return (
+                    <motion.div
+                      key={event._id || idx}
+                      initial={{ opacity: 0, x: -12 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: idx * 0.04 }}
+                      style={{ position: 'relative' }}
+                    >
+                      {/* Timeline Dot */}
+                      <div
+                        style={{
+                          position: 'absolute',
+                          left: -39,
+                          top: 8,
+                          width: 20,
+                          height: 20,
+                          borderRadius: '50%',
+                          background: isCertified ? '#10B981' : isEmployed ? '#F59E0B' : '#6366F1',
+                          border: '3px solid #090A0F',
+                          boxShadow: isCertified ? '0 0 10px rgba(16,185,129,0.5)' : isEmployed ? '0 0 10px rgba(245,158,11,0.5)' : 'none',
+                        }}
+                      />
+
+                      {/* Timeline Card */}
+                      <div
+                        style={{
+                          background: '#10131E',
+                          borderRadius: 14,
+                          border: isCertified
+                            ? '1px solid rgba(16, 185, 129, 0.3)'
+                            : isEmployed
+                            ? '1px solid rgba(245, 158, 11, 0.25)'
+                            : '1px solid rgba(255, 255, 255, 0.08)',
+                          padding: 20,
+                          boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
+                        }}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 10, marginBottom: 8 }}>
+                          <div>
+                            <div style={{ fontSize: 11, fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                              {new Date(event.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                            </div>
+                            <h3 style={{ fontSize: 16, fontWeight: 800, color: '#FFFFFF', margin: '2px 0 0' }}>
+                              {event.title}
+                            </h3>
+                          </div>
+                          {getEventBadge(event.verificationStatus, event.confidence)}
+                        </div>
+
+                        <p style={{ fontSize: 13, color: '#94A3B8', lineHeight: 1.5, margin: '0 0 12px' }}>
+                          {event.description}
+                        </p>
+
+                        {/* Event Metadata Badges */}
+                        {event.metadata && Object.keys(event.metadata).length > 0 && (
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, paddingTop: 10, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                            {event.metadata.employerName && (
+                              <span style={{ fontSize: 11, color: '#CBD5E1', display: 'inline-flex', alignItems: 'center', gap: 4, background: 'rgba(255,255,255,0.04)', padding: '3px 8px', borderRadius: 6 }}>
+                                <Building size={12} style={{ color: '#F59E0B' }} /> {event.metadata.employerName}
+                              </span>
+                            )}
+                            {event.metadata.salary && (
+                              <span style={{ fontSize: 11, color: '#10B981', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 3, background: 'rgba(16,185,129,0.08)', padding: '3px 8px', borderRadius: 6 }}>
+                                <DollarSign size={12} /> ₹{Number(event.metadata.salary).toLocaleString('en-IN')}/mo
+                              </span>
+                            )}
+                            {event.metadata.nsqfLevel && (
+                              <span style={{ fontSize: 11, color: '#CBD5E1', background: 'rgba(255,255,255,0.04)', padding: '3px 8px', borderRadius: 6 }}>
+                                NSQF Level {event.metadata.nsqfLevel}
+                              </span>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* Right: Skill Passport & Ledger Summary Card */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+            <div
+              style={{
+                background: 'linear-gradient(145deg, #111422 0%, #171D30 100%)',
+                borderRadius: 18,
+                border: '1px solid rgba(245, 158, 11, 0.3)',
+                padding: 24,
+                boxShadow: '0 8px 30px rgba(0,0,0,0.5)',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+                <div
+                  style={{
+                    width: 38,
+                    height: 38,
+                    borderRadius: 10,
+                    background: 'rgba(245, 158, 11, 0.15)',
+                    color: '#F59E0B',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Award size={20} />
+                </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
-                    Current Status
-                  </label>
-                  <select
-                    value={status}
-                    onChange={(e) => setStatus(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-amber-500"
+                  <h3 style={{ fontSize: 15, fontWeight: 800, color: '#FFFFFF', margin: 0 }}>
+                    Verified Skill Passport
+                  </h3>
+                  <span style={{ fontSize: 11, color: '#10B981', fontWeight: 700 }}>● ACTIVE STATE LEDGER</span>
+                </div>
+              </div>
+
+              <p style={{ fontSize: 12.5, color: '#94A3B8', lineHeight: 1.55, margin: '0 0 16px' }}>
+                Your credentials and employment milestones are anchored to a verifiable state cryptographic ledger. Employers and government verification agents can validate authenticity instantly.
+              </p>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, padding: 14, borderRadius: 12, background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
+                  <span style={{ color: '#64748B' }}>Verifier Hash:</span>
+                  <span style={{ color: '#F59E0B', fontFamily: "'JetBrains Mono', monospace", fontSize: 11, fontWeight: 700 }}>
+                    0x8f4c2e...cb72e01a
+                  </span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
+                  <span style={{ color: '#64748B' }}>Candidate Name:</span>
+                  <span style={{ color: '#FFFFFF', fontWeight: 700 }}>{user?.name || 'Trikam Devasi'}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
+                  <span style={{ color: '#64748B' }}>Target NSQF Level:</span>
+                  <span style={{ color: '#FFFFFF', fontWeight: 700 }}>Level 5 (Advanced Technical)</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
+                  <span style={{ color: '#64748B' }}>Verification Ledger:</span>
+                  <span style={{ color: '#10B981', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                    <ShieldCheck size={13} /> State Validated
+                  </span>
+                </div>
+              </div>
+
+              <Link
+                href="/student/passport"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 8,
+                  marginTop: 18,
+                  padding: '11px',
+                  borderRadius: 10,
+                  background: 'rgba(245, 158, 11, 0.12)',
+                  border: '1px solid rgba(245, 158, 11, 0.25)',
+                  color: '#F59E0B',
+                  fontSize: 12,
+                  fontWeight: 800,
+                  textDecoration: 'none',
+                }}
+              >
+                View Full Skill Passport <ExternalLink size={13} />
+              </Link>
+            </div>
+
+            {/* Longitudinal Privacy Banner */}
+            <div
+              style={{
+                borderRadius: 16,
+                background: '#10131E',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                padding: 20,
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                <ShieldCheck size={16} style={{ color: '#10B981' }} />
+                <h4 style={{ fontSize: 13, fontWeight: 800, color: '#FFFFFF', margin: 0 }}>
+                  DPDP Act 2023 Compliant
+                </h4>
+              </div>
+              <p style={{ fontSize: 12, color: '#94A3B8', lineHeight: 1.5, margin: '0 0 12px' }}>
+                Periodic follow-ups and outcome data are cryptographically bound under your explicit consent settings.
+              </p>
+              <Link
+                href="/student/consent"
+                style={{ fontSize: 12, fontWeight: 700, color: '#F59E0B', textDecoration: 'none' }}
+              >
+                Manage Privacy Settings →
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Modal: Self-Report Milestone ── */}
+        <AnimatePresence>
+          {showSelfReportModal && (
+            <div
+              style={{
+                position: 'fixed',
+                inset: 0,
+                background: 'rgba(0,0,0,0.75)',
+                backdropFilter: 'blur(8px)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 1000,
+                padding: 16,
+              }}
+            >
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                style={{
+                  width: '100%',
+                  maxWidth: 520,
+                  background: '#111422',
+                  border: '1px solid rgba(245, 158, 11, 0.3)',
+                  borderRadius: 20,
+                  padding: 28,
+                  boxShadow: '0 20px 50px rgba(0,0,0,0.8)',
+                  maxHeight: '90vh',
+                  overflowY: 'auto',
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                  <h3 style={{ fontSize: 18, fontWeight: 800, color: '#FFFFFF', margin: 0 }}>
+                    Report Employment Milestone
+                  </h3>
+                  <button
+                    onClick={() => setShowSelfReportModal(false)}
+                    style={{ background: 'none', border: 'none', color: '#64748B', cursor: 'pointer' }}
                   >
-                    <option value="EMPLOYED">Salaried Employment</option>
-                    <option value="SELF_EMPLOYED">Self-Employed / Entrepreneurship</option>
-                    <option value="APPRENTICESHIP">Apprenticeship</option>
-                    <option value="SEEKING">Seeking Placement Opportunities</option>
-                    <option value="UNEMPLOYED">Currently Unemployed</option>
-                  </select>
+                    <X size={20} />
+                  </button>
                 </div>
 
-                {['EMPLOYED', 'APPRENTICESHIP', 'SELF_EMPLOYED'].includes(status) && (
-                  <>
-                    {status !== 'SELF_EMPLOYED' && (
+                <form onSubmit={handleSelfReportSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                  <div>
+                    <label style={{ fontSize: 12, fontWeight: 700, color: '#94A3B8', display: 'block', marginBottom: 6 }}>
+                      Placement Outcome Type
+                    </label>
+                    <select
+                      value={status}
+                      onChange={(e) => setStatus(e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '10px 14px',
+                        borderRadius: 10,
+                        background: '#090A0F',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        color: '#FFFFFF',
+                        fontSize: 13,
+                      }}
+                    >
+                      <option value="EMPLOYED">Salaried Employment (Full-Time / Part-Time)</option>
+                      <option value="APPRENTICESHIP">Registered Apprenticeship (NAPS / Industry)</option>
+                      <option value="SELF_EMPLOYED">Self-Employed / Freelancer / Entrepreneur</option>
+                      <option value="UNEMPLOYED_SEEKING">Actively Seeking Placement</option>
+                      <option value="HIGHER_EDUCATION">Pursuing Higher Education</option>
+                    </select>
+                  </div>
+
+                  {(status === 'EMPLOYED' || status === 'APPRENTICESHIP') && (
+                    <>
                       <div>
-                        <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
-                          Employer / Enterprise Name
+                        <label style={{ fontSize: 12, fontWeight: 700, color: '#94A3B8', display: 'block', marginBottom: 6 }}>
+                          Hiring Company / Organization
                         </label>
                         <input
                           type="text"
                           required
                           value={employerName}
                           onChange={(e) => setEmployerName(e.target.value)}
-                          placeholder="e.g. Tata Consultancy Services, Bajaj Auto"
-                          className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-amber-500"
+                          placeholder="e.g. Tata Consultancy Services, Infosys, Tech Mahindra"
+                          style={{
+                            width: '100%',
+                            padding: '10px 14px',
+                            borderRadius: 10,
+                            background: '#090A0F',
+                            border: '1px solid rgba(255,255,255,0.1)',
+                            color: '#FFFFFF',
+                            fontSize: 13,
+                          }}
                         />
                       </div>
-                    )}
 
-                    <div>
-                      <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
-                        Job Role / Designation
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        value={jobRole}
-                        onChange={(e) => setJobRole(e.target.value)}
-                        placeholder="e.g. Associate Software Engineer, Solar Technician"
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-amber-500"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
-                        Monthly Compensation (INR)
-                      </label>
-                      <input
-                        type="number"
-                        min={0}
-                        value={monthlySalary}
-                        onChange={(e) => setMonthlySalary(e.target.value)}
-                        placeholder="e.g. 28000"
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-amber-500"
-                      />
-                      <span className="text-[11px] text-slate-400 mt-1 block">
-                        Confidential data used purely for state wage progression analytics.
-                      </span>
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
-                        Training Relevance to Current Role
-                      </label>
-                      <select
-                        value={trainingRelevance}
-                        onChange={(e) => setTrainingRelevance(e.target.value)}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-amber-500"
-                      >
-                        <option value="HIGHLY_RELEVANT">Highly Relevant (Direct Match to Curriculum)</option>
-                        <option value="PARTIALLY_RELEVANT">Partially Relevant (Adjacent Technology)</option>
-                        <option value="NOT_RELEVANT">Not Relevant (Skill Mismatch)</option>
-                      </select>
-                    </div>
-
-                    {status !== 'SELF_EMPLOYED' && (
                       <div>
-                        <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
-                          Employer HR / Manager Email (For Verification)
+                        <label style={{ fontSize: 12, fontWeight: 700, color: '#94A3B8', display: 'block', marginBottom: 6 }}>
+                          Job Role / Designation
                         </label>
                         <input
-                          type="email"
-                          value={employerContact}
-                          onChange={(e) => setEmployerContact(e.target.value)}
-                          placeholder="e.g. hr@company.com"
-                          className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-amber-500"
+                          type="text"
+                          required
+                          value={jobRole}
+                          onChange={(e) => setJobRole(e.target.value)}
+                          placeholder="e.g. Full-Stack Developer, Data Analyst, Cloud Technician"
+                          style={{
+                            width: '100%',
+                            padding: '10px 14px',
+                            borderRadius: 10,
+                            background: '#090A0F',
+                            border: '1px solid rgba(255,255,255,0.1)',
+                            color: '#FFFFFF',
+                            fontSize: 13,
+                          }}
                         />
                       </div>
-                    )}
-                  </>
-                )}
 
-                {['SEEKING', 'UNEMPLOYED'].includes(status) && (
-                  <div>
-                    <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
-                      Primary Barrier Faced
-                    </label>
-                    <select
-                      value={nonPlacementReason}
-                      onChange={(e) => setNonPlacementReason(e.target.value)}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-amber-500"
-                    >
-                      <option value="SKILL_GAP">Skill Gap / Lack of Advanced Practical Labs</option>
-                      <option value="COMMUNICATION">Interview Communication / Articulation</option>
-                      <option value="LOCATION">Relocation / Geographical Constraints</option>
-                      <option value="TRANSPORT">Commute / Transportation Feasibility</option>
-                      <option value="SALARY_EXPECTATION">Entry Salary Below Expectations</option>
-                      <option value="LACK_OF_JOB_OPENINGS">Lack of Local Job Openings</option>
-                      <option value="OTHER">Personal / Family Circumstances</option>
-                    </select>
-                  </div>
-                )}
+                      <div>
+                        <label style={{ fontSize: 12, fontWeight: 700, color: '#94A3B8', display: 'block', marginBottom: 6 }}>
+                          Monthly In-Hand Salary (₹ INR)
+                        </label>
+                        <input
+                          type="number"
+                          value={monthlySalary}
+                          onChange={(e) => setMonthlySalary(e.target.value)}
+                          placeholder="e.g. 28000"
+                          style={{
+                            width: '100%',
+                            padding: '10px 14px',
+                            borderRadius: 10,
+                            background: '#090A0F',
+                            border: '1px solid rgba(255,255,255,0.1)',
+                            color: '#FFFFFF',
+                            fontSize: 13,
+                          }}
+                        />
+                      </div>
+                    </>
+                  )}
 
-                <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
-                  <button
-                    type="button"
-                    onClick={() => setShowSelfReportModal(false)}
-                    className="px-4 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800 text-sm font-semibold transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={submitting}
-                    className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-sm font-bold shadow-lg shadow-amber-500/20 disabled:opacity-50 flex items-center gap-2"
-                  >
-                    {submitting ? 'Recording...' : 'Submit Status Update'}
-                  </button>
-                </div>
-              </form>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-
-      {/* ── Modal: Longitudinal Follow-Up Survey ── */}
-      <AnimatePresence>
-        {showFollowUpModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-[#11141E] border border-amber-500/30 rounded-2xl p-6 sm:p-8 max-w-lg w-full shadow-2xl space-y-6"
-            >
-              <div className="flex items-center justify-between border-b border-slate-800 pb-4">
-                <div>
-                  <h3 className="text-lg font-bold text-white">
-                    {showFollowUpModal.scheduleDays}-Day Longitudinal Outcome Survey
-                  </h3>
-                  <p className="text-xs text-slate-400 mt-0.5">Government of Maharashtra Verification</p>
-                </div>
-                <button
-                  onClick={() => setShowFollowUpModal(null)}
-                  className="p-1 rounded-lg text-slate-400 hover:text-white"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              <form onSubmit={handleFollowUpSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
-                    Are you currently employed or self-employed?
-                  </label>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 12 }}>
                     <button
                       type="button"
-                      onClick={() => setFuEmployed(true)}
-                      className={`p-3 rounded-xl border text-sm font-bold text-center transition-all ${
-                        fuEmployed
-                          ? 'bg-amber-500/10 border-amber-500 text-amber-400'
-                          : 'bg-slate-900 border-slate-800 text-slate-400'
-                      }`}
+                      onClick={() => setShowSelfReportModal(false)}
+                      style={{
+                        padding: '10px 18px',
+                        borderRadius: 10,
+                        background: 'rgba(255,255,255,0.05)',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        color: '#94A3B8',
+                        fontSize: 13,
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                      }}
                     >
-                      Yes, Employed
+                      Cancel
                     </button>
                     <button
-                      type="button"
-                      onClick={() => setFuEmployed(false)}
-                      className={`p-3 rounded-xl border text-sm font-bold text-center transition-all ${
-                        !fuEmployed
-                          ? 'bg-amber-500/10 border-amber-500 text-amber-400'
-                          : 'bg-slate-900 border-slate-800 text-slate-400'
-                      }`}
+                      type="submit"
+                      disabled={submitting}
+                      style={{
+                        padding: '10px 20px',
+                        borderRadius: 10,
+                        background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
+                        border: 'none',
+                        color: '#090A0F',
+                        fontSize: 13,
+                        fontWeight: 800,
+                        cursor: submitting ? 'not-allowed' : 'pointer',
+                      }}
                     >
-                      No, Seeking
+                      {submitting ? 'Submitting...' : 'Submit for Verification'}
                     </button>
                   </div>
-                </div>
+                </form>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
 
-                {fuEmployed && (
-                  <>
-                    <div>
-                      <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
-                        Current Employer / Enterprise
-                      </label>
-                      <input
-                        type="text"
-                        value={fuEmployer}
-                        onChange={(e) => setFuEmployer(e.target.value)}
-                        placeholder="e.g. Tata Consultancy Services"
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-amber-500"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
-                        Current Monthly Salary (INR)
-                      </label>
-                      <input
-                        type="number"
-                        value={fuSalary}
-                        onChange={(e) => setFuSalary(e.target.value)}
-                        placeholder="e.g. 32000"
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-amber-500"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
-                        Is your job related to your training?
-                      </label>
-                      <select
-                        value={fuRelevance}
-                        onChange={(e) => setFuRelevance(e.target.value)}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-amber-500"
-                      >
-                        <option value="HIGHLY_RELEVANT">Highly Relevant</option>
-                        <option value="PARTIALLY_RELEVANT">Partially Relevant</option>
-                        <option value="NOT_RELEVANT">Not Relevant</option>
-                      </select>
-                    </div>
-                  </>
-                )}
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">
-                    Feedback / Missing Skills in Curriculum (Optional)
-                  </label>
-                  <textarea
-                    rows={3}
-                    value={fuFeedback}
-                    onChange={(e) => setFuFeedback(e.target.value)}
-                    placeholder="Did you feel any practical skills were missing during actual job tasks?"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-amber-500"
-                  />
-                </div>
-
-                <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
-                  <button
-                    type="button"
-                    onClick={() => setShowFollowUpModal(null)}
-                    className="px-4 py-2.5 rounded-xl text-slate-300 hover:bg-slate-800 text-sm font-semibold transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={submitting}
-                    className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-sm font-bold shadow-lg shadow-amber-500/20 disabled:opacity-50"
-                  >
-                    {submitting ? 'Submitting...' : 'Submit Response'}
-                  </button>
-                </div>
-              </form>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
+      </div>
     </div>
   );
 }
