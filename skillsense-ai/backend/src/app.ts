@@ -31,6 +31,9 @@ import dataQualityRouter from './routes/dataQuality.routes';
 
 const app = express();
 
+// Trust reverse proxies (Vercel, Render, AWS ALB, Nginx, Cloudflare)
+app.set('trust proxy', 1);
+
 // ── Simple Cookie Parser Middleware ─────────────────────────────────────────
 app.use((req, _res, next) => {
   const cookieHeader = req.headers.cookie;
