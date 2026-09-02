@@ -29,9 +29,12 @@ import {
   ExternalLink,
   Briefcase,
   Milestone,
+  GraduationCap,
+  School,
 } from 'lucide-react';
 
 import { AIBadge } from '@/components/ui/AIBadge';
+
 
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
@@ -107,9 +110,10 @@ export default function LandingPage() {
             <a href="#features" style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none' }}>Features</a>
             <a href="#how-it-works" style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none' }}>How It Works</a>
             <a href="#showcase" style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none' }}>Platform Showcase</a>
-            <a href="#stakeholders" style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none' }}>Solutions</a>
+            <a href="#target-audience" style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none' }}>Target Audience</a>
             <a href="#passport" style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none' }}>Skill Passport</a>
             <a href="#trust" style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none' }}>Fairness & Trust</a>
+
           </div>
 
           {/* Auth Actions */}
@@ -690,88 +694,463 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── 8. Multi-Stakeholder Solutions ── */}
-      <section id="stakeholders" style={{ padding: '80px 24px' }}>
+      {/* ── 8. Target Audience: Ecosystem Stakeholders ── */}
+      <section id="target-audience" style={{ padding: '90px 24px', position: 'relative' }}>
+
         <div style={{ maxWidth: 1240, margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 50 }}>
-            <AIBadge type="ai" label="ECOSYSTEM IMPACT" />
-            <h2 className="font-display" style={{ fontSize: 'clamp(26px, 3.5vw, 38px)', fontWeight: 800, color: '#f8fafc', margin: '8px 0 10px' }}>
-              Built for Every Workforce Stakeholder
+          {/* Section Header */}
+          <div style={{ textAlign: 'center', marginBottom: 54 }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+              <AIBadge type="live" label="TARGET AUDIENCE" />
+            </div>
+            <h2
+              className="font-display"
+              style={{
+                fontSize: 'clamp(26px, 3.6vw, 42px)',
+                fontWeight: 900,
+                color: '#f8fafc',
+                letterSpacing: '-0.03em',
+                margin: '0 auto 14px',
+                maxWidth: 820,
+              }}
+            >
+              Built for Every Stakeholder in the{' '}
+              <span className="text-gradient-gold">Skilling Ecosystem</span>
             </h2>
-            <p style={{ color: 'var(--text-secondary)', fontSize: 15 }}>
-              Tailored workspaces engineered for students, educators, employers, and policymakers.
+            <p
+              style={{
+                color: 'var(--text-secondary)',
+                fontSize: 'clamp(14px, 1.6vw, 16px)',
+                maxWidth: 720,
+                margin: '0 auto',
+                lineHeight: 1.6,
+              }}
+            >
+              From policy decisions to individual careers, SkillSense AI connects the people responsible for creating, delivering, validating and benefiting from skilling outcomes.
             </p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(270px, 1fr))', gap: 18 }}>
-            {/* Students */}
-            <div className="card-linear" style={{ padding: 24, borderTop: '3px solid var(--gold)' }}>
-              <div style={{ width: 36, height: 36, borderRadius: 8, background: 'rgba(245,158,11,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--gold)', marginBottom: 14 }}>
-                <Users size={18} />
+          {/* 4 Audience Cards Grid */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(270px, 1fr))',
+              gap: 20,
+            }}
+          >
+            {/* 1. Government & Policy Makers */}
+            <div
+              className="card-linear"
+              style={{
+                padding: 24,
+                borderRadius: 16,
+                borderTop: '3px solid #F59E0B',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                background: '#10131E',
+                boxShadow: '0 8px 30px rgba(0,0,0,0.4)',
+                transition: 'transform 0.2s ease, border-color 0.2s ease',
+              }}
+            >
+              <div>
+                {/* Header row with Icon & Tag */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                  <div
+                    style={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: 10,
+                      background: 'rgba(245,158,11,0.12)',
+                      border: '1px solid rgba(245,158,11,0.25)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#F59E0B',
+                    }}
+                  >
+                    <Landmark size={20} />
+                  </div>
+                  <span
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 800,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.06em',
+                      padding: '3px 9px',
+                      borderRadius: 99,
+                      background: 'rgba(245,158,11,0.12)',
+                      color: '#F59E0B',
+                      border: '1px solid rgba(245,158,11,0.25)',
+                    }}
+                  >
+                    Policy & Impact
+                  </span>
+                </div>
+
+                <h3 className="font-display" style={{ fontSize: 18, fontWeight: 800, color: '#f8fafc', margin: '0 0 6px' }}>
+                  Government & Policy Makers
+                </h3>
+
+                <p style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.45, marginBottom: 16 }}>
+                  Maharashtra Government departments, skill development authorities, district policymakers, and programme administrators.
+                </p>
+
+                {/* Bullet Points */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
+                  {[
+                    'Track longitudinal employment outcomes after training',
+                    'Monitor placement, 365d retention, wages and self-employment',
+                    'Identify district-wise skill gaps across Maharashtra',
+                    'Evaluate training providers & use AI-assisted evidence for policy interventions',
+                  ].map((pt, i) => (
+                    <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 12.5, color: '#cbd5e1', lineHeight: 1.45 }}>
+                      <CheckCircle2 size={15} style={{ color: '#F59E0B', marginTop: 2, flexShrink: 0 }} />
+                      <span>{pt}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <h3 className="font-display" style={{ fontSize: 17, fontWeight: 800, color: '#f8fafc', margin: '0 0 8px' }}>
-                For Students & Learners
-              </h3>
-              <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 14 }}>
-                Understand your true technical baseline, close high-impact skill gaps with personalized roadmaps, and showcase verifiable Skill Passports to recruiters.
-              </p>
-              <Link href="/student" style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--gold)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>
-                Student Workspace →
+
+              <Link
+                href="/government"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '10px 14px',
+                  borderRadius: 10,
+                  background: 'rgba(245, 158, 11, 0.08)',
+                  border: '1px solid rgba(245, 158, 11, 0.2)',
+                  color: '#F59E0B',
+                  fontSize: 12.5,
+                  fontWeight: 700,
+                  textDecoration: 'none',
+                  transition: 'background 0.2s ease',
+                }}
+              >
+                <span>Open Government Cockpit</span>
+                <ArrowRight size={14} />
               </Link>
             </div>
 
-            {/* Institutions */}
-            <div className="card-linear" style={{ padding: 24, borderTop: '3px solid #60a5fa' }}>
-              <div style={{ width: 36, height: 36, borderRadius: 8, background: 'rgba(59,130,246,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#60a5fa', marginBottom: 14 }}>
-                <Building2 size={18} />
+            {/* 2. Training Providers / Institutes */}
+            <div
+              className="card-linear"
+              style={{
+                padding: 24,
+                borderRadius: 16,
+                borderTop: '3px solid #60A5FA',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                background: '#10131E',
+                boxShadow: '0 8px 30px rgba(0,0,0,0.4)',
+                transition: 'transform 0.2s ease, border-color 0.2s ease',
+              }}
+            >
+              <div>
+                {/* Header row with Icon & Tag */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                  <div
+                    style={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: 10,
+                      background: 'rgba(59,130,246,0.12)',
+                      border: '1px solid rgba(59,130,246,0.25)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#60A5FA',
+                    }}
+                  >
+                    <Building2 size={20} />
+                  </div>
+                  <span
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 800,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.06em',
+                      padding: '3px 9px',
+                      borderRadius: 99,
+                      background: 'rgba(59,130,246,0.12)',
+                      color: '#60A5FA',
+                      border: '1px solid rgba(59,130,246,0.25)',
+                    }}
+                  >
+                    Training & Outcomes
+                  </span>
+                </div>
+
+                <h3 className="font-display" style={{ fontSize: 18, fontWeight: 800, color: '#f8fafc', margin: '0 0 6px' }}>
+                  Training Providers & ITIs
+                </h3>
+
+                <p style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.45, marginBottom: 16 }}>
+                  ITIs, polytechnics, skill development centres, and government & private vocational training partners.
+                </p>
+
+                {/* Bullet Points */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
+                  {[
+                    'Track trainee progress from enrolment to assessment & placement',
+                    'Identify learners at risk of non-placement early with AI indicators',
+                    'Understand curriculum skill gaps vs real industry hiring demand',
+                    'Monitor long-term cohort placement & prove institutional ROI',
+                  ].map((pt, i) => (
+                    <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 12.5, color: '#cbd5e1', lineHeight: 1.45 }}>
+                      <CheckCircle2 size={15} style={{ color: '#60A5FA', marginTop: 2, flexShrink: 0 }} />
+                      <span>{pt}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <h3 className="font-display" style={{ fontSize: 17, fontWeight: 800, color: '#f8fafc', margin: '0 0 8px' }}>
-                For Universities & Colleges
-              </h3>
-              <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 14 }}>
-                Benchmark batch outcomes, detect curriculum alignment deficiencies against hiring trends, and prove educational ROI with automated institutional reporting.
-              </p>
-              <Link href="/institute" style={{ fontSize: 12.5, fontWeight: 700, color: '#60a5fa', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>
-                Institute Portal →
+
+              <Link
+                href="/institute"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '10px 14px',
+                  borderRadius: 10,
+                  background: 'rgba(59, 130, 246, 0.08)',
+                  border: '1px solid rgba(59, 130, 246, 0.2)',
+                  color: '#60A5FA',
+                  fontSize: 12.5,
+                  fontWeight: 700,
+                  textDecoration: 'none',
+                  transition: 'background 0.2s ease',
+                }}
+              >
+                <span>Open Provider Dashboard</span>
+                <ArrowRight size={14} />
               </Link>
             </div>
 
-            {/* Employers */}
-            <div className="card-linear" style={{ padding: 24, borderTop: '3px solid #10b981' }}>
-              <div style={{ width: 36, height: 36, borderRadius: 8, background: 'rgba(16,185,129,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#10b981', marginBottom: 14 }}>
-                <Briefcase size={18} />
+            {/* 3. Trainees & Students */}
+            <div
+              className="card-linear"
+              style={{
+                padding: 24,
+                borderRadius: 16,
+                borderTop: '3px solid #10B981',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                background: '#10131E',
+                boxShadow: '0 8px 30px rgba(0,0,0,0.4)',
+                transition: 'transform 0.2s ease, border-color 0.2s ease',
+              }}
+            >
+              <div>
+                {/* Header row with Icon & Tag */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                  <div
+                    style={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: 10,
+                      background: 'rgba(16,185,129,0.12)',
+                      border: '1px solid rgba(16,185,129,0.25)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#10B981',
+                    }}
+                  >
+                    <GraduationCap size={20} />
+                  </div>
+                  <span
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 800,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.06em',
+                      padding: '3px 9px',
+                      borderRadius: 99,
+                      background: 'rgba(16,185,129,0.12)',
+                      color: '#10B981',
+                      border: '1px solid rgba(16,185,129,0.25)',
+                    }}
+                  >
+                    Career & Growth
+                  </span>
+                </div>
+
+                <h3 className="font-display" style={{ fontSize: 18, fontWeight: 800, color: '#f8fafc', margin: '0 0 6px' }}>
+                  Trainees & Students
+                </h3>
+
+                <p style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.45, marginBottom: 16 }}>
+                  Vocational learners, ITI students, skilling scheme beneficiaries, and technical job seekers.
+                </p>
+
+                {/* Bullet Points */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
+                  {[
+                    'Maintain a verifiable longitudinal skill & career milestone journey',
+                    'Complete diagnostic assessments & earn NSQF Skill Passports',
+                    'Receive AI-assisted career insights, gap roadmaps & wage forecasts',
+                    'Report employment outcomes & manage DPDP Act 2023 consent',
+                  ].map((pt, i) => (
+                    <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 12.5, color: '#cbd5e1', lineHeight: 1.45 }}>
+                      <CheckCircle2 size={15} style={{ color: '#10B981', marginTop: 2, flexShrink: 0 }} />
+                      <span>{pt}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <h3 className="font-display" style={{ fontSize: 17, fontWeight: 800, color: '#f8fafc', margin: '0 0 8px' }}>
-                For Industry & Employers
-              </h3>
-              <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 14 }}>
-                Cut recruitment screening latency by searching pre-verified candidate talent pools with immutable skill proofs and diagnostic audit trails.
-              </p>
-              <Link href="/industry" style={{ fontSize: 12.5, fontWeight: 700, color: '#10b981', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>
-                Industry Portal →
+
+              <Link
+                href="/student/journey"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '10px 14px',
+                  borderRadius: 10,
+                  background: 'rgba(16, 185, 129, 0.08)',
+                  border: '1px solid rgba(16, 185, 129, 0.2)',
+                  color: '#10B981',
+                  fontSize: 12.5,
+                  fontWeight: 700,
+                  textDecoration: 'none',
+                  transition: 'background 0.2s ease',
+                }}
+              >
+                <span>View Trainee Journey</span>
+                <ArrowRight size={14} />
               </Link>
             </div>
 
-            {/* Government */}
-            <div className="card-linear" style={{ padding: 24, borderTop: '3px solid #c084fc' }}>
-              <div style={{ width: 36, height: 36, borderRadius: 8, background: 'rgba(168,85,247,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#c084fc', marginBottom: 14 }}>
-                <Landmark size={18} />
+            {/* 4. Employers & Industry */}
+            <div
+              className="card-linear"
+              style={{
+                padding: 24,
+                borderRadius: 16,
+                borderTop: '3px solid #C084FC',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                background: '#10131E',
+                boxShadow: '0 8px 30px rgba(0,0,0,0.4)',
+                transition: 'transform 0.2s ease, border-color 0.2s ease',
+              }}
+            >
+              <div>
+                {/* Header row with Icon & Tag */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                  <div
+                    style={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: 10,
+                      background: 'rgba(168,85,247,0.12)',
+                      border: '1px solid rgba(168,85,247,0.25)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#C084FC',
+                    }}
+                  >
+                    <ShieldCheck size={20} />
+                  </div>
+                  <span
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 800,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.06em',
+                      padding: '3px 9px',
+                      borderRadius: 99,
+                      background: 'rgba(168,85,247,0.12)',
+                      color: '#C084FC',
+                      border: '1px solid rgba(168,85,247,0.25)',
+                    }}
+                  >
+                    Employment Verification
+                  </span>
+                </div>
+
+                <h3 className="font-display" style={{ fontSize: 18, fontWeight: 800, color: '#f8fafc', margin: '0 0 6px' }}>
+                  Hiring Employers & MSMEs
+                </h3>
+
+                <p style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.45, marginBottom: 16 }}>
+                  Enterprises, MSMEs, hiring organisations, and national apprenticeship partners.
+                </p>
+
+                {/* Bullet Points */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
+                  {[
+                    'Validate candidate placement & employment claims in 1 click',
+                    'Verify candidate credentials via tamper-proof state ledger hashes',
+                    'Request corrections where necessary to build trusted records',
+                    'Access pre-assessed, competency-verified candidate talent pools',
+                  ].map((pt, i) => (
+                    <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 12.5, color: '#cbd5e1', lineHeight: 1.45 }}>
+                      <CheckCircle2 size={15} style={{ color: '#C084FC', marginTop: 2, flexShrink: 0 }} />
+                      <span>{pt}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <h3 className="font-display" style={{ fontSize: 17, fontWeight: 800, color: '#f8fafc', margin: '0 0 8px' }}>
-                For Government & Policymakers
-              </h3>
-              <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 14 }}>
-                Access macro-economic talent supply/demand heatmaps across Indian states, monitor NSQF compliance, and simulate vocational funding impact.
-              </p>
-              <Link href="/government" style={{ fontSize: 12.5, fontWeight: 700, color: '#c084fc', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>
-                Governance Center →
+
+              <Link
+                href="/employer/validations"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '10px 14px',
+                  borderRadius: 10,
+                  background: 'rgba(168, 85, 247, 0.08)',
+                  border: '1px solid rgba(168, 85, 247, 0.2)',
+                  color: '#C084FC',
+                  fontSize: 12.5,
+                  fontWeight: 700,
+                  textDecoration: 'none',
+                  transition: 'background 0.2s ease',
+                }}
+              >
+                <span>Open Employer Ledger</span>
+                <ArrowRight size={14} />
               </Link>
             </div>
+          </div>
+
+          {/* ── Contextual Ecosystem Connector CTA ── */}
+          <div style={{ textAlign: 'center', marginTop: 44 }}>
+            <a
+              href="#how-it-works"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 8,
+                fontSize: 13.5,
+                fontWeight: 700,
+                color: 'var(--gold)',
+                textDecoration: 'none',
+                padding: '11px 22px',
+                borderRadius: 12,
+                background: 'rgba(245, 158, 11, 0.08)',
+                border: '1px solid rgba(245, 158, 11, 0.25)',
+                boxShadow: '0 4px 16px rgba(0,0,0,0.3)',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              See How SkillSense AI Connects the Ecosystem <ArrowRight size={15} />
+            </a>
           </div>
         </div>
       </section>
 
       {/* ── 9. Verifiable Skill Passport Feature Section ── */}
+
       <section id="passport" style={{ padding: '80px 24px', background: 'var(--bg-surface)' }}>
         <div style={{ maxWidth: 1140, margin: '0 auto' }}>
           <div
