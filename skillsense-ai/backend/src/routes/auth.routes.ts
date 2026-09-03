@@ -210,6 +210,8 @@ const isGoogleConfigured = () => {
 
 // ── Google OAuth ───────────────────────────────────────────────────────────────
 router.get('/google', (req: Request, res: Response, next) => {
+  const origin = (req.query.origin as string) || (req.headers.referer ? new URL(req.headers.referer).origin : null) || env.FRONTEND_URL || 'http://localhost:5173';
+
   if (!isGoogleConfigured()) {
     // If not configured in development, perform dev login
     (async () => {
@@ -241,34 +243,40 @@ router.get('/google', (req: Request, res: Response, next) => {
         }
         const token = signToken({ id: String(user._id), role: user.role, email: user.email });
         const encoded = encodeUser(user);
-        return res.redirect(`${env.FRONTEND_URL}/auth/callback?token=${token}&user=${encoded}&provider=google`);
+        return res.redirect(`${origin}/auth/callback?token=${token}&user=${encoded}&provider=google`);
       } catch {
-        return res.redirect(`${env.FRONTEND_URL}/auth?error=google_failed`);
+        return res.redirect(`${origin}/auth?error=google_failed`);
       }
     })();
     return;
   }
-  passport.authenticate('google', { scope: ['profile', 'email'], session: false })(req, res, next);
+  passport.authenticate('google', { scope: ['profile', 'email'], session: false, state: origin })(req, res, next);
 });
 
 router.get('/google/callback',
-  passport.authenticate('google', {
-    session: false,
-    failureRedirect: `${env.FRONTEND_URL}/auth?error=google_failed`,
-  }),
+  (req: Request, res: Response, next) => {
+    const origin = (req.query.state as string) || env.FRONTEND_URL || 'http://localhost:5173';
+    passport.authenticate('google', {
+      session: false,
+      failureRedirect: `${origin}/auth?error=google_failed`,
+    })(req, res, next);
+  },
   (req: Request, res: Response) => {
     const user = req.user as IUser;
     const token = signToken({ id: String(user._id), role: user.role, email: user.email });
     const encoded = encodeUser(user);
+    const origin = (req.query.state as string) || env.FRONTEND_URL || 'http://localhost:5173';
 
     res.redirect(
-      `${env.FRONTEND_URL}/auth/callback?token=${token}&user=${encoded}&provider=google`
+      `${origin}/auth/callback?token=${token}&user=${encoded}&provider=google`
     );
   }
 );
 
 // ── GitHub OAuth ───────────────────────────────────────────────────────────────
 router.get('/github', (req: Request, res: Response, next) => {
+  const origin = (req.query.origin as string) || (req.headers.referer ? new URL(req.headers.referer).origin : null) || env.FRONTEND_URL || 'http://localhost:5173';
+
   if (!isGitHubConfigured()) {
     // If GitHub OAuth credentials are not set in .env, seamlessly log in/create the GitHub developer user
     (async () => {
@@ -301,28 +309,32 @@ router.get('/github', (req: Request, res: Response, next) => {
         }
         const token = signToken({ id: String(user._id), role: user.role, email: user.email });
         const encoded = encodeUser(user);
-        return res.redirect(`${env.FRONTEND_URL}/auth/callback?token=${token}&user=${encoded}&provider=github`);
+        return res.redirect(`${origin}/auth/callback?token=${token}&user=${encoded}&provider=github`);
       } catch {
-        return res.redirect(`${env.FRONTEND_URL}/auth?error=github_failed`);
+        return res.redirect(`${origin}/auth?error=github_failed`);
       }
     })();
     return;
   }
-  passport.authenticate('github', { scope: ['user:email'], session: false })(req, res, next);
+  passport.authenticate('github', { scope: ['user:email'], session: false, state: origin })(req, res, next);
 });
 
 router.get('/github/callback',
-  passport.authenticate('github', {
-    session: false,
-    failureRedirect: `${env.FRONTEND_URL}/auth?error=github_failed`,
-  }),
+  (req: Request, res: Response, next) => {
+    const origin = (req.query.state as string) || env.FRONTEND_URL || 'http://localhost:5173';
+    passport.authenticate('github', {
+      session: false,
+      failureRedirect: `${origin}/auth?error=github_failed`,
+    })(req, res, next);
+  },
   (req: Request, res: Response) => {
     const user = req.user as IUser;
     const token = signToken({ id: String(user._id), role: user.role, email: user.email });
     const encoded = encodeUser(user);
+    const origin = (req.query.state as string) || env.FRONTEND_URL || 'http://localhost:5173';
 
     res.redirect(
-      `${env.FRONTEND_URL}/auth/callback?token=${token}&user=${encoded}&provider=github`
+      `${origin}/auth/callback?token=${token}&user=${encoded}&provider=github`
     );
   }
 );
