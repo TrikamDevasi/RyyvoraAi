@@ -23,3 +23,6 @@ ts_errors.txt
 
 # OS
 .DS_Store
+
+# Vercel deployment artifacts
+.vercel

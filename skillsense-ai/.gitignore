@@ -8,3 +8,5 @@ dist
 out
 *.txt
 build_output*
+.vercel
+

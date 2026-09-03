@@ -211,6 +211,36 @@ cd frontend && npm run build
 
 ---
 
+## 🚀 Production Deployment Workflow
+
+SkillSense AI is deployed on **Vercel Hobby** infrastructure under the repository owner's account (`TrikamDevasi`).
+
+### Vercel Hobby Policy & Collaboration Restriction
+> [!IMPORTANT]
+> **Vercel Hobby does not support collaboration for private repositories.**
+> If a commit is pushed directly to the `main` branch by any team member other than the project owner, Vercel automatically halts and cancels the deployment with the error:
+> *"The deployment was blocked because the commit author did not have contributing access to the project on Vercel. The Hobby Plan does not support collaboration for private repositories."*
+> 
+> To honor contributor attribution while keeping production deployments seamless on Vercel Hobby, all contributors follow an **Owner-Controlled Deployment Workflow**.
+
+### Workflow Rules & Execution
+1. **Feature Branches Only**: Team members must create and work exclusively on dedicated feature branches (`feature/<name>` or `fix/<name>`).
+2. **No Direct Pushes to `main`**: Team members must never push production changes directly to the `main` branch.
+3. **Pull Requests Required**: All proposed modifications must be submitted via a GitHub Pull Request targeting `main`.
+4. **Owner Review & Quality Gate**: The repository owner reviews all incoming PRs, validates test suite passes (`npm test`), and approves changes.
+5. **Owner-Controlled Deployment**:
+   - **Automated CI/CD**: Merged PRs on `main` trigger `.github/workflows/deploy.yml`, which deploys the production build using the Owner's Vercel token stored in GitHub Secrets.
+   - **Manual Fallback**: The repository owner can also deploy locally at any time using:
+     ```bash
+     git checkout main && git pull origin main
+     cd frontend && npx vercel --prod
+     ```
+6. **Genuine Contributor Attribution**: All commits permanently retain their original author metadata (`git log`), properly crediting every teammate's contributions.
+
+For detailed branching commands, review [CONTRIBUTING.md](file:///c:/Users/trika/Documents/skillsense/TEAM_QUANTUM_CODERS-SU-/skillsense-ai/CONTRIBUTING.md).
+
+---
+
 ## 📂 Unified Codebase Architecture
 
 ```
