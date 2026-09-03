@@ -156,6 +156,7 @@ export default function UserProfileDropdown() {
         aria-label={`User account menu for ${user?.name || 'User'}`}
         aria-haspopup="menu"
         aria-expanded={isOpen}
+        className="icon-btn-hover"
         style={{
           display: 'flex',
           alignItems: 'center',
@@ -167,13 +168,6 @@ export default function UserProfileDropdown() {
           border: '1px solid',
           borderColor: isOpen ? 'var(--border)' : 'transparent',
           cursor: 'pointer',
-          transition: 'all 0.15s ease',
-        }}
-        onMouseEnter={(e) => {
-          if (!isOpen) e.currentTarget.style.background = 'var(--bg-surface-elevated)';
-        }}
-        onMouseLeave={(e) => {
-          if (!isOpen) e.currentTarget.style.background = 'transparent';
         }}
       >
         {/* Avatar */}
@@ -191,6 +185,7 @@ export default function UserProfileDropdown() {
             justifyContent: 'center',
             boxShadow: '0 2px 6px rgba(245, 158, 11, 0.25)',
             flexShrink: 0,
+            transition: 'transform 0.18s ease',
           }}
         >
           {initials}
@@ -348,6 +343,7 @@ export default function UserProfileDropdown() {
               type="button"
               role="menuitem"
               onClick={() => handleNavigate(canonicalProfileHref)}
+              className="menu-item-hover"
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -362,10 +358,7 @@ export default function UserProfileDropdown() {
                 width: '100%',
                 cursor: 'pointer',
                 textAlign: 'left',
-                transition: 'background 0.12s ease',
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--bg-surface-elevated)')}
-              onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
             >
               <User size={15} style={{ color: 'var(--gold)', flexShrink: 0 }} />
               <span style={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
@@ -377,6 +370,7 @@ export default function UserProfileDropdown() {
               type="button"
               role="menuitem"
               onClick={() => handleNavigate('/settings/billing')}
+              className="menu-item-hover"
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -391,10 +385,7 @@ export default function UserProfileDropdown() {
                 width: '100%',
                 cursor: 'pointer',
                 textAlign: 'left',
-                transition: 'background 0.12s ease',
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--bg-surface-elevated)')}
-              onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
             >
               <CreditCard size={15} style={{ color: 'var(--text-secondary)', flexShrink: 0 }} />
               <span>Billing & Subscription</span>
@@ -404,6 +395,7 @@ export default function UserProfileDropdown() {
               type="button"
               role="menuitem"
               onClick={() => handleNavigate('/student/consent')}
+              className="menu-item-hover"
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -418,10 +410,7 @@ export default function UserProfileDropdown() {
                 width: '100%',
                 cursor: 'pointer',
                 textAlign: 'left',
-                transition: 'background 0.12s ease',
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--bg-surface-elevated)')}
-              onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
             >
               <Lock size={15} style={{ color: 'var(--text-secondary)', flexShrink: 0 }} />
               <span>Security & DPDP Consent</span>
@@ -432,6 +421,7 @@ export default function UserProfileDropdown() {
               type="button"
               role="menuitem"
               onClick={() => toggleTheme()}
+              className="menu-item-hover"
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -446,10 +436,7 @@ export default function UserProfileDropdown() {
                 border: 'none',
                 cursor: 'pointer',
                 textAlign: 'left',
-                transition: 'background 0.12s ease',
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--bg-surface-elevated)')}
-              onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 {theme === 'dark' ? (
@@ -472,6 +459,7 @@ export default function UserProfileDropdown() {
             type="button"
             role="menuitem"
             onClick={handleLogout}
+            className="menu-item-danger-hover"
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -486,10 +474,7 @@ export default function UserProfileDropdown() {
               border: 'none',
               cursor: 'pointer',
               textAlign: 'left',
-              transition: 'background 0.12s ease',
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(239, 68, 68, 0.08)')}
-            onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
           >
             <LogOut size={15} />
             <span>Sign Out</span>

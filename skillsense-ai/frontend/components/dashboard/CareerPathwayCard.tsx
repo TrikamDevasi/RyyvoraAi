@@ -43,25 +43,17 @@ export default function CareerPathwayCard({ pathway, onSelect }: Props) {
 
     return (
         <div
+            className="interactive-card"
             style={{
                 background: pathway.isRecommended
                     ? 'linear-gradient(145deg, rgba(212,168,67,0.12), rgba(10,8,2,0.97))'
                     : 'linear-gradient(145deg, rgba(255,255,255,0.03), rgba(10,8,2,0.97))',
-                border: `1px solid ${pathway.isRecommended ? 'rgba(212,168,67,0.4)' : 'rgba(255,255,255,0.1)'}`,
+                border: `1px solid ${pathway.isRecommended ? 'var(--gold-border)' : 'var(--border)'}`,
                 borderRadius: 14,
                 padding: '18px 20px',
                 cursor: 'pointer',
-                transition: 'border-color 0.2s, transform 0.2s',
                 position: 'relative',
                 overflow: 'hidden',
-            }}
-            onMouseEnter={(e) => {
-                (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(212,168,67,0.6)';
-            }}
-            onMouseLeave={(e) => {
-                (e.currentTarget as HTMLDivElement).style.borderColor = pathway.isRecommended
-                    ? 'rgba(212,168,67,0.4)'
-                    : 'rgba(255,255,255,0.1)';
             }}
             onClick={() => {
                 if (onSelect) onSelect(pathway.id);
@@ -145,7 +137,7 @@ export default function CareerPathwayCard({ pathway, onSelect }: Props) {
                         
                         <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, color: GOLD, fontWeight: 600 }}>
                             {isExpanded ? 'Hide Roadmap' : 'View Roadmap'}
-                            {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                            {isExpanded ? <ChevronUp size={16} className="interactive-arrow" /> : <ChevronDown size={16} className="interactive-arrow" />}
                         </div>
                     </div>
                 </div>

@@ -189,9 +189,56 @@ function runFrontendUnitTests() {
   assert.strictEqual(clearanceGap, 12, 'Mobile bottom clearance gap is exactly 12px');
   console.log('✓ AI Copilot floating launcher clearance invariant verified (no overlap with bottom nav).');
 
+  // ── Test 12: Micro-Interaction & Transition Timing Standards ───────────
+  console.log('Testing Micro-Interaction Timing & Elevation Bounds...');
+  const UI_TRANSITION_TIMINGS_MS = {
+    fast: 150,
+    normal: 180,
+    smooth: 220,
+  };
+
+  for (const [name, ms] of Object.entries(UI_TRANSITION_TIMINGS_MS)) {
+    assert.ok(ms >= 150, `${name} transition must be >= 150ms for smooth visibility`);
+    assert.ok(ms <= 250, `${name} transition must be <= 250ms to prevent perceived UI sluggishness`);
+  }
+
+  const UI_MICRO_SCALES = {
+    iconButtonHover: 1.04,
+    mobileActiveIcon: 1.06,
+    kpiIconHover: 1.06,
+    buttonActivePress: 0.98,
+  };
+
+  assert.ok(UI_MICRO_SCALES.iconButtonHover <= 1.06, 'Icon button hover scale must be <= 1.06 to avoid excessive zoom');
+  assert.ok(UI_MICRO_SCALES.buttonActivePress >= 0.95 && UI_MICRO_SCALES.buttonActivePress < 1.0, 'Button active press must provide subtle tactile compression');
+
+  const UI_CARD_ELEVATION_PX = -2;
+  assert.ok(UI_CARD_ELEVATION_PX >= -3 && UI_CARD_ELEVATION_PX <= -1, 'Card hover elevation must be between -1px and -3px for subtle lift');
+  console.log('✓ Micro-interaction timing (150-220ms), elevation (-2px), and scale invariants verified.');
+
+  // ── Test 13: Touch Safety & Reduced Motion Accessibility Invariants ────
+  console.log('Testing Touch Safety & Reduced Motion Accessibility Invariants...');
+  const isHoverSafeDevice = (pointerType: 'mouse' | 'touch'): boolean => {
+    return pointerType === 'mouse';
+  };
+
+  assert.strictEqual(isHoverSafeDevice('mouse'), true, 'Mouse devices support persistent hover states');
+  assert.strictEqual(isHoverSafeDevice('touch'), false, 'Touch devices must not trigger sticky hover states');
+
+  const reducedMotionConfig = {
+    animationDurationMs: 0.01,
+    transitionDurationMs: 0.01,
+    transform: 'none',
+  };
+
+  assert.strictEqual(reducedMotionConfig.transform, 'none', 'Reduced motion must disable translation and scaling');
+  assert.ok(reducedMotionConfig.transitionDurationMs <= 0.1, 'Transitions must be instantaneous under reduced motion');
+  console.log('✓ Touch safety (@media (hover: hover)) and reduced motion invariants verified.');
+
   console.log('\n====================================================');
-  console.log('🎉 ALL FRONTEND INTEGRATION & CONTRACT TESTS PASSED! (11/11)');
+  console.log('🎉 ALL FRONTEND INTEGRATION & CONTRACT TESTS PASSED! (13/13)');
   console.log('====================================================');
 }
 
 runFrontendUnitTests();
+

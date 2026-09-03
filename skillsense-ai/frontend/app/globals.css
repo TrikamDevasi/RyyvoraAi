@@ -187,6 +187,54 @@ body {
   outline-offset: 2px;
 }
 
+/* ── Form Inputs & Select Micro-Interactions ── */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="search"],
+select,
+textarea {
+  transition: border-color 0.18s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.18s cubic-bezier(0.4, 0, 0.2, 1),
+              background-color 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (hover: hover) {
+  input[type="text"]:hover,
+  input[type="email"]:hover,
+  input[type="password"]:hover,
+  input[type="number"]:hover,
+  input[type="search"]:hover,
+  select:hover,
+  textarea:hover {
+    border-color: var(--border-active);
+  }
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="number"]:focus,
+input[type="search"]:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--gold) !important;
+  box-shadow: 0 0 0 2px var(--gold-muted) !important;
+  outline: none;
+}
+
+/* ── Table Row Micro-Interactions ── */
+tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+@media (hover: hover) {
+  tbody tr:hover {
+    background-color: var(--bg-surface-elevated);
+  }
+}
+
 /* ── Modern Card & Surface Utility Classes ── */
 .card-linear {
   background: var(--bg-surface);
@@ -237,22 +285,29 @@ body {
   border-radius: var(--radius-md);
   border: 1px solid #d97706;
   cursor: pointer;
-  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
   text-decoration: none;
   white-space: nowrap;
 }
 
-.btn-primary:hover,
-.btn-gold:hover {
-  background: #fbbf24;
-  border-color: #f59e0b;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.25);
+@media (hover: hover) {
+  .btn-primary:hover,
+  .btn-gold:hover {
+    background: #fbbf24;
+    border-color: #f59e0b;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(245, 158, 11, 0.25);
+  }
+
+  .btn-primary:hover svg,
+  .btn-gold:hover svg {
+    transform: translateX(2px);
+  }
 }
 
 .btn-primary:active,
 .btn-gold:active {
-  transform: translateY(0);
+  transform: translateY(0) scale(0.98);
 }
 
 .btn-secondary {
@@ -261,21 +316,59 @@ body {
   justify-content: center;
   gap: 8px;
   padding: 8px 16px;
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--bg-surface-elevated);
   color: var(--text-primary);
   font-weight: 600;
   font-size: 13px;
   border-radius: var(--radius-md);
   border: 1px solid var(--border);
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
   text-decoration: none;
 }
 
-.btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.15);
-  color: #ffffff;
+@media (hover: hover) {
+  .btn-secondary:hover {
+    background: var(--bg-surface-hover);
+    border-color: var(--border-active);
+    color: var(--text-primary);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+  }
+}
+
+.btn-secondary:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: transparent;
+  color: var(--gold);
+  font-weight: 600;
+  font-size: 13px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--gold-border);
+  cursor: pointer;
+  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  text-decoration: none;
+}
+
+@media (hover: hover) {
+  .btn-outline:hover {
+    background: var(--gold-muted);
+    border-color: var(--gold);
+    color: var(--gold-light);
+    transform: translateY(-1px);
+  }
+}
+
+.btn-outline:active {
+  transform: translateY(0) scale(0.98);
 }
 
 .btn-ghost {
@@ -289,14 +382,210 @@ body {
   font-weight: 600;
   font-size: 13px;
   border-radius: var(--radius-sm);
-  border: none;
+  border: 1px solid transparent;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.btn-ghost:hover {
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--text-primary);
+@media (hover: hover) {
+  .btn-ghost:hover {
+    background: var(--bg-surface-elevated);
+    border-color: var(--border);
+    color: var(--text-primary);
+  }
+}
+
+.btn-ghost:active {
+  transform: scale(0.98);
+}
+
+/* ── Centralized Micro-Interactions & Hover System ── */
+
+/* 1. Interactive Cards */
+.interactive-card {
+  transition: transform 0.18s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.18s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.18s cubic-bezier(0.4, 0, 0.2, 1),
+              background-color 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (hover: hover) {
+  .interactive-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--border-active) !important;
+    box-shadow: var(--shadow-md) !important;
+  }
+
+  .interactive-card:hover .interactive-arrow {
+    transform: translateX(3px);
+  }
+
+  .interactive-card:hover .interactive-icon {
+    transform: scale(1.06);
+  }
+}
+
+.interactive-card:active {
+  transform: translateY(0);
+}
+
+.interactive-arrow {
+  transition: transform 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.interactive-icon {
+  transition: transform 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 2. Icon Buttons (Theme toggle, notifications, profile trigger, sidebar toggle) */
+.icon-btn-hover {
+  transition: transform 0.18s cubic-bezier(0.4, 0, 0.2, 1),
+              background-color 0.18s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.18s cubic-bezier(0.4, 0, 0.2, 1),
+              color 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (hover: hover) {
+  .icon-btn-hover:hover {
+    background-color: var(--bg-surface-elevated) !important;
+    border-color: var(--border-active) !important;
+    color: var(--text-primary) !important;
+    transform: scale(1.04);
+  }
+}
+
+.icon-btn-hover:active {
+  transform: scale(0.96) !important;
+}
+
+/* 3. Navigation Links (Sidebar & Top Navbar) */
+.sidebar-nav-item {
+  transition: background-color 0.18s cubic-bezier(0.4, 0, 0.2, 1),
+              color 0.18s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.18s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar-nav-item svg {
+  transition: transform 0.18s cubic-bezier(0.4, 0, 0.2, 1), color 0.18s ease;
+}
+
+@media (hover: hover) {
+  .sidebar-nav-item:hover:not([aria-current="page"]) {
+    background-color: var(--bg-surface-elevated) !important;
+    color: var(--text-primary) !important;
+  }
+
+  .sidebar-nav-item:hover svg {
+    transform: translateX(2px);
+  }
+}
+
+.sidebar-nav-item:active {
+  transform: scale(0.99);
+}
+
+.navbar-nav-item {
+  transition: background-color 0.18s cubic-bezier(0.4, 0, 0.2, 1),
+              color 0.18s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.18s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.navbar-nav-item svg {
+  transition: transform 0.18s cubic-bezier(0.4, 0, 0.2, 1), color 0.18s ease;
+}
+
+@media (hover: hover) {
+  .navbar-nav-item:hover:not([aria-current="page"]) {
+    background-color: var(--bg-surface-elevated) !important;
+    color: var(--text-primary) !important;
+    transform: translateY(-1px);
+  }
+
+  .navbar-nav-item:hover svg {
+    transform: translateY(-1px);
+  }
+}
+
+.navbar-nav-item:active {
+  transform: translateY(0);
+}
+
+/* 4. Dropdown Menu Items */
+.menu-item-hover {
+  transition: background-color 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+              color 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.menu-item-hover svg {
+  transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), color 0.15s ease;
+}
+
+@media (hover: hover) {
+  .menu-item-hover:hover {
+    background-color: var(--bg-surface-elevated) !important;
+    color: var(--text-primary) !important;
+  }
+
+  .menu-item-hover:hover svg {
+    transform: translateX(2px);
+  }
+}
+
+.menu-item-hover:active {
+  transform: scale(0.99);
+}
+
+.menu-item-danger-hover {
+  transition: background-color 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+              color 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.menu-item-danger-hover svg {
+  transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (hover: hover) {
+  .menu-item-danger-hover:hover {
+    background-color: rgba(239, 68, 68, 0.1) !important;
+    color: #ef4444 !important;
+  }
+
+  .menu-item-danger-hover:hover svg {
+    transform: translateX(2px);
+  }
+}
+
+.menu-item-danger-hover:active {
+  transform: scale(0.99);
+}
+
+/* 5. Text Links */
+.link-hover {
+  transition: color 0.18s ease;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1.5px;
+}
+
+@media (hover: hover) {
+  .link-hover:hover {
+    color: var(--gold) !important;
+    text-decoration: underline;
+  }
+}
+
+/* 6. Table Rows */
+.table-row-hover {
+  transition: background-color 0.15s ease;
+}
+
+@media (hover: hover) {
+  .table-row-hover:hover {
+    background-color: var(--bg-surface-elevated) !important;
+  }
 }
 
 /* ── Badges & Status Pills ── */
@@ -509,6 +798,7 @@ body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+    transform: none !important;
   }
 }
 

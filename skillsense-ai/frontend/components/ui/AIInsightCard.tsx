@@ -27,6 +27,7 @@ export function AIInsightCard({
 }: AIInsightCardProps) {
   return (
     <div
+      className="interactive-card"
       style={{
         background: 'linear-gradient(135deg, rgba(245,158,11,0.06) 0%, rgba(15,17,26,0.98) 60%)',
         border: '1px solid rgba(245,158,11,0.22)',

@@ -239,6 +239,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 onClick={toggleSidebar}
                 aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
                 title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+                className="icon-btn-hover"
                 style={{
                   background: 'var(--bg-surface-elevated)',
                   border: '1px solid var(--border)',
@@ -249,10 +250,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  transition: 'all 0.15s ease',
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
-                onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
               >
                 {sidebarCollapsed ? <ChevronRight size={15} /> : <ChevronLeft size={16} />}
               </button>
@@ -298,7 +296,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                         <Link
                           key={route.href}
                           href={route.href}
-                          className={sidebarCollapsed ? 'sidebar-item-collapsed' : undefined}
+                          className={sidebarCollapsed ? 'sidebar-item-collapsed sidebar-nav-item' : 'sidebar-nav-item'}
                           style={{
                             display: 'flex',
                             alignItems: 'center',
@@ -313,7 +311,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                             background: active ? 'var(--gold-muted)' : 'transparent',
                             borderLeft: active ? '3px solid var(--gold)' : '3px solid transparent',
                             textDecoration: 'none',
-                            transition: 'all 0.15s ease',
                           }}
                           aria-label={route.label}
                           aria-current={active ? 'page' : undefined}
@@ -375,6 +372,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 onClick={toggleSidebar}
                 aria-label="Expand sidebar"
                 title="Expand sidebar"
+                className="icon-btn-hover"
                 style={{
                   width: '100%',
                   padding: '8px 0',
@@ -385,10 +383,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   cursor: 'pointer',
                   display: 'flex',
                   justifyContent: 'center',
-                  transition: 'all 0.15s ease',
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary)')}
-                onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
               >
                 <ChevronRight size={17} />
               </button>
@@ -560,6 +555,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     key={route.href}
                     href={route.href}
                     title={route.label}
+                    className="navbar-nav-item"
                     style={{
                       display: 'inline-flex',
                       alignItems: 'center',
@@ -574,20 +570,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                       border: active ? '1px solid var(--gold-border)' : '1px solid transparent',
                       textDecoration: 'none',
                       whiteSpace: 'nowrap',
-                      transition: 'all 0.15s ease',
                       flexShrink: 0,
-                    }}
-                    onMouseEnter={(e) => {
-                      if (!active) {
-                        e.currentTarget.style.background = 'var(--bg-surface-elevated)';
-                        e.currentTarget.style.color = 'var(--text-primary)';
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!active) {
-                        e.currentTarget.style.background = 'transparent';
-                        e.currentTarget.style.color = 'var(--text-secondary)';
-                      }
                     }}
                   >
                     <Icon size={16} style={{ color: active ? 'var(--gold)' : 'currentColor', flexShrink: 0 }} />
@@ -606,6 +589,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 onClick={() => setNavigationStyle('sidebar')}
                 aria-label="Toggle Sidebar"
                 title="Toggle Sidebar (Switch to Sidebar Layout)"
+                className="icon-btn-hover"
                 style={{
                   width: 38,
                   height: 38,
@@ -617,15 +601,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  transition: 'all 0.15s ease',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.color = 'var(--text-primary)';
-                  e.currentTarget.style.borderColor = 'var(--gold)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.color = 'var(--text-secondary)';
-                  e.currentTarget.style.borderColor = 'var(--border)';
                 }}
               >
                 <SidebarIcon size={18} />
@@ -669,6 +644,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               type="button"
               onClick={() => setMobileOpen(!mobileOpen)}
               aria-label="Open mobile navigation drawer"
+              className="icon-btn-hover md:hidden"
               style={{
                 background: 'var(--bg-surface-elevated)',
                 border: '1px solid var(--border)',
@@ -682,7 +658,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 justifyContent: 'center',
                 flexShrink: 0,
               }}
-              className="md:hidden"
             >
               {mobileOpen ? <X size={18} /> : <Menu size={18} />}
             </button>
@@ -904,6 +879,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                               key={route.href}
                               href={route.href}
                               onClick={() => setMobileOpen(false)}
+                              className="menu-item-hover"
                               style={{
                                 display: 'flex',
                                 alignItems: 'center',

@@ -113,6 +113,7 @@ export default function NotificationDropdown() {
         aria-haspopup="true"
         aria-expanded={isOpen}
         title="Notifications"
+        className="icon-btn-hover"
         style={{
           display: 'inline-flex',
           alignItems: 'center',
@@ -124,7 +125,6 @@ export default function NotificationDropdown() {
           border: '1px solid var(--border)',
           color: unreadCount > 0 ? 'var(--text-primary)' : 'var(--text-secondary)',
           cursor: 'pointer',
-          transition: 'all 0.2s ease',
           position: 'relative',
         }}
       >
@@ -281,6 +281,7 @@ export default function NotificationDropdown() {
                     markAsRead(n.id);
                     setIsOpen(false);
                   }}
+                  className="menu-item-hover"
                   style={{
                     display: 'flex',
                     alignItems: 'flex-start',
@@ -289,7 +290,6 @@ export default function NotificationDropdown() {
                     borderBottom: '1px solid var(--border-subtle)',
                     background: n.unread ? 'var(--gold-muted)' : 'transparent',
                     textDecoration: 'none',
-                    transition: 'background 0.15s ease',
                   }}
                 >
                   <div

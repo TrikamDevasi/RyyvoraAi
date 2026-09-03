@@ -92,6 +92,7 @@ export default function MobileBottomNav({ onOpenMore, isMoreOpen }: MobileBottom
               href={item.href}
               aria-label={item.label}
               aria-current={active ? 'page' : undefined}
+              className="mobile-nav-item"
               style={{
                 flex: 1,
                 display: 'flex',
@@ -104,7 +105,6 @@ export default function MobileBottomNav({ onOpenMore, isMoreOpen }: MobileBottom
                 textDecoration: 'none',
                 color: active ? 'var(--gold)' : 'var(--text-muted)',
                 position: 'relative',
-                transition: 'color 0.15s ease',
               }}
             >
               {/* Active subtle pill / indicator */}
@@ -126,7 +126,7 @@ export default function MobileBottomNav({ onOpenMore, isMoreOpen }: MobileBottom
                   strokeWidth={active ? 2.4 : 1.8}
                   style={{
                     color: active ? 'var(--gold)' : 'currentColor',
-                    transition: 'transform 0.15s ease',
+                    transition: 'transform 0.18s ease',
                     transform: active ? 'scale(1.06)' : 'scale(1)',
                   }}
                 />
@@ -159,6 +159,7 @@ export default function MobileBottomNav({ onOpenMore, isMoreOpen }: MobileBottom
           aria-label="Open more navigation"
           aria-haspopup="dialog"
           aria-expanded={isMoreOpen}
+          className="mobile-nav-item"
           style={{
             flex: 1,
             display: 'flex',
@@ -174,7 +175,6 @@ export default function MobileBottomNav({ onOpenMore, isMoreOpen }: MobileBottom
             cursor: 'pointer',
             padding: 0,
             position: 'relative',
-            transition: 'color 0.15s ease',
           }}
         >
           {/* Subtle Pill for More */}

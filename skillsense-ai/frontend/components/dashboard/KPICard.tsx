@@ -37,9 +37,10 @@ export default function KPICard({
 
     return (
         <div
+            className="interactive-card"
             style={{
-                background: 'linear-gradient(135deg, rgba(212,168,67,0.08) 0%, rgba(20,15,5,0.95) 100%)',
-                border: '1px solid rgba(212,168,67,0.2)',
+                background: 'var(--bg-surface)',
+                border: '1px solid var(--border)',
                 borderRadius: compact ? 10 : 14,
                 padding: compact ? '14px 18px' : '20px 24px',
                 display: 'flex',
@@ -47,16 +48,7 @@ export default function KPICard({
                 gap: 8,
                 position: 'relative',
                 overflow: 'hidden',
-                transition: 'border-color 0.25s, transform 0.2s',
                 cursor: 'default',
-            }}
-            onMouseEnter={(e) => {
-                (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(212,168,67,0.5)';
-                (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-2px)';
-            }}
-            onMouseLeave={(e) => {
-                (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(212,168,67,0.2)';
-                (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)';
             }}
         >
             {/* Background glow */}
@@ -68,7 +60,7 @@ export default function KPICard({
                     width: 80,
                     height: 80,
                     borderRadius: '50%',
-                    background: 'radial-gradient(circle, rgba(212,168,67,0.12) 0%, transparent 70%)',
+                    background: 'radial-gradient(circle, var(--gold-muted) 0%, transparent 70%)',
                     pointerEvents: 'none',
                 }}
             />
@@ -88,7 +80,7 @@ export default function KPICard({
                     {label}
                 </p>
                 {icon && (
-                    <span style={{ fontSize: compact ? 16 : 20, opacity: 0.7 }}>{icon}</span>
+                    <span className="interactive-icon" style={{ fontSize: compact ? 16 : 20, opacity: 0.85 }}>{icon}</span>
                 )}
             </div>
 
