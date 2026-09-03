@@ -137,7 +137,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         employer: 'employer@skillsense.demo',
         institute: 'provider@skillsense.demo',
         government: 'government@skillsense.demo',
-        industry: 'employer@skillsense.demo',
+        industry: 'industry@skillsense.demo',
         admin: 'admin@skillsense.demo',
       };
       const demoUser: AuthUser = {

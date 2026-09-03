@@ -54,7 +54,10 @@ export default function proxy(request: NextRequest): NextResponse {
     try {
       const parts = token.split('.');
       if (parts[1]) {
-        const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+        let base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+        while (base64.length % 4 !== 0) {
+          base64 += '=';
+        }
         const json = atob(base64);
         const payload = JSON.parse(json);
         if (payload?.role) {

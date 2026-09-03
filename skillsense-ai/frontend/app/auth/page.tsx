@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore, UserRole } from '@/store/authStore';
-import { setTokens } from '@/lib/auth';
+import { setTokens, removeTokens } from '@/lib/auth';
 import {
   Mail,
   Lock,
@@ -49,7 +49,7 @@ const DEMO_ACCOUNTS: Record<UserRole, { name: string; email: string; role: UserR
   employer: { name: 'Tata Consultancy Services (TCS)', email: 'employer@skillsense.demo', role: 'employer', defaultRoute: '/employer' },
   institute: { name: 'MSSDS Pune Regional Training Center', email: 'provider@skillsense.demo', role: 'institute', defaultRoute: '/institute' },
   government: { name: 'Maharashtra Skilling Directorate', email: 'government@skillsense.demo', role: 'government', defaultRoute: '/government' },
-  industry: { name: 'Sector Skill Council Intelligence Lead', email: 'employer@skillsense.demo', role: 'industry', defaultRoute: '/industry' },
+  industry: { name: 'Sector Skill Council Intelligence Lead', email: 'industry@skillsense.demo', role: 'industry', defaultRoute: '/industry' },
   admin: { name: 'SkillSense Chief Administrator', email: 'admin@skillsense.demo', role: 'admin', defaultRoute: '/admin' },
 };
 
@@ -151,9 +151,12 @@ export default function AuthPage() {
     const demo = DEMO_ACCOUNTS[role];
     setLoading(true);
     try {
+      removeTokens();
       const user = await demoLogin(role);
-      toast.success(`Logged in as ${user.name || demo.name} (${role.toUpperCase()})`);
-      window.location.replace(demo.defaultRoute);
+      const targetRole = (user?.role || role).toLowerCase();
+      const destination = ROLE_DASHBOARD[targetRole] || demo.defaultRoute;
+      toast.success(`Logged in as ${user?.name || demo.name} (${targetRole.toUpperCase()})`);
+      window.location.replace(destination);
     } catch {
       window.location.replace(demo.defaultRoute);
     }

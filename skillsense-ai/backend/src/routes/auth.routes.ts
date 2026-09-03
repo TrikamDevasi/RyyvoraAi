@@ -40,7 +40,7 @@ router.post('/demo-login', async (req: Request, res: Response) => {
       institute: 'provider@skillsense.demo',
       government: 'government@skillsense.demo',
       admin: 'admin@skillsense.demo',
-      industry: 'employer@skillsense.demo',
+      industry: 'industry@skillsense.demo',
     };
     const demoNames: Record<string, string> = {
       student: 'Aarav Deshmukh',
@@ -102,6 +102,22 @@ router.post('/demo-login', async (req: Request, res: Response) => {
     }
 
     const token = signToken({ id: String(user._id), role: user.role, email: user.email });
+
+    res.cookie('skillsense_token', token, {
+      httpOnly: false,
+      secure: env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: '/',
+    });
+    res.cookie('skillsense_role', user.role, {
+      httpOnly: false,
+      secure: env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: '/',
+    });
+
     res.status(200).json({
       success: true,
       message: `Logged in as demo ${role}`,
