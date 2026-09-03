@@ -123,6 +123,62 @@ router.post('/demo-login', async (req: Request, res: Response) => {
     res.status(500).json({ success: false, message: err.message || 'Demo login failed' });
   }
 });
+router.post('/switch-role', protect, async (req: Request, res: Response) => {
+  try {
+    const rawRole = (req.body.role || '').toLowerCase();
+    const validRoles = ['student', 'employer', 'institute', 'industry', 'government', 'admin'];
+    if (!validRoles.includes(rawRole)) {
+      res.status(400).json({ success: false, message: 'Invalid role specified' });
+      return;
+    }
+
+    const userId = (req.user as any)?._id;
+    const user = await User.findById(userId);
+    if (!user) {
+      res.status(404).json({ success: false, message: 'User not found' });
+      return;
+    }
+
+    user.role = rawRole as any;
+    await user.save();
+
+    const token = signToken({ id: String(user._id), role: user.role, email: user.email });
+
+    res.cookie('skillsense_token', token, {
+      httpOnly: false,
+      secure: env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: '/',
+    });
+    res.cookie('skillsense_role', user.role, {
+      httpOnly: false,
+      secure: env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: '/',
+    });
+
+    res.status(200).json({
+      success: true,
+      message: `Role switched to ${user.role}`,
+      data: {
+        token,
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          avatar: user.avatar,
+          isVerified: user.isVerified,
+          institutionId: user.institutionId,
+        },
+      },
+    });
+  } catch (err: any) {
+    res.status(500).json({ success: false, message: err.message || 'Failed to switch role' });
+  }
+});
 router.get('/me', protect, getMe);
 router.get('/preferences', protect, getPreferences);
 router.patch('/preferences', protect, updatePreferences);

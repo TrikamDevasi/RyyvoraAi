@@ -45,12 +45,12 @@ const ROLE_DASHBOARD: Record<string, string> = {
 };
 
 const DEMO_ACCOUNTS: Record<UserRole, { name: string; email: string; role: UserRole; defaultRoute: string }> = {
-  student: { name: 'Arjun Mehta', email: 'arjun.student@skillsense.gov.in', role: 'student', defaultRoute: '/student' },
-  employer: { name: 'Priya Verma (TCS Talent Lead)', email: 'priya.talent@tcs.com', role: 'employer', defaultRoute: '/employer' },
-  institute: { name: 'Dr. Ramesh Kulkarni (Dean, IIT-B)', email: 'dean@iitb.ac.in', role: 'institute', defaultRoute: '/institute' },
-  government: { name: 'National Skill Development Officer', email: 'officer@msde.gov.in', role: 'government', defaultRoute: '/government' },
-  industry: { name: 'NASSCOM Sector Intelligence Lead', email: 'intelligence@nasscom.in', role: 'industry', defaultRoute: '/industry' },
-  admin: { name: 'SkillSense Chief Administrator', email: 'admin@skillsense.gov.in', role: 'admin', defaultRoute: '/admin' },
+  student: { name: 'Aarav Deshmukh', email: 'trainee@skillsense.demo', role: 'student', defaultRoute: '/student' },
+  employer: { name: 'Tata Consultancy Services (TCS)', email: 'employer@skillsense.demo', role: 'employer', defaultRoute: '/employer' },
+  institute: { name: 'MSSDS Pune Regional Training Center', email: 'provider@skillsense.demo', role: 'institute', defaultRoute: '/institute' },
+  government: { name: 'Maharashtra Skilling Directorate', email: 'government@skillsense.demo', role: 'government', defaultRoute: '/government' },
+  industry: { name: 'Sector Skill Council Intelligence Lead', email: 'employer@skillsense.demo', role: 'industry', defaultRoute: '/industry' },
+  admin: { name: 'SkillSense Chief Administrator', email: 'admin@skillsense.demo', role: 'admin', defaultRoute: '/admin' },
 };
 
 export default function AuthPage() {
@@ -70,13 +70,17 @@ export default function AuthPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const err = searchParams.get('error');
-    if (err) {
-      if (err === 'github_failed') setError('GitHub authentication could not be completed. Please try again.');
-      else if (err === 'google_failed') setError('Google authentication could not be completed. Please try again.');
-      else if (err === 'account_suspended') setError('Your account has been suspended.');
-      else setError(`Authentication notice: ${err.replace(/_/g, ' ')}`);
-      setTimeout(() => setError(null), 5000);
+    const errParam = searchParams.get('error');
+    if (errParam) {
+      const messages: Record<string, string> = {
+        google_failed: 'Google sign in failed. Please try again.',
+        github_failed: 'GitHub sign in failed. Please try again.',
+        oauth_failed: 'OAuth sign in was interrupted. Please try again.',
+        session_expired: 'Your session expired. Please sign in again.',
+        missing_token: 'Missing authentication credentials. Please sign in.',
+        account_suspended: 'This account has been suspended. Please contact support.',
+      };
+      setError(messages[errParam] || 'Authentication failed. Please try again.');
     }
   }, [searchParams]);
 
@@ -93,11 +97,11 @@ export default function AuthPage() {
 
     try {
       await login(email.trim(), password);
-      const { useAuthStore: store } = await import('@/store/authStore');
-      const role = store.getState().user?.role || 'student';
-      const destination = ROLE_DASHBOARD[role] || '/student';
+      const user = useAuthStore.getState().user;
+      const role = (user?.role || 'student').toLowerCase();
+      const destination = ROLE_DASHBOARD[role] || `/${role}`;
       toast.success('Signed in successfully!');
-      router.push(destination);
+      window.location.replace(destination);
     } catch (err: any) {
       setLoading(false);
       const status = err.response?.status;
@@ -108,21 +112,7 @@ export default function AuthPage() {
       } else if (status === 401 || message.toLowerCase().includes('incorrect')) {
         setError('Incorrect credentials. Please verify your password.');
       } else {
-        // Provide seamless fallback login in case backend is offline on preview deployments
-        const demoUser = DEMO_ACCOUNTS.student;
-        const fakeToken = `demo_jwt_token_${Date.now()}`;
-        setAuth(
-          {
-            _id: 'demo_student_id',
-            name: name || 'Aarav Sharma',
-            email: email || 'student@skillsense.gov.in',
-            role: 'student',
-            isVerified: true,
-          },
-          fakeToken
-        );
-        toast.success('Signed in with verified demo session!');
-        router.push('/student');
+        setError(message || 'Unable to sign in. Please check your credentials.');
       }
     }
   };
@@ -144,25 +134,13 @@ export default function AuthPage() {
     setLoading(true);
     try {
       await register(name.trim(), email.trim(), password, selectedRole);
-      const destination = ROLE_DASHBOARD[selectedRole] || '/student';
+      const destination = ROLE_DASHBOARD[selectedRole] || `/${selectedRole}`;
       toast.success('Account created successfully!');
-      router.push(destination);
+      window.location.replace(destination);
     } catch (err: any) {
       setLoading(false);
-      // Fallback local registration if backend is in read-only / demo mode
-      const fakeToken = `demo_jwt_token_${Date.now()}`;
-      setAuth(
-        {
-          _id: `user_${Date.now()}`,
-          name: name.trim() || 'New User',
-          email: email.trim() || 'user@skillsense.gov.in',
-          role: selectedRole,
-          isVerified: true,
-        },
-        fakeToken
-      );
-      toast.success('Account registered with verified credential!');
-      router.push(ROLE_DASHBOARD[selectedRole] || '/student');
+      const message = err.response?.data?.message || 'Registration failed';
+      setError(message);
     }
   };
 
@@ -175,9 +153,9 @@ export default function AuthPage() {
     try {
       const user = await demoLogin(role);
       toast.success(`Logged in as ${user.name || demo.name} (${role.toUpperCase()})`);
-      window.location.href = demo.defaultRoute;
+      window.location.replace(demo.defaultRoute);
     } catch {
-      window.location.href = demo.defaultRoute;
+      window.location.replace(demo.defaultRoute);
     }
   };
 
