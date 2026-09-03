@@ -423,9 +423,7 @@ export default function AIChatWidget() {
           aria-label="Open SkillSense AI Copilot assistant"
           style={{
             position: 'fixed',
-            bottom: 16,
             right: 16,
-            zIndex: 50,
             padding: '9px 15px',
             borderRadius: 99,
             background: 'linear-gradient(135deg, #f59e0b, #d97706)',
@@ -440,7 +438,7 @@ export default function AIChatWidget() {
             boxShadow: '0 8px 32px rgba(245,158,11,0.35)',
             transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
           }}
-          className="hover:scale-105 active:scale-95"
+          className="ai-copilot-launcher hover:scale-105 active:scale-95"
         >
           <Sparkles size={15} />
           <span>AI Copilot</span>
@@ -461,9 +459,9 @@ export default function AIChatWidget() {
         <div
           role="dialog"
           aria-label="SkillSense AI Copilot"
+          className="ai-copilot-modal"
           style={{
             position: 'fixed',
-            bottom: 12,
             right: 12,
             width: expanded ? 'calc(100vw - 24px)' : 'calc(100vw - 24px)',
             maxWidth: expanded ? 580 : 390,

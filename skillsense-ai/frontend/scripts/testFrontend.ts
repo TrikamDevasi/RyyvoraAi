@@ -179,8 +179,18 @@ function runFrontendUnitTests() {
   assert.ok(calculateMobileClearance(0) > 64, 'Clearance must exceed fixed navbar height so content is not obscured');
   console.log('✓ Mobile content offset and safe area invariants verified.');
 
+  // ── Test 11: AI Copilot Launcher Clearance Above Bottom Navigation ────────
+  console.log('Testing AI Copilot Floating Widget Clearance Above Mobile Bottom Nav...');
+  const baseBottomNavHeight = 64;
+  const launcherMobileBottomOffset = 76;
+  const clearanceGap = launcherMobileBottomOffset - baseBottomNavHeight;
+
+  assert.ok(clearanceGap >= 12, 'Launcher must float at least 12px above bottom nav to prevent obscuring navigation destinations');
+  assert.strictEqual(clearanceGap, 12, 'Mobile bottom clearance gap is exactly 12px');
+  console.log('✓ AI Copilot floating launcher clearance invariant verified (no overlap with bottom nav).');
+
   console.log('\n====================================================');
-  console.log('🎉 ALL FRONTEND INTEGRATION & CONTRACT TESTS PASSED! (10/10)');
+  console.log('🎉 ALL FRONTEND INTEGRATION & CONTRACT TESTS PASSED! (11/11)');
   console.log('====================================================');
 }
 

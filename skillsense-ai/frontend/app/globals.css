@@ -440,9 +440,32 @@ body {
   padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px)) !important;
 }
 
+/* ── AI Copilot Floating Launcher & Modal Mobile Offset ── */
+.ai-copilot-launcher {
+  bottom: calc(76px + env(safe-area-inset-bottom, 0px)) !important;
+  z-index: 40 !important;
+}
+
+.ai-copilot-modal {
+  bottom: calc(74px + env(safe-area-inset-bottom, 0px)) !important;
+  max-height: calc(100dvh - 86px - env(safe-area-inset-bottom, 0px)) !important;
+  z-index: 55 !important;
+}
+
 @media (min-width: 768px) {
   .dashboard-main-content {
     padding-bottom: 28px !important;
+  }
+
+  .ai-copilot-launcher {
+    bottom: 16px !important;
+    z-index: 50 !important;
+  }
+
+  .ai-copilot-modal {
+    bottom: 12px !important;
+    max-height: 680px !important;
+    z-index: 50 !important;
   }
 }
 
