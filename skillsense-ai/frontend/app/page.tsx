@@ -316,7 +316,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── 3. Platform Credibility & Tech Partners Grid ── */}
-      <section style={{ padding: '36px 24px', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)', background: 'rgba(15,17,26,0.6)' }}>
+      <section style={{ padding: '36px 24px', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)', background: 'var(--bg-surface-elevated)' }}>
         <div style={{ maxWidth: 1240, margin: '0 auto', textAlign: 'center' }}>
           <div style={{ fontSize: 11.5, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 20 }}>
             Architected With Multi-Provider AI Inference & National Standards
@@ -332,7 +332,7 @@ export default function LandingPage() {
               { label: 'Algorithmic Fairness 4/5ths', sub: 'Automated Bias Auditing' },
             ].map((item, idx) => (
               <div key={idx} style={{ textAlign: 'left', minWidth: 160 }}>
-                <div style={{ fontSize: 13, fontWeight: 800, color: '#f8fafc' }}>{item.label}</div>
+                <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-primary)' }}>{item.label}</div>
                 <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{item.sub}</div>
               </div>
             ))}
@@ -656,12 +656,12 @@ export default function LandingPage() {
             )}
 
             {activeShowcaseTab === 'passport' && (
-              <div style={{ padding: 16, background: '#090a0f', borderRadius: 10, border: '1px solid var(--border)' }}>
+              <div style={{ padding: 16, background: 'var(--bg-surface-elevated)', borderRadius: 10, border: '1px solid var(--border)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: '#f8fafc' }}>Candidate: Arjun Mehta (SKP-7819)</span>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>Candidate: Arjun Mehta (SKP-7819)</span>
                   <AIBadge type="verified" label="VERIFIED" />
                 </div>
-                <div className="font-mono" style={{ fontSize: 11, color: '#94a3b8', wordBreak: 'break-all', background: 'rgba(255,255,255,0.03)', padding: 8, borderRadius: 6 }}>
+                <div className="font-mono" style={{ fontSize: 11, color: 'var(--text-secondary)', wordBreak: 'break-all', background: 'rgba(255,255,255,0.03)', padding: 8, borderRadius: 6 }}>
                   SHA-256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
                 </div>
               </div>
@@ -1385,9 +1385,9 @@ export default function LandingPage() {
             </div>
 
             {/* Passport Credential Seal Preview */}
-            <div style={{ padding: 20, background: '#090a0f', borderRadius: 14, border: '1px solid var(--border)', maxWidth: 420, width: '100%' }}>
+            <div style={{ padding: 20, background: 'var(--bg-surface)', borderRadius: 14, border: '1px solid var(--border)', maxWidth: 420, width: '100%' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border)', paddingBottom: 10, marginBottom: 12 }}>
-                <div style={{ fontSize: 12, fontWeight: 700, color: '#f8fafc' }}>Digital Passport #SKP-7819</div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-primary)' }}>Digital Passport #SKP-7819</div>
                 <span style={{ fontSize: 10, color: '#10b981', fontWeight: 700 }}>✓ VERIFIED (DEMO SAMPLE)</span>
               </div>
               <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginBottom: 6 }}>Candidate: Arjun Mehta (illustrative)</div>

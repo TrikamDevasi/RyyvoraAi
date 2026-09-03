@@ -679,8 +679,10 @@ td {
 [data-theme="light"] [style*="background: #0f111a"],
 [data-theme="light"] [style*="background:#0f111a"],
 [data-theme="light"] [style*="background: #151824"],
-[data-theme="light"] [style*="background: rgb(15, 17, 26)"] {
-  background: var(--bg-surface) !important;
+[data-theme="light"] [style*="background: rgb(15, 17, 26)"],
+[data-theme="light"] [style*="rgba(15,17,26"],
+[data-theme="light"] [style*="rgba(15, 17, 26"] {
+  background: var(--bg-surface-elevated) !important;
 }
 
 [data-theme="light"] [style*="background: rgba(255, 255, 255, 0.03)"],
