@@ -227,24 +227,30 @@ const isGoogleConfigured = () => {
 // ── Google OAuth ───────────────────────────────────────────────────────────────
 router.get('/google', (req: Request, res: Response, next) => {
   const origin = (req.query.origin as string) || (req.headers.referer ? new URL(req.headers.referer).origin : null) || env.FRONTEND_URL || 'http://localhost:5173';
+  const role = ((req.query.role as string) || '').toLowerCase();
+  const statePayload = Buffer.from(JSON.stringify({ origin, role })).toString('base64');
 
   if (!isGoogleConfigured()) {
     // If not configured in development, perform dev login
     (async () => {
       try {
         let user = await User.findOne({ email: 'google.dev@skillsense.demo' });
+        const userRole = (role && ['student', 'employer', 'institute', 'industry', 'government', 'admin'].includes(role)) ? role : 'student';
         if (!user) {
           user = await User.create({
             name: 'Google Verified User',
             email: 'google.dev@skillsense.demo',
-            role: 'student',
+            role: userRole,
             isVerified: true,
             authProvider: 'google',
             password: crypto.randomBytes(32).toString('hex'),
           });
+        } else if (role && user.role !== userRole) {
+          user.role = userRole as any;
+          await user.save();
         }
         let student = await Student.findOne({ userId: user._id });
-        if (!student) {
+        if (!student && user.role === 'student') {
           await Student.create({
             userId: user._id,
             enrollmentNumber: `SKP-${user._id.toString().slice(-6).toUpperCase()}`,
@@ -266,22 +272,69 @@ router.get('/google', (req: Request, res: Response, next) => {
     })();
     return;
   }
-  passport.authenticate('google', { scope: ['profile', 'email'], session: false, state: origin })(req, res, next);
+  passport.authenticate('google', { scope: ['profile', 'email'], session: false, state: statePayload })(req, res, next);
 });
 
 router.get('/google/callback',
   (req: Request, res: Response, next) => {
-    const origin = (req.query.state as string) || env.FRONTEND_URL || 'http://localhost:5173';
+    let origin = env.FRONTEND_URL || 'http://localhost:5173';
+    try {
+      const stateRaw = (req.query.state as string) || '';
+      if (stateRaw) {
+        const decoded = JSON.parse(Buffer.from(stateRaw, 'base64').toString('utf-8'));
+        if (decoded.origin) origin = decoded.origin;
+      }
+    } catch {
+      if ((req.query.state as string)?.startsWith('http')) origin = req.query.state as string;
+    }
     passport.authenticate('google', {
       session: false,
       failureRedirect: `${origin}/auth?error=google_failed`,
     })(req, res, next);
   },
-  (req: Request, res: Response) => {
-    const user = req.user as IUser;
+  async (req: Request, res: Response) => {
+    let user = req.user as IUser;
+    let origin = env.FRONTEND_URL || 'http://localhost:5173';
+    let requestedRole = '';
+
+    try {
+      const stateRaw = (req.query.state as string) || '';
+      if (stateRaw) {
+        const decoded = JSON.parse(Buffer.from(stateRaw, 'base64').toString('utf-8'));
+        if (decoded.origin) origin = decoded.origin;
+        if (decoded.role) requestedRole = String(decoded.role).toLowerCase();
+      }
+    } catch {
+      if ((req.query.state as string)?.startsWith('http')) origin = req.query.state as string;
+    }
+
+    const validRoles = ['student', 'employer', 'institute', 'industry', 'government', 'admin'];
+    if (requestedRole && validRoles.includes(requestedRole)) {
+      const dbUser = await User.findById(user._id);
+      if (dbUser) {
+        dbUser.role = requestedRole as any;
+        await dbUser.save();
+        user = dbUser;
+      }
+    }
+
     const token = signToken({ id: String(user._id), role: user.role, email: user.email });
     const encoded = encodeUser(user);
-    const origin = (req.query.state as string) || env.FRONTEND_URL || 'http://localhost:5173';
+
+    res.cookie('skillsense_token', token, {
+      httpOnly: false,
+      secure: env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: '/',
+    });
+    res.cookie('skillsense_role', user.role, {
+      httpOnly: false,
+      secure: env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: '/',
+    });
 
     res.redirect(
       `${origin}/auth/callback?token=${token}&user=${encoded}&provider=google`
@@ -292,25 +345,31 @@ router.get('/google/callback',
 // ── GitHub OAuth ───────────────────────────────────────────────────────────────
 router.get('/github', (req: Request, res: Response, next) => {
   const origin = (req.query.origin as string) || (req.headers.referer ? new URL(req.headers.referer).origin : null) || env.FRONTEND_URL || 'http://localhost:5173';
+  const role = ((req.query.role as string) || '').toLowerCase();
+  const statePayload = Buffer.from(JSON.stringify({ origin, role })).toString('base64');
 
   if (!isGitHubConfigured()) {
     // If GitHub OAuth credentials are not set in .env, seamlessly log in/create the GitHub developer user
     (async () => {
       try {
         let user = await User.findOne({ email: 'github.developer@skillsense.demo' });
+        const userRole = (role && ['student', 'employer', 'institute', 'industry', 'government', 'admin'].includes(role)) ? role : 'student';
         if (!user) {
           user = await User.create({
             name: 'GitHub Verified Developer',
             email: 'github.developer@skillsense.demo',
             avatar: 'https://avatars.githubusercontent.com/u/9919?v=4',
-            role: 'student',
+            role: userRole,
             isVerified: true,
             authProvider: 'github',
             password: crypto.randomBytes(32).toString('hex'),
           });
+        } else if (role && user.role !== userRole) {
+          user.role = userRole as any;
+          await user.save();
         }
         let student = await Student.findOne({ userId: user._id });
-        if (!student) {
+        if (!student && user.role === 'student') {
           await Student.create({
             userId: user._id,
             enrollmentNumber: `SKP-${user._id.toString().slice(-6).toUpperCase()}`,
@@ -332,22 +391,69 @@ router.get('/github', (req: Request, res: Response, next) => {
     })();
     return;
   }
-  passport.authenticate('github', { scope: ['user:email'], session: false, state: origin })(req, res, next);
+  passport.authenticate('github', { scope: ['user:email'], session: false, state: statePayload })(req, res, next);
 });
 
 router.get('/github/callback',
   (req: Request, res: Response, next) => {
-    const origin = (req.query.state as string) || env.FRONTEND_URL || 'http://localhost:5173';
+    let origin = env.FRONTEND_URL || 'http://localhost:5173';
+    try {
+      const stateRaw = (req.query.state as string) || '';
+      if (stateRaw) {
+        const decoded = JSON.parse(Buffer.from(stateRaw, 'base64').toString('utf-8'));
+        if (decoded.origin) origin = decoded.origin;
+      }
+    } catch {
+      if ((req.query.state as string)?.startsWith('http')) origin = req.query.state as string;
+    }
     passport.authenticate('github', {
       session: false,
       failureRedirect: `${origin}/auth?error=github_failed`,
     })(req, res, next);
   },
-  (req: Request, res: Response) => {
-    const user = req.user as IUser;
+  async (req: Request, res: Response) => {
+    let user = req.user as IUser;
+    let origin = env.FRONTEND_URL || 'http://localhost:5173';
+    let requestedRole = '';
+
+    try {
+      const stateRaw = (req.query.state as string) || '';
+      if (stateRaw) {
+        const decoded = JSON.parse(Buffer.from(stateRaw, 'base64').toString('utf-8'));
+        if (decoded.origin) origin = decoded.origin;
+        if (decoded.role) requestedRole = String(decoded.role).toLowerCase();
+      }
+    } catch {
+      if ((req.query.state as string)?.startsWith('http')) origin = req.query.state as string;
+    }
+
+    const validRoles = ['student', 'employer', 'institute', 'industry', 'government', 'admin'];
+    if (requestedRole && validRoles.includes(requestedRole)) {
+      const dbUser = await User.findById(user._id);
+      if (dbUser) {
+        dbUser.role = requestedRole as any;
+        await dbUser.save();
+        user = dbUser;
+      }
+    }
+
     const token = signToken({ id: String(user._id), role: user.role, email: user.email });
     const encoded = encodeUser(user);
-    const origin = (req.query.state as string) || env.FRONTEND_URL || 'http://localhost:5173';
+
+    res.cookie('skillsense_token', token, {
+      httpOnly: false,
+      secure: env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: '/',
+    });
+    res.cookie('skillsense_role', user.role, {
+      httpOnly: false,
+      secure: env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: '/',
+    });
 
     res.redirect(
       `${origin}/auth/callback?token=${token}&user=${encoded}&provider=github`

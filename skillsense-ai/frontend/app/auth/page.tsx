@@ -87,7 +87,9 @@ export default function AuthPage() {
   const handleOAuth = (provider: 'google' | 'github') => {
     const backendUrl = process.env.NEXT_PUBLIC_API_URL?.replace('/api/v1', '') || 'http://localhost:5000';
     const origin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:5173';
-    window.location.href = `${backendUrl}/api/v1/auth/${provider}?origin=${encodeURIComponent(origin)}`;
+    const role = activeTab === 'signup' ? selectedRole : '';
+    const roleParam = role ? `&role=${encodeURIComponent(role)}` : '';
+    window.location.href = `${backendUrl}/api/v1/auth/${provider}?origin=${encodeURIComponent(origin)}${roleParam}`;
   };
 
   const handleSignIn = async (e: React.FormEvent) => {
