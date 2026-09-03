@@ -3,10 +3,11 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import api from '@/lib/api';
+import { useAuth } from '@/hooks/useAuth';
+import { instituteApi, InstituteStudent } from '@/lib/api/institute.api';
 import {
   Users,
   Search,
-  Plus,
   Download,
   Filter,
   CheckCircle2,
@@ -25,12 +26,16 @@ import {
   BookOpen,
   QrCode,
   FileCheck,
+  RefreshCw,
+  AlertTriangle,
+  Upload,
+  UserCheck,
+  CheckCircle,
 } from 'lucide-react';
 import { FadeIn } from '@/components/shared/FadeIn';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { AIBadge } from '@/components/ui/AIBadge';
 import toast from 'react-hot-toast';
-import confetti from 'canvas-confetti';
 
 interface StudentRosterItem {
   id: string;
@@ -47,115 +52,6 @@ interface StudentRosterItem {
   skills: string[];
 }
 
-const DEFAULT_ROSTER: StudentRosterItem[] = [
-  {
-    id: 'std_1',
-    name: 'Arjun Mehta',
-    enrollmentNo: 'ENR-2026-MH-9482',
-    program: 'Full-Stack Web Engineering',
-    nsqfLevel: 'NSQF Level 6',
-    overallScore: 92,
-    githubScore: 89,
-    placementStatus: 'PLACED',
-    placedCompany: 'TechCorp Digital Pune',
-    ctcLPA: 8.8,
-    passportHash: '0x9e7a...4b12_HMAC_SEALED',
-    skills: ['React 19', 'Next.js App Router', 'Node.js Microservices', 'PostgreSQL'],
-  },
-  {
-    id: 'std_2',
-    name: 'Priya Sharma',
-    enrollmentNo: 'ENR-2026-MH-8812',
-    program: 'Applied AI & Data Engineering',
-    nsqfLevel: 'NSQF Level 6',
-    overallScore: 95,
-    githubScore: 94,
-    placementStatus: 'PLACED',
-    placedCompany: 'FinTech Labs Mumbai',
-    ctcLPA: 10.5,
-    passportHash: '0x7c3d...8f90_HMAC_SEALED',
-    skills: ['Python AI', 'LangChain', 'FastAPI', 'PyTorch', 'Vector DB'],
-  },
-  {
-    id: 'std_3',
-    name: 'Rohan Deshmukh',
-    enrollmentNo: 'ENR-2026-MH-7140',
-    program: 'Cloud Native & DevOps SRE',
-    nsqfLevel: 'NSQF Level 5',
-    overallScore: 88,
-    githubScore: 86,
-    placementStatus: 'PLACED',
-    placedCompany: 'CloudScale Nagpur',
-    ctcLPA: 7.2,
-    passportHash: '0x3a2b...1c4e_HMAC_SEALED',
-    skills: ['Docker', 'Kubernetes Ingress', 'Terraform', 'AWS ECS', 'Linux'],
-  },
-  {
-    id: 'std_4',
-    name: 'Sneha Kulkarni',
-    enrollmentNo: 'ENR-2026-MH-6290',
-    program: 'Frontend & UI Systems',
-    nsqfLevel: 'NSQF Level 5',
-    overallScore: 90,
-    githubScore: 88,
-    placementStatus: 'PLACED',
-    placedCompany: 'SoftWeb Systems Nashik',
-    ctcLPA: 6.8,
-    passportHash: '0x5f8a...9c2d_HMAC_SEALED',
-    skills: ['TypeScript', 'TailwindCSS', 'WebSockets', 'Next.js UI', 'Framer'],
-  },
-  {
-    id: 'std_5',
-    name: 'Aditya Patel',
-    enrollmentNo: 'ENR-2026-MH-5521',
-    program: 'Full-Stack Web Engineering',
-    nsqfLevel: 'NSQF Level 5',
-    overallScore: 86,
-    githubScore: 84,
-    placementStatus: 'INTERVIEWING',
-    placedCompany: 'Nexus Infotech (Final Round)',
-    ctcLPA: 7.5,
-    passportHash: '0x1b4c...7e3f_HMAC_SEALED',
-    skills: ['Node.js', 'Express', 'React', 'MongoDB', 'Redis Caching'],
-  },
-  {
-    id: 'std_6',
-    name: 'Tanvi Joshi',
-    enrollmentNo: 'ENR-2026-MH-4310',
-    program: 'Applied AI & Data Engineering',
-    nsqfLevel: 'NSQF Level 6',
-    overallScore: 91,
-    githubScore: 90,
-    placementStatus: 'SEEKING',
-    passportHash: '0x8f2d...6a1c_HMAC_SEALED',
-    skills: ['Python', 'Data Modeling', 'Scikit-Learn', 'SQL', 'FastAPI'],
-  },
-  {
-    id: 'std_7',
-    name: 'Rajesh Rao',
-    enrollmentNo: 'ENR-2026-MH-3920',
-    program: 'Industrial IoT & Automation',
-    nsqfLevel: 'NSQF Level 4',
-    overallScore: 82,
-    githubScore: 79,
-    placementStatus: 'IN_TRAINING',
-    passportHash: '0x4d1e...9b8a_HMAC_SEALED',
-    skills: ['C++', 'Embedded Linux', 'MQTT Protocols', 'Sensor Automation'],
-  },
-  {
-    id: 'std_8',
-    name: 'Pooja Gaikwad',
-    enrollmentNo: 'ENR-2026-MH-2841',
-    program: 'Cloud Native & DevOps SRE',
-    nsqfLevel: 'NSQF Level 5',
-    overallScore: 87,
-    githubScore: 85,
-    placementStatus: 'SEEKING',
-    passportHash: '0x6e9a...2f1b_HMAC_SEALED',
-    skills: ['Docker', 'CI/CD Pipelines', 'GitHub Actions', 'Bash Scripting'],
-  },
-];
-
 const STATUS_CONFIG: Record<string, { label: string; bg: string; color: string }> = {
   PLACED: { label: 'Placed & Verified', bg: 'rgba(16,185,129,0.12)', color: '#10b981' },
   INTERVIEWING: { label: 'Interviewing', bg: 'rgba(245,158,11,0.12)', color: '#f59e0b' },
@@ -163,68 +59,152 @@ const STATUS_CONFIG: Record<string, { label: string; bg: string; color: string }
   IN_TRAINING: { label: 'In Training', bg: 'rgba(192,132,252,0.12)', color: '#c084fc' },
 };
 
+const STATUS_MAP: Record<string, StudentRosterItem['placementStatus']> = {
+  placed: 'PLACED',
+  seeking: 'SEEKING',
+  studying: 'IN_TRAINING',
+  higher_education: 'SEEKING',
+};
+
+function mapStudent(s: InstituteStudent): StudentRosterItem {
+  return {
+    id: s._id,
+    name: s.userId?.name || 'Unnamed Trainee',
+    enrollmentNo: s.enrollmentNumber || 'Not assigned',
+    program: s.program || 'General',
+    nsqfLevel: `NSQF Level ${s.nsqfLevel || 5}`,
+    overallScore: s.overallScore || 0,
+    githubScore: s.overallScore || 0,
+    placementStatus: STATUS_MAP[s.placementStatus] || 'IN_TRAINING',
+    placedCompany: s.placementStatus === 'placed' ? 'Verified Placement' : undefined,
+    ctcLPA: s.salary ? Math.round((s.salary / 1000000) * 10) / 10 : undefined,
+    passportHash: s.passportHash || 'Passport not issued',
+    skills: (s.skills || [])
+      .map((k: any) => (typeof k.skillId === 'object' && k.skillId?.name ? k.skillId.name : String(k.skillId || '')))
+      .filter((x) => x),
+  };
+}
+
 export default function StudentsPage() {
-  const [students, setStudents] = useState<StudentRosterItem[]>(DEFAULT_ROSTER);
+  const { user } = useAuth();
+  const [institutionId, setInstitutionId] = useState<string | null>(null);
+  const [students, setStudents] = useState<StudentRosterItem[]>([]);
   const [search, setSearch] = useState('');
   const [programFilter, setProgramFilter] = useState('ALL');
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [selectedStudent, setSelectedStudent] = useState<StudentRosterItem | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [programs, setPrograms] = useState<string[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = React.useRef<HTMLInputElement | null>(null);
 
-  // New Student State
-  const [newName, setNewName] = useState('');
-  const [newProgram, setNewProgram] = useState('Full-Stack Web Engineering');
-  const [newNsqf, setNewNsqf] = useState('NSQF Level 5');
-  const [newScore, setNewScore] = useState(85);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    program: '',
+    nsqfLevel: 5,
+    gender: 'male',
+    batch: '2025-2026',
+  });
+  const [submittingStudent, setSubmittingStudent] = useState(false);
+  const [enrollMode, setEnrollMode] = useState<'form' | 'csv'>('form');
 
-  useEffect(() => {
-    api
-      .get('/students')
-      .then((res) => {
-        const data = res.data?.data;
-        if (Array.isArray(data) && data.length > 0) {
-          // Live students available
-        }
-      })
-      .catch(() => {});
-  }, []);
-
-  const handleAddStudent = (e: React.FormEvent) => {
+  const handleEnrollStudent = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newName.trim()) {
-      toast.error('Please enter the student name');
+    if (!institutionId) {
+      toast.error('No institution linked to this account.');
       return;
     }
+    if (!formData.name.trim() || !formData.email.trim()) {
+      toast.error('Please enter candidate name and email.');
+      return;
+    }
+    setSubmittingStudent(true);
+    try {
+      await instituteApi.createStudent(institutionId, {
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        program: formData.program.trim() || (programs[0] || 'MSSDS Advanced Web Engineering'),
+        nsqfLevel: Number(formData.nsqfLevel) || 5,
+        gender: formData.gender,
+        batch: formData.batch,
+      });
+      toast.success('Candidate enrolled & SHA-256 Skill Passport generated!');
+      setFormData({
+        name: '',
+        email: '',
+        program: '',
+        nsqfLevel: 5,
+        gender: 'male',
+        batch: '2025-2026',
+      });
+      setShowAddModal(false);
+      loadStudents();
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || 'Enrollment failed. Please verify candidate details.');
+    } finally {
+      setSubmittingStudent(false);
+    }
+  };
 
-    const newStd: StudentRosterItem = {
-      id: `std_${Date.now()}`,
-      name: newName,
-      enrollmentNo: `ENR-2026-MH-${Math.floor(1000 + Math.random() * 9000)}`,
-      program: newProgram,
-      nsqfLevel: newNsqf,
-      overallScore: Number(newScore),
-      githubScore: Number(newScore) - 3,
-      placementStatus: 'IN_TRAINING',
-      passportHash: `0x${Math.random().toString(16).substring(2, 6)}...${Math.random().toString(16).substring(2, 6)}_HMAC_SEALED`,
-      skills: ['TypeScript', 'Node.js', 'Next.js', 'SQL'],
-    };
+  const loadStudents = async () => {
+    const instId = instituteApi.getInstitutionId(user);
+    if (!instId) {
+      setLoading(false);
+      setError('No institution is linked to this account.');
+      return;
+    }
+    setInstitutionId(instId);
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await instituteApi.getStudents(instId, { limit: 200 });
+      setStudents(data.map(mapStudent));
+      setPrograms(Array.from(new Set(data.map((s) => s.program || 'General'))));
+    } catch (err: any) {
+      const msg = err?.response?.status === 404
+        ? 'No institution roster found for this account.'
+        : 'Unable to load the student roster. Please try again.';
+      setError(msg);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    setStudents((prev) => [newStd, ...prev]);
-    setShowAddModal(false);
-    setNewName('');
-    confetti({
-      particleCount: 50,
-      spread: 60,
-      origin: { y: 0.6 },
-      colors: ['#f59e0b', '#10b981'],
-    });
-    toast.success('Candidate enrolled and minted on institutional roster!');
+  useEffect(() => {
+    loadStudents();
+  }, [user?.institutionId, user?._id, user?.id]);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!institutionId) {
+      toast.error('No institution linked to this account.');
+      return;
+    }
+    setUploading(true);
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      await api.post(`/institutes/${institutionId}/upload`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      toast.success('Cohort roster uploaded successfully!');
+      loadStudents();
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || 'Upload failed. Please try again.');
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
   };
 
   const handleExportCSV = () => {
-    const headers = 'Name,EnrollmentNo,Program,NSQF_Level,OverallScore,GitHubScore,PlacementStatus,PlacedCompany,CTC_LPA,PassportHash\n';
+    const headers = 'Name,EnrollmentNo,Program,NSQF_Level,OverallScore,PlacementStatus,PassportHash\n';
     const rows = students
-      .map((s) => `"${s.name}","${s.enrollmentNo}","${s.program}","${s.nsqfLevel}",${s.overallScore},${s.githubScore},"${s.placementStatus}","${s.placedCompany || 'N/A'}",${s.ctcLPA || 0},"${s.passportHash}"`)
+      .map((s) => `"${s.name}","${s.enrollmentNo}","${s.program}","${s.nsqfLevel}",${s.overallScore},"${s.placedCompany || ''}","${s.passportHash}"`)
       .join('\n');
     const blob = new Blob([headers + rows], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
@@ -247,7 +227,7 @@ export default function StudentsPage() {
   });
 
   const totalPlaced = students.filter((s) => s.placementStatus === 'PLACED').length;
-  const avgScore = (students.reduce((sum, s) => sum + s.overallScore, 0) / students.length).toFixed(1);
+  const avgScore = students.length ? (students.reduce((sum, s) => sum + s.overallScore, 0) / students.length).toFixed(1) : '0';
 
   return (
     <ErrorBoundary>
@@ -275,22 +255,25 @@ export default function StudentsPage() {
               Enrolled Candidate & <span style={{ color: 'var(--gold)' }}>Batch Competency Roster</span>
             </h1>
             <p style={{ color: 'var(--text-secondary)', fontSize: 13.5, marginTop: 4, maxWidth: 680 }}>
-              Track candidate skill assessments, NSQF attainment tiers, cryptographic digital passport minting, and placement outcomes across all institutional programs.
+              Track candidate skill assessments, NSQF attainment tiers, and placement outcomes across all institutional programs.
             </p>
           </div>
 
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
             <button
               type="button"
-              onClick={() => setShowAddModal(true)}
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading}
               className="btn-gold"
-              style={{ fontSize: 12.5, padding: '9px 18px', display: 'flex', alignItems: 'center', gap: 6 }}
+              style={{ fontSize: 12.5, padding: '9px 18px', display: 'flex', alignItems: 'center', gap: 6, cursor: uploading ? 'not-allowed' : 'pointer' }}
             >
-              <Plus size={15} /> Enroll Candidate
+              <Upload size={15} /> {uploading ? 'Uploading...' : 'Bulk Upload CSV'}
             </button>
+            <input ref={fileInputRef} type="file" accept=".csv" style={{ display: 'none' }} onChange={handleFileUpload} />
             <button
               type="button"
               onClick={handleExportCSV}
+              disabled={students.length === 0}
               className="btn-secondary"
               style={{ fontSize: 12.5, padding: '9px 16px', display: 'flex', alignItems: 'center', gap: 6 }}
             >
@@ -303,9 +286,9 @@ export default function StudentsPage() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14, marginBottom: 24 }}>
           {[
             { label: 'Enrolled Candidates', value: `${students.length} Trainees`, sub: 'Active Cohort Roster', color: 'var(--gold)', icon: Users },
-            { label: 'Placed & Verified', value: `${totalPlaced} Candidates`, sub: `${((totalPlaced / students.length) * 100).toFixed(1)}% Placement Rate`, color: '#10b981', icon: CheckCircle2 },
+            { label: 'Placed & Verified', value: `${totalPlaced} Candidates`, sub: students.length ? `${((totalPlaced / students.length) * 100).toFixed(1)}% Placement Rate` : 'No placements yet', color: '#10b981', icon: CheckCircle2 },
             { label: 'Avg Competency Score', value: `${avgScore}%`, sub: 'NSQF Multi-Modal Radar', color: '#60a5fa', icon: Award },
-            { label: 'Cryptographic Passports', value: '100% Minted', sub: 'SHA-256 HMAC Ledger Sealed', color: '#a855f7', icon: ShieldCheck },
+            { label: 'Cryptographic Passports', value: `${students.filter((s) => s.passportHash && s.passportHash !== 'Passport not issued').length} Sealed`, sub: 'SHA-256 HMAC Ledger', color: '#a855f7', icon: ShieldCheck },
           ].map((stat, idx) => {
             const Icon = stat.icon;
             return (
@@ -328,6 +311,38 @@ export default function StudentsPage() {
             );
           })}
         </div>
+
+        {/* ── Loading / Error / Empty states ── */}
+        {loading && (
+          <div className="card-linear" style={{ padding: 32, borderRadius: 14, textAlign: 'center' }}>
+            <RefreshCw size={26} style={{ color: 'var(--gold)', animation: 'spin 1.5s linear infinite', marginBottom: 8 }} />
+            <p style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Loading institutional roster...</p>
+          </div>
+        )}
+
+        {!loading && error && (
+          <div className="card-linear" style={{ padding: 32, borderRadius: 14, textAlign: 'center', marginBottom: 20 }}>
+            <AlertTriangle size={28} style={{ color: 'var(--gold)', marginBottom: 8 }} />
+            <p style={{ fontSize: 13, color: 'var(--text-secondary)', margin: '0 0 12px' }}>{error}</p>
+            <button onClick={loadStudents} className="btn-outline" style={{ fontSize: 12, padding: '6px 14px' }}>
+              <RefreshCw size={13} /> Retry
+            </button>
+          </div>
+        )}
+
+        {!loading && !error && students.length === 0 && (
+          <div className="card-linear" style={{ padding: 32, borderRadius: 14, textAlign: 'center', marginBottom: 20 }}>
+            <Users size={32} style={{ color: 'var(--text-muted)', marginBottom: 8 }} />
+            <p style={{ fontSize: 14, fontWeight: 600, color: '#f8fafc', margin: '0 0 4px' }}>No students in this roster yet</p>
+            <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', margin: '0 0 12px' }}>Upload a CSV cohort to populate your institutional roster.</p>
+            <button onClick={() => fileInputRef.current?.click()} className="btn-gold" style={{ fontSize: 12.5, padding: '8px 18px' }}>
+              <Upload size={14} /> Bulk Upload CSV
+            </button>
+          </div>
+        )}
+
+        {!loading && !error && students.length > 0 && (
+        <>
 
         {/* ── Filter Bar ── */}
         <div
@@ -378,11 +393,9 @@ export default function StudentsPage() {
               }}
             >
               <option value="ALL">All Programs</option>
-              <option value="Full-Stack Web Engineering">Full-Stack Web Engineering</option>
-              <option value="Applied AI & Data Engineering">Applied AI & Data Engineering</option>
-              <option value="Cloud Native & DevOps SRE">Cloud Native & DevOps SRE</option>
-              <option value="Frontend & UI Systems">Frontend & UI Systems</option>
-              <option value="Industrial IoT & Automation">Industrial IoT & Automation</option>
+              {programs.map((p) => (
+                <option key={p} value={p}>{p}</option>
+              ))}
             </select>
 
             <select
@@ -486,6 +499,8 @@ export default function StudentsPage() {
             </table>
           </div>
         </div>
+        </>
+        )}
 
         {/* ── Student Passport Inspection Modal ── */}
         {selectedStudent && (
@@ -588,7 +603,7 @@ export default function StudentsPage() {
           </div>
         )}
 
-        {/* ── Add Student Modal ── */}
+        {/* ── Enrollment Modal (Interactive Form & CSV Upload) ── */}
         {showAddModal && (
           <div
             style={{
@@ -607,15 +622,17 @@ export default function StudentsPage() {
               className="card-accent"
               style={{
                 width: '100%',
-                maxWidth: 460,
+                maxWidth: 520,
                 borderRadius: 18,
                 padding: 26,
                 boxShadow: '0 20px 50px rgba(0,0,0,0.8)',
+                maxHeight: '90vh',
+                overflowY: 'auto',
               }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                <h3 className="font-display" style={{ fontSize: 18, fontWeight: 800, color: '#f8fafc', margin: 0 }}>
-                  Enroll New Trainee to Institutional Cohort
+                <h3 className="font-display" style={{ fontSize: 18, fontWeight: 800, color: '#f8fafc', margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <UserCheck size={18} color="var(--gold)" /> Enroll Candidate
                 </h3>
                 <button
                   type="button"
@@ -626,126 +643,260 @@ export default function StudentsPage() {
                 </button>
               </div>
 
-              <form onSubmit={handleAddStudent} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                <div>
-                  <label style={{ fontSize: 11.5, fontWeight: 700, color: '#cbd5e1', display: 'block', marginBottom: 4 }}>
-                    Candidate Full Name
-                  </label>
-                  <input
-                    type="text"
-                    value={newName}
-                    onChange={(e) => setNewName(e.target.value)}
-                    placeholder="e.g. Vikas Shinde"
-                    required
-                    style={{
-                      width: '100%',
-                      padding: '8px 12px',
-                      borderRadius: 6,
-                      background: 'var(--bg-input, #0f111a)',
-                      border: '1px solid var(--border)',
-                      color: '#fff',
-                      fontSize: 12.5,
-                    }}
-                  />
-                </div>
+              {/* Tabs */}
+              <div style={{ display: 'flex', gap: 8, marginBottom: 18, borderBottom: '1px solid var(--border)', paddingBottom: 10 }}>
+                <button
+                  type="button"
+                  onClick={() => setEnrollMode('form')}
+                  style={{
+                    padding: '6px 14px',
+                    borderRadius: 8,
+                    border: 'none',
+                    background: enrollMode === 'form' ? 'rgba(212,175,55,0.15)' : 'transparent',
+                    color: enrollMode === 'form' ? 'var(--gold)' : 'var(--text-muted)',
+                    fontSize: 12.5,
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                  }}
+                >
+                  Direct Enrollment
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setEnrollMode('csv')}
+                  style={{
+                    padding: '6px 14px',
+                    borderRadius: 8,
+                    border: 'none',
+                    background: enrollMode === 'csv' ? 'rgba(212,175,55,0.15)' : 'transparent',
+                    color: enrollMode === 'csv' ? 'var(--gold)' : 'var(--text-muted)',
+                    fontSize: 12.5,
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6,
+                  }}
+                >
+                  <Upload size={13} /> Bulk Cohort CSV
+                </button>
+              </div>
 
-                <div>
-                  <label style={{ fontSize: 11.5, fontWeight: 700, color: '#cbd5e1', display: 'block', marginBottom: 4 }}>
-                    Program / Specialization
-                  </label>
-                  <select
-                    value={newProgram}
-                    onChange={(e) => setNewProgram(e.target.value)}
-                    style={{
-                      width: '100%',
-                      padding: '8px 10px',
-                      borderRadius: 6,
-                      background: 'var(--bg-input, #0f111a)',
-                      border: '1px solid var(--border)',
-                      color: '#fff',
-                      fontSize: 12,
-                    }}
-                  >
-                    <option value="Full-Stack Web Engineering">Full-Stack Web Engineering</option>
-                    <option value="Applied AI & Data Engineering">Applied AI & Data Engineering</option>
-                    <option value="Cloud Native & DevOps SRE">Cloud Native & DevOps SRE</option>
-                    <option value="Frontend & UI Systems">Frontend & UI Systems</option>
-                    <option value="Industrial IoT & Automation">Industrial IoT & Automation</option>
-                  </select>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+              {enrollMode === 'form' ? (
+                <form onSubmit={handleEnrollStudent} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                   <div>
-                    <label style={{ fontSize: 11.5, fontWeight: 700, color: '#cbd5e1', display: 'block', marginBottom: 4 }}>
-                      NSQF Tier
-                    </label>
-                    <select
-                      value={newNsqf}
-                      onChange={(e) => setNewNsqf(e.target.value)}
-                      style={{
-                        width: '100%',
-                        padding: '8px 10px',
-                        borderRadius: 6,
-                        background: 'var(--bg-input, #0f111a)',
-                        border: '1px solid var(--border)',
-                        color: '#fff',
-                        fontSize: 12,
-                      }}
-                    >
-                      <option value="NSQF Level 5">NSQF Level 5</option>
-                      <option value="NSQF Level 6">NSQF Level 6</option>
-                      <option value="NSQF Level 4">NSQF Level 4</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label style={{ fontSize: 11.5, fontWeight: 700, color: '#cbd5e1', display: 'block', marginBottom: 4 }}>
-                      Diagnostic Score (%)
+                    <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 5, textTransform: 'uppercase' }}>
+                      Full Name *
                     </label>
                     <input
-                      type="number"
-                      min="50"
-                      max="100"
-                      value={newScore}
-                      onChange={(e) => setNewScore(Number(e.target.value))}
+                      type="text"
+                      required
+                      placeholder="e.g. Rohini Patil"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       style={{
                         width: '100%',
-                        padding: '8px 12px',
-                        borderRadius: 6,
-                        background: 'var(--bg-input, #0f111a)',
+                        padding: '10px 12px',
+                        background: 'rgba(255,255,255,0.04)',
                         border: '1px solid var(--border)',
-                        color: '#fff',
-                        fontSize: 12.5,
+                        borderRadius: 8,
+                        color: '#f8fafc',
+                        fontSize: 13,
+                        outline: 'none',
                       }}
                     />
                   </div>
-                </div>
 
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 12 }}>
-                  <button
-                    type="button"
-                    onClick={() => setShowAddModal(false)}
-                    style={{
-                      padding: '8px 14px',
-                      borderRadius: 6,
-                      background: 'rgba(255,255,255,0.05)',
-                      border: '1px solid var(--border)',
-                      color: '#cbd5e1',
-                      fontSize: 12,
-                      cursor: 'pointer',
-                    }}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="btn-gold"
-                    style={{ padding: '8px 18px', fontSize: 12.5, fontWeight: 800 }}
-                  >
-                    Enroll Candidate
-                  </button>
+                  <div>
+                    <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 5, textTransform: 'uppercase' }}>
+                      Email Address *
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      placeholder="e.g. rohini.patil@example.com"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      style={{
+                        width: '100%',
+                        padding: '10px 12px',
+                        background: 'rgba(255,255,255,0.04)',
+                        border: '1px solid var(--border)',
+                        borderRadius: 8,
+                        color: '#f8fafc',
+                        fontSize: 13,
+                        outline: 'none',
+                      }}
+                    />
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                    <div>
+                      <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 5, textTransform: 'uppercase' }}>
+                        Program
+                      </label>
+                      <select
+                        value={formData.program}
+                        onChange={(e) => setFormData({ ...formData, program: e.target.value })}
+                        style={{
+                          width: '100%',
+                          padding: '10px 12px',
+                          background: 'rgba(15,23,42,0.95)',
+                          border: '1px solid var(--border)',
+                          borderRadius: 8,
+                          color: '#f8fafc',
+                          fontSize: 12.5,
+                          outline: 'none',
+                        }}
+                      >
+                        <option value="">Select or default...</option>
+                        {programs.map((p) => (
+                          <option key={p} value={p}>{p}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 5, textTransform: 'uppercase' }}>
+                        NSQF Level
+                      </label>
+                      <select
+                        value={formData.nsqfLevel}
+                        onChange={(e) => setFormData({ ...formData, nsqfLevel: Number(e.target.value) })}
+                        style={{
+                          width: '100%',
+                          padding: '10px 12px',
+                          background: 'rgba(15,23,42,0.95)',
+                          border: '1px solid var(--border)',
+                          borderRadius: 8,
+                          color: '#f8fafc',
+                          fontSize: 12.5,
+                          outline: 'none',
+                        }}
+                      >
+                        <option value={3}>Level 3 (Certificate)</option>
+                        <option value={4}>Level 4 (Vocational Diploma)</option>
+                        <option value={5}>Level 5 (Advanced Diploma)</option>
+                        <option value={6}>Level 6 (B.Voc / Technical)</option>
+                        <option value={7}>Level 7 (Post-Graduate)</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                    <div>
+                      <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 5, textTransform: 'uppercase' }}>
+                        Gender
+                      </label>
+                      <select
+                        value={formData.gender}
+                        onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
+                        style={{
+                          width: '100%',
+                          padding: '10px 12px',
+                          background: 'rgba(15,23,42,0.95)',
+                          border: '1px solid var(--border)',
+                          borderRadius: 8,
+                          color: '#f8fafc',
+                          fontSize: 12.5,
+                          outline: 'none',
+                        }}
+                      >
+                        <option value="female">Female</option>
+                        <option value="male">Male</option>
+                        <option value="other">Other</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 5, textTransform: 'uppercase' }}>
+                        Academic Batch
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.batch}
+                        onChange={(e) => setFormData({ ...formData, batch: e.target.value })}
+                        style={{
+                          width: '100%',
+                          padding: '10px 12px',
+                          background: 'rgba(255,255,255,0.04)',
+                          border: '1px solid var(--border)',
+                          borderRadius: 8,
+                          color: '#f8fafc',
+                          fontSize: 13,
+                          outline: 'none',
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 14 }}>
+                    <button
+                      type="button"
+                      onClick={() => setShowAddModal(false)}
+                      style={{
+                        padding: '10px 16px',
+                        borderRadius: 8,
+                        background: 'rgba(255,255,255,0.05)',
+                        border: '1px solid var(--border)',
+                        color: '#cbd5e1',
+                        fontSize: 12.5,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={submittingStudent}
+                      className="btn-gold"
+                      style={{
+                        padding: '10px 20px',
+                        fontSize: 12.5,
+                        fontWeight: 800,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 8,
+                        opacity: submittingStudent ? 0.7 : 1,
+                        cursor: submittingStudent ? 'not-allowed' : 'pointer',
+                      }}
+                    >
+                      {submittingStudent ? (
+                        <>
+                          <RefreshCw size={14} className="spin" /> Generating Passport...
+                        </>
+                      ) : (
+                        <>
+                          <CheckCircle size={14} /> Enroll Candidate & Generate Passport
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <div>
+                  <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: 16 }}>
+                    Upload a cohort roster CSV with columns: <code>name, email, program, nsqfLevel, gender, batch</code>. SkillSense AI automatically parses the records, validates DPDP consent boundaries, and generates SHA-256 verifiable credentials.
+                  </p>
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+                    <button
+                      type="button"
+                      onClick={() => setShowAddModal(false)}
+                      style={{ padding: '8px 14px', borderRadius: 8, background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)', color: '#cbd5e1', fontSize: 12, cursor: 'pointer' }}
+                    >
+                      Close
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setShowAddModal(false); fileInputRef.current?.click(); }}
+                      className="btn-gold"
+                      style={{ padding: '8px 18px', fontSize: 12.5, fontWeight: 800, display: 'flex', alignItems: 'center', gap: 6 }}
+                    >
+                      <Upload size={14} /> Select & Upload CSV
+                    </button>
+                  </div>
                 </div>
-              </form>
+              )}
             </div>
           </div>
         )}

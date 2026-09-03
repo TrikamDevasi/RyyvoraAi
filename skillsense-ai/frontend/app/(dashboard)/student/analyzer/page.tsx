@@ -212,7 +212,7 @@ export default function AIAnalyzerPage() {
         'Complete practical sandbox assessments in Backend Resilience & SQL Optimization',
         'Showcase real-world open-source contributions in verified SkillSense portfolio',
       ],
-      passportHash: `SKP-${Math.random().toString(36).substring(2, 8).toUpperCase()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
+      passportHash: '',
       evaluatedAt: new Date().toISOString(),
     };
 
@@ -352,7 +352,7 @@ export default function AIAnalyzerPage() {
   };
 
   const handleCopyHash = () => {
-    const hash = result?.passportHash || 'SKP-78A9C2-VERIFIED';
+    const hash = result?.passportHash || '';
     navigator.clipboard.writeText(hash);
     setCopiedHash(true);
     toast.success('Passport verification hash copied!');
@@ -822,25 +822,31 @@ export default function AIAnalyzerPage() {
                   }}
                 >
                   <ShieldCheck size={14} color="#10b981" />
-                  <span>Seal: {result.passportHash || 'SKP-E94A1-SHA256'}</span>
-                  <button
-                    onClick={handleCopyHash}
-                    type="button"
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      color: copiedHash ? '#10b981' : 'var(--gold)',
-                      cursor: 'pointer',
-                      fontSize: 11,
-                      fontWeight: 700,
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 4,
-                      padding: 0,
-                    }}
-                  >
-                    {copiedHash ? <Check size={12} /> : null} {copiedHash ? 'Copied' : 'Copy'}
-                  </button>
+                  {result.passportHash ? (
+                    <>
+                      <span>Seal: {result.passportHash}</span>
+                      <button
+                        onClick={handleCopyHash}
+                        type="button"
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: copiedHash ? '#10b981' : 'var(--gold)',
+                          cursor: 'pointer',
+                          fontSize: 11,
+                          fontWeight: 700,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 4,
+                          padding: 0,
+                        }}
+                      >
+                        {copiedHash ? <Check size={12} /> : null} {copiedHash ? 'Copied' : 'Copy'}
+                      </button>
+                    </>
+                  ) : (
+                    <span>Seal: Pending verification on the SkillSense ledger.</span>
+                  )}
                 </div>
               </div>
 

@@ -30,6 +30,7 @@ export interface IUser extends Document {
     theme?: string;
     sidebarCollapsed?: boolean;
   };
+  institutionId?: mongoose.Types.ObjectId;
   comparePassword(candidate: string): Promise<boolean>;
 }
 
@@ -45,6 +46,7 @@ const UserSchema = new Schema<IUser>(
     },
     avatar: { type: String, default: '' },
     phone: { type: String },
+    institutionId: { type: Schema.Types.ObjectId, ref: 'Institution' },
     isVerified: { type: Boolean, default: false },
     isActive: { type: Boolean, default: true },
     isDeleted: { type: Boolean, default: false },

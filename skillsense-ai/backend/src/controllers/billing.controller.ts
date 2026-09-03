@@ -237,6 +237,20 @@ export const getUsage = async (req: Request, res: Response): Promise<void> => {
 // ─── POST /billing/webhook ────────────────────────────────────────────────────
 // In demo mode: always returns 200 OK (no real events).
 // In production: verifies provider signature before processing.
+// Includes idempotency: duplicate event IDs are acknowledged but not re-processed.
+
+// In-memory idempotency store for webhook events (resets on server restart, acceptable for demo)
+const processedWebhookEvents = new Map<string, number>();
+const WEBHOOK_EVENT_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+function cleanupOldWebhookEvents(): void {
+  const now = Date.now();
+  for (const [eventId, timestamp] of processedWebhookEvents) {
+    if (now - timestamp > WEBHOOK_EVENT_TTL_MS) {
+      processedWebhookEvents.delete(eventId);
+    }
+  }
+}
 
 export const handleWebhook = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -248,6 +262,20 @@ export const handleWebhook = async (req: Request, res: Response): Promise<void> 
       logger.warn('[BILLING] Webhook rejected: invalid signature');
       res.status(401).json({ success: false, data: null, message: 'Invalid webhook signature' });
       return;
+    }
+
+    // Idempotency: check if this event was already processed
+    const eventId = req.body?.id || req.body?.event_id || req.body?.eventId;
+    if (eventId && typeof eventId === 'string') {
+      // Cleanup old events periodically
+      if (processedWebhookEvents.size > 1000) cleanupOldWebhookEvents();
+
+      if (processedWebhookEvents.has(eventId)) {
+        logger.info(`[BILLING] Duplicate webhook event acknowledged: ${eventId}`);
+        res.json({ success: true, data: null, message: 'Event already processed' });
+        return;
+      }
+      processedWebhookEvents.set(eventId, Date.now());
     }
 
     // In demo mode: just acknowledge

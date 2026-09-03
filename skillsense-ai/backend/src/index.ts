@@ -5,6 +5,8 @@ import app from './app';
 import connectDB from './config/db';
 import redisClient from './config/redis';
 import logger from './utils/logger';
+import { followUpSchedulerService } from './services/followupScheduler.service';
+import { retentionService } from './services/retention.service';
 
 const PORT = parseInt(process.env.PORT || '5000', 10);
 
@@ -20,6 +22,15 @@ const startServer = async () => {
       logger.warn('Redis unavailable — caching disabled. Server will continue without Redis.', redisErr);
     }
 
+    // ── Background Services ───────────────────────────────────────────────
+    // Run an initial retention batch pass on startup (catches any missed updates)
+    retentionService.updateRetentionStatuses().catch((err) => {
+      logger.error('Initial retention batch failed (non-fatal):', err);
+    });
+
+    // Start the follow-up scheduler (runs every 6 hours; first run is immediate)
+    followUpSchedulerService.start();
+
     // Start HTTP server
     const server = app.listen(PORT, () => {
       logger.info(`Server running on port ${PORT} in ${process.env.NODE_ENV ?? 'development'} mode`);
@@ -28,6 +39,10 @@ const startServer = async () => {
     // ── Graceful Shutdown ─────────────────────────────────────────────────
     const shutdown = async (signal: string) => {
       logger.info(`${signal} received — shutting down gracefully`);
+
+      // Stop background services first
+      followUpSchedulerService.stop();
+
       server.close(async () => {
         logger.info('HTTP server closed');
         try {

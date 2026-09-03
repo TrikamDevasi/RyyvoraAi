@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import api from '@/lib/api';
+import { studentApi } from '@/lib/api/student.api';
 import { useAuth } from '@/hooks/useAuth';
 import {
   Shield,
@@ -85,44 +85,38 @@ const PURPOSES = [
   },
 ];
 
-const DEFAULT_CONSENT: ConsentState = {
-  status: 'GRANTED',
-  purposes: ['outcome_tracking', 'employer_verification', 'longitudinal_followup', 'salary_benchmarking'],
-  grantedAt: '2025-06-15T10:30:00.000Z',
-  consentId: 'DPDP-MH-2026-CONSENT-8F12A09',
-  consentHistory: [
-    {
-      action: 'CONSENT_GRANTED',
-      timestamp: '2025-06-15 10:30 AM',
-      purposes: ['outcome_tracking', 'employer_verification', 'longitudinal_followup', 'salary_benchmarking'],
-      signatureHash: '0x8f12a09c4e21b78912d09fe34bca81',
-    },
-    {
-      action: 'PREFERENCES_UPDATED',
-      timestamp: '2025-11-10 03:15 PM',
-      purposes: ['outcome_tracking', 'employer_verification', 'longitudinal_followup', 'salary_benchmarking'],
-      signatureHash: '0x3c99a120ef9a4718cd99812450abce',
-    },
-  ],
-};
-
 export default function TraineeConsentPage() {
   const { user } = useAuth();
-  const [consent, setConsent] = useState<ConsentState>(DEFAULT_CONSENT);
-  const [selectedPurposes, setSelectedPurposes] = useState<string[]>(DEFAULT_CONSENT.purposes);
-  const [loading, setLoading] = useState(false);
+  const [consent, setConsent] = useState<ConsentState>({ status: 'PENDING', purposes: [], consentHistory: [] });
+  const [selectedPurposes, setSelectedPurposes] = useState<string[]>(['outcome_tracking']);
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const loadConsent = async () => {
     setLoading(true);
+    setError(null);
     try {
-      const res = await api.get('/consent/status');
-      if (res.data?.success && res.data.data) {
-        setConsent(res.data.data);
-        setSelectedPurposes(res.data.data.purposes || DEFAULT_CONSENT.purposes);
+      const res = await studentApi.getConsent();
+      if (res) {
+        const state: ConsentState = {
+          status: res.status,
+          purposes: res.purposes || [],
+          grantedAt: res.grantedAt,
+          withdrawnAt: res.withdrawnAt,
+          consentId: res._id,
+          consentHistory: (res.consentHistory || []).map((h) => ({
+            action: h.action,
+            timestamp: new Date(h.timestamp).toLocaleString(),
+            purposes: h.purposes || [],
+            signatureHash: h.action === 'CONSENT_GRANTED' ? 'CONSENT_SEALED' : 'UPDATED',
+          })),
+        };
+        setConsent(state);
+        setSelectedPurposes(res.purposes || ['outcome_tracking']);
       }
     } catch {
-      // Keep rich default consent state on demo / unauthenticated access
+      setError('Unable to load consent data. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -147,41 +141,45 @@ export default function TraineeConsentPage() {
     setSaving(true);
     const updatedPurposes = newStatus === 'WITHDRAWN' ? [] : selectedPurposes;
 
-    const newHistoryItem: ConsentHistoryItem = {
-      action: newStatus === 'GRANTED' ? 'PREFERENCES_UPDATED' : 'CONSENT_WITHDRAWN',
-      timestamp: new Date().toLocaleString(),
-      purposes: updatedPurposes,
-      signatureHash: `0x${Math.random().toString(16).substring(2, 10)}${Date.now().toString(16)}`,
-    };
-
     try {
-      await api.post('/consent/update', {
+      const result = await studentApi.updateConsent({
         status: newStatus,
         purposes: updatedPurposes,
       });
-    } catch {}
 
-    setConsent((prev) => ({
-      ...prev,
-      status: newStatus,
-      purposes: updatedPurposes,
-      grantedAt: newStatus === 'GRANTED' ? new Date().toISOString() : prev.grantedAt,
-      withdrawnAt: newStatus === 'WITHDRAWN' ? new Date().toISOString() : undefined,
-      consentHistory: [newHistoryItem, ...prev.consentHistory],
-    }));
+      const newHistoryItem: ConsentHistoryItem = {
+        action: newStatus === 'GRANTED' ? 'PREFERENCES_UPDATED' : 'CONSENT_WITHDRAWN',
+        timestamp: new Date().toLocaleString(),
+        purposes: updatedPurposes,
+        signatureHash: result?._id || 'CONSENT_SEALED',
+      };
 
-    setSaving(false);
+      setConsent((prev) => ({
+        ...prev,
+        status: newStatus,
+        purposes: updatedPurposes,
+        grantedAt: newStatus === 'GRANTED' ? new Date().toISOString() : prev.grantedAt,
+        withdrawnAt: newStatus === 'WITHDRAWN' ? new Date().toISOString() : undefined,
+        consentId: result?._id || prev.consentId,
+        consentHistory: [newHistoryItem, ...prev.consentHistory],
+      }));
 
-    if (newStatus === 'GRANTED') {
-      confetti({
-        particleCount: 50,
-        spread: 60,
-        origin: { y: 0.6 },
-        colors: ['#f59e0b', '#10b981'],
-      });
-      toast.success('DPDP Act 2023 Consent Preferences Saved!');
-    } else {
-      toast.success('All optional data processing consents withdrawn.');
+      if (newStatus === 'GRANTED') {
+        confetti({
+          particleCount: 50,
+          spread: 60,
+          origin: { y: 0.6 },
+          colors: ['#f59e0b', '#10b981'],
+        });
+        toast.success('DPDP Act 2023 Consent Preferences Saved!');
+      } else {
+        toast.success('All optional data processing consents withdrawn.');
+      }
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || 'Failed to save consent preferences. Please try again.';
+      toast.error(msg);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -190,7 +188,7 @@ export default function TraineeConsentPage() {
       JSON.stringify(
         {
           candidate: user?.name || 'Candidate',
-          dpdpConsentId: consent.consentId || 'DPDP-MH-2026-CONSENT-8F12A09',
+          dpdpConsentId: consent.consentId || 'PENDING',
           status: consent.status,
           activePurposes: selectedPurposes,
           auditHistory: consent.consentHistory,
@@ -289,6 +287,25 @@ export default function TraineeConsentPage() {
             </span>
           </div>
         </div>
+
+        {/* ── Loading State ── */}
+        {loading && (
+          <div style={{ textAlign: 'center', padding: '40px 16px' }}>
+            <RefreshCw size={28} style={{ color: 'var(--gold)', marginBottom: 10, animation: 'spin 1.5s linear infinite' }} />
+            <p style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Loading consent data...</p>
+          </div>
+        )}
+
+        {/* ── Error State ── */}
+        {error && !loading && (
+          <div className="card-linear" style={{ padding: 24, borderRadius: 12, textAlign: 'center', marginBottom: 24 }}>
+            <AlertTriangle size={28} style={{ color: 'var(--error, #f87171)', marginBottom: 8 }} />
+            <p style={{ fontSize: 13, color: 'var(--text-secondary)', margin: '0 0 12px' }}>{error}</p>
+            <button onClick={loadConsent} className="btn-outline" style={{ fontSize: 12, padding: '6px 14px' }}>
+              <RefreshCw size={13} /> Retry
+            </button>
+          </div>
+        )}
 
         {/* ── DPDP 3-Pillar Security Matrix ── */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 14, marginBottom: 24 }}>
@@ -439,7 +456,7 @@ export default function TraineeConsentPage() {
               <Clock size={15} color="var(--gold)" /> Immutable Consent Audit History
             </h3>
             <span style={{ fontSize: 11, fontFamily: 'monospace', color: '#10b981' }}>
-              Ledger ID: {consent.consentId || 'DPDP-MH-2026-CONSENT-8F12A09'}
+              Ledger ID: {consent.consentId || 'PENDING'}
             </span>
           </div>
 

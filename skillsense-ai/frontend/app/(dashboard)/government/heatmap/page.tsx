@@ -191,14 +191,38 @@ export default function HeatmapPage() {
   useEffect(() => {
     setLoading(true);
     api
-      .get('/analytics/national-heatmap')
+      .get('/outcomes/districts')
       .then((res) => {
-        if (res.data?.data && Array.isArray(res.data.data) && res.data.data.length > 0) {
-          // Use live data if returned
+        if (res.data?.success && Array.isArray(res.data.data) && res.data.data.length > 0) {
+          const liveDistricts: DistrictItem[] = res.data.data.map((d: any) => {
+            const placementRate = d.employmentRate ?? 0;
+            const retentionRate = d.retention90dRate ?? 0;
+            const avgSalaryLPA = d.medianSalary ? Math.round((d.medianSalary * 12) / 10000) / 10 : 0;
+            const status: 'SURPLUS' | 'EQUILIBRIUM' | 'DEFICIT' =
+              placementRate >= 80 ? 'SURPLUS' : placementRate >= 65 ? 'EQUILIBRIUM' : 'DEFICIT';
+            return {
+              id: d.district.toLowerCase().replace(/\s+/g, '_'),
+              name: d.district,
+              division: `${d.district} Division`,
+              score: placementRate || 65,
+              placementRate,
+              retentionRate,
+              avgSalaryLPA,
+              studentCount: d.totalTrainees,
+              topSkills: ['Vocational IT', 'Automation', 'Cloud Infrastructure'],
+              gapSkills: ['Technical Communication', 'Specialized Testing'],
+              status,
+              actionDirective: d.isSmallSample
+                ? 'Sample size under privacy threshold (N < 5). Additional cohort intake recommended.'
+                : `${d.statusLabel} — Active monitoring and targeted intervention pipeline.`,
+            };
+          });
+          setDistricts(liveDistricts);
+          if (liveDistricts.length > 0) setSelectedDistrict(liveDistricts[0]);
         }
       })
       .catch(() => {
-        // Fallback gracefully to curated district intelligence
+        // Fallback gracefully
       })
       .finally(() => {
         setLoading(false);

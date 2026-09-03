@@ -4,16 +4,15 @@ import {
   verifyEmploymentAction,
   verifyPublicPassport,
 } from '../controllers/verification.controller';
-import { protect } from '../middleware/auth.middleware';
+import { protect, requireRole } from '../middleware/auth.middleware';
 
 const router = Router();
 
-// Public cryptographic ledger verification
+// Public cryptographic ledger verification (no auth required)
 router.get('/public/:hash', verifyPublicPassport);
 
 // Employer authenticated routes
-router.get('/pending', protect, getPendingVerifications);
-router.post('/action', protect, verifyEmploymentAction);
+router.get('/pending', protect, requireRole('employer', 'admin', 'government'), getPendingVerifications);
+router.post('/action', protect, requireRole('employer', 'admin', 'government'), verifyEmploymentAction);
 
 export default router;
-

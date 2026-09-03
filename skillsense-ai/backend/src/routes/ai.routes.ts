@@ -1,6 +1,6 @@
 // backend/src/routes/ai.routes.ts
 import { Router } from 'express';
-import { protect, optionalProtect } from '../middleware/auth.middleware';
+import { protect, optionalProtect, requireRole } from '../middleware/auth.middleware';
 import {
   chat,
   assessSkill,
@@ -21,7 +21,9 @@ const router = Router();
 router.get('/assessment/:id', getAssessment);
 router.post('/chat', optionalProtect, chat);
 router.get('/market-trends', marketTrends);
-router.post('/policy-copilot', optionalProtect, policyCopilot);
+
+// Policy Copilot: requires authenticated government or admin user
+router.post('/policy-copilot', protect, requireRole('government', 'admin'), aiLimiter, policyCopilot);
 router.get('/interventions', getPolicyInterventions);
 
 // Protected AI Routes

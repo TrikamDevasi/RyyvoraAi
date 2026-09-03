@@ -8,6 +8,8 @@ import CareerPrediction from '../models/CareerPrediction.model';
 import Student from '../models/Student.model';
 import { ChatMessage } from '../services/providers';
 import { AIUnavailableError, AI_UNAVAILABLE_MESSAGE } from '../services/ai.service';
+import { entitlementService } from '../services/entitlement.service';
+import { UserRole } from '../types';
 
 // ── In-memory market-trends cache (1-hour TTL) ───────────────────────────────
 const trendCache = new Map<string, { data: object; ts: number }>();
@@ -27,10 +29,42 @@ function checkRateLimit(userId: string): boolean {
   return false;
 }
 
+// ── Server-side AI usage entitlement check ───────────────────────────────────
+// Enforces plan-based usage limits. Bypass roles (government/student/admin) are exempt.
+async function checkAIEntitlement(userId: string, userRole?: UserRole): Promise<{ allowed: boolean; message?: string }> {
+  if (!userId || userId === 'anon' || !userRole) return { allowed: true };
+  try {
+    const entitlement = await entitlementService.getEntitlements(userId, userRole);
+    if (entitlement.bypassedByRole) return { allowed: true };
+    const quota = entitlement.checkQuota('aiRequests');
+    if (!quota.allowed) {
+      return {
+        allowed: false,
+        message: `AI request limit reached for your plan (${quota.used}/${quota.limit}). Please upgrade your plan.`,
+      };
+    }
+    return { allowed: true };
+  } catch {
+    // Fail open — don't block user if entitlement check fails
+    return { allowed: true };
+  }
+}
+
+// ── Increment AI usage counter ───────────────────────────────────────────────
+async function incrementAIUsage(userId: string): Promise<void> {
+  if (!userId || userId === 'anon') return;
+  try {
+    await entitlementService.incrementUsage(userId, 'aiRequests', 1);
+  } catch {
+    // Non-critical — log but don't block
+  }
+}
+
 // ── 1.  POST /api/v1/ai/chat ──────────────────────────────────────────────────
 export const chat = async (req: Request, res: Response): Promise<void> => {
   const user = req.user as any;
   const userId = user?._id?.toString() || user?.id || 'anon';
+  const userRole = user?.role as UserRole | undefined;
   const isDemo = process.env.DEMO_MODE === 'true';
 
   if (!isDemo && checkRateLimit(userId)) {
@@ -40,6 +74,19 @@ export const chat = async (req: Request, res: Response): Promise<void> => {
       message: 'Rate limit reached. Please wait a moment before sending more messages.',
     });
     return;
+  }
+
+  // Server-side entitlement check (enforces plan-based AI usage limits)
+  if (!isDemo) {
+    const entitlementCheck = await checkAIEntitlement(userId, userRole);
+    if (!entitlementCheck.allowed) {
+      res.status(403).json({
+        success: false,
+        data: null,
+        message: entitlementCheck.message,
+      });
+      return;
+    }
   }
 
   const { message, history = [], context = '' } = req.body as {
@@ -106,6 +153,9 @@ Context about this candidate: ${studentContext}`;
     // Send final payload with suggestions
     res.write(`data: ${JSON.stringify({ done: true, suggestions })}\n\n`);
     res.end();
+
+    // Increment AI usage counter (server-side entitlement tracking)
+    await incrementAIUsage(userId);
 
     // Save to ChatSession in background
     if (userId !== 'anon') {
@@ -425,16 +475,27 @@ export const analyzeSkills = async (req: Request, res: Response): Promise<void> 
 };
 
 // ── 9. POST /api/v1/ai/policy-copilot ────────────────────────────────────────
+// Requires authenticated government/admin user. Validates query length and sanitizes input.
 export const policyCopilot = async (req: Request, res: Response): Promise<void> => {
   try {
     const { query } = req.body;
-    if (!query) {
+    if (!query || typeof query !== 'string') {
       res.status(400).json({ success: false, message: 'Query string is required' });
       return;
     }
 
+    const trimmedQuery = query.trim();
+    if (trimmedQuery.length < 5) {
+      res.status(400).json({ success: false, message: 'Query must be at least 5 characters' });
+      return;
+    }
+    if (trimmedQuery.length > 2000) {
+      res.status(400).json({ success: false, message: 'Query must not exceed 2000 characters' });
+      return;
+    }
+
     const { policyCopilotService } = await import('../services/policyCopilot.service');
-    const result = await policyCopilotService.queryPolicyCopilot(query);
+    const result = await policyCopilotService.queryPolicyCopilot(trimmedQuery);
 
     res.status(200).json({
       success: true,

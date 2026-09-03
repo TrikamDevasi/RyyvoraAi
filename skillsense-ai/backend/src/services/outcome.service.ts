@@ -75,6 +75,58 @@ export class OutcomeService {
   }
 
   /**
+   * Attempt safe, normalized matching of employerName against registered employer records.
+   * Criteria:
+   * 1. Trim whitespace and normalize case.
+   * 2. Prefer exact case-insensitive match on user.name.
+   * 3. Strip common corporate suffixes (e.g., '(TCS)', 'Ltd', 'Pvt Ltd', 'LLC') for exact base match.
+   * 4. If exactly ONE employer matches, return their _id.
+   * 5. If 0 or multiple matches exist, return undefined (do not guess).
+   */
+  async resolveEmployerId(employerName?: string): Promise<mongoose.Types.ObjectId | undefined> {
+    if (!employerName || typeof employerName !== 'string') return undefined;
+    const cleanName = employerName.trim();
+    if (cleanName.length < 2) return undefined;
+
+    try {
+      const employers = await User.find({
+        role: { $in: ['employer', 'industry'] },
+        isDeleted: false,
+      }).select('_id name email').lean();
+
+      if (!employers.length) return undefined;
+
+      const normalize = (str: string) =>
+        str
+          .toLowerCase()
+          .replace(/\(.*?\)/g, '')
+          .replace(/\b(ltd|pvt|private|limited|llc|inc|corp|corporation)\b/gi, '')
+          .replace(/[^a-z0-9]/gi, '')
+          .trim();
+
+      const targetNorm = normalize(cleanName);
+      if (!targetNorm) return undefined;
+
+      const exactMatches = employers.filter((e) => normalize(e.name) === targetNorm);
+      if (exactMatches.length === 1) {
+        return exactMatches[0]._id as mongoose.Types.ObjectId;
+      }
+
+      // Also check if raw case-insensitive regex matches exactly 1
+      const escaped = cleanName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regexMatches = employers.filter((e) => new RegExp(`^${escaped}$`, 'i').test(e.name));
+      if (regexMatches.length === 1) {
+        return regexMatches[0]._id as mongoose.Types.ObjectId;
+      }
+
+      return undefined;
+    } catch (err) {
+      logger.error('Error resolving employerId from name:', err);
+      return undefined;
+    }
+  }
+
+  /**
    * Handle Trainee Self-Report (Employed, Self-Employed, Apprenticeship, Seeking, Unemployed)
    */
   async recordSelfReport(input: SelfReportInput): Promise<{ outcome: IEmploymentOutcome; milestone: IOutcomeTimeline }> {
@@ -89,6 +141,7 @@ export class OutcomeService {
     const institutionId = student?.institutionId;
 
     let existingOutcome = await EmploymentOutcome.findOne({ traineeId: traineeObjectId });
+    const resolvedEmployerId = await this.resolveEmployerId(input.employerName);
 
     const isEmployedType = ['EMPLOYED', 'SELF_EMPLOYED', 'APPRENTICESHIP'].includes(input.status);
 
@@ -111,6 +164,7 @@ export class OutcomeService {
         state: 'Maharashtra',
         status: input.status,
         employerName: input.employerName,
+        employerId: resolvedEmployerId,
         employerContact: input.employerContact,
         jobRole: input.jobRole,
         industryDomain: input.industryDomain,
@@ -128,6 +182,7 @@ export class OutcomeService {
     } else {
       existingOutcome.status = input.status;
       if (input.employerName) existingOutcome.employerName = input.employerName;
+      if (resolvedEmployerId) existingOutcome.employerId = resolvedEmployerId;
       if (input.employerContact) existingOutcome.employerContact = input.employerContact;
       if (input.jobRole) existingOutcome.jobRole = input.jobRole;
       if (input.industryDomain) existingOutcome.industryDomain = input.industryDomain;
@@ -291,8 +346,16 @@ export class OutcomeService {
   /**
    * District-level Intelligence for Maharashtra with Small-Sample Protection (N < 5 -> "Insufficient Data")
    */
-  async getDistrictIntelligence() {
-    const districts = await EmploymentOutcome.aggregate([
+  /**
+   * District-level Intelligence for Maharashtra with Small-Sample Protection (N < 5 -> "Insufficient Data")
+   */
+  async getDistrictIntelligence(filter: { district?: string } = {}) {
+    const pipeline: any[] = [];
+    if (filter.district && filter.district !== 'All') {
+      pipeline.push({ $match: { district: filter.district } });
+    }
+
+    pipeline.push(
       {
         $group: {
           _id: '$district',
@@ -324,8 +387,10 @@ export class OutcomeService {
           },
         },
       },
-      { $sort: { totalTrainees: -1 } },
-    ]);
+      { $sort: { totalTrainees: -1 } }
+    );
+
+    const districts = await EmploymentOutcome.aggregate(pipeline);
 
     const result = districts.map((d) => {
       const isSmallSample = d.totalTrainees < 5;
@@ -356,10 +421,15 @@ export class OutcomeService {
   /**
    * Wage Progression Analytics across Courses, Districts, and Longitudinal Milestones
    */
-  async getWageProgressionAnalytics() {
-    const outcomesWithSalaries = await EmploymentOutcome.find({
+  async getWageProgressionAnalytics(filter: { district?: string } = {}) {
+    const matchQuery: Record<string, any> = {
       $or: [{ currentSalary: { $gt: 0 } }, { initialSalary: { $gt: 0 } }],
-    }).lean();
+    };
+    if (filter.district && filter.district !== 'All') {
+      matchQuery.district = filter.district;
+    }
+
+    const outcomesWithSalaries = await EmploymentOutcome.find(matchQuery).lean();
 
     let initialTotal = 0;
     let currentTotal = 0;
@@ -387,16 +457,18 @@ export class OutcomeService {
       }
     });
 
-    const avgInitialSalary = initialCount > 0 ? Math.round(initialTotal / initialCount) : 18500;
-    const avgCurrentSalary = currentCount > 0 ? Math.round(currentTotal / currentCount) : 24800;
-    const wageProgressionPercent = Math.round(((avgCurrentSalary - avgInitialSalary) / avgInitialSalary) * 100);
+    const avgInitialSalary = initialCount > 0 ? Math.round(initialTotal / initialCount) : 0;
+    const avgCurrentSalary = currentCount > 0 ? Math.round(currentTotal / currentCount) : 0;
+    const wageProgressionPercent = avgInitialSalary > 0
+      ? Math.round(((avgCurrentSalary - avgInitialSalary) / avgInitialSalary) * 100)
+      : 0;
 
-    const progressionCurve = [
+    const progressionCurve = initialCount > 0 ? [
       { milestone: 'Initial Placement (0m)', medianSalary: avgInitialSalary, verifiedAverage: Math.round(avgInitialSalary * 1.05) },
       { milestone: '6-Month Progression', medianSalary: Math.round(avgInitialSalary * 1.15), verifiedAverage: Math.round(avgInitialSalary * 1.18) },
       { milestone: '12-Month Progression', medianSalary: Math.round(avgInitialSalary * 1.34), verifiedAverage: Math.round(avgInitialSalary * 1.38) },
       { milestone: '24-Month Progression', medianSalary: avgCurrentSalary > avgInitialSalary * 1.4 ? avgCurrentSalary : Math.round(avgInitialSalary * 1.52), verifiedAverage: Math.round(avgInitialSalary * 1.58) },
-    ];
+    ] : [];
 
     const courseBreakdown = Object.keys(courseSalaries).map((program) => {
       const inits = courseSalaries[program].initial;
@@ -429,19 +501,24 @@ export class OutcomeService {
   /**
    * Training Relevance & Non-Placement Reason Analysis
    */
-  async getRelevanceAndBarrierAnalysis() {
+  async getRelevanceAndBarrierAnalysis(filter: { district?: string } = {}) {
+    const matchFilter: Record<string, any> = {};
+    if (filter.district && filter.district !== 'All') {
+      matchFilter.district = filter.district;
+    }
+
     const [relevanceData, barrierData, attritionData] = await Promise.all([
       EmploymentOutcome.aggregate([
-        { $match: { trainingRelevance: { $exists: true, $ne: 'UNKNOWN' } } },
+        { $match: { ...matchFilter, trainingRelevance: { $exists: true, $ne: 'UNKNOWN' } } },
         { $group: { _id: '$trainingRelevance', count: { $sum: 1 } } },
       ]),
       EmploymentOutcome.aggregate([
-        { $match: { nonPlacementReason: { $exists: true, $ne: null } } },
+        { $match: { ...matchFilter, nonPlacementReason: { $exists: true, $ne: null } } },
         { $group: { _id: '$nonPlacementReason', count: { $sum: 1 } } },
         { $sort: { count: -1 } },
       ]),
       EmploymentOutcome.aggregate([
-        { $match: { attritionReason: { $exists: true, $ne: null } } },
+        { $match: { ...matchFilter, attritionReason: { $exists: true, $ne: null } } },
         { $group: { _id: '$attritionReason', count: { $sum: 1 } } },
         { $sort: { count: -1 } },
       ]),

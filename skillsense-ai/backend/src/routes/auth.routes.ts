@@ -35,20 +35,20 @@ router.post('/demo-login', async (req: Request, res: Response) => {
   try {
     const role = (req.body.role || 'student').toLowerCase();
     const demoEmails: Record<string, string> = {
-      student: 'arjun.student@skillsense.gov.in',
-      employer: 'priya.talent@tcs.com',
-      institute: 'dean@iitb.ac.in',
-      government: 'officer@msde.gov.in',
-      industry: 'intelligence@nasscom.in',
-      admin: 'admin@skillsense.gov.in',
+      student: 'trainee@skillsense.demo',
+      employer: 'employer@skillsense.demo',
+      institute: 'provider@skillsense.demo',
+      government: 'government@skillsense.demo',
+      admin: 'admin@skillsense.demo',
+      industry: 'employer@skillsense.demo',
     };
     const demoNames: Record<string, string> = {
-      student: 'Arjun Mehta',
-      employer: 'Priya Verma (TCS Talent Lead)',
-      institute: 'Dr. Ramesh Kulkarni (Dean, IIT-B)',
-      government: 'National Skill Development Officer',
-      industry: 'NASSCOM Sector Intelligence Lead',
-      admin: 'SkillSense Chief Administrator',
+      student: 'Aarav Deshmukh',
+      employer: 'Tata Consultancy Services (TCS)',
+      institute: 'MSSDS Pune Regional Training Center',
+      government: 'Maharashtra Skilling Directorate',
+      industry: 'Sector Skill Council Intelligence Lead',
+      admin: 'System Admin',
     };
 
     const email = demoEmails[role] || `${role}.demo@skillsense.gov.in`;
@@ -64,6 +64,17 @@ router.post('/demo-login', async (req: Request, res: Response) => {
         authProvider: 'local',
         password: crypto.randomBytes(32).toString('hex'),
       });
+    }
+
+    if (role === 'institute') {
+      if (!user.institutionId) {
+        const Institution = (await import('../models/Institution.model')).default;
+        const inst = await Institution.findOne({ contactEmail: 'provider@skillsense.demo' }) || await Institution.findOne({});
+        if (inst) {
+          user.institutionId = inst._id as any;
+          await user.save();
+        }
+      }
     }
 
     if (role === 'student') {
@@ -104,6 +115,7 @@ router.post('/demo-login', async (req: Request, res: Response) => {
           role: user.role,
           isVerified: user.isVerified,
           avatar: user.avatar,
+          institutionId: user.institutionId ? String(user.institutionId) : undefined,
         },
       },
     });

@@ -22,116 +22,45 @@ import {
   Building,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import confetti from 'canvas-confetti';
-
-interface Persona {
-  id: string;
-  name: string;
-  enrollmentNumber: string;
-  program: string;
-  state: string;
-  gender: string;
-  nsqfLevel: number;
-  overallScore: number;
-  placementStatus: string;
-  passportHash: string;
-  skills: { name: string; score: number; verified: boolean }[];
-}
-
-const SAMPLE_PERSONAS: Persona[] = [
-  {
-    id: 'student_arjun',
-    name: 'Arjun Mehta',
-    enrollmentNumber: 'SKP-78A9C2',
-    program: 'Full-Stack Software Engineering',
-    state: 'Maharashtra',
-    gender: 'male',
-    nsqfLevel: 5,
-    overallScore: 84,
-    placementStatus: 'placed',
-    passportHash: '0x8f23b1c9e472a156df78b043ce51909a87cdb64e2154378f9910ae234bca8812',
-    skills: [
-      { name: 'React.js & Next.js 19 Architecture', score: 88, verified: true },
-      { name: 'Node.js & Express REST Microservices', score: 82, verified: true },
-      { name: 'PostgreSQL & Prisma ORM Modeling', score: 79, verified: true },
-      { name: 'TypeScript Systems & Generics', score: 85, verified: true },
-      { name: 'Docker & Cloud Deployment', score: 76, verified: true },
-    ],
-  },
-  {
-    id: 'student_priya',
-    name: 'Priya Sharma',
-    enrollmentNumber: 'SKP-99C12E',
-    program: 'Applied Artificial Intelligence & Data Science',
-    state: 'Maharashtra',
-    gender: 'female',
-    nsqfLevel: 6,
-    overallScore: 91,
-    placementStatus: 'placed',
-    passportHash: '0x4d12a9efb87612c304a9910e52b719483ce99120ff9a4718cd99812450abce91',
-    skills: [
-      { name: 'Python & PyTorch Deep Learning', score: 94, verified: true },
-      { name: 'Retrieval Augmented Generation (RAG)', score: 90, verified: true },
-      { name: 'NumPy & Pandas Data Pipelines', score: 92, verified: true },
-      { name: 'FastAPI & LLM Serving', score: 88, verified: true },
-      { name: 'Vector DBs (Pinecone / Chroma)', score: 86, verified: true },
-    ],
-  },
-  {
-    id: 'student_ravi',
-    name: 'Ravi Kumar',
-    enrollmentNumber: 'SKP-55B32A',
-    program: 'Cloud Architecture & DevOps Systems',
-    state: 'Maharashtra',
-    gender: 'male',
-    nsqfLevel: 5,
-    overallScore: 82,
-    placementStatus: 'studying',
-    passportHash: '0x12fa90b719a82cd45610ec8823b19487ac99812dfa901244ef91204857bca711',
-    skills: [
-      { name: 'Kubernetes & Docker Swarm', score: 84, verified: true },
-      { name: 'AWS ECS, S3 & CloudFront Ingress', score: 81, verified: true },
-      { name: 'CI/CD Pipelines (GitHub Actions)', score: 85, verified: true },
-      { name: 'Linux Kernel & Shell Automation', score: 80, verified: true },
-      { name: 'Prometheus & Grafana Telemetry', score: 78, verified: true },
-    ],
-  },
-];
 
 export default function PassportPage() {
   const [profile, setProfile] = useState<StudentProfile | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [selectedPersona, setSelectedPersona] = useState<Persona>(SAMPLE_PERSONAS[0]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadProfile = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await studentApi.getMyProfile();
+      setProfile(data && data._id ? data : null);
+    } catch (err: any) {
+      if (err?.response?.status === 404) {
+        setProfile(null);
+      } else {
+        setError('Unable to load your skill passport. Please try again.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    setLoading(true);
-    studentApi
-      .getMyProfile()
-      .then((data) => {
-        if (data && data._id) {
-          setProfile(data);
-        }
-      })
-      .catch(() => {
-        // Fallback gracefully to curated verified persona
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    loadProfile();
   }, []);
 
-  const activeStudent: Persona = profile
+  const activeStudent = profile
     ? {
         id: profile._id,
-        name: profile.userId?.name || selectedPersona.name,
-        enrollmentNumber: profile.enrollmentNumber || selectedPersona.enrollmentNumber,
-        program: profile.program || selectedPersona.program,
-        state: profile.state || selectedPersona.state,
-        gender: profile.gender || selectedPersona.gender,
-        nsqfLevel: profile.nsqfLevel || selectedPersona.nsqfLevel,
-        overallScore: profile.overallScore || selectedPersona.overallScore,
-        placementStatus: profile.placementStatus || selectedPersona.placementStatus,
-        passportHash: profile.passportHash || selectedPersona.passportHash,
+        name: profile.userId?.name || 'Student',
+        enrollmentNumber: profile.enrollmentNumber || 'Not assigned',
+        program: profile.program || 'Vocational Program',
+        state: profile.state || '',
+        gender: profile.gender || '',
+        nsqfLevel: profile.nsqfLevel || 5,
+        overallScore: profile.overallScore || 0,
+        placementStatus: profile.placementStatus || 'studying',
+        passportHash: profile.passportHash || '',
         skills:
           profile.skills && profile.skills.length > 0
             ? profile.skills.map((s: any) => ({
@@ -139,20 +68,9 @@ export default function PassportPage() {
                 score: s.score || 0,
                 verified: true,
               }))
-            : selectedPersona.skills,
+            : [],
       }
-    : selectedPersona;
-
-  const handleSwitchPersona = (p: Persona) => {
-    setSelectedPersona(p);
-    confetti({
-      particleCount: 50,
-      spread: 60,
-      origin: { y: 0.6 },
-      colors: ['#f59e0b', '#10b981'],
-    });
-    toast.success(`Loaded verified credential for ${p.name}`);
-  };
+    : null;
 
   return (
     <ErrorBoundary>
@@ -183,50 +101,45 @@ export default function PassportPage() {
               Tamper-proof, cryptographically signed workforce credential proving candidate competencies, real-time diagnostic performance, and employer verifications.
             </p>
           </div>
-
-          {/* Persona Switcher Buttons */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-end' }}>
-            <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              Switch Verified Candidate Demo:
-            </span>
-            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-              {SAMPLE_PERSONAS.map((p) => {
-                const isCurrent = activeStudent.name === p.name;
-                return (
-                  <button
-                    key={p.id}
-                    type="button"
-                    onClick={() => handleSwitchPersona(p)}
-                    style={{
-                      padding: '6px 12px',
-                      borderRadius: 8,
-                      fontSize: 12,
-                      fontWeight: 700,
-                      background: isCurrent ? 'var(--gold)' : 'rgba(255,255,255,0.04)',
-                      border: `1px solid ${isCurrent ? 'var(--gold)' : 'var(--border)'}`,
-                      color: isCurrent ? '#000' : '#cbd5e1',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 4,
-                      transition: 'all 0.15s ease',
-                    }}
-                  >
-                    {isCurrent && <Check size={12} />}
-                    <span>{p.name.split(' ')[0]}</span>
-                    <span style={{ opacity: 0.7, fontSize: 10.5 }}>(L{p.nsqfLevel})</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
         </div>
 
+        {/* ── Loading State ── */}
+        {loading && (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14 }}>
+            {[0, 1, 2, 3].map((i) => (
+              <div key={i} className="card-linear" style={{ padding: '16px 18px', borderRadius: 12 }}>
+                <div style={{ height: 14, width: 100, background: 'rgba(255,255,255,0.06)', borderRadius: 4, marginBottom: 12 }} />
+                <div style={{ height: 24, width: 120, background: 'rgba(255,255,255,0.06)', borderRadius: 4 }} />
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* ── Error / Empty State ── */}
+        {!loading && (error || !activeStudent) && (
+          <div className="card-linear" style={{ padding: 40, borderRadius: 16, textAlign: 'center' }}>
+            <Award size={36} style={{ color: 'var(--gold)', marginBottom: 12 }} />
+            <h2 className="font-display" style={{ fontSize: 20, fontWeight: 800, color: '#f8fafc', margin: '0 0 8px' }}>
+              {error ? 'Unable to Load Passport' : 'No Skill Passport Yet'}
+            </h2>
+            <p style={{ fontSize: 13.5, color: 'var(--text-secondary)', maxWidth: 520, margin: '0 auto 16px', lineHeight: 1.6 }}>
+              {error
+                ? 'We could not retrieve your passport. Check your connection and try again.'
+                : 'Complete assessments and skill diagnostic evaluations to generate your cryptographically sealed skill passport.'}
+            </p>
+            <button onClick={loadProfile} className="btn-gold" style={{ fontSize: 13, padding: '9px 20px', cursor: 'pointer' }}>
+              <RefreshCw size={14} /> Retry
+            </button>
+          </div>
+        )}
+
+        {!loading && !error && activeStudent && (
+        <>
         {/* ── Key Trust Badges ── */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14, marginBottom: 24 }}>
           {[
             { label: 'Issuing Authority', value: 'Govt of Maharashtra', sub: 'MSDE & NSQF Certified', icon: Building, color: 'var(--gold)' },
-            { label: 'Ledger Status', value: 'Immutable Signature', sub: 'SHA-256 HMAC Seal', icon: ShieldCheck, color: '#10b981' },
+            { label: 'Ledger Status', value: activeStudent.passportHash ? 'Immutable Signature' : 'Not Sealed', sub: activeStudent.passportHash ? 'SHA-256 HMAC Seal' : 'Complete assessment to seal', icon: ShieldCheck, color: '#10b981' },
             { label: 'Assessed Competencies', value: `${activeStudent.skills.length} Technical Modules`, sub: 'Real-time AI Evaluated', icon: Award, color: '#60a5fa' },
             { label: 'Composite Score', value: `${activeStudent.overallScore}% Overall`, sub: `Tier: NSQF Level ${activeStudent.nsqfLevel}`, icon: Sparkles, color: '#a855f7' },
           ].map((stat, idx) => {
@@ -253,7 +166,17 @@ export default function PassportPage() {
         </div>
 
         {/* ── Skill Passport Interactive Component ── */}
-        <SkillPassport student={activeStudent as any} />
+        {activeStudent.skills.length > 0 ? (
+          <SkillPassport student={activeStudent as any} />
+        ) : (
+          <div className="card-linear" style={{ padding: 28, borderRadius: 14, textAlign: 'center' }}>
+            <p style={{ fontSize: 13.5, color: 'var(--text-secondary)', margin: 0 }}>
+              No assessed competencies available yet. Take an assessment to populate your passport.
+            </p>
+          </div>
+        )}
+        </>
+        )}
       </FadeIn>
     </ErrorBoundary>
   );

@@ -154,14 +154,17 @@ User Query ──► AIProviderManager ──► [ Groq Cloud (Primary) ] ──
 
 Pre-seeded accounts ready for jury evaluation:
 
-| Role | Email | Password | Access URL |
-| :--- | :--- | :--- | :--- |
-| **State Government** | `government@skillsense.demo` | `Demo@1234` | [`/government`](http://localhost:5173/government) |
-| **Training Institute** | `provider@skillsense.demo` | `Demo@1234` | [`/institute`](http://localhost:5173/institute) |
-| **Hiring Employer** | `recruiter@skillsense.demo` | `Demo@1234` | [`/employer`](http://localhost:5173/employer) |
-| **Industry / SSC** | `industry@skillsense.demo` | `Demo@1234` | [`/industry`](http://localhost:5173/industry) |
-| **State Admin** | `admin@skillsense.demo` | `Demo@1234` | [`/admin`](http://localhost:5173/admin) |
-| **Trainee / Student** | `trainee@skillsense.demo` | `Demo@1234` | [`/student/journey`](http://localhost:5173/student/journey) |
+| Role | Email | Password | Persona & Entity | Access URL |
+| :--- | :--- | :--- | :--- | :--- |
+| **State Government** | `government@skillsense.demo` | `Demo@1234` | Maharashtra Skilling Directorate | [`/government`](http://localhost:5173/government) |
+| **Training Institute** | `provider@skillsense.demo` | `Demo@1234` | MSSDS Pune Regional Center | [`/institute`](http://localhost:5173/institute) |
+| **Hiring Employer** | `employer@skillsense.demo` | `Demo@1234` | Tata Consultancy Services (TCS) | [`/employer`](http://localhost:5173/employer) |
+| **Industry / SSC** | `employer@skillsense.demo` | `Demo@1234` | Sector Skill Council Intelligence Lead | [`/industry`](http://localhost:5173/industry) |
+| **State Admin** | `admin@skillsense.demo` | `Demo@1234` | SkillSense Chief Administrator | [`/admin`](http://localhost:5173/admin) |
+| **Trainee / Student** | `trainee@skillsense.demo` | `Demo@1234` | Aarav Deshmukh (Certified Trainee) | [`/student/journey`](http://localhost:5173/student/journey) |
+
+> 📖 **Evaluator Demonstration Guide:** For a comprehensive step-by-step evaluator click-through walkthrough, see [DEMO_GUIDE.md](file:///c:/Users/trika/Documents/skillsense/TEAM_QUANTUM_CODERS-SU-/skillsense-ai/DEMO_GUIDE.md).  
+> 📋 **SIH Requirement Traceability Matrix:** For systematic mapping of SIH26135 problem statements to code, APIs, and tests, see [SIH_REQUIREMENT_MATRIX.md](file:///c:/Users/trika/Documents/skillsense/TEAM_QUANTUM_CODERS-SU-/skillsense-ai/SIH_REQUIREMENT_MATRIX.md).
 
 ---
 
@@ -169,7 +172,7 @@ Pre-seeded accounts ready for jury evaluation:
 
 ### Prerequisites
 - Node.js 20+ installed
-- MongoDB & Redis instances running (or cloud connection strings)
+- MongoDB & Redis instances running (or local defaults)
 
 ### 1. Clone & Install
 ```bash
@@ -178,8 +181,11 @@ cd TEAM_QUANTUM_CODERS-SU-/skillsense-ai
 npm install
 ```
 
-### 2. Configure Environment
-Copy `.env.example` to `.env` in both `frontend/` and `backend/` directories.
+### 2. Populate Longitudinal Demonstration Database
+```bash
+cd backend
+npx ts-node src/scripts/seedLongitudinalOutcomes.ts
+```
 
 ### 3. Run Development Servers
 ```bash
@@ -192,14 +198,15 @@ npm run dev
 ## 🧪 Automated Test Suites & Code Verification
 
 ```bash
-# Frontend TypeScript Compilation Check
-cd frontend && npx tsc --noEmit
-
-# Backend TypeScript Compilation Check
-cd backend && npx tsc --noEmit
-
-# Run Backend Unit & Integration Tests
+# Backend Automated Test Suite (11/11 Test Suites Passing)
 cd backend && npm test
+
+# Frontend Automated Test Suite (5/5 Contract & Utility Tests Passing)
+cd frontend && npm test
+
+# Full Production Builds (0 Compilation or Type Errors)
+cd backend && npm run build
+cd frontend && npm run build
 ```
 
 ---

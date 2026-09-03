@@ -254,8 +254,9 @@ export class PassportService {
 
   private generatePassportId(studentId: string): string {
     const timestamp = Date.now().toString(36).toUpperCase();
-    const random    = Math.random().toString(36).slice(2, 6).toUpperCase();
-    return `SKP-${studentId.slice(-4).toUpperCase()}-${timestamp}-${random}`;
+    // Use cryptographically secure random bytes instead of Math.random()
+    const randomPart = crypto.randomBytes(3).toString('hex').toUpperCase();
+    return `SKP-${studentId.slice(-4).toUpperCase()}-${timestamp}-${randomPart}`;
   }
 
   private generateCredentialHash(payload: Record<string, unknown>): string {

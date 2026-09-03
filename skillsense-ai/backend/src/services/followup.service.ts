@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import FollowUp, { IFollowUp, IFollowUpResponse, FollowUpInterval } from '../models/FollowUp.model';
 import EmploymentOutcome from '../models/EmploymentOutcome.model';
 import { outcomeService } from './outcome.service';
+import { retentionService } from './retention.service';
 import logger from '../utils/logger';
 
 export class FollowUpService {
@@ -94,20 +95,11 @@ export class FollowUpService {
         monthlySalary: response.currentSalary,
         trainingRelevance: response.trainingRelevance,
       });
-
-      // Update retention markers based on scheduleDays
-      const outcome = await EmploymentOutcome.findOne({
-        traineeId: new mongoose.Types.ObjectId(traineeId),
-      });
-
-      if (outcome) {
-        if (followUp.scheduleDays >= 30) outcome.retained30d = true;
-        if (followUp.scheduleDays >= 90) outcome.retained90d = true;
-        if (followUp.scheduleDays >= 180) outcome.retained180d = true;
-        if (followUp.scheduleDays >= 365) outcome.retained365d = true;
-        await outcome.save();
-      }
     }
+
+    // Recompute retention flags from DB data (handles all milestones correctly)
+    // This is the authoritative retention update — avoids naive >= comparisons
+    await retentionService.onFollowUpCompleted(traineeId);
 
     // Add milestone event in timeline
     await outcomeService.recordMilestone({

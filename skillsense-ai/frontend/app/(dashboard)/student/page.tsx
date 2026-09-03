@@ -23,7 +23,6 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { FadeIn } from '@/components/shared/FadeIn';
 import { QuickTipsSegment } from '@/components/shared/QuickTipsSegment';
-import { sampleStudents, SampleStudent } from '@/data/sampleStudents';
 import {
   Brain,
   Award,
@@ -47,6 +46,7 @@ import {
   Briefcase,
   QrCode,
   Calendar,
+  RefreshCw,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -87,265 +87,63 @@ const DarkTooltip = ({ active, payload, label }: any) => {
   return null;
 };
 
-// ── Persona definitions for 1-click interactive demo mode ──────────────────────
-const DEMO_PERSONAS = [
-  {
-    id: 'STU001',
-    name: 'Arjun Mehta',
-    program: 'Full-Stack Development',
-    nsqfLevel: 5,
-    enrollmentNumber: 'SKP-ND2025-0142',
-    passportHash: 'e7f8a92b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f',
-    overallScore: 84,
-    skills: [
-      { skillId: { name: 'React.js & Next.js' }, score: 88, lastAssessed: '2026-02-15' },
-      { skillId: { name: 'Node.js & Express' }, score: 82, lastAssessed: '2026-02-18' },
-      { skillId: { name: 'PostgreSQL & Prisma' }, score: 79, lastAssessed: '2026-02-22' },
-      { skillId: { name: 'Docker & Microservices' }, score: 75, lastAssessed: '2026-02-25' },
-      { skillId: { name: 'TypeScript Systems' }, score: 85, lastAssessed: '2026-03-01' },
-      { skillId: { name: 'REST & GraphQL' }, score: 86, lastAssessed: '2026-03-02' },
-    ],
-    growthData: [
-      { cycle: 'Q1 2025', score: 62, benchmark: 60 },
-      { cycle: 'Q2 2025', score: 69, benchmark: 65 },
-      { cycle: 'Q3 2025', score: 76, benchmark: 70 },
-      { cycle: 'Q4 2025', score: 81, benchmark: 72 },
-      { cycle: 'Current', score: 84, benchmark: 75 },
-    ],
-    careers: [
-      {
-        title: 'Full-Stack Software Engineer',
-        matchPercent: 92,
-        salaryRange: '₹7.5 - 14.0 LPA',
-        timeToAchieve: 'Immediate (Job Ready)',
-        companies: ['Swiggy', 'Zerodha', 'Razorpay', 'TCS Digital'],
-        roadmap: ['Deploy production CI/CD microservice', 'Contribute to open-source Next.js libraries'],
-      },
-      {
-        title: 'Frontend Platform Architect',
-        matchPercent: 88,
-        salaryRange: '₹9.0 - 16.5 LPA',
-        timeToAchieve: '2-3 Months',
-        companies: ['Flipkart', 'Cred', 'PhonePe'],
-        roadmap: ['Master React 19 Server Actions & Streaming SSR', 'Benchmark Core Web Vitals at Scale'],
-      },
-      {
-        title: 'Backend Systems Developer',
-        matchPercent: 83,
-        salaryRange: '₹8.0 - 15.0 LPA',
-        timeToAchieve: '3-4 Months',
-        companies: ['Zomato', 'Infosys', 'Groww'],
-        roadmap: ['Implement Distributed Redis Caching & BullMQ', 'Master Database Query Indexing'],
-      },
-    ],
-    gaps: {
-      targetRole: 'Senior Full-Stack Engineer (NSQF Level 6)',
-      overallGapScore: 18,
-      aiSummary: 'Strong proficiency in modern JavaScript/TypeScript and relational schemas. Priority growth areas include distributed caching and automated end-to-end integration testing.',
-      criticalGaps: [
-        { skill: 'Distributed Caching (Redis)', currentScore: 64, requiredScore: 85, priority: 'High', recommendedAction: 'Complete Redis message queue & pub/sub architecture module' },
-        { skill: 'Automated E2E Testing (Playwright)', currentScore: 58, requiredScore: 80, priority: 'High', recommendedAction: 'Build full test suite for authentication and payment flows' },
-        { skill: 'Kubernetes Orchestration', currentScore: 68, requiredScore: 82, priority: 'Medium', recommendedAction: 'Deploy multi-pod containerized workload with ingress routing' },
-      ],
-      roadmap: [
-        { phase: 'Phase 1: Testing & Reliability', timeline: 'Weeks 1-4', actions: ['Implement Playwright E2E tests', 'Configure GitHub Actions CI automated coverage checks'] },
-        { phase: 'Phase 2: High Throughput Caching', timeline: 'Weeks 5-8', actions: ['Integrate Redis caching layer for top 5 API endpoints', 'Implement rate-limiting middleware'] },
-        { phase: 'Phase 3: Production Capstone', timeline: 'Weeks 9-12', actions: ['Deploy full microservices cluster with Prometheus telemetry', 'Publish verified skill passport'] },
-      ],
-    },
-  },
-  {
-    id: 'STU002',
-    name: 'Priya Sharma',
-    program: 'Data Science & Applied AI',
-    nsqfLevel: 6,
-    enrollmentNumber: 'SKP-AI2025-0891',
-    passportHash: 'b4a5c6d7e8f90123456789abcdef0123456789abcdef0123456789abcdef0123',
-    overallScore: 88,
-    skills: [
-      { skillId: { name: 'Python & NumPy' }, score: 94, lastAssessed: '2026-02-20' },
-      { skillId: { name: 'PyTorch & Deep Learning' }, score: 89, lastAssessed: '2026-02-24' },
-      { skillId: { name: 'LLM Fine-Tuning & RAG' }, score: 86, lastAssessed: '2026-02-28' },
-      { skillId: { name: 'SQL & Data Warehousing' }, score: 82, lastAssessed: '2026-03-01' },
-      { skillId: { name: 'FastAPI Model Serving' }, score: 87, lastAssessed: '2026-03-02' },
-      { skillId: { name: 'MLOps & Experiment Tracking' }, score: 78, lastAssessed: '2026-03-02' },
-    ],
-    growthData: [
-      { cycle: 'Q1 2025', score: 68, benchmark: 60 },
-      { cycle: 'Q2 2025', score: 75, benchmark: 65 },
-      { cycle: 'Q3 2025', score: 82, benchmark: 70 },
-      { cycle: 'Q4 2025', score: 85, benchmark: 72 },
-      { cycle: 'Current', score: 88, benchmark: 75 },
-    ],
-    careers: [
-      {
-        title: 'Applied Machine Learning Engineer',
-        matchPercent: 95,
-        salaryRange: '₹10.0 - 20.0 LPA',
-        timeToAchieve: 'Immediate (Job Ready)',
-        companies: ['TCS AI Labs', 'Wipro AI', 'Persistent', 'Lenskart'],
-        roadmap: ['Deploy LangChain RAG pipeline to cloud inference endpoints', 'Optimize quantization with vLLM'],
-      },
-      {
-        title: 'Data Science Specialist',
-        matchPercent: 90,
-        salaryRange: '₹8.5 - 16.0 LPA',
-        timeToAchieve: '1-2 Months',
-        companies: ['Mu Sigma', 'Fractal Analytics', 'LatentView'],
-        roadmap: ['Build real-time streaming ETL pipeline with Apache Kafka'],
-      },
-    ],
-    gaps: {
-      targetRole: 'Principal AI Systems Architect (NSQF Level 7)',
-      overallGapScore: 14,
-      aiSummary: 'Exceptional foundations in model architecture and fine-tuning. Opportunity to strengthen distributed model parallel training and low-latency inference quantization.',
-      criticalGaps: [
-        { skill: 'Distributed Model Training (DeepSpeed)', currentScore: 66, requiredScore: 85, priority: 'High', recommendedAction: 'Train multi-GPU transformer pipeline using DeepSpeed ZeRO-3' },
-        { skill: 'vLLM / TensorRT Inference Engines', currentScore: 70, requiredScore: 88, priority: 'Medium', recommendedAction: 'Benchmark sub-50ms token latency under concurrent load' },
-      ],
-      roadmap: [
-        { phase: 'Phase 1: Quantization & Compression', timeline: 'Weeks 1-4', actions: ['Implement AWQ and GGUF quantization', 'Deploy vLLM high-throughput server'] },
-        { phase: 'Phase 2: Production MLOps', timeline: 'Weeks 5-8', actions: ['Set up MLflow model registry and drift monitoring alerts'] },
-      ],
-    },
-  },
-  {
-    id: 'STU003',
-    name: 'Ravi Kumar',
-    program: 'Cloud Infrastructure & DevOps',
-    nsqfLevel: 5,
-    enrollmentNumber: 'SKP-CL2025-0453',
-    passportHash: '9a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9a8b',
-    overallScore: 81,
-    skills: [
-      { skillId: { name: 'AWS Cloud Architecture' }, score: 85, lastAssessed: '2026-02-14' },
-      { skillId: { name: 'Kubernetes & Docker' }, score: 84, lastAssessed: '2026-02-19' },
-      { skillId: { name: 'Terraform IaC' }, score: 80, lastAssessed: '2026-02-23' },
-      { skillId: { name: 'Linux System Admin' }, score: 88, lastAssessed: '2026-02-26' },
-      { skillId: { name: 'CI/CD Pipelines (ArgoCD)' }, score: 76, lastAssessed: '2026-03-01' },
-      { skillId: { name: 'Observability (Prometheus/Grafana)' }, score: 79, lastAssessed: '2026-03-02' },
-    ],
-    growthData: [
-      { cycle: 'Q1 2025', score: 58, benchmark: 60 },
-      { cycle: 'Q2 2025', score: 67, benchmark: 65 },
-      { cycle: 'Q3 2025', score: 73, benchmark: 70 },
-      { cycle: 'Q4 2025', score: 78, benchmark: 72 },
-      { cycle: 'Current', score: 81, benchmark: 75 },
-    ],
-    careers: [
-      {
-        title: 'Cloud DevOps Engineer',
-        matchPercent: 91,
-        salaryRange: '₹8.0 - 16.0 LPA',
-        timeToAchieve: 'Immediate (Job Ready)',
-        companies: ['Wipro', 'HCLTech', 'Cognizant', 'Jio Platforms'],
-        roadmap: ['Build GitOps deployment workflow using ArgoCD', 'Configure AWS Multi-Region failover'],
-      },
-      {
-        title: 'Site Reliability Engineer (SRE)',
-        matchPercent: 86,
-        salaryRange: '₹9.0 - 18.0 LPA',
-        timeToAchieve: '2-3 Months',
-        companies: ['Paytm', 'MakeMyTrip', 'Ola'],
-        roadmap: ['Implement SLO/SLI alerting and chaos engineering experiments with LitmusChaos'],
-      },
-    ],
-    gaps: {
-      targetRole: 'Lead SRE & Platform Engineer (NSQF Level 6)',
-      overallGapScore: 20,
-      aiSummary: 'Strong Linux kernel and container fundamentals. Priority upskilling targets include zero-trust security mesh and automated blue-green traffic management.',
-      criticalGaps: [
-        { skill: 'Service Mesh (Istio)', currentScore: 60, requiredScore: 82, priority: 'High', recommendedAction: 'Configure mTLS and canary traffic splitting with Istio Ingress' },
-        { skill: 'Security Scanning & Compliance (Trivy)', currentScore: 65, requiredScore: 84, priority: 'Medium', recommendedAction: 'Integrate Trivy container image scanning into pre-commit pipeline' },
-      ],
-      roadmap: [
-        { phase: 'Phase 1: Zero Trust Service Mesh', timeline: 'Weeks 1-4', actions: ['Deploy Istio on Kubernetes cluster', 'Enforce strict mutual TLS authentication'] },
-        { phase: 'Phase 2: Chaos Engineering & SRE', timeline: 'Weeks 5-8', actions: ['Simulate pod network latency & node outages', 'Automate self-healing alerts'] },
-      ],
-    },
-  },
-];
-
 export default function StudentDashboardPage() {
   const [activeTab, setActiveTab] = useState<string>('overview');
-  const [selectedPersonaIndex, setSelectedPersonaIndex] = useState<number>(0);
   const [profile, setProfile] = useState<any>(null);
   const [careerData, setCareerData] = useState<any>(null);
   const [gapData, setGapData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [loadingGaps, setLoadingGaps] = useState(false);
-  const [isDemoMode, setIsDemoMode] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [copiedHash, setCopiedHash] = useState(false);
 
-  // Load active profile from backend, or seamlessly activate rich interactive persona
-  const fetchProfile = async (personaIdx = selectedPersonaIndex) => {
+  const fetchProfile = async () => {
     setLoading(true);
+    setError(null);
     try {
       const data = await studentApi.getMyProfile();
-      if (data && data._id && data.skills && data.skills.length > 0) {
+      if (data && data._id) {
         setProfile(data);
-        setIsDemoMode(false);
-
-        studentApi
-          .getCareerPaths(data._id)
-          .then((res) => setCareerData(res))
-          .catch(() => setCareerData({ topCareerPaths: DEMO_PERSONAS[0].careers }));
       } else {
-        // Fallback to active demo persona
-        activateDemoPersona(personaIdx);
+        setProfile(null);
       }
-    } catch {
-      // Backend offline / unauthenticated demo visitor
-      activateDemoPersona(personaIdx);
+    } catch (err: any) {
+      if (err?.response?.status === 404) {
+        setProfile(null);
+      } else {
+        setError('Unable to load your dashboard data. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
-  };
-
-  const activateDemoPersona = (idx: number) => {
-    const persona = DEMO_PERSONAS[idx] || DEMO_PERSONAS[0];
-    setProfile({
-      _id: persona.id,
-      userId: { name: persona.name, email: `${persona.id.toLowerCase()}@skillsense.gov.in`, isVerified: true },
-      enrollmentNumber: persona.enrollmentNumber,
-      program: persona.program,
-      nsqfLevel: persona.nsqfLevel,
-      state: 'Karnataka',
-      placementStatus: 'seeking',
-      overallScore: persona.overallScore,
-      skills: persona.skills,
-      passportHash: persona.passportHash,
-      growthData: persona.growthData,
-    });
-    setCareerData({ topCareerPaths: persona.careers });
-    setGapData(persona.gaps);
-    setIsDemoMode(true);
-  };
-
-  const handleSwitchPersona = (idx: number) => {
-    setSelectedPersonaIndex(idx);
-    activateDemoPersona(idx);
-    toast.success(`Switched to persona: ${DEMO_PERSONAS[idx].name}`);
   };
 
   useEffect(() => {
     fetchProfile();
   }, []);
 
+  useEffect(() => {
+    if (!profile?._id) return;
+    studentApi
+      .getCareerPaths(profile._id)
+      .then((res) => setCareerData(res))
+      .catch(() => setCareerData(null));
+  }, [profile?._id]);
+
   const handleCopyPassport = () => {
-    const hash = profile?.passportHash || DEMO_PERSONAS[0].passportHash;
+    const hash = profile?.passportHash;
+    if (!hash) return;
     navigator.clipboard.writeText(hash);
     setCopiedHash(true);
     toast.success('Passport verification hash copied!');
     setTimeout(() => setCopiedHash(false), 2500);
   };
 
-  const studentName = profile?.userId?.name || DEMO_PERSONAS[selectedPersonaIndex].name;
-  const overallScore = profile?.overallScore ?? DEMO_PERSONAS[selectedPersonaIndex].overallScore;
-  const nsqfLevel = profile?.nsqfLevel ?? DEMO_PERSONAS[selectedPersonaIndex].nsqfLevel;
-  const program = profile?.program || DEMO_PERSONAS[selectedPersonaIndex].program;
-  const skills = profile?.skills || DEMO_PERSONAS[selectedPersonaIndex].skills;
-  const growthData = profile?.growthData || DEMO_PERSONAS[selectedPersonaIndex].growthData;
+  const studentName = profile?.userId?.name || 'Student';
+  const overallScore = profile?.overallScore ?? 0;
+  const nsqfLevel = profile?.nsqfLevel ?? 5;
+  const program = profile?.program || 'Vocational Program';
+  const skills = profile?.skills || [];
+  const growthData = profile?.growthData || [];
 
   const sortedSkills = [...skills].sort((a: any, b: any) => (b.score || 0) - (a.score || 0));
   const strongestSkills = sortedSkills.slice(0, 3);
@@ -356,57 +154,57 @@ export default function StudentDashboardPage() {
     score: s.score || 75,
   }));
 
-  const careers = careerData?.topCareerPaths || DEMO_PERSONAS[selectedPersonaIndex].careers;
+  const careers = careerData?.topCareerPaths || [];
   const topCareer = careers[0] || null;
 
   return (
     <ErrorBoundary>
       <FadeIn style={{ maxWidth: 1100, margin: '0 auto', paddingBottom: 60 }}>
-        {/* ── Demo Persona Switcher Banner ── */}
-        <div
-          style={{
-            background: 'rgba(245,158,11,0.06)',
-            border: '1px solid rgba(245,158,11,0.25)',
-            borderRadius: 12,
-            padding: '10px 16px',
-            marginBottom: 20,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            flexWrap: 'wrap',
-            gap: 12,
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 700, color: 'var(--gold)' }}>
-            <Zap size={16} /> <span>Interactive Student Persona Switcher:</span>
-          </div>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-            {DEMO_PERSONAS.map((persona, idx) => (
-              <button
-                key={persona.id}
-                type="button"
-                onClick={() => handleSwitchPersona(idx)}
-                style={{
-                  padding: '5px 12px',
-                  borderRadius: 6,
-                  fontSize: 12,
-                  fontWeight: 600,
-                  background: selectedPersonaIndex === idx ? 'var(--gold)' : 'rgba(255,255,255,0.05)',
-                  border: `1px solid ${selectedPersonaIndex === idx ? 'var(--gold)' : 'var(--border)'}`,
-                  color: selectedPersonaIndex === idx ? '#000' : '#cbd5e1',
-                  cursor: 'pointer',
-                  transition: 'all 0.15s ease',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 6,
-                }}
-              >
-                <UserCheck size={13} /> {persona.name} ({persona.program.split(' ')[0]})
-              </button>
+        {/* ── Loading State ── */}
+        {loading && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="card-linear" style={{ padding: 24, borderRadius: 14 }}>
+                <div style={{ height: 20, width: 220, background: 'rgba(255,255,255,0.06)', borderRadius: 4, marginBottom: 12 }} />
+                <div style={{ height: 120, background: 'rgba(255,255,255,0.04)', borderRadius: 8 }} />
+              </div>
             ))}
           </div>
-        </div>
+        )}
 
+        {/* ── Error / Empty State ── */}
+        {!loading && (error || !profile) && (
+          <div className="card-linear" style={{ padding: 40, borderRadius: 16, textAlign: 'center', marginTop: 20 }}>
+            <AlertTriangle size={36} style={{ color: 'var(--gold)', marginBottom: 12 }} />
+            <h2 className="font-display" style={{ fontSize: 20, fontWeight: 800, color: '#f8fafc', margin: '0 0 8px' }}>
+              {error ? 'Unable to Load Dashboard' : 'No Student Profile Found'}
+            </h2>
+            <p style={{ fontSize: 13.5, color: 'var(--text-secondary)', maxWidth: 520, margin: '0 auto 16px', lineHeight: 1.6 }}>
+              {error
+                ? 'We could not retrieve your dashboard data. Check your connection and try again.'
+                : 'No verified student profile is linked to your account yet. Enroll or complete an assessment to generate your personalized dashboard.'}
+            </p>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: 10, flexWrap: 'wrap' }}>
+              {error ? (
+                <button onClick={fetchProfile} className="btn-gold" style={{ fontSize: 13, padding: '9px 20px', cursor: 'pointer' }}>
+                  <RefreshCw size={14} /> Retry
+                </button>
+              ) : (
+                <>
+                  <Link href="/student/assessments" className="btn-gold" style={{ fontSize: 13, padding: '9px 20px' }}>
+                    Take Assessment
+                  </Link>
+                  <Link href="/student/analyzer" className="btn-secondary" style={{ fontSize: 13, padding: '9px 20px' }}>
+                    Run AI Analyzer
+                  </Link>
+                </>
+              )}
+            </div>
+          </div>
+        )}
+
+        {!loading && !error && profile && (
+        <>
         {/* ── Top Intelligence Briefing ── */}
         <div style={{ marginBottom: 20 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 14 }}>
@@ -414,21 +212,6 @@ export default function StudentDashboardPage() {
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
                 <AIBadge type="nsqf" label={`NSQF LEVEL ${nsqfLevel || 5}`} />
                 <AIBadge type="verified" label="CREDENTIAL VERIFIED · DIGITAL SEAL" />
-                {isDemoMode && (
-                  <span
-                    style={{
-                      fontSize: 11,
-                      fontWeight: 700,
-                      color: '#60a5fa',
-                      background: 'rgba(96,165,250,0.12)',
-                      padding: '2px 8px',
-                      borderRadius: 6,
-                      border: '1px solid rgba(96,165,250,0.25)',
-                    }}
-                  >
-                    Interactive Mode
-                  </span>
-                )}
               </div>
               <h1
                 className="font-display"
@@ -446,7 +229,7 @@ export default function StudentDashboardPage() {
               <p style={{ color: 'var(--text-secondary)', fontSize: 13.5, marginTop: 4, lineHeight: 1.5 }}>
                 {program} · Enrollment ID:{' '}
                 <span className="font-mono" style={{ color: '#cbd5e1' }}>
-                  {profile?.enrollmentNumber || 'SKP-ND2025-0142'}
+                  {profile?.enrollmentNumber || 'Not assigned'}
                 </span>
               </p>
             </div>
@@ -530,9 +313,9 @@ export default function StudentDashboardPage() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 12 }}>
               {[
                 { label: 'Overall Readiness Index', value: `${overallScore}/100`, sub: 'NSQF Benchmarked', color: 'var(--gold)' },
-                { label: 'Top Career Alignment', value: `${topCareer?.matchPercent || 92}%`, sub: topCareer?.title || 'Software Engineer', color: '#10b981' },
+                { label: 'Top Career Alignment',                 value: `${topCareer?.matchPercent ?? '--'}%`, sub: topCareer?.title || 'No career match yet', color: '#10b981' },
                 { label: 'Assessed Competencies', value: `${skills.length} Domains`, sub: 'Skill passport entries', color: '#60a5fa' },
-                { label: 'Skill Gap Index', value: `${gapData?.overallGapScore || 18}%`, sub: 'vs Indian hiring standards', color: '#f59e0b' },
+                { label: 'Skill Gap Index', value: gapData?.overallGapScore != null ? `${gapData.overallGapScore}%` : '--', sub: 'vs Indian hiring standards', color: '#f59e0b' },
               ].map((card, i) => (
                 <div key={i} className="card-linear" style={{ padding: '16px 18px', borderRadius: 12 }}>
                   <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
@@ -723,17 +506,17 @@ export default function StudentDashboardPage() {
                     Target Career Benchmark
                   </span>
                   <h3 className="font-display" style={{ fontSize: 22, fontWeight: 800, color: '#f8fafc', margin: '2px 0 0' }}>
-                    {gapData?.targetRole || 'Senior Full-Stack Engineer (NSQF Level 6)'}
+                    {gapData?.targetRole || 'Career Roadmap'}
                   </h3>
                   <p style={{ color: 'var(--text-secondary)', fontSize: 13.5, marginTop: 4, maxWidth: 680 }}>
-                    {gapData?.aiSummary || 'Analysis compares your verified competencies against contemporary Indian hiring benchmarks (TCS, Swiggy, Zerodha, Razorpay).'}
+                    {gapData?.aiSummary || 'Run the AI Analyzer to generate skill gap recommendations based on your verified competencies.'}
                   </p>
                 </div>
 
                 <div style={{ textAlign: 'right' }}>
                   <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Deficiency Index</div>
                   <div style={{ fontSize: 24, fontWeight: 800, color: '#f59e0b' }}>
-                    {gapData?.overallGapScore || 18}%
+                    {gapData?.overallGapScore != null ? `${gapData.overallGapScore}%` : '--'}
                   </div>
                 </div>
               </div>
@@ -930,7 +713,7 @@ export default function StudentDashboardPage() {
                     Government of India · SkillSense Digital Seal
                   </div>
                   <div style={{ fontSize: 18, fontWeight: 800, color: '#f8fafc', marginTop: 4 }}>{studentName}</div>
-                  <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', marginTop: 2 }}>Enrollment ID: {profile?.enrollmentNumber || 'SKP-ND2025-0142'}</div>
+                  <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', marginTop: 2 }}>Enrollment ID: {profile?.enrollmentNumber || 'Not assigned'}</div>
                   <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', marginTop: 2 }}>Program: {program}</div>
                   <div style={{ fontSize: 14, color: 'var(--gold)', marginTop: 8, fontWeight: 800 }}>
                     Verified Competency Score: {overallScore}/100 (NSQF Level {nsqfLevel})
@@ -960,7 +743,7 @@ export default function StudentDashboardPage() {
                     border: '1px solid rgba(255,255,255,0.06)',
                   }}
                 >
-                  {profile?.passportHash || DEMO_PERSONAS[0].passportHash}
+                  {profile?.passportHash || 'PASSPORT UNAVAILABLE'}
                 </div>
               </div>
             </div>
@@ -1031,6 +814,8 @@ export default function StudentDashboardPage() {
               ))}
             </div>
           </div>
+        )}
+        </>
         )}
       </FadeIn>
     </ErrorBoundary>

@@ -57,6 +57,7 @@ interface CampusDriveSchedule {
   status: 'CONFIRMED' | 'UNDER_REVIEW';
 }
 
+// State vocational campus drive partner directory (accredited regional hiring centers)
 const DEFAULT_INSTITUTIONS: CampusInstitution[] = [
   {
     id: 'inst_pune',

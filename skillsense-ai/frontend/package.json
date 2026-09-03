@@ -6,7 +6,8 @@
     "dev": "next dev --turbopack --port 5173",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "npx ts-node --transpile-only scripts/testFrontend.ts"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.70.0",

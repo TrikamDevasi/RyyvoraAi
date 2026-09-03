@@ -75,7 +75,6 @@ interface EvalResult {
   strengths: string[];
   improvementPlan: string;
   nextSteps: string[];
-  passportSeal: string;
 }
 
 // ── Curated High-Standard Question Banks ───────────────────────────────────────
@@ -401,11 +400,10 @@ export default function AssessmentPage() {
       strengths: ['Core Syntax & Execution Flow', 'Algorithmic Problem Solving', 'Design Pattern Adherence'],
       improvementPlan: `Candidate demonstrated solid grasp of ${selectedTopic} principles. Focus upskilling on distributed patterns and production fault-tolerance.`,
       nextSteps: [
-        'Sync score with cryptographic SkillSense Passport',
+        'Sync score with the SkillSense Passport after verification',
         `Explore verified openings in ${selectedTopic} Engineering`,
         'Complete targeted capstone practical project',
       ],
-      passportSeal: `SKP-${Math.random().toString(36).substring(2, 8).toUpperCase()}-${scorePct}PCT`,
     };
 
     try {
@@ -782,8 +780,8 @@ export default function AssessmentPage() {
                   {evalResult.improvementPlan}
                 </p>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 12, fontSize: 11.5, color: '#10b981', fontFamily: 'monospace' }}>
-                  <ShieldCheck size={14} /> Cryptographic Seal: {evalResult.passportSeal}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 12, fontSize: 11.5, color: 'var(--text-secondary)', fontFamily: 'monospace' }}>
+                  <ShieldCheck size={14} /> Passport seal: Pending verification on the SkillSense ledger.
                 </div>
               </div>
 

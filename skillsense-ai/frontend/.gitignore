@@ -8,6 +8,8 @@ out
 # environment
 .env.local
 .env
+.env.*
+!.env.example
 
 # logs & build artifacts
 npm-debug.log*

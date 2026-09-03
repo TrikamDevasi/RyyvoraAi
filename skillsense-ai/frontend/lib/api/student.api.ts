@@ -45,6 +45,40 @@ export interface SkillAnalysisPayload {
   skills?: string[];
 }
 
+export interface ConsentData {
+  _id?: string;
+  status: 'GRANTED' | 'PENDING' | 'WITHDRAWN';
+  purposes: string[];
+  grantedAt?: string;
+  withdrawnAt?: string;
+  consentHistory?: {
+    action: string;
+    timestamp: string;
+    purposes: string[];
+  }[];
+}
+
+export interface TimelineEvent {
+  _id: string;
+  eventType: string;
+  title: string;
+  description: string;
+  date: string;
+  source: string;
+  verificationStatus: string;
+  confidence: number;
+  metadata?: Record<string, any>;
+}
+
+export interface PendingFollowUp {
+  _id: string;
+  scheduleDays: number;
+  dueDate: string;
+  status: string;
+  title?: string;
+  channel?: string;
+}
+
 export const studentApi = {
   getMyProfile: async () => {
     const response = await api.get<{ success: boolean; data: StudentProfile }>('/students/me');
@@ -83,6 +117,72 @@ export const studentApi = {
 
   updateProfile: async (studentId: string, updates: Partial<StudentProfile>) => {
     const response = await api.put(`/students/${studentId}`, updates);
+    return response.data.data;
+  },
+
+  getMyTimeline: async (): Promise<TimelineEvent[]> => {
+    const response = await api.get('/outcomes/my-timeline');
+    return response.data.data;
+  },
+
+  submitSelfReport: async (payload: {
+    status?: string;
+    employerName?: string;
+    jobRole?: string;
+    monthlySalary?: number;
+    trainingRelevance?: string;
+    district?: string;
+    program?: string;
+  }) => {
+    const response = await api.post('/outcomes/self-report', payload);
+    return response.data.data;
+  },
+
+  getMyPendingFollowUps: async (): Promise<PendingFollowUp[]> => {
+    const response = await api.get('/followups/my-pending');
+    return response.data.data;
+  },
+
+  submitFollowUp: async (followUpId: string, responses: {
+    isEmployed: boolean;
+    employmentType?: string;
+    employerName?: string;
+    jobRole?: string;
+    currentSalary?: number;
+    trainingRelevance?: string;
+    feedback?: string;
+  }) => {
+    const response = await api.post('/followups/submit', { followUpId, responses });
+    return response.data.data;
+  },
+
+  getConsent: async (): Promise<ConsentData> => {
+    const response = await api.get('/consent/status');
+    return response.data.data;
+  },
+
+  updateConsent: async (payload: { status: string; purposes: string[] }): Promise<ConsentData> => {
+    const response = await api.post('/consent/update', payload);
+    return response.data.data;
+  },
+
+  getInstituteDashboard: async (institutionId: string) => {
+    const response = await api.get(`/institutes/${institutionId}/dashboard`);
+    return response.data.data;
+  },
+
+  getInstituteStudents: async (institutionId: string) => {
+    const response = await api.get(`/institutes/${institutionId}/students`);
+    return response.data.data;
+  },
+
+  getInstituteROI: async (institutionId: string) => {
+    const response = await api.get(`/institutes/${institutionId}/roi`);
+    return response.data.data;
+  },
+
+  getInstituteReport: async (institutionId: string) => {
+    const response = await api.get(`/institutes/${institutionId}/report`);
     return response.data.data;
   },
 };

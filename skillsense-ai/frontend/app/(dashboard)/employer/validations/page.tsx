@@ -1,7 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
+import React, { useState, useEffect, useCallback } from 'react';
 import api from '@/lib/api';
 import {
   ShieldCheck,
@@ -31,152 +30,151 @@ import toast from 'react-hot-toast';
 import confetti from 'canvas-confetti';
 
 interface ValidationClaim {
-  id: string;
-  candidateName: string;
-  enrollmentNo: string;
-  institute: string;
-  claimedRole: string;
-  claimedSalaryMonthly: number;
-  startDate: string;
-  employmentType: string;
-  status: 'PENDING' | 'VERIFIED' | 'REJECTED' | 'CORRECTION_REQUESTED';
-  verificationHash?: string;
+  _id: string;
+  traineeName: string;
+  traineeLocation?: string;
+  institutionName: string;
+  program: string;
+  jobRole: string;
+  employerName?: string;
+  employmentType?: string;
+  startDate?: string;
+  currentSalary?: number;
+  initialSalary?: number;
+  status: string;
+  verificationStatus: 'PENDING' | 'SELF_REPORTED' | 'VERIFIED' | 'REJECTED' | 'CORRECTION_REQUESTED';
+  verificationNotes?: string;
   verifiedAt?: string;
+  createdAt: string;
 }
 
-const DEFAULT_CLAIMS: ValidationClaim[] = [
-  {
-    id: 'claim_1',
-    candidateName: 'Arjun Mehta',
-    enrollmentNo: 'ENR-2026-MH-9482',
-    institute: 'Government Polytechnic Pune',
-    claimedRole: 'Full-Stack Developer (Next.js & Node.js)',
-    claimedSalaryMonthly: 65000,
-    startDate: 'Feb 15, 2026',
-    employmentType: 'Full-time Permanent',
-    status: 'PENDING',
-  },
-  {
-    id: 'claim_2',
-    candidateName: 'Priya Sharma',
-    enrollmentNo: 'ENR-2026-MH-8812',
-    institute: 'VJTI Technical Institute Mumbai',
-    claimedRole: 'Applied AI & GenAI Platform Associate',
-    claimedSalaryMonthly: 78000,
-    startDate: 'March 01, 2026',
-    employmentType: 'Full-time Permanent',
-    status: 'PENDING',
-  },
-  {
-    id: 'claim_3',
-    candidateName: 'Rohan Deshmukh',
-    enrollmentNo: 'ENR-2026-MH-7140',
-    institute: 'Government College of Engineering Nagpur',
-    claimedRole: 'Cloud Native DevOps & Site Reliability Engineer',
-    claimedSalaryMonthly: 55000,
-    startDate: 'Jan 20, 2026',
-    employmentType: 'Full-time Permanent',
-    status: 'PENDING',
-  },
-  {
-    id: 'claim_4',
-    candidateName: 'Sneha Kulkarni',
-    enrollmentNo: 'ENR-2026-MH-6290',
-    institute: 'K.K. Wagh Institute of Engineering Nashik',
-    claimedRole: 'Frontend UI Systems Engineer',
-    claimedSalaryMonthly: 50000,
-    startDate: 'Feb 01, 2026',
-    employmentType: 'Full-time Apprenticeship',
-    status: 'PENDING',
-  },
-];
-
 export default function EmployerValidationsPage() {
-  const [claims, setClaims] = useState<ValidationClaim[]>(DEFAULT_CLAIMS);
+  const [claims, setClaims] = useState<ValidationClaim[]>([]);
   const [activeTab, setActiveTab] = useState<'PENDING' | 'VERIFIED'>('PENDING');
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const loadPending = async () => {
+  const loadPending = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       const res = await api.get('/verification/pending');
-      if (res.data?.success && Array.isArray(res.data.data) && res.data.data.length > 0) {
-        // Map live data
+      if (res.data?.success && Array.isArray(res.data.data)) {
+        setClaims(res.data.data);
+      } else {
+        setClaims([]);
       }
     } catch (err: any) {
-      // Graceful fallback
+      const status = err?.response?.status;
+      const message = err?.response?.data?.message;
+      if (status === 401) {
+        toast.error('Your session has expired. Please log in again.');
+      } else if (status === 403) {
+        toast.error('You are not authorized to access verification records.');
+      } else {
+        toast.error(message || 'Failed to load pending claims. Please try again.');
+      }
+      setError(message || 'Unable to load claims');
+      setClaims([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     loadPending();
-  }, []);
+  }, [loadPending]);
 
-  const handleAction = (claimId: string, action: 'VERIFY' | 'REJECT' | 'CORRECTION_REQUESTED') => {
+  const handleAction = async (
+    claimId: string,
+    action: 'VERIFY' | 'REJECT' | 'CORRECTION_REQUESTED'
+  ) => {
+    if (actionLoading) return;
     setActionLoading(claimId);
-    setTimeout(() => {
-      setClaims((prev) =>
-        prev.map((c) => {
-          if (c.id === claimId) {
-            const isVerified = action === 'VERIFY';
-            return {
-              ...c,
-              status: isVerified ? 'VERIFIED' : action === 'REJECT' ? 'REJECTED' : 'CORRECTION_REQUESTED',
-              verificationHash: isVerified ? `0x${Math.random().toString(16).substring(2, 10)}...${Math.random().toString(16).substring(2, 6)}_HMAC_LEDGER_SIGNED` : undefined,
-              verifiedAt: isVerified ? new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : undefined,
-            };
-          }
-          return c;
-        })
-      );
-      setActionLoading(null);
 
-      if (action === 'VERIFY') {
-        confetti({
-          particleCount: 50,
-          spread: 60,
-          origin: { y: 0.6 },
-          colors: ['#10b981', '#f59e0b'],
-        });
-        toast.success('Placement verified & cryptographically signed on state ledger!');
-      } else if (action === 'REJECT') {
-        toast.error('Claim rejected and candidate notified.');
+    try {
+      const res = await api.post('/verification/action', {
+        outcomeId: claimId,
+        action,
+      });
+
+      if (res.data?.success) {
+        // Update the claim in local state from backend response
+        const updated = res.data.data;
+        setClaims((prev) =>
+          prev.map((c) =>
+            c._id === claimId
+              ? {
+                  ...c,
+                  verificationStatus: updated.verificationStatus,
+                  verificationNotes: updated.verificationNotes,
+                  verifiedAt: updated.verifiedAt,
+                  confidenceScore: updated.confidenceScore,
+                }
+              : c
+          )
+        );
+
+        if (action === 'VERIFY') {
+          confetti({
+            particleCount: 50,
+            spread: 60,
+            origin: { y: 0.6 },
+            colors: ['#10b981', '#f59e0b'],
+          });
+          toast.success('Placement verified successfully!');
+        } else if (action === 'REJECT') {
+          toast.error('Claim rejected. Candidate has been notified.');
+        } else {
+          toast.success('Correction request sent to candidate.');
+        }
       } else {
-        toast.success('Correction request dispatched to candidate.');
+        toast.error(res.data?.message || 'Action failed. Please try again.');
       }
-    }, 600);
+    } catch (err: any) {
+      const status = err?.response?.status;
+      const message = err?.response?.data?.message;
+      if (status === 401) {
+        toast.error('Your session has expired. Please log in again.');
+      } else if (status === 403) {
+        toast.error('You are not authorized to perform this action.');
+      } else if (status === 404) {
+        toast.error('Employment claim not found.');
+      } else if (status === 409) {
+        toast.error('This claim has already been processed.');
+      } else if (status === 422) {
+        toast.error(message || 'Invalid request. Please check your input.');
+      } else {
+        toast.error(message || 'Unable to process verification. Please try again.');
+      }
+    } finally {
+      setActionLoading(null);
+    }
   };
 
-  const handleVerifyAll = () => {
-    setClaims((prev) =>
-      prev.map((c) => ({
-        ...c,
-        status: 'VERIFIED',
-        verificationHash: `0x${Math.random().toString(16).substring(2, 10)}...${Math.random().toString(16).substring(2, 6)}_HMAC_LEDGER_SIGNED`,
-        verifiedAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-      }))
+  const handleVerifyAll = async () => {
+    const pendingClaims = claims.filter(
+      (c) => c.verificationStatus === 'PENDING' || c.verificationStatus === 'SELF_REPORTED'
     );
-    confetti({
-      particleCount: 60,
-      spread: 60,
-      origin: { y: 0.6 },
-      colors: ['#10b981', '#f59e0b'],
-    });
-    toast.success('All pending candidate claims verified successfully!');
+    if (pendingClaims.length === 0) return;
+
+    for (const claim of pendingClaims) {
+      await handleAction(claim._id, 'VERIFY');
+    }
   };
 
-  const pendingList = claims.filter((c) => c.status === 'PENDING');
-  const verifiedList = claims.filter((c) => c.status === 'VERIFIED');
+  const pendingList = claims.filter(
+    (c) => c.verificationStatus === 'PENDING' || c.verificationStatus === 'SELF_REPORTED'
+  );
+  const verifiedList = claims.filter((c) => c.verificationStatus === 'VERIFIED');
 
   const displayedList = (activeTab === 'PENDING' ? pendingList : verifiedList).filter(
     (c) =>
-      c.candidateName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      c.claimedRole.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      c.enrollmentNo.toLowerCase().includes(searchQuery.toLowerCase())
+      c.traineeName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      c.jobRole?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      c.program?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -205,7 +203,7 @@ export default function EmployerValidationsPage() {
               Candidate Placement & <span style={{ color: 'var(--gold)' }}>Outcome Validations</span>
             </h1>
             <p style={{ color: 'var(--text-secondary)', fontSize: 13.5, marginTop: 4, maxWidth: 680 }}>
-              Audit and cryptographically sign self-reported candidate hiring claims. Verified placements receive immediate state recognition and contribute to institutional ROI scorecards.
+              Audit self-reported candidate hiring claims. Verified placements receive immediate state recognition and contribute to institutional ROI scorecards.
             </p>
           </div>
 
@@ -214,8 +212,9 @@ export default function EmployerValidationsPage() {
               <button
                 type="button"
                 onClick={handleVerifyAll}
+                disabled={!!actionLoading}
                 className="btn-gold"
-                style={{ fontSize: 12.5, padding: '8px 16px', display: 'flex', alignItems: 'center', gap: 6 }}
+                style={{ fontSize: 12.5, padding: '8px 16px', display: 'flex', alignItems: 'center', gap: 6, opacity: actionLoading ? 0.6 : 1 }}
               >
                 <CheckCircle2 size={14} /> Confirm All ({pendingList.length})
               </button>
@@ -223,6 +222,7 @@ export default function EmployerValidationsPage() {
             <button
               type="button"
               onClick={loadPending}
+              disabled={loading}
               className="btn-secondary"
               style={{ fontSize: 12.5, padding: '8px 16px', display: 'flex', alignItems: 'center', gap: 6 }}
             >
@@ -235,9 +235,9 @@ export default function EmployerValidationsPage() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14, marginBottom: 24 }}>
           {[
             { label: 'Pending Verification', value: `${pendingList.length} Claims`, sub: 'Awaiting Employer Confirmation', color: pendingList.length > 0 ? 'var(--gold)' : '#10b981', icon: Clock },
-            { label: 'Confirmed Validations', value: `${verifiedList.length + 180} Placements`, sub: 'Signed on Cryptographic Ledger', color: '#10b981', icon: ShieldCheck },
-            { label: 'Avg Verification Latency', value: '1.2 Days', sub: 'Faster than 48h SLA', color: '#60a5fa', icon: Sparkles },
-            { label: 'Ledger Audit Integrity', value: '100% Verified', sub: 'SHA-256 HMAC Signatures', color: '#a855f7', icon: Lock },
+            { label: 'Confirmed Validations', value: `${verifiedList.length} Placements`, sub: 'Signed on Ledger', color: '#10b981', icon: ShieldCheck },
+            { label: 'Total Claims Loaded', value: `${claims.length} Records`, sub: 'From Backend Database', color: '#60a5fa', icon: Sparkles },
+            { label: 'Verification Integrity', value: 'Server-Verified', sub: 'Database is Source of Truth', color: '#a855f7', icon: Lock },
           ].map((stat, idx) => {
             const Icon = stat.icon;
             return (
@@ -307,7 +307,7 @@ export default function EmployerValidationsPage() {
                 cursor: 'pointer',
               }}
             >
-              Verified Ledger Audit ({verifiedList.length})
+              Verified Ledger ({verifiedList.length})
             </button>
           </div>
 
@@ -332,153 +332,227 @@ export default function EmployerValidationsPage() {
           </div>
         </div>
 
-        {/* ── Main Verification Queue List ── */}
-        <div className="card-linear" style={{ padding: 24, borderRadius: 16 }}>
-          {displayedList.length === 0 ? (
-            <div style={{ padding: '48px 20px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
-              <CheckCircle2 size={44} style={{ color: '#10B981' }} />
-              <h3 className="font-display" style={{ fontSize: 18, fontWeight: 800, color: '#FFFFFF', margin: 0 }}>
-                {activeTab === 'PENDING' ? 'Pending Queue is Clear!' : 'No Verified Records Found'}
-              </h3>
-              <p style={{ fontSize: 13, color: 'var(--text-secondary)', maxWidth: 460, margin: 0, lineHeight: 1.5 }}>
-                {activeTab === 'PENDING'
-                  ? 'All candidate self-reported placement claims under your organization have been verified and sealed onto the state ledger.'
-                  : 'Confirmed placement records with cryptographic HMAC signatures will appear here.'}
-              </p>
-            </div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              {displayedList.map((item) => {
-                const isProcessing = actionLoading === item.id;
-                const isVerified = item.status === 'VERIFIED';
+        {/* ── Loading State ── */}
+        {loading && (
+          <div className="card-linear" style={{ padding: '48px 20px', textAlign: 'center', borderRadius: 16 }}>
+            <RefreshCw size={32} className="animate-spin" style={{ color: 'var(--gold)', marginBottom: 12 }} />
+            <p style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Loading pending claims from database...</p>
+          </div>
+        )}
 
-                return (
-                  <div
-                    key={item.id}
-                    className="card-accent"
-                    style={{
-                      padding: 20,
-                      borderRadius: 14,
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: 14,
-                      borderLeft: `4px solid ${isVerified ? '#10b981' : 'var(--gold)'}`,
-                    }}
-                  >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
-                      <div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                          <h3 className="font-display" style={{ fontSize: 16, fontWeight: 800, color: '#f8fafc', margin: 0 }}>
-                            {item.candidateName}
-                          </h3>
-                          <span style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'monospace' }}>
-                            {item.enrollmentNo}
+        {/* ── Error State ── */}
+        {!loading && error && (
+          <div className="card-linear" style={{ padding: '48px 20px', textAlign: 'center', borderRadius: 16 }}>
+            <AlertCircle size={44} style={{ color: '#ef4444', marginBottom: 12 }} />
+            <h3 className="font-display" style={{ fontSize: 18, fontWeight: 800, color: '#f8fafc', margin: '0 0 8px' }}>
+              Unable to Load Claims
+            </h3>
+            <p style={{ fontSize: 13, color: 'var(--text-secondary)', maxWidth: 460, margin: '0 0 16px', lineHeight: 1.5 }}>
+              {error}
+            </p>
+            <button type="button" onClick={loadPending} className="btn-gold" style={{ fontSize: 12.5, padding: '8px 16px' }}>
+              <RefreshCw size={14} style={{ marginRight: 6 }} /> Retry
+            </button>
+          </div>
+        )}
+
+        {/* ── Main Verification Queue List ── */}
+        {!loading && !error && (
+          <div className="card-linear" style={{ padding: 24, borderRadius: 16 }}>
+            {displayedList.length === 0 ? (
+              <div style={{ padding: '48px 20px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+                <CheckCircle2 size={44} style={{ color: activeTab === 'PENDING' ? '#10B981' : 'var(--text-muted)' }} />
+                <h3 className="font-display" style={{ fontSize: 18, fontWeight: 800, color: '#FFFFFF', margin: 0 }}>
+                  {activeTab === 'PENDING' ? 'No Pending Claims' : 'No Verified Records'}
+                </h3>
+                <p style={{ fontSize: 13, color: 'var(--text-secondary)', maxWidth: 460, margin: 0, lineHeight: 1.5 }}>
+                  {activeTab === 'PENDING'
+                    ? 'There are no pending employment claims from trainees at your organization awaiting verification.'
+                    : 'Confirmed placement records will appear here after you verify claims.'}
+                </p>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                {displayedList.map((item) => {
+                  const isProcessing = actionLoading === item._id;
+                  const isVerified = item.verificationStatus === 'VERIFIED';
+                  const isPending = item.verificationStatus === 'PENDING' || item.verificationStatus === 'SELF_REPORTED';
+
+                  return (
+                    <div
+                      key={item._id}
+                      className="card-accent"
+                      style={{
+                        padding: 20,
+                        borderRadius: 14,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 14,
+                        borderLeft: `4px solid ${isVerified ? '#10b981' : 'var(--gold)'}`,
+                      }}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
+                        <div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                            <h3 className="font-display" style={{ fontSize: 16, fontWeight: 800, color: '#f8fafc', margin: 0 }}>
+                              {item.traineeName}
+                            </h3>
+                            <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+                              {item.program}
+                            </span>
+                          </div>
+                          <div style={{ fontSize: 13, color: '#cbd5e1' }}>
+                            Claimed Role: <strong style={{ color: 'var(--gold)' }}>{item.jobRole || 'N/A'}</strong>
+                          </div>
+                          <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
+                            {item.institutionName} · {item.employmentType || 'Full-time'}
+                          </div>
+                        </div>
+
+                        <div style={{ textAlign: 'right' }}>
+                          {item.currentSalary ? (
+                            <div className="font-display" style={{ fontSize: 18, fontWeight: 900, color: '#10b981' }}>
+                              ₹{item.currentSalary.toLocaleString('en-IN')}/mo
+                            </div>
+                          ) : null}
+                          {item.startDate && (
+                            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
+                              Start: {new Date(item.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {isVerified && item.verifiedAt && (
+                        <div
+                          style={{
+                            padding: '10px 14px',
+                            borderRadius: 8,
+                            background: 'rgba(16,185,129,0.08)',
+                            border: '1px solid rgba(16,185,129,0.25)',
+                            fontSize: 11.5,
+                            color: '#86efac',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            flexWrap: 'wrap',
+                            gap: 8,
+                          }}
+                        >
+                          <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <CheckCircle2 size={14} color="#10b981" />
+                            <span>Verified by Employer</span>
+                          </span>
+                          <span style={{ color: 'var(--text-muted)' }}>
+                            Verified: {new Date(item.verifiedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                           </span>
                         </div>
-                        <div style={{ fontSize: 13, color: '#cbd5e1' }}>
-                          Claimed Role: <strong style={{ color: 'var(--gold)' }}>{item.claimedRole}</strong>
-                        </div>
-                        <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
-                          {item.institute} · {item.employmentType}
-                        </div>
-                      </div>
+                      )}
 
-                      <div style={{ textAlign: 'right' }}>
-                        <div className="font-display" style={{ fontSize: 18, fontWeight: 900, color: '#10b981' }}>
-                          ₹{item.claimedSalaryMonthly.toLocaleString('en-IN')}/mo
-                        </div>
-                        <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>
-                          Start Date: {item.startDate}
-                        </div>
-                      </div>
-                    </div>
-
-                    {isVerified && item.verificationHash && (
-                      <div
-                        style={{
-                          padding: '10px 14px',
-                          borderRadius: 8,
-                          background: 'rgba(16,185,129,0.08)',
-                          border: '1px solid rgba(16,185,129,0.25)',
-                          fontSize: 11.5,
-                          color: '#86efac',
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          flexWrap: 'wrap',
-                          gap: 8,
-                        }}
-                      >
-                        <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                          <CheckCircle2 size={14} color="#10b981" />
-                          <span>Ledger Signature: <code style={{ fontFamily: 'monospace' }}>{item.verificationHash}</code></span>
-                        </span>
-                        <span style={{ color: 'var(--text-muted)' }}>Verified: {item.verifiedAt}</span>
-                      </div>
-                    )}
-
-                    {!isVerified && (
-                      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: 12 }}>
-                        <button
-                          type="button"
-                          onClick={() => handleAction(item.id, 'REJECT')}
-                          disabled={isProcessing}
+                      {item.verificationStatus === 'REJECTED' && (
+                        <div
                           style={{
-                            padding: '6px 14px',
-                            borderRadius: 6,
-                            background: 'rgba(239,68,68,0.1)',
+                            padding: '10px 14px',
+                            borderRadius: 8,
+                            background: 'rgba(239,68,68,0.08)',
                             border: '1px solid rgba(239,68,68,0.25)',
-                            color: '#f87171',
-                            fontSize: 12,
-                            fontWeight: 700,
-                            cursor: 'pointer',
-                          }}
-                        >
-                          Reject Claim
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleAction(item.id, 'CORRECTION_REQUESTED')}
-                          disabled={isProcessing}
-                          style={{
-                            padding: '6px 14px',
-                            borderRadius: 6,
-                            background: 'rgba(255,255,255,0.04)',
-                            border: '1px solid var(--border)',
-                            color: '#cbd5e1',
-                            fontSize: 12,
-                            fontWeight: 700,
-                            cursor: 'pointer',
-                          }}
-                        >
-                          Request Correction
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleAction(item.id, 'VERIFY')}
-                          disabled={isProcessing}
-                          className="btn-gold"
-                          style={{
-                            padding: '6px 18px',
-                            fontSize: 12,
-                            fontWeight: 800,
+                            fontSize: 11.5,
+                            color: '#fca5a5',
                             display: 'flex',
                             alignItems: 'center',
                             gap: 6,
-                            cursor: isProcessing ? 'not-allowed' : 'pointer',
                           }}
                         >
-                          {isProcessing ? <RefreshCw size={13} className="animate-spin" /> : <Check size={13} />}
-                          <span>Confirm Placement (Verify)</span>
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
+                          <XCircle size={14} color="#ef4444" />
+                          <span>Claim Rejected{item.verificationNotes ? `: ${item.verificationNotes}` : ''}</span>
+                        </div>
+                      )}
+
+                      {item.verificationStatus === 'CORRECTION_REQUESTED' && (
+                        <div
+                          style={{
+                            padding: '10px 14px',
+                            borderRadius: 8,
+                            background: 'rgba(245,158,11,0.08)',
+                            border: '1px solid rgba(245,158,11,0.25)',
+                            fontSize: 11.5,
+                            color: '#fcd34d',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 6,
+                          }}
+                        >
+                          <AlertCircle size={14} color="#f59e0b" />
+                          <span>Correction Requested{item.verificationNotes ? `: ${item.verificationNotes}` : ''}</span>
+                        </div>
+                      )}
+
+                      {isPending && (
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: 12, flexWrap: 'wrap' }}>
+                          <button
+                            type="button"
+                            onClick={() => handleAction(item._id, 'REJECT')}
+                            disabled={isProcessing}
+                            style={{
+                              padding: '6px 14px',
+                              borderRadius: 6,
+                              background: 'rgba(239,68,68,0.1)',
+                              border: '1px solid rgba(239,68,68,0.25)',
+                              color: '#f87171',
+                              fontSize: 12,
+                              fontWeight: 700,
+                              cursor: isProcessing ? 'not-allowed' : 'pointer',
+                              opacity: isProcessing ? 0.6 : 1,
+                            }}
+                          >
+                            {isProcessing ? 'Processing...' : 'Reject Claim'}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleAction(item._id, 'CORRECTION_REQUESTED')}
+                            disabled={isProcessing}
+                            style={{
+                              padding: '6px 14px',
+                              borderRadius: 6,
+                              background: 'rgba(255,255,255,0.04)',
+                              border: '1px solid var(--border)',
+                              color: '#cbd5e1',
+                              fontSize: 12,
+                              fontWeight: 700,
+                              cursor: isProcessing ? 'not-allowed' : 'pointer',
+                              opacity: isProcessing ? 0.6 : 1,
+                            }}
+                          >
+                            {isProcessing ? 'Processing...' : 'Request Correction'}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleAction(item._id, 'VERIFY')}
+                            disabled={isProcessing}
+                            className="btn-gold"
+                            style={{
+                              padding: '6px 18px',
+                              fontSize: 12,
+                              fontWeight: 800,
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 6,
+                              cursor: isProcessing ? 'not-allowed' : 'pointer',
+                              opacity: isProcessing ? 0.6 : 1,
+                            }}
+                          >
+                            {isProcessing ? <RefreshCw size={13} className="animate-spin" /> : <Check size={13} />}
+                            <span>Confirm Placement (Verify)</span>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
       </FadeIn>
     </ErrorBoundary>
   );

@@ -1,9 +1,20 @@
 // backend/src/scripts/seedLongitudinalOutcomes.ts
 // Seeds realistic longitudinal skilling outcome dataset for Government of Maharashtra (SIH26135)
 // Run: npx ts-node -r tsconfig-paths/register src/scripts/seedLongitudinalOutcomes.ts
+//
+// IDEMPOTENCY: Safe to run multiple times.
+//   - Demo users: upserted by email
+//   - Institution: upserted by name
+//   - Bulk trainees: upserted by email (User) and enrollmentNumber (Student)
+//   - Outcome data (OutcomeTimeline, EmploymentOutcome, FollowUp, PolicyIntervention):
+//       deleted and re-seeded on each run (these are analytics/demo data, not user data)
+//
+// RESET MODE:  npm run seed:reset  (deletes ALL users and starts fresh)
+// NORMAL MODE: npm run seed:outcomes (idempotent, safe to re-run)
 
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 import dotenv from 'dotenv';
 import path from 'path';
 
@@ -164,6 +175,13 @@ async function seed() {
     });
   }
 
+  // Associate primary institution with provider user for dashboard linking
+  const providerUser = userMap['provider@skillsense.demo'];
+  if (providerUser) {
+    providerUser.institutionId = primaryInst._id;
+    await providerUser.save();
+    console.log(` Linked Institution ${primaryInst.name} to provider@skillsense.demo`);
+  }
 
   // 3. Setup Aarav Deshmukh (Primary Trainee Demo)
   const primaryTraineeUser = userMap['trainee@skillsense.demo'];
@@ -450,6 +468,13 @@ async function seed() {
       const prog = PROGRAMMES[globalStudentCount % PROGRAMMES.length];
       const enrollmentNo = `MH-${dist.name.slice(0, 3).toUpperCase()}-2024-${String(100 + i).padStart(4, '0')}`;
 
+      // Upsert User (idempotent — keyed on email)
+      const passportSecret = process.env.PASSPORT_SECRET || 'skillsense-default-secret';
+      const deterministicPassportHash = crypto
+        .createHmac('sha256', passportSecret)
+        .update(`${enrollmentNo}:2024-2025`)
+        .digest('hex');
+
       // Random outcome decision based on district employment rate
       const rand = Math.random();
       const isPlaced = rand < dist.empRate;
@@ -469,49 +494,76 @@ async function seed() {
         }
       }
 
-      // Create User
-      const user = await User.create({
-        name: fullName,
-        email,
-        password: hashedPass,
-        role: 'student',
-        location: dist.name,
-        isVerified: true,
-        isActive: true,
-        authProvider: 'local',
-        skills: ['Technical Competency', 'Problem Solving', 'Communication'],
-      });
+      // Upsert User (idempotent — keyed on email)
+      const user = await User.findOneAndUpdate(
+        { email },
+        {
+          $setOnInsert: {
+            name: fullName,
+            email,
+            password: hashedPass,
+            role: 'student',
+            location: dist.name,
+            isVerified: true,
+            isActive: true,
+            authProvider: 'local',
+            skills: ['Technical Competency', 'Problem Solving', 'Communication'],
+          },
+        },
+        { upsert: true, new: true }
+      );
 
-      // Create Student Record
-      const initialSalary = Math.round(dist.avgSalary * (0.85 + Math.random() * 0.3));
-      const currentSalary = isPlaced ? Math.round(initialSalary * (1.1 + Math.random() * 0.25)) : undefined;
+      // Salary values use a deterministic seed based on enrollment number
+      // so re-runs produce the same salary values for the same trainee
+      const hashInt = parseInt(deterministicPassportHash.slice(0, 8), 16);
+      const salaryRandA = ((hashInt & 0xFF) / 255) * 0.3; // 0.0 – 0.3
+      const salaryRandB = (((hashInt >> 8) & 0xFF) / 255) * 0.25; // 0.0 – 0.25
+      const initialSalary = Math.round(dist.avgSalary * (0.85 + salaryRandA));
+      const currentSalary = isPlaced ? Math.round(initialSalary * (1.1 + salaryRandB)) : undefined;
+      const skillScoreA = 70 + Math.round(((hashInt >> 16) & 0xFF) / 255 * 25);
+      const skillScoreB = 65 + Math.round(((hashInt >> 24) & 0xFF) / 255 * 30);
 
-      const student = await Student.create({
-        userId: user._id,
-        institutionId: primaryInst._id,
-        enrollmentNumber: enrollmentNo,
-        program: prog.name,
-        nsqfLevel: prog.nsqf,
-        batch: '2024-2025',
-        state: 'Maharashtra',
-        gender: i % 3 === 0 ? 'female' : 'male',
-        skills: [
-          { score: Math.round(70 + Math.random() * 25), lastAssessed: new Date('2024-09-20') },
-          { score: Math.round(65 + Math.random() * 30), lastAssessed: new Date('2024-09-20') },
-        ],
-        placementStatus: isPlaced ? 'placed' : 'seeking',
-        placedAt: isPlaced ? new Date('2024-11-15') : undefined,
-        placedRole: isPlaced ? (selfEmployed ? 'Entrepreneur / Freelancer' : apprenticeship ? 'Industrial Apprentice' : 'Junior Technical Associate') : undefined,
-        salary: currentSalary ? currentSalary * 12 : undefined,
-        passportHash: `0x${Math.random().toString(16).slice(2, 10)}${Math.random().toString(16).slice(2, 10)}${Math.random().toString(16).slice(2, 10)}`,
-      });
+      // Upsert Student (idempotent — keyed on enrollmentNumber)
+      const student = await Student.findOneAndUpdate(
+        { enrollmentNumber: enrollmentNo },
+        {
+          $setOnInsert: {
+            userId: user!._id,
+            institutionId: primaryInst._id,
+            enrollmentNumber: enrollmentNo,
+            program: prog.name,
+            nsqfLevel: prog.nsqf,
+            batch: '2024-2025',
+            state: 'Maharashtra',
+            gender: i % 3 === 0 ? 'female' : 'male',
+            skills: [
+              { score: skillScoreA, lastAssessed: new Date('2024-09-20') },
+              { score: skillScoreB, lastAssessed: new Date('2024-09-20') },
+            ],
+            placementStatus: isPlaced ? 'placed' : 'seeking',
+            placedAt: isPlaced ? new Date('2024-11-15') : undefined,
+            placedRole: isPlaced ? (selfEmployed ? 'Entrepreneur / Freelancer' : apprenticeship ? 'Industrial Apprentice' : 'Junior Technical Associate') : undefined,
+            salary: currentSalary ? currentSalary * 12 : undefined,
+            // Deterministic HMAC hash — reproducible across seed runs, but cryptographically derived
+            passportHash: deterministicPassportHash,
+          },
+        },
+        { upsert: true, new: true }
+      );
 
-      // Consent
-      await Consent.create({
-        userId: user._id,
-        status: 'GRANTED',
-        purposes: ['outcome_tracking', 'employer_verification', 'longitudinal_followup'],
-      });
+      // Upsert Consent (idempotent — keyed on userId)
+      await Consent.findOneAndUpdate(
+        { userId: user!._id },
+        {
+          $setOnInsert: {
+            userId: user!._id,
+            status: 'GRANTED',
+            purposes: ['outcome_tracking', 'employer_verification', 'longitudinal_followup'],
+            grantedAt: new Date('2024-06-01'),
+          },
+        },
+        { upsert: true }
+      );
 
       const enrollDate = new Date('2024-06-10');
       const certDate = new Date('2024-09-25');
@@ -552,8 +604,11 @@ async function seed() {
 
       if (isPlaced) {
         const empName = EMPLOYERS[globalStudentCount % EMPLOYERS.length];
+        const isTCSEmployer = !selfEmployed && empName === 'Tata Consultancy Services';
+        const employerId = isTCSEmployer ? userMap['employer@skillsense.demo']._id : undefined;
+        // For TCS, make half verified and half pending/self-reported so employer has a live queue
+        const isVerifiedEmployer = isTCSEmployer ? (i % 2 === 0) : (i % 4 !== 0);
         const role = selfEmployed ? 'Founder / Consultant' : apprenticeship ? 'Trade Apprentice' : 'Technical Associate';
-        const isVerifiedEmployer = i % 4 !== 0; // 75% verified
 
         milestones.push({
           traineeId: user._id,
@@ -583,6 +638,7 @@ async function seed() {
           state: 'Maharashtra',
           status,
           employerName: selfEmployed ? 'Independent Enterprise' : empName,
+          employerId,
           jobRole: role,
           industryDomain: prog.domain,
           employmentType: 'full_time',

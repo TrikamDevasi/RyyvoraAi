@@ -2,28 +2,17 @@
 
 import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import api from '@/lib/api';
 import {
   TrendingUp,
-  DollarSign,
-  Award,
   Users,
-  Building,
-  Layers,
-  Search,
-  Download,
-  Filter,
   RefreshCw,
-  Sparkles,
-  ShieldCheck,
   AlertTriangle,
-  ArrowUpRight,
-  Landmark,
-  Sliders,
-  CheckCircle2,
-  PieChart,
   School,
-  Check,
+  FileDown,
+  Calculator,
+  CheckCircle2,
+  DollarSign,
+  Info,
 } from 'lucide-react';
 import {
   Bar,
@@ -32,11 +21,12 @@ import {
   CartesianGrid,
   Tooltip,
 } from 'recharts';
+import { useAuth } from '@/hooks/useAuth';
+import { instituteApi } from '@/lib/api/institute.api';
 import { FadeIn } from '@/components/shared/FadeIn';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { AIBadge } from '@/components/ui/AIBadge';
 import toast from 'react-hot-toast';
-import confetti from 'canvas-confetti';
 
 const ResponsiveContainer = dynamic(
   () => import('recharts').then((m) => m.ResponsiveContainer),
@@ -47,137 +37,103 @@ const BarChart = dynamic(
   { ssr: false }
 );
 
-interface ProgramROIItem {
-  id: string;
-  name: string;
-  traineesCount: number;
-  costPerTraineeINR: number;
-  avgStartingCtcLPA: number;
-  placementRate: number;
-  economicMultiplier: number;
-  netEconomicOutputCr: number;
-  status: 'EXEMPLARY' | 'STRONG' | 'OPTIMIZING';
+export interface ProgramROIItem {
+  program: string;
+  roi: number | null;
+  status?: string;
+  isSufficientData?: boolean;
+  sampleSize?: number;
+  placedCount?: number;
+  avgSalaryMonthly?: number;
+  annualWageUplift?: number;
+  threeYearReturn?: number;
+  costPerTrainee?: number;
+  message?: string;
 }
 
-const DEFAULT_PROGRAM_ROI: ProgramROIItem[] = [
-  {
-    id: 'prog_1',
-    name: 'Full-Stack Web (Next.js & Microservices)',
-    traineesCount: 840,
-    costPerTraineeINR: 32000,
-    avgStartingCtcLPA: 8.8,
-    placementRate: 92,
-    economicMultiplier: 27.5,
-    netEconomicOutputCr: 6.8,
-    status: 'EXEMPLARY',
-  },
-  {
-    id: 'prog_2',
-    name: 'Applied AI & GenAI Platform Engineering',
-    traineesCount: 620,
-    costPerTraineeINR: 42000,
-    avgStartingCtcLPA: 10.5,
-    placementRate: 88,
-    economicMultiplier: 25.0,
-    netEconomicOutputCr: 5.7,
-    status: 'EXEMPLARY',
-  },
-  {
-    id: 'prog_3',
-    name: 'Cloud Native & DevOps SRE',
-    traineesCount: 540,
-    costPerTraineeINR: 36000,
-    avgStartingCtcLPA: 7.2,
-    placementRate: 85,
-    economicMultiplier: 20.0,
-    netEconomicOutputCr: 3.3,
-    status: 'STRONG',
-  },
-  {
-    id: 'prog_4',
-    name: 'Frontend & UI Performance Systems',
-    traineesCount: 450,
-    costPerTraineeINR: 28000,
-    avgStartingCtcLPA: 6.8,
-    placementRate: 87,
-    economicMultiplier: 24.3,
-    netEconomicOutputCr: 2.6,
-    status: 'STRONG',
-  },
-  {
-    id: 'prog_5',
-    name: 'Industrial IoT & Embedded Automation',
-    traineesCount: 380,
-    costPerTraineeINR: 30000,
-    avgStartingCtcLPA: 5.5,
-    placementRate: 78,
-    economicMultiplier: 18.3,
-    netEconomicOutputCr: 1.6,
-    status: 'OPTIMIZING',
-  },
-];
-
 export default function ROIPage() {
-  const [programs, setPrograms] = useState<ProgramROIItem[]>(DEFAULT_PROGRAM_ROI);
-  const [simCohortSize, setSimCohortSize] = useState(250);
-  const [simSubsidyINR, setSimSubsidyINR] = useState(35000);
-  const [simAvgLPA, setSimAvgLPA] = useState(8.0);
-  const [simulating, setSimulating] = useState(false);
+  const { user } = useAuth();
+  const [scores, setScores] = useState<ProgramROIItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [insufficientDataNotice, setInsufficientDataNotice] = useState<string | null>(null);
 
-  useEffect(() => {
-    api
-      .get('/governance/compliance')
-      .then(() => {})
-      .catch(() => {});
-  }, []);
+  // Prospective Cohort Simulator state
+  const [simCohortSize, setSimCohortSize] = useState<number>(60);
+  const [simPlacementRate, setSimPlacementRate] = useState<number>(80);
+  const [simAvgSalary, setSimAvgSalary] = useState<number>(28000);
 
-  // Simulator Calculations
-  const simTotalInvestmentCr = ((simCohortSize * simSubsidyINR) / 10000000).toFixed(2);
-  const simAnnualEarningsCr = ((simCohortSize * 0.88 * simAvgLPA * 100000) / 10000000).toFixed(2);
-  const simROI = (
-    ((Number(simAnnualEarningsCr) * 10000000) / (simCohortSize * simSubsidyINR))
-  ).toFixed(1);
+  const load = async () => {
+    const instId = instituteApi.getInstitutionId(user);
+    if (!instId) {
+      setLoading(false);
+      setError('No institution is linked to this account.');
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    setInsufficientDataNotice(null);
 
-  const totalEconomicOutput = programs
-    .reduce((sum, p) => sum + p.netEconomicOutputCr, 0)
-    .toFixed(1);
-  const avgMultiplier = (
-    programs.reduce((sum, p) => sum + p.economicMultiplier, 0) / programs.length
-  ).toFixed(1);
-  const totalTrainees = programs.reduce((sum, p) => sum + p.traineesCount, 0);
-
-  const handleRunSimulation = () => {
-    setSimulating(true);
-    setTimeout(() => {
-      setSimulating(false);
-      confetti({
-        particleCount: 50,
-        spread: 60,
-        origin: { y: 0.6 },
-        colors: ['#f59e0b', '#10b981'],
-      });
-      toast.success(`ROI Model Calibrated: ${simROI}x Multiplier with ₹${simAnnualEarningsCr} Cr Annual Wage Return!`);
-    }, 600);
+    try {
+      const res = await instituteApi.getROI(instId);
+      if (Array.isArray(res)) {
+        setScores(res.map((r: any) => ({
+          program: r.program,
+          roi: r.roi,
+          status: 'SUFFICIENT_DATA',
+          isSufficientData: true,
+        })));
+      } else if (res && res.programs) {
+        if (!res.isSufficientData) {
+          setInsufficientDataNotice(res.message || 'Insufficient data for reliable ROI calculation (minimum cohort size of 5 required).');
+        }
+        setScores(res.programs || []);
+      } else {
+        setScores([]);
+      }
+    } catch (err: any) {
+      const msg = err?.response?.status === 404
+        ? 'No ROI analysis is available for this institution yet.'
+        : 'Unable to load the ROI analysis. Please try again.';
+      setError(msg);
+    } finally {
+      setLoading(false);
+    }
   };
 
+  useEffect(() => {
+    load();
+  }, [user?.institutionId, user?._id, user?.id]);
+
+  const validScores = scores.filter((p) => p.roi !== null && p.roi !== undefined && (p.status !== 'INSUFFICIENT_DATA'));
+  const totalOutput = validScores.reduce((sum, p) => sum + (p.roi || 0), 0);
+  const avgMultiplier = validScores.length ? (totalOutput / validScores.length).toFixed(1) : '0';
+
+  const chartData = validScores.map((p) => ({
+    name: p.program.split(' ').slice(0, 2).join(' '),
+    roi: p.roi,
+  }));
+
+  // Simulator calculation
+  const simPlacedCount = Math.round((simCohortSize * simPlacementRate) / 100);
+  const baselineMonthly = 10000;
+  const simAnnualUplift = simPlacedCount * (simAvgSalary - baselineMonthly) * 12;
+  const unitCostNorm = 25000;
+  const simTotalCost = simCohortSize * unitCostNorm;
+  const simThreeYearReturn = simAnnualUplift * 3;
+  const simMultiplier = simTotalCost > 0 ? (simThreeYearReturn / simTotalCost).toFixed(1) : '0';
+
   const handleExportDossier = () => {
+    if (scores.length === 0) return;
     const report = {
       title: 'Institutional ROI & Vocational Wage Impact Analysis',
       generatedAt: new Date().toISOString(),
-      institution: 'Government Polytechnic Pune',
       metrics: {
-        totalTrainees,
-        avgEconomicMultiplier: `${avgMultiplier}x`,
-        cumulativeAnnualWageOutputCr: `₹${totalEconomicOutput} Cr`,
-        stateSubsidyEfficiency: '96.4%',
+        programCount: scores.length,
+        avgRoiMultiplier: `${avgMultiplier}x`,
+        cumulativeRoi: `${totalOutput.toFixed(1)}x`,
       },
-      programs,
-      simulationModel: {
-        cohortSize: simCohortSize,
-        subsidyPerTraineeINR: simSubsidyINR,
-        projectedAnnualEarningsCr: `₹${simAnnualEarningsCr} Cr`,
-        projectedROI: `${simROI}x`,
-      },
+      programs: scores,
     };
 
     const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
@@ -188,12 +144,6 @@ export default function ROIPage() {
     a.click();
     toast.success('Official ROI Impact Dossier (JSON) exported!');
   };
-
-  const chartData = programs.map((p) => ({
-    name: p.name.split(' ')[0] + ' ' + (p.name.split(' ')[1] || ''),
-    multiplier: p.economicMultiplier,
-    salaryLPA: p.avgStartingCtcLPA,
-  }));
 
   return (
     <ErrorBoundary>
@@ -215,13 +165,13 @@ export default function ROIPage() {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, flexWrap: 'wrap' }}>
               <AIBadge type="nsqf" label="VOCATIONAL FISCAL GOVERNANCE" />
-              <AIBadge type="verified" label="LONGITUDINAL WAGE ROI: 23.4x" />
+              <AIBadge type="verified" label="DYNAMIC LONGITUDINAL ROI" />
             </div>
             <h1 className="font-display" style={{ fontSize: 26, fontWeight: 800, color: '#f8fafc', margin: 0 }}>
-              Institutional Return-on-Investment & <span style={{ color: 'var(--gold)' }}>Wage Yield</span>
+              Institutional Return-on-Investment <span style={{ color: 'var(--gold)' }}>&amp; Wage Yield</span>
             </h1>
             <p style={{ color: 'var(--text-secondary)', fontSize: 13.5, marginTop: 4, maxWidth: 680 }}>
-              Quantitative analysis of vocational grant deployment against graduate starting wages, 3-year wage acceleration curves, and societal ROI multipliers.
+              Quantitative longitudinal analysis of vocational outcomes, wage gains above baseline, and fiscal multipliers.
             </p>
           </div>
 
@@ -229,235 +179,302 @@ export default function ROIPage() {
             <button
               type="button"
               onClick={handleExportDossier}
+              disabled={scores.length === 0}
               className="btn-gold"
               style={{ fontSize: 12.5, padding: '9px 18px', display: 'flex', alignItems: 'center', gap: 6 }}
             >
-              <Download size={14} /> Export Fiscal Dossier
+              <FileDown size={14} /> Export Fiscal Dossier
+            </button>
+            <button
+              type="button"
+              onClick={load}
+              className="btn-secondary"
+              style={{ fontSize: 12.5, padding: '9px 14px', display: 'flex', alignItems: 'center', gap: 6 }}
+            >
+              <RefreshCw size={13} className={loading ? 'spin' : ''} />
             </button>
           </div>
         </div>
 
-        {/* ── Metric Scorecards ── */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14, marginBottom: 24 }}>
-          {[
-            { label: 'Avg Economic Multiplier', value: `${avgMultiplier}x ROI`, sub: '₹23.40 Returned per ₹1 Invested', color: 'var(--gold)', icon: TrendingUp },
-            { label: 'Annual Cohort Wage Output', value: `₹${totalEconomicOutput} Cr`, sub: 'Cumulative Starting Salaries', color: '#10b981', icon: DollarSign },
-            { label: 'Trainees Evaluated', value: `${totalTrainees.toLocaleString('en-IN')}`, sub: 'Across 5 Technical Programs', color: '#60a5fa', icon: Users },
-            { label: 'Subsidy Efficiency', value: '96.4%', sub: 'Zero-Leakage Direct Grant Utilization', color: '#a855f7', icon: ShieldCheck },
-          ].map((stat, idx) => {
-            const Icon = stat.icon;
-            return (
-              <div key={idx} className="card-linear" style={{ padding: '16px 18px', borderRadius: 12 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
-                    {stat.label}
-                  </span>
-                  <div style={{ padding: 6, borderRadius: 6, background: 'rgba(255,255,255,0.04)', color: stat.color }}>
-                    <Icon size={16} />
-                  </div>
-                </div>
-                <div className="font-display" style={{ fontSize: 22, fontWeight: 800, color: stat.color }}>
-                  {stat.value}
-                </div>
-                <div style={{ fontSize: 11.5, color: 'var(--text-secondary)', marginTop: 2 }}>
-                  {stat.sub}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* ── Charts & Simulation Row ── */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: 20, marginBottom: 24 }}>
-          {/* Economic Multiplier Chart */}
-          <div className="card-linear" style={{ padding: 22, borderRadius: 16 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <div>
-                <h3 className="font-display" style={{ fontSize: 15, fontWeight: 800, color: '#f8fafc', margin: 0 }}>
-                  Program Economic Multiplier (ROI)
-                </h3>
-                <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '2px 0 0' }}>
-                  Wage yield ratio per departmental cohort.
-                </p>
-              </div>
-              <span style={{ fontSize: 11, color: '#10b981', fontWeight: 700 }}>Peak: 27.5x</span>
-            </div>
-
-            <div style={{ height: 230, width: '100%' }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-                  <XAxis dataKey="name" stroke="#64748b" tick={{ fontSize: 10.5 }} />
-                  <YAxis stroke="#64748b" tick={{ fontSize: 10.5 }} unit="x" />
-                  <Tooltip
-                    contentStyle={{
-                      background: '#0f111a',
-                      border: '1px solid rgba(245,158,11,0.3)',
-                      borderRadius: 8,
-                      fontSize: 12,
-                      color: '#fff',
-                    }}
-                  />
-                  <Bar dataKey="multiplier" fill="var(--gold)" radius={[4, 4, 0, 0]} name="Economic Multiplier (x)" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
+        {/* ── Insufficient Data Alert ── */}
+        {insufficientDataNotice && (
+          <div
+            className="card-linear"
+            style={{
+              padding: '16px 20px',
+              borderRadius: 12,
+              marginBottom: 20,
+              background: 'rgba(245,158,11,0.06)',
+              border: '1px solid rgba(245,158,11,0.3)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+            }}
+          >
+            <Info size={20} color="var(--gold)" />
+            <p style={{ fontSize: 13, color: '#f8fafc', margin: 0 }}>
+              <strong>Statistical Boundary Notice:</strong> {insufficientDataNotice}
+            </p>
           </div>
+        )}
 
-          {/* Interactive Cohort ROI Simulator */}
-          <div className="card-accent" style={{ padding: 22, borderRadius: 16, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-            <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-                <h3 className="font-display" style={{ fontSize: 15, fontWeight: 800, color: '#f8fafc', margin: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <Sliders size={16} color="var(--gold)" /> Cohort Fiscal Yield Simulator
-                </h3>
-                <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--gold)' }}>Live Neural Model</span>
-              </div>
+        {/* ── Loading state ── */}
+        {loading && (
+          <div className="card-linear" style={{ padding: 32, borderRadius: 14, textAlign: 'center' }}>
+            <RefreshCw size={26} style={{ color: 'var(--gold)', animation: 'spin 1.5s linear infinite', marginBottom: 8 }} />
+            <p style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Calculating dynamic longitudinal ROI...</p>
+          </div>
+        )}
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11.5, color: '#cbd5e1', marginBottom: 3 }}>
-                    <span>Target Cohort Size:</span>
-                    <strong style={{ color: 'var(--gold)' }}>{simCohortSize} Students</strong>
+        {/* ── Error state ── */}
+        {!loading && error && (
+          <div className="card-linear" style={{ padding: 32, borderRadius: 14, textAlign: 'center', marginBottom: 20 }}>
+            <AlertTriangle size={28} style={{ color: 'var(--gold)', marginBottom: 8 }} />
+            <p style={{ fontSize: 13, color: 'var(--text-secondary)', margin: '0 0 12px' }}>{error}</p>
+            <button onClick={load} className="btn-outline" style={{ fontSize: 12, padding: '6px 14px' }}>
+              <RefreshCw size={13} /> Retry
+            </button>
+          </div>
+        )}
+
+        {/* ── Empty state ── */}
+        {!loading && !error && scores.length === 0 && (
+          <div className="card-linear" style={{ padding: 40, borderRadius: 14, textAlign: 'center' }}>
+            <School size={36} style={{ color: 'var(--text-muted)', marginBottom: 10 }} />
+            <p style={{ fontSize: 15, fontWeight: 700, color: '#f8fafc', margin: '0 0 6px' }}>
+              No ROI analysis available yet
+            </p>
+            <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', margin: 0, maxWidth: 520, lineHeight: 1.6, display: 'inline-block' }}>
+              Program-level return-on-investment figures will be dynamically calculated once verified placement and wage data is associated with your cohort programs.
+            </p>
+          </div>
+        )}
+
+        {!loading && !error && scores.length > 0 && (
+          <>
+            {/* ── Metric Scorecards ── */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14, marginBottom: 24 }}>
+              {[
+                { label: 'Avg Economic Multiplier', value: `${avgMultiplier}x ROI`, sub: '3-year cumulative yield ratio', color: 'var(--gold)', icon: TrendingUp },
+                { label: 'Programs Evaluated', value: `${scores.length}`, sub: 'Tracked vocational tracks', color: 'var(--gold)', icon: Users },
+                { label: 'Cumulative Yield', value: `${totalOutput.toFixed(1)}x`, sub: 'Total measured program ROI', color: '#10b981', icon: TrendingUp },
+              ].map((stat, idx) => {
+                const Icon = stat.icon;
+                return (
+                  <div key={idx} className="card-linear" style={{ padding: '16px 18px', borderRadius: 12 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                      <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+                        {stat.label}
+                      </span>
+                      <div style={{ padding: 6, borderRadius: 6, background: 'rgba(255,255,255,0.04)', color: stat.color }}>
+                        <Icon size={16} />
+                      </div>
+                    </div>
+                    <div className="font-display" style={{ fontSize: 22, fontWeight: 800, color: stat.color }}>
+                      {stat.value}
+                    </div>
+                    <div style={{ fontSize: 11.5, color: 'var(--text-secondary)', marginTop: 2 }}>
+                      {stat.sub}
+                    </div>
                   </div>
+                );
+              })}
+            </div>
+
+            {/* ── ROI Chart ── */}
+            {validScores.length > 0 && (
+              <div className="card-linear" style={{ padding: 22, borderRadius: 16, marginBottom: 24 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                  <div>
+                    <h3 className="font-display" style={{ fontSize: 15, fontWeight: 800, color: '#f8fafc', margin: 0 }}>
+                      Program Economic Multiplier (3-Year Fiscal ROI)
+                    </h3>
+                    <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '2px 0 0' }}>
+                      Calculated from real placed wages versus state standard training cost (₹25,000 unit cost norm).
+                    </p>
+                  </div>
+                </div>
+
+                <div style={{ height: 260, width: '100%' }}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={chartData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+                      <XAxis dataKey="name" stroke="#64748b" tick={{ fontSize: 10.5 }} />
+                      <YAxis stroke="#64748b" tick={{ fontSize: 10.5 }} unit="x" />
+                      <Tooltip
+                        contentStyle={{
+                          background: '#0f111a',
+                          border: '1px solid rgba(245,158,11,0.3)',
+                          borderRadius: 8,
+                          fontSize: 12,
+                          color: '#fff',
+                        }}
+                      />
+                      <Bar dataKey="roi" fill="var(--gold)" radius={[4, 4, 0, 0]} name="ROI Multiplier (x)" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            )}
+
+            {/* ── Prospective Cohort Fiscal Yield Simulator ── */}
+            <div className="card-accent" style={{ padding: 24, borderRadius: 16, marginBottom: 24 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+                <Calculator size={18} color="var(--gold)" />
+                <h3 className="font-display" style={{ fontSize: 16, fontWeight: 800, color: '#f8fafc', margin: 0 }}>
+                  Interactive Cohort Fiscal Yield Simulator
+                </h3>
+              </div>
+              <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', margin: '0 0 16px', lineHeight: 1.6 }}>
+                Simulate state-level economic value creation for prospective training cohorts. Calibrate batch volume, target placement rate, and projected wages to estimate total cumulative economic yield.
+              </p>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, marginBottom: 18 }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 4, textTransform: 'uppercase' }}>
+                    Cohort Enrolled (Trainees): {simCohortSize}
+                  </label>
                   <input
                     type="range"
-                    min="50"
-                    max="600"
-                    step="10"
+                    min={10}
+                    max={200}
+                    step={5}
                     value={simCohortSize}
                     onChange={(e) => setSimCohortSize(Number(e.target.value))}
-                    style={{ width: '100%', accentColor: 'var(--gold)', cursor: 'pointer' }}
+                    style={{ width: '100%', accentColor: 'var(--gold)' }}
                   />
                 </div>
 
                 <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11.5, color: '#cbd5e1', marginBottom: 3 }}>
-                    <span>Subsidy Cost / Trainee:</span>
-                    <strong style={{ color: '#60a5fa' }}>₹{simSubsidyINR.toLocaleString('en-IN')}</strong>
-                  </div>
+                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 4, textTransform: 'uppercase' }}>
+                    Target Placement Rate: {simPlacementRate}%
+                  </label>
                   <input
                     type="range"
-                    min="15000"
-                    max="60000"
-                    step="1000"
-                    value={simSubsidyINR}
-                    onChange={(e) => setSimSubsidyINR(Number(e.target.value))}
-                    style={{ width: '100%', accentColor: 'var(--gold)', cursor: 'pointer' }}
+                    min={30}
+                    max={100}
+                    step={5}
+                    value={simPlacementRate}
+                    onChange={(e) => setSimPlacementRate(Number(e.target.value))}
+                    style={{ width: '100%', accentColor: 'var(--gold)' }}
                   />
                 </div>
 
                 <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11.5, color: '#cbd5e1', marginBottom: 3 }}>
-                    <span>Target Average CTC:</span>
-                    <strong style={{ color: '#10b981' }}>₹{simAvgLPA.toFixed(1)} LPA</strong>
-                  </div>
+                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 4, textTransform: 'uppercase' }}>
+                    Projected Wage: ₹{simAvgSalary.toLocaleString('en-IN')}/mo
+                  </label>
                   <input
                     type="range"
-                    min="4.0"
-                    max="15.0"
-                    step="0.5"
-                    value={simAvgLPA}
-                    onChange={(e) => setSimAvgLPA(Number(e.target.value))}
-                    style={{ width: '100%', accentColor: 'var(--gold)', cursor: 'pointer' }}
+                    min={15000}
+                    max={60000}
+                    step={1000}
+                    value={simAvgSalary}
+                    onChange={(e) => setSimAvgSalary(Number(e.target.value))}
+                    style={{ width: '100%', accentColor: 'var(--gold)' }}
                   />
                 </div>
               </div>
-            </div>
 
-            <div style={{ marginTop: 16, borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 14 }}>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, textAlign: 'center', marginBottom: 12 }}>
-                <div style={{ padding: 8, borderRadius: 6, background: 'rgba(255,255,255,0.02)' }}>
-                  <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>Grant Needed</div>
-                  <div style={{ fontSize: 13, fontWeight: 800, color: '#f8fafc' }}>₹{simTotalInvestmentCr} Cr</div>
+              {/* Simulation Result Outputs */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12, background: 'rgba(0,0,0,0.3)', padding: 14, borderRadius: 10 }}>
+                <div>
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Projected Placed</div>
+                  <div style={{ fontSize: 18, fontWeight: 800, color: '#f8fafc' }}>{simPlacedCount} Candidates</div>
                 </div>
-                <div style={{ padding: 8, borderRadius: 6, background: 'rgba(255,255,255,0.02)' }}>
-                  <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>Yr-1 Wages</div>
-                  <div style={{ fontSize: 13, fontWeight: 800, color: '#10b981' }}>₹{simAnnualEarningsCr} Cr</div>
+                <div>
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Annual Wage Uplift</div>
+                  <div style={{ fontSize: 18, fontWeight: 800, color: '#10b981' }}>₹{(simAnnualUplift / 100000).toFixed(2)} Lakhs</div>
                 </div>
-                <div style={{ padding: 8, borderRadius: 6, background: 'rgba(255,255,255,0.02)' }}>
-                  <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>Yield Multiplier</div>
-                  <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--gold)' }}>{simROI}x ROI</div>
+                <div>
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>3-Year Economic Yield</div>
+                  <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--gold)' }}>₹{(simThreeYearReturn / 100000).toFixed(2)} Lakhs</div>
+                </div>
+                <div>
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Projected Fiscal Multiplier</div>
+                  <div style={{ fontSize: 18, fontWeight: 800, color: '#60a5fa' }}>{simMultiplier}x ROI</div>
                 </div>
               </div>
-
-              <button
-                type="button"
-                onClick={handleRunSimulation}
-                className="btn-gold"
-                style={{ width: '100%', padding: '8px', fontSize: 12, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
-              >
-                <Sparkles size={13} />
-                <span>Simulate Allocation</span>
-              </button>
             </div>
-          </div>
-        </div>
 
-        {/* ── Detailed Department ROI Table ── */}
-        <div className="card-linear" style={{ padding: 24, borderRadius: 16 }}>
-          <h3 className="font-display" style={{ fontSize: 16, fontWeight: 800, color: '#f8fafc', margin: '0 0 16px' }}>
-            Departmental Vocational Yield & Subsidy Recovery Ledger
-          </h3>
+            {/* ── Detailed Program ROI Table ── */}
+            <div className="card-linear" style={{ padding: 24, borderRadius: 16 }}>
+              <h3 className="font-display" style={{ fontSize: 16, fontWeight: 800, color: '#f8fafc', margin: '0 0 16px' }}>
+                Program ROI &amp; Longitudinal Wage Ledger
+              </h3>
 
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13, textAlign: 'left' }}>
-              <thead>
-                <tr style={{ borderBottom: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: 11.5, textTransform: 'uppercase' }}>
-                  <th style={{ padding: '10px 12px' }}>Department Program</th>
-                  <th style={{ padding: '10px 12px' }}>Trainees</th>
-                  <th style={{ padding: '10px 12px' }}>Cost / Trainee</th>
-                  <th style={{ padding: '10px 12px' }}>Avg Starting CTC</th>
-                  <th style={{ padding: '10px 12px' }}>Placement %</th>
-                  <th style={{ padding: '10px 12px' }}>Net Yield Output</th>
-                  <th style={{ padding: '10px 12px' }}>ROI Multiplier</th>
-                </tr>
-              </thead>
-              <tbody>
-                {programs.map((p) => (
-                  <tr
-                    key={p.id}
-                    style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}
-                    className="hover:bg-white/5"
-                  >
-                    <td style={{ padding: '12px', fontWeight: 700, color: '#f8fafc' }}>
-                      {p.name}
-                    </td>
-                    <td style={{ padding: '12px', color: 'var(--text-secondary)' }}>
-                      {p.traineesCount.toLocaleString('en-IN')}
-                    </td>
-                    <td style={{ padding: '12px', color: '#cbd5e1' }}>
-                      ₹{p.costPerTraineeINR.toLocaleString('en-IN')}
-                    </td>
-                    <td style={{ padding: '12px', fontWeight: 800, color: '#10b981' }}>
-                      ₹{p.avgStartingCtcLPA} LPA
-                    </td>
-                    <td style={{ padding: '12px', color: '#f8fafc' }}>
-                      {p.placementRate}%
-                    </td>
-                    <td style={{ padding: '12px', color: 'var(--gold)', fontWeight: 700 }}>
-                      ₹{p.netEconomicOutputCr} Cr
-                    </td>
-                    <td style={{ padding: '12px' }}>
-                      <span
-                        style={{
-                          fontSize: 11,
-                          fontWeight: 800,
-                          padding: '3px 8px',
-                          borderRadius: 99,
-                          background: 'rgba(245,158,11,0.12)',
-                          color: 'var(--gold)',
-                        }}
-                      >
-                        {p.economicMultiplier}x Multiplier
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13, textAlign: 'left' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: 11.5, textTransform: 'uppercase' }}>
+                      <th style={{ padding: '10px 12px' }}>Program</th>
+                      <th style={{ padding: '10px 12px' }}>Enrolled Cohort</th>
+                      <th style={{ padding: '10px 12px' }}>Placed</th>
+                      <th style={{ padding: '10px 12px' }}>Avg Salary</th>
+                      <th style={{ padding: '10px 12px' }}>Annual Uplift</th>
+                      <th style={{ padding: '10px 12px' }}>3-Year ROI Multiplier</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {scores.map((p, idx) => {
+                      const isInsufficient = p.status === 'INSUFFICIENT_DATA' || p.roi === null;
+                      return (
+                        <tr key={idx} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
+                          <td style={{ padding: '12px', fontWeight: 700, color: '#f8fafc' }}>
+                            {p.program}
+                          </td>
+                          <td style={{ padding: '12px', color: 'var(--text-secondary)' }}>
+                            {p.sampleSize ?? '—'}
+                          </td>
+                          <td style={{ padding: '12px', color: 'var(--text-secondary)' }}>
+                            {p.placedCount ?? '—'}
+                          </td>
+                          <td style={{ padding: '12px', color: '#f8fafc' }}>
+                            {p.avgSalaryMonthly ? `₹${p.avgSalaryMonthly.toLocaleString('en-IN')}/mo` : '—'}
+                          </td>
+                          <td style={{ padding: '12px', color: '#10b981' }}>
+                            {p.annualWageUplift ? `+₹${p.annualWageUplift.toLocaleString('en-IN')}` : '—'}
+                          </td>
+                          <td style={{ padding: '12px' }}>
+                            {isInsufficient ? (
+                              <span
+                                style={{
+                                  fontSize: 11,
+                                  fontWeight: 700,
+                                  padding: '3px 8px',
+                                  borderRadius: 99,
+                                  background: 'rgba(245,158,11,0.1)',
+                                  color: 'var(--gold)',
+                                  border: '1px solid rgba(245,158,11,0.3)',
+                                }}
+                              >
+                                Insufficient Data (N &lt; 3 Placed)
+                              </span>
+                            ) : (
+                              <span
+                                style={{
+                                  fontSize: 11,
+                                  fontWeight: 800,
+                                  padding: '4px 10px',
+                                  borderRadius: 99,
+                                  background: 'rgba(16,185,129,0.15)',
+                                  color: '#10b981',
+                                  border: '1px solid rgba(16,185,129,0.3)',
+                                }}
+                              >
+                                {p.roi}x Multiplier
+                              </span>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </>
+        )}
       </FadeIn>
     </ErrorBoundary>
   );

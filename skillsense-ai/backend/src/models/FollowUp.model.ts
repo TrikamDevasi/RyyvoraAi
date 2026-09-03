@@ -74,6 +74,12 @@ const FollowUpSchema = new Schema<IFollowUp>(
 
 FollowUpSchema.index({ institutionId: 1, status: 1 });
 FollowUpSchema.index({ dueDate: 1, status: 1 });
+// Compound unique index: prevents creating duplicate follow-ups for the same trainee/milestone/outcome
+// sparse: true handles the case where employmentOutcomeId may be undefined
+FollowUpSchema.index(
+  { traineeId: 1, scheduleDays: 1, employmentOutcomeId: 1 },
+  { unique: true, sparse: true, name: 'unique_trainee_milestone_outcome' }
+);
 
 const FollowUp = mongoose.model<IFollowUp>('FollowUp', FollowUpSchema);
 export default FollowUp;

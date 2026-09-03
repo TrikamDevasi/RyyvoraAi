@@ -200,7 +200,7 @@ export default function GovernmentNewsPage() {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, flexWrap: 'wrap' }}>
               <AIBadge type="nsqf" label="STATE POLICY & GAZETTE WIRE" />
-              <AIBadge type="live" label="OFFICIAL SKILLING DIRECTIVES" />
+              <AIBadge type="live" label="OFFICIAL POLICY GAZETTE (DEMO REPOSITORY)" />
             </div>
             <h1 className="font-display" style={{ fontSize: 26, fontWeight: 800, color: '#f8fafc', margin: 0 }}>
               Government Skilling <span style={{ color: 'var(--gold)' }}>Policy & Gazette Intelligence</span>

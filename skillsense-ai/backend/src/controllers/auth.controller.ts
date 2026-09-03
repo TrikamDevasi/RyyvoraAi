@@ -173,6 +173,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
           role: user.role,
           avatar: user.avatar,
           isVerified: user.isVerified,
+          institutionId: user.institutionId,
         },
         token,
       },

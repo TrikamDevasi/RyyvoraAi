@@ -87,27 +87,30 @@ export const getOutcomeFunnel = async (req: Request, res: Response, next: NextFu
   }
 };
 
-export const getDistrictIntelligence = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const getDistrictIntelligence = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const districts = await outcomeService.getDistrictIntelligence();
+    const { district } = req.query;
+    const districts = await outcomeService.getDistrictIntelligence({ district: district as string });
     res.status(200).json(buildApiResponse(districts, 'District intelligence retrieved'));
   } catch (err) {
     next(err);
   }
 };
 
-export const getWageProgression = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const getWageProgression = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const wageData = await outcomeService.getWageProgressionAnalytics();
+    const { district } = req.query;
+    const wageData = await outcomeService.getWageProgressionAnalytics({ district: district as string });
     res.status(200).json(buildApiResponse(wageData, 'Wage progression analytics retrieved'));
   } catch (err) {
     next(err);
   }
 };
 
-export const getRelevanceAndGaps = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const getRelevanceAndGaps = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const data = await outcomeService.getRelevanceAndBarrierAnalysis();
+    const { district } = req.query;
+    const data = await outcomeService.getRelevanceAndBarrierAnalysis({ district: district as string });
     res.status(200).json(buildApiResponse(data, 'Training relevance and barrier analysis retrieved'));
   } catch (err) {
     next(err);

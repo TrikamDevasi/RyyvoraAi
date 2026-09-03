@@ -15,6 +15,7 @@ export interface AuthUser {
   role: UserRole;
   phone?: string;
   avatar?: string;
+  institutionId?: string;
   authProvider?: 'local' | 'google' | 'github';
   isVerified: boolean;
   isActive?: boolean;
@@ -124,18 +125,26 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     } catch {
       // If backend is unreachable, activate seamless persistent local demo session
       const demoNames: Record<UserRole, string> = {
-        student: 'Arjun Mehta',
-        employer: 'Priya Verma (TCS Talent Lead)',
-        institute: 'Dr. Ramesh Kulkarni (Dean, IIT-B)',
-        government: 'National Skill Development Officer',
-        industry: 'NASSCOM Sector Intelligence Lead',
-        admin: 'SkillSense Chief Administrator',
+        student: 'Aarav Deshmukh',
+        employer: 'Tata Consultancy Services (TCS)',
+        institute: 'MSSDS Pune Regional Training Center',
+        government: 'Maharashtra Skilling Directorate',
+        industry: 'Sector Skill Council Intelligence Lead',
+        admin: 'System Admin',
+      };
+      const demoEmails: Record<UserRole, string> = {
+        student: 'trainee@skillsense.demo',
+        employer: 'employer@skillsense.demo',
+        institute: 'provider@skillsense.demo',
+        government: 'government@skillsense.demo',
+        industry: 'employer@skillsense.demo',
+        admin: 'admin@skillsense.demo',
       };
       const demoUser: AuthUser = {
         _id: `demo_${role}_001`,
         id: `demo_${role}_001`,
         name: demoNames[role] || 'Demo User',
-        email: `${role}.demo@skillsense.gov.in`,
+        email: demoEmails[role] || `${role}.demo@skillsense.demo`,
         role,
         isVerified: true,
         authProvider: 'local',

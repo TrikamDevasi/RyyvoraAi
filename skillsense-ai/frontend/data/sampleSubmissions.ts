@@ -1,4 +1,8 @@
-/* ─── Sample Data: Data Collection System ─── */
+/**
+ * OFFLINE DEVELOPMENT TEST FIXTURE ONLY
+ * Note: Production evaluations and submissions query live backend Assessment records via `/api/institutes/:id/evaluations`.
+ * This static dataset is retained strictly as an offline reference fixture and is not imported in active routes.
+ */
 
 export interface AssignmentSubmission {
     id: string;

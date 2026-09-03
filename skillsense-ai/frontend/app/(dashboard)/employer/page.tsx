@@ -30,6 +30,7 @@ import {
   ArrowUpRight,
   Send,
   Zap,
+  AlertCircle,
 } from 'lucide-react';
 import { FadeIn } from '@/components/shared/FadeIn';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
@@ -143,23 +144,46 @@ export default function EmployerPage() {
       });
   }, []);
 
-  const handleVerifyLedgerHash = () => {
+  const [verifyLoading, setVerifyLoading] = useState(false);
+
+  const handleVerifyLedgerHash = async () => {
     if (!verifyHashInput.trim()) {
-      toast.error('Please enter a valid candidate HMAC hash or ledger signature');
+      toast.error('Please enter a valid candidate Skill Passport hash');
       return;
     }
 
-    setVerifyResult({
-      status: 'SUCCESS',
-      message: 'Ledger Hash Verified! Issued by Maharashtra NCVET Registry. Integrity: 100% Tamper-Proof.',
-    });
-    confetti({
-      particleCount: 50,
-      spread: 50,
-      origin: { y: 0.6 },
-      colors: ['#10b981', '#f59e0b'],
-    });
-    toast.success('Candidate Skill Passport cryptographically verified!');
+    setVerifyLoading(true);
+    setVerifyResult({ status: 'IDLE', message: '' });
+
+    try {
+      const res = await api.get(`/verification/public/${encodeURIComponent(verifyHashInput.trim())}`);
+      if (res.data?.success && res.data.data?.isValid) {
+        const data = res.data.data;
+        setVerifyResult({
+          status: 'SUCCESS',
+          message: `Passport Verified! Candidate: ${data.trainee?.name || 'Unknown'} | Program: ${data.trainee?.program || 'N/A'} | NSQF: ${data.trainee?.nsqfLevel || 'N/A'} | Integrity: Cryptographically Confirmed.`,
+        });
+        confetti({
+          particleCount: 50,
+          spread: 50,
+          origin: { y: 0.6 },
+          colors: ['#10b981', '#f59e0b'],
+        });
+        toast.success('Candidate Skill Passport cryptographically verified!');
+      } else {
+        setVerifyResult({
+          status: 'ERROR',
+          message: res.data?.message || 'Passport verification failed. Hash not found or invalid.',
+        });
+        toast.error('Verification failed. Please check the hash and try again.');
+      }
+    } catch (err: any) {
+      const message = err?.response?.data?.message || 'Unable to verify passport. Please try again.';
+      setVerifyResult({ status: 'ERROR', message });
+      toast.error(message);
+    } finally {
+      setVerifyLoading(false);
+    }
   };
 
   const handleScheduleInterview = (name: string) => {
@@ -284,18 +308,11 @@ export default function EmployerPage() {
             <button
               type="button"
               onClick={handleVerifyLedgerHash}
+              disabled={verifyLoading}
               className="btn-gold"
-              style={{ fontSize: 12.5, padding: '9px 18px', display: 'flex', alignItems: 'center', gap: 6 }}
+              style={{ fontSize: 12.5, padding: '9px 18px', display: 'flex', alignItems: 'center', gap: 6, opacity: verifyLoading ? 0.6 : 1 }}
             >
-              <ShieldCheck size={14} /> Verify Authenticity
-            </button>
-            <button
-              type="button"
-              onClick={() => setVerifyHashInput('0x9e7a8f34bc12_HMAC_VERIFIED_ARJUN_MEHTA_NSQF_6')}
-              className="btn-secondary"
-              style={{ fontSize: 12, padding: '9px 14px' }}
-            >
-              Load Sample Hash
+              <ShieldCheck size={14} /> {verifyLoading ? 'Verifying...' : 'Verify Authenticity'}
             </button>
           </div>
 
@@ -315,6 +332,26 @@ export default function EmployerPage() {
               }}
             >
               <CheckCircle2 size={16} color="#10b981" />
+              <span>{verifyResult.message}</span>
+            </div>
+          )}
+
+          {verifyResult.status === 'ERROR' && (
+            <div
+              style={{
+                marginTop: 12,
+                padding: '10px 14px',
+                borderRadius: 8,
+                background: 'rgba(239,68,68,0.08)',
+                border: '1px solid rgba(239,68,68,0.3)',
+                color: '#fca5a5',
+                fontSize: 12,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+              }}
+            >
+              <AlertCircle size={16} color="#ef4444" />
               <span>{verifyResult.message}</span>
             </div>
           )}

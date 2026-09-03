@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import api from '@/lib/api';
+import { studentApi, TimelineEvent, PendingFollowUp } from '@/lib/api/student.api';
 import { useAuth } from '@/hooks/useAuth';
 import {
   Milestone,
@@ -35,110 +36,12 @@ import { AIBadge } from '@/components/ui/AIBadge';
 import toast from 'react-hot-toast';
 import confetti from 'canvas-confetti';
 
-interface TimelineEvent {
-  _id: string;
-  eventType: string;
-  title: string;
-  description: string;
-  date: string;
-  source: string;
-  verificationStatus: 'VERIFIED' | 'SELF_REPORTED' | 'PENDING';
-  confidence: number;
-  metadata?: Record<string, any>;
-}
-
-interface PendingFollowUp {
-  _id: string;
-  scheduleDays: number;
-  dueDate: string;
-  status: string;
-  title: string;
-}
-
-const DEFAULT_TIMELINE_EVENTS: TimelineEvent[] = [
-  {
-    _id: 'evt_1',
-    eventType: 'ENROLLMENT',
-    title: 'Vocational Engineering Enrollment',
-    description: 'Admitted into Full-Stack Software Engineering program, NSQF Level 5 mapped at Pune Technical Institute.',
-    date: '2025-06-15',
-    source: 'INSTITUTE_REGISTRY',
-    verificationStatus: 'VERIFIED',
-    confidence: 1.0,
-    metadata: { program: 'Full-Stack Software Engineering', nsqfLevel: 5, state: 'Maharashtra' },
-  },
-  {
-    _id: 'evt_2',
-    eventType: 'ASSESSMENT',
-    title: 'AI Competency Diagnostic & Passport Seal',
-    description: 'Scored 84/100 in core technical assessment. Cryptographic digital credential hash issued and synced with National Skills Registry.',
-    date: '2025-09-20',
-    source: 'SKILLSENSE_AI',
-    verificationStatus: 'VERIFIED',
-    confidence: 0.98,
-    metadata: { score: 84, topSkill: 'React.js & Next.js', hash: 'SKP-78A9C2-VERIFIED' },
-  },
-  {
-    _id: 'evt_3',
-    eventType: 'PLACEMENT',
-    title: 'Campus Placement & Job Offer',
-    description: 'Secured full-time employment as Software Engineer with Swiggy / TCS Digital. Starting compensation: ₹7.80 LPA (₹65,000/mo).',
-    date: '2025-11-10',
-    source: 'EMPLOYER_OFFER',
-    verificationStatus: 'VERIFIED',
-    confidence: 0.96,
-    metadata: { employer: 'Swiggy Tech India', role: 'Software Engineer (Frontend)', salary: 65000 },
-  },
-  {
-    _id: 'evt_4',
-    eventType: 'RETENTION_30D',
-    title: '30-Day Employment & Onboarding Retention',
-    description: 'Successfully completed initial probation period. Employer verified active full-time status and technical role alignment.',
-    date: '2025-12-15',
-    source: 'EMPLOYER_VERIFICATION',
-    verificationStatus: 'VERIFIED',
-    confidence: 0.99,
-    metadata: { feedback: 'Exceeding sprint expectations in Next.js component migration.' },
-  },
-  {
-    _id: 'evt_5',
-    eventType: 'RETENTION_90D',
-    title: '90-Day Performance Review & Wage Growth',
-    description: 'Achieved SDE-1 confirmation with merit increment to ₹8.50 LPA. 100% training relevance validated.',
-    date: '2026-02-15',
-    source: 'LONGITUDINAL_FOLLOWUP',
-    verificationStatus: 'VERIFIED',
-    confidence: 0.95,
-    metadata: { newSalary: 70800, growthPct: 18.5 },
-  },
-  {
-    _id: 'evt_6',
-    eventType: 'MILESTONE_180D',
-    title: '180-Day Production Capstone & Architecture Upgrade',
-    description: 'Designed and deployed distributed Redis caching layer reducing API latency by 42%. Verified on NSQF ledger.',
-    date: '2026-03-01',
-    source: 'STUDENT_PORTFOLIO',
-    verificationStatus: 'VERIFIED',
-    confidence: 0.92,
-    metadata: { domain: 'Cloud & System Design' },
-  },
-];
-
-const DEFAULT_FOLLOW_UPS: PendingFollowUp[] = [
-  {
-    _id: 'fu_180',
-    scheduleDays: 180,
-    dueDate: '2026-05-15',
-    status: 'PENDING',
-    title: '180-Day Longitudinal Career Progression Check-in',
-  },
-];
-
 export default function TraineeJourneyPage() {
   const { user } = useAuth();
-  const [timeline, setTimeline] = useState<TimelineEvent[]>(DEFAULT_TIMELINE_EVENTS);
-  const [pendingFollowUps, setPendingFollowUps] = useState<PendingFollowUp[]>(DEFAULT_FOLLOW_UPS);
-  const [loading, setLoading] = useState(false);
+  const [timeline, setTimeline] = useState<TimelineEvent[]>([]);
+  const [pendingFollowUps, setPendingFollowUps] = useState<PendingFollowUp[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [showSelfReportModal, setShowSelfReportModal] = useState(false);
   const [showFollowUpModal, setShowFollowUpModal] = useState<PendingFollowUp | null>(null);
 
@@ -152,26 +55,28 @@ export default function TraineeJourneyPage() {
 
   // Follow-up Form State
   const [fuEmployed, setFuEmployed] = useState(true);
-  const [fuEmployer, setFuEmployer] = useState('Swiggy Tech India');
-  const [fuSalary, setFuSalary] = useState('72000');
-  const [fuFeedback, setFuFeedback] = useState('High alignment with modern full-stack development curriculum.');
+  const [fuEmployer, setFuEmployer] = useState('');
+  const [fuSalary, setFuSalary] = useState('');
+  const [fuJobRole, setFuJobRole] = useState('');
+  const [fuFeedback, setFuFeedback] = useState('');
 
   const loadData = async () => {
     setLoading(true);
+    setError(null);
     try {
-      const [timelineRes, followUpRes] = await Promise.all([
-        api.get('/outcomes/my-timeline').catch(() => null),
-        api.get('/followups/my-pending').catch(() => null),
+      const [timelineResult, followUpsResult] = await Promise.allSettled([
+        studentApi.getMyTimeline(),
+        studentApi.getMyPendingFollowUps(),
       ]);
 
-      if (timelineRes?.data?.success && Array.isArray(timelineRes.data.data) && timelineRes.data.data.length > 0) {
-        setTimeline(timelineRes.data.data);
+      if (timelineResult.status === 'fulfilled' && Array.isArray(timelineResult.value)) {
+        setTimeline(timelineResult.value);
       }
-      if (followUpRes?.data?.success && Array.isArray(followUpRes.data.data)) {
-        setPendingFollowUps(followUpRes.data.data);
+      if (followUpsResult.status === 'fulfilled' && Array.isArray(followUpsResult.value)) {
+        setPendingFollowUps(followUpsResult.value);
       }
     } catch {
-      // Keep rich default timeline on network failure or demo access
+      setError('Unable to load your training journey data. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -189,66 +94,72 @@ export default function TraineeJourneyPage() {
     }
 
     setSubmitting(true);
-    const newEvent: TimelineEvent = {
-      _id: `evt_${Date.now()}`,
-      eventType: status,
-      title: `${jobRole || 'Career Promotion'} at ${employerName || 'Technology Partner'}`,
-      description: `Self-reported milestone: Updated monthly compensation to ₹${Number(monthlySalary || 75000).toLocaleString('en-IN')}/mo. Submitted for state verification.`,
-      date: new Date().toISOString().split('T')[0],
-      source: 'STUDENT_SELF_REPORT',
-      verificationStatus: 'SELF_REPORTED',
-      confidence: 0.9,
-      metadata: { employer: employerName, role: jobRole, salary: Number(monthlySalary) || 75000 },
-    };
-
     try {
-      await api.post('/outcomes/self-report', {
+      await studentApi.submitSelfReport({
         status,
-        employerName,
-        jobRole,
+        employerName: employerName || undefined,
+        jobRole: jobRole || undefined,
         monthlySalary: Number(monthlySalary) || undefined,
         trainingRelevance,
       });
-    } catch {
-      // Optimistic local add
+
+      confetti({
+        particleCount: 60,
+        spread: 60,
+        origin: { y: 0.6 },
+        colors: ['#f59e0b', '#10b981'],
+      });
+      toast.success('Career milestone recorded on your longitudinal ledger!');
+
+      setShowSelfReportModal(false);
+      setEmployerName('');
+      setJobRole('');
+      setMonthlySalary('');
+      loadData();
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || 'Failed to record milestone. Please try again.';
+      toast.error(msg);
+    } finally {
+      setSubmitting(false);
     }
-
-    setTimeline((prev) => [newEvent, ...prev]);
-    setShowSelfReportModal(false);
-    setSubmitting(false);
-    setEmployerName('');
-    setJobRole('');
-    setMonthlySalary('');
-
-    confetti({
-      particleCount: 60,
-      spread: 60,
-      origin: { y: 0.6 },
-      colors: ['#f59e0b', '#10b981'],
-    });
-
-    toast.success('Career milestone recorded on your longitudinal ledger!');
   };
 
   const handleFollowUpSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!showFollowUpModal) return;
+
     setSubmitting(true);
     try {
-      if (showFollowUpModal) {
-        await api.post(`/followups/${showFollowUpModal._id}/submit`, {
-          isCurrentlyEmployed: fuEmployed,
-          currentEmployer: fuEmployer,
-          currentSalary: Number(fuSalary) || undefined,
-          trainingRelevance: 'HIGHLY_RELEVANT',
-          feedback: fuFeedback,
-        });
-      }
-    } catch {}
+      await studentApi.submitFollowUp(showFollowUpModal._id, {
+        isEmployed: fuEmployed,
+        employerName: fuEmployed ? fuEmployer : undefined,
+        currentSalary: fuEmployed && fuSalary ? Number(fuSalary) : undefined,
+        jobRole: fuEmployed ? fuJobRole : undefined,
+        trainingRelevance: 'HIGHLY_RELEVANT',
+        feedback: fuFeedback || undefined,
+      });
 
-    setPendingFollowUps((prev) => prev.filter((f) => f._id !== showFollowUpModal?._id));
-    setShowFollowUpModal(null);
-    setSubmitting(false);
-    toast.success('Longitudinal check-in successfully submitted!');
+      confetti({
+        particleCount: 50,
+        spread: 60,
+        origin: { y: 0.6 },
+        colors: ['#f59e0b', '#10b981'],
+      });
+      toast.success('Longitudinal check-in submitted successfully!');
+
+      setShowFollowUpModal(null);
+      setFuEmployed(true);
+      setFuEmployer('');
+      setFuSalary('');
+      setFuJobRole('');
+      setFuFeedback('');
+      loadData();
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || 'Failed to submit check-in. Please try again.';
+      toast.error(msg);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -303,34 +214,46 @@ export default function TraineeJourneyPage() {
         </div>
 
         {/* ── Key Outcome Metrics Banner ── */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14, marginBottom: 24 }}>
-          {[
-            { label: 'Current Career Status', value: 'Employed (SDE-1)', sub: 'Swiggy Tech India', color: '#10b981', icon: Briefcase },
-            { label: 'Monthly Compensation', value: '₹70,800/mo', sub: '+18.5% Growth (₹8.5 LPA)', color: 'var(--gold)', icon: TrendingUp },
-            { label: 'Verified Milestones', value: `${timeline.length} Events`, sub: '100% Cryptographically Sealed', color: '#60a5fa', icon: ShieldCheck },
-            { label: 'Retention Status', value: 'Active (90d+)', sub: 'Next Check-in in 45 Days', color: '#a855f7', icon: Award },
-          ].map((card, idx) => {
-            const Icon = card.icon;
-            return (
-              <div key={idx} className="card-linear" style={{ padding: '18px 20px', borderRadius: 12 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                  <span style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                    {card.label}
-                  </span>
-                  <div style={{ padding: 6, borderRadius: 6, background: 'rgba(255,255,255,0.04)', color: card.color }}>
-                    <Icon size={16} />
+        {loading ? (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14, marginBottom: 24 }}>
+            {[0, 1, 2, 3].map((i) => (
+              <div key={i} className="card-linear" style={{ padding: '18px 20px', borderRadius: 12 }}>
+                <div style={{ height: 14, width: 100, background: 'rgba(255,255,255,0.06)', borderRadius: 4, marginBottom: 8 }} />
+                <div style={{ height: 28, width: 140, background: 'rgba(255,255,255,0.06)', borderRadius: 4, marginBottom: 6 }} />
+                <div style={{ height: 12, width: 120, background: 'rgba(255,255,255,0.04)', borderRadius: 4 }} />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14, marginBottom: 24 }}>
+            {[
+              { label: 'Timeline Events', value: `${timeline.length}`, sub: timeline.length > 0 ? 'Milestones Recorded' : 'No events yet', color: '#60a5fa', icon: ShieldCheck },
+              { label: 'Pending Check-ins', value: `${pendingFollowUps.length}`, sub: pendingFollowUps.length > 0 ? 'Action Required' : 'All check-ins completed', color: pendingFollowUps.length > 0 ? 'var(--gold)' : '#10b981', icon: Clock },
+              { label: 'Latest Event', value: timeline.length > 0 ? timeline[0].eventType.replace(/_/g, ' ') : 'None', sub: timeline.length > 0 ? new Date(timeline[0].date).toLocaleDateString() : 'Start your journey', color: 'var(--gold)', icon: Milestone },
+              { label: 'Verification Status', value: timeline.filter((t) => t.verificationStatus === 'VERIFIED').length > 0 ? 'Verified' : 'Pending', sub: `${timeline.filter((t) => t.verificationStatus === 'VERIFIED').length} of ${timeline.length} events verified`, color: '#10b981', icon: CheckCircle2 },
+            ].map((card, idx) => {
+              const Icon = card.icon;
+              return (
+                <div key={idx} className="card-linear" style={{ padding: '18px 20px', borderRadius: 12 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                    <span style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                      {card.label}
+                    </span>
+                    <div style={{ padding: 6, borderRadius: 6, background: 'rgba(255,255,255,0.04)', color: card.color }}>
+                      <Icon size={16} />
+                    </div>
+                  </div>
+                  <div className="font-display" style={{ fontSize: 24, fontWeight: 800, color: card.color, textTransform: 'capitalize' }}>
+                    {card.value}
+                  </div>
+                  <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 2 }}>
+                    {card.sub}
                   </div>
                 </div>
-                <div className="font-display" style={{ fontSize: 24, fontWeight: 800, color: card.color }}>
-                  {card.value}
-                </div>
-                <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 2 }}>
-                  {card.sub}
-                </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
 
         {/* ── Pending Verification Check-ins ── */}
         {pendingFollowUps.length > 0 && (
@@ -352,7 +275,7 @@ export default function TraineeJourneyPage() {
               <Clock size={18} color="var(--gold)" />
               <div>
                 <div style={{ fontSize: 13.5, fontWeight: 700, color: '#f8fafc' }}>
-                  {pendingFollowUps[0].title}
+                  {pendingFollowUps[0].title || `Follow-up Check-in (${pendingFollowUps[0].scheduleDays}-day)`}
                 </div>
                 <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
                   State government longitudinal outcome verification due by {pendingFollowUps[0].dueDate}
@@ -737,45 +660,72 @@ export default function TraineeJourneyPage() {
                   />
                 </div>
 
-                <div>
-                  <label style={{ fontSize: 12, fontWeight: 700, color: '#cbd5e1', display: 'block', marginBottom: 6 }}>
-                    Current Organization
-                  </label>
-                  <input
-                    type="text"
-                    value={fuEmployer}
-                    onChange={(e) => setFuEmployer(e.target.value)}
-                    style={{
-                      width: '100%',
-                      padding: '10px 12px',
-                      borderRadius: 8,
-                      background: 'var(--bg-input, #0f111a)',
-                      border: '1px solid var(--border)',
-                      color: '#fff',
-                      fontSize: 13,
-                    }}
-                  />
-                </div>
+                {fuEmployed && (
+                  <>
+                    <div>
+                      <label style={{ fontSize: 12, fontWeight: 700, color: '#cbd5e1', display: 'block', marginBottom: 6 }}>
+                        Current Organization
+                      </label>
+                      <input
+                        type="text"
+                        value={fuEmployer}
+                        onChange={(e) => setFuEmployer(e.target.value)}
+                        placeholder="e.g. Infosys, Swiggy, Zerodha"
+                        style={{
+                          width: '100%',
+                          padding: '10px 12px',
+                          borderRadius: 8,
+                          background: 'var(--bg-input, #0f111a)',
+                          border: '1px solid var(--border)',
+                          color: '#fff',
+                          fontSize: 13,
+                        }}
+                      />
+                    </div>
 
-                <div>
-                  <label style={{ fontSize: 12, fontWeight: 700, color: '#cbd5e1', display: 'block', marginBottom: 6 }}>
-                    Updated Monthly Salary (INR ₹)
-                  </label>
-                  <input
-                    type="number"
-                    value={fuSalary}
-                    onChange={(e) => setFuSalary(e.target.value)}
-                    style={{
-                      width: '100%',
-                      padding: '10px 12px',
-                      borderRadius: 8,
-                      background: 'var(--bg-input, #0f111a)',
-                      border: '1px solid var(--border)',
-                      color: '#fff',
-                      fontSize: 13,
-                    }}
-                  />
-                </div>
+                    <div>
+                      <label style={{ fontSize: 12, fontWeight: 700, color: '#cbd5e1', display: 'block', marginBottom: 6 }}>
+                        Current Job Role
+                      </label>
+                      <input
+                        type="text"
+                        value={fuJobRole}
+                        onChange={(e) => setFuJobRole(e.target.value)}
+                        placeholder="e.g. SDE-1, Frontend Developer"
+                        style={{
+                          width: '100%',
+                          padding: '10px 12px',
+                          borderRadius: 8,
+                          background: 'var(--bg-input, #0f111a)',
+                          border: '1px solid var(--border)',
+                          color: '#fff',
+                          fontSize: 13,
+                        }}
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ fontSize: 12, fontWeight: 700, color: '#cbd5e1', display: 'block', marginBottom: 6 }}>
+                        Updated Monthly Salary (INR ₹)
+                      </label>
+                      <input
+                        type="number"
+                        value={fuSalary}
+                        onChange={(e) => setFuSalary(e.target.value)}
+                        placeholder="e.g. 65000"
+                        style={{
+                          width: '100%',
+                          padding: '10px 12px',
+                          borderRadius: 8,
+                          background: 'var(--bg-input, #0f111a)',
+                          border: '1px solid var(--border)',
+                          color: '#fff',
+                          fontSize: 13,
+                        }}
+                      />
+                    </div>
+                  </>
+                )}
 
                 <div>
                   <label style={{ fontSize: 12, fontWeight: 700, color: '#cbd5e1', display: 'block', marginBottom: 6 }}>

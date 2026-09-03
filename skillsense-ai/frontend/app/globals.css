@@ -376,6 +376,29 @@ body {
   .lg\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
 }
 
+/* ── Employer Page Mobile Fixes ── */
+@media (max-width: 768px) {
+  .card-accent,
+  .card-linear {
+    overflow-x: hidden;
+  }
+
+  table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    max-width: 100%;
+  }
+
+  table thead,
+  table tbody,
+  table tr,
+  table th,
+  table td {
+    white-space: nowrap;
+  }
+}
+
 /* ── Accessibility: Reduced Motion ── */
 @media (prefers-reduced-motion: reduce) {
   *,

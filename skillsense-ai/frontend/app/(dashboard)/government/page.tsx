@@ -1,33 +1,31 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import api from '@/lib/api';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { FadeIn } from '@/components/shared/FadeIn';
 import { AIBadge } from '@/components/ui/AIBadge';
 import {
-  Landmark,
   Users,
   Briefcase,
   TrendingUp,
   ShieldCheck,
-  Award,
   AlertTriangle,
   RefreshCw,
   Sparkles,
   Bot,
   Send,
   Building,
-  CheckCircle2,
   Layers,
   Search,
-  ArrowUpRight,
   Filter,
   BarChart3,
-  MapPin,
-  Compass,
-  FileCheck,
+  Info,
+  X,
+  Lock,
+  UserCheck,
+  CheckCircle2,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -42,134 +40,236 @@ import {
 const ResponsiveContainer = dynamic(() => import('recharts').then((mod) => mod.ResponsiveContainer), { ssr: false });
 const LineChart = dynamic(() => import('recharts').then((mod) => mod.LineChart), { ssr: false });
 
-// ── Curated Maharashtra Macro Dataset (Resilient Telemetry Fallback) ───────────
-const DEFAULT_DISTRICTS = [
-  { district: 'Pune Metro Cluster', totalTrainees: 4280, employmentRate: 88, retention90dRate: 91, medianSalary: 38500, verificationRate: 94, statusLabel: 'High Reliability', isSmallSample: false },
-  { district: 'Mumbai Suburban & Thane', totalTrainees: 5640, employmentRate: 85, retention90dRate: 89, medianSalary: 42000, verificationRate: 96, statusLabel: 'High Reliability', isSmallSample: false },
-  { district: 'Nagpur IT & Tech Hub', totalTrainees: 2950, employmentRate: 79, retention90dRate: 84, medianSalary: 32000, verificationRate: 88, statusLabel: 'Verified', isSmallSample: false },
-  { district: 'Nashik Industrial Corridor', totalTrainees: 2180, employmentRate: 81, retention90dRate: 82, medianSalary: 29500, verificationRate: 86, statusLabel: 'Verified', isSmallSample: false },
-  { district: 'Chhatrapati Sambhajinagar', totalTrainees: 1840, employmentRate: 74, retention90dRate: 78, medianSalary: 27000, verificationRate: 82, statusLabel: 'Verified', isSmallSample: false },
-  { district: 'Kolhapur & Sangli', totalTrainees: 1420, employmentRate: 76, retention90dRate: 80, medianSalary: 26000, verificationRate: 80, statusLabel: 'Verified', isSmallSample: false },
-  { district: 'Solapur Tech Cluster', totalTrainees: 980, employmentRate: 71, retention90dRate: 75, medianSalary: 24500, verificationRate: 78, statusLabel: 'Verified', isSmallSample: false },
-  { district: 'Amravati Vocational Hub', totalTrainees: 860, employmentRate: 68, retention90dRate: 72, medianSalary: 23000, verificationRate: 75, statusLabel: 'Moderate', isSmallSample: false },
-  { district: 'Nanded Special Skilling Zone', totalTrainees: 340, employmentRate: 65, retention90dRate: 70, medianSalary: 22000, verificationRate: 71, statusLabel: 'Sampling Active', isSmallSample: false },
-];
+// ── Types ─────────────────────────────────────────────────────────────────────
 
-const DEFAULT_STAGES = [
-  { id: 'enrolled', label: '1. Enrolled', count: 20490, percent: 100 },
-  { id: 'nsqf_passed', label: '2. NSQF Passed', count: 18850, percent: 92 },
-  { id: 'assessed', label: '3. AI Verified', count: 17200, percent: 84 },
-  { id: 'placed', label: '4. Placed / Hired', count: 15980, percent: 78 },
-  { id: 'retained_30', label: '5. 30d Retention', count: 14860, percent: 73 },
-  { id: 'retained_90', label: '6. 90d Retention', count: 13740, percent: 67 },
-  { id: 'retained_180', label: '7. 180d Retention', count: 12290, percent: 60 },
-  { id: 'wage_growth', label: '8. Wage Growth', count: 10860, percent: 53 },
-  { id: 'retained_365', label: '9. 365d Retention', count: 9630, percent: 47 },
-];
+interface FunnelStage {
+  id: string;
+  label: string;
+  count: number;
+  percent: number;
+}
 
-const DEFAULT_WAGE_CURVE = [
-  { milestone: 'Baseline', medianSalary: 18000, topQuartile: 24000 },
-  { milestone: 'Placement (M0)', medianSalary: 26000, topQuartile: 34000 },
-  { milestone: 'Month 3', medianSalary: 28500, topQuartile: 38000 },
-  { milestone: 'Month 6', medianSalary: 32000, topQuartile: 44000 },
-  { milestone: 'Month 12', medianSalary: 38500, topQuartile: 54000 },
-  { milestone: 'Month 24', medianSalary: 49000, topQuartile: 68000 },
-];
+interface FunnelBreakdown {
+  totalEnrolled: number;
+  completed: number;
+  certified: number;
+  placed: number;
+  salaried: number;
+  selfEmployed: number;
+  apprenticeship: number;
+  retained30d: number;
+  retained90d: number;
+  retained180d: number;
+  retained365d: number;
+}
 
-const DEFAULT_BARRIERS = [
-  { reason: 'Geographical Relocation Resistance', count: 412, pct: 34 },
-  { reason: 'English & Business Communication Gaps', count: 328, pct: 27 },
-  { reason: 'Mismatch in Core Technology Expectations', count: 246, pct: 20 },
-  { reason: 'Compensation Expectation Alignment', count: 144, pct: 12 },
-  { reason: 'Higher Education / Competitive Exam Pursuit', count: 85, pct: 7 },
-];
+interface DistrictMetric {
+  district: string;
+  state: string;
+  totalTrainees: number;
+  isSmallSample: boolean;
+  employmentRate: number | null;
+  salariedRate: number | null;
+  selfEmployedRate: number | null;
+  apprenticeshipRate: number | null;
+  retention90dRate: number | null;
+  verificationRate: number | null;
+  medianSalary: number | null;
+  statusLabel: string;
+}
 
-const DEFAULT_INTERVENTIONS = [
-  {
-    targetType: 'District Cluster',
-    targetName: 'Nagpur & Amravati Hub',
-    confidence: 0.94,
-    title: 'Cloud DevOps & Full-Stack Bridging Program',
-    observation: 'High local demand from IT SEZ units with 32% skill deficit in containerization and modern API deployment.',
-    recommendedAction: 'Direct ₹42 Lakh state fund toward practical Kubernetes & cloud sandbox training across 6 engineering polytechnics.',
-  },
-  {
-    targetType: 'Curriculum Standard',
-    targetName: 'NSQF Level 5 Web Technologies',
-    confidence: 0.91,
-    title: 'Automated Testing & Security Hygiene Directives',
-    observation: 'Campus recruitment data reflects high rejection in Unit Testing (Jest/Playwright) and API security standards.',
-    recommendedAction: 'Mandate automated code verification capstone projects before issuing digital skill passports.',
-  },
-  {
-    targetType: 'Industry Partnership',
-    targetName: 'Pune Automotive & Embedded Tech',
-    confidence: 0.89,
-    title: 'EV Telemetry & Embedded C Dual Certification',
-    observation: 'Transition rate in traditional mechanical courses slowed by 18% while EV electronics requisitions grew 4x.',
-    recommendedAction: 'Establish joint apprenticeship pipeline with Tata Motors, Bajaj Auto, and Mahindra Electric.',
-  },
-];
+interface WagePoint {
+  milestone: string;
+  medianSalary: number;
+  verifiedAverage?: number;
+}
+
+interface WageSummary {
+  avgInitialSalary: number;
+  avgCurrentSalary: number;
+  wageProgressionPercent: number;
+  totalTrackedWithSalary: number;
+}
+
+interface ReasonItem {
+  reason: string;
+  rawReason?: string;
+  count: number;
+  pct?: number;
+}
+
+interface PolicyDirective {
+  targetType: string;
+  targetName: string;
+  confidence: number;
+  title: string;
+  observation: string;
+  recommendedAction: string;
+}
+
+interface CopilotResponse {
+  answer: string;
+  citedMetrics?: Array<{ label: string; value: string }>;
+}
 
 const SAMPLE_COPILOT_QUERIES = [
-  '⚡ Compare wage growth across engineering vs data sectors',
-  '⚡ Which districts show the highest 90-day job retention?',
-  '⚡ What are the top candidate non-placement barriers?',
+  '⚡ Which districts have high skill certification but low placement?',
+  '⚡ What are the primary non-placement barriers in rural clusters?',
+  '⚡ Compare wage growth across vocational programs',
+  '⚡ How is 90-day job retention trending across Maharashtra?',
 ];
 
 export default function GovernmentMacroDashboardPage() {
-  const [funnelStages, setFunnelStages] = useState(DEFAULT_STAGES);
-  const [districtData, setDistrictData] = useState(DEFAULT_DISTRICTS);
-  const [wageCurve, setWageCurve] = useState(DEFAULT_WAGE_CURVE);
-  const [barrierData, setBarrierData] = useState(DEFAULT_BARRIERS);
-  const [interventions, setInterventions] = useState(DEFAULT_INTERVENTIONS);
-  const [loading, setLoading] = useState(false);
+  // ── Core Analytics State (Live Database-Driven) ─────────────────────────
+  const [funnelStages, setFunnelStages] = useState<FunnelStage[]>([]);
+  const [funnelBreakdown, setFunnelBreakdown] = useState<FunnelBreakdown | null>(null);
+  const [districtData, setDistrictData] = useState<DistrictMetric[]>([]);
+  const [wageCurve, setWageCurve] = useState<WagePoint[]>([]);
+  const [wageSummary, setWageSummary] = useState<WageSummary | null>(null);
+  const [barrierData, setBarrierData] = useState<ReasonItem[]>([]);
+  const [interventions, setInterventions] = useState<PolicyDirective[]>([]);
 
-  // Copilot State
-  const [copilotQuery, setCopilotQuery] = useState('');
-  const [copilotLoading, setCopilotLoading] = useState(false);
-  const [copilotResponse, setCopilotResponse] = useState<any>({
-    answer:
-      'Grounded Analysis: Pune and Mumbai Suburban clusters lead Maharashtra with an 88% and 85% placement transition rate, driven by high demand in Full-Stack Software Engineering and Cloud Infrastructure. Key intervention recommended: expanding state-subsidized containerization and testing sandboxes into Nagpur and Nashik clusters to bridge the 18% compensation gap.',
-    citedMetrics: [
-      { label: 'Pune Placement Rate', value: '88%' },
-      { label: 'Statewide 90d Retention', value: '89%' },
-      { label: '24-Month Wage Growth', value: '+88.4%' },
-      { label: 'Total Tracked Trainees', value: '20,490' },
-    ],
-  });
+  // ── Filter State ────────────────────────────────────────────────────────
+  const [selectedDistrict, setSelectedDistrict] = useState<string>('All');
+  const [selectedProgram, setSelectedProgram] = useState<string>('All');
+  const [districtOptions, setDistrictOptions] = useState<string[]>([]);
+  const [programOptions, setProgramOptions] = useState<string[]>([]);
+  const [searchTerm, setSearchTerm] = useState<string>('');
 
-  const [searchTerm, setSearchTerm] = useState('');
+  // ── Status State ────────────────────────────────────────────────────────
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const loadAllData = async () => {
+  // ── AI Policy Copilot State ─────────────────────────────────────────────
+  const [copilotQuery, setCopilotQuery] = useState<string>('');
+  const [copilotLoading, setCopilotLoading] = useState<boolean>(false);
+  const [copilotResponse, setCopilotResponse] = useState<CopilotResponse | null>(null);
+
+  // ── Data Fetching Logic ─────────────────────────────────────────────────
+  const loadDashboardData = useCallback(async (district = selectedDistrict, program = selectedProgram) => {
     setLoading(true);
+    setError(null);
+
     try {
+      const outcomeParams: Record<string, string> = {};
+      if (district && district !== 'All') outcomeParams.district = district;
+      if (program && program !== 'All') outcomeParams.program = program;
+
       const [fRes, dRes, wRes, bRes, iRes] = await Promise.all([
-        api.get('/outcomes/funnel').catch(() => null),
-        api.get('/outcomes/districts').catch(() => null),
-        api.get('/outcomes/wage-progression').catch(() => null),
-        api.get('/outcomes/relevance-and-gaps').catch(() => null),
-        api.get('/ai/interventions').catch(() => null),
+        api.get('/outcomes/funnel', { params: outcomeParams }).catch((e) => ({ error: e })),
+        api.get('/outcomes/districts', { params: district && district !== 'All' ? { district } : {} }).catch((e) => ({ error: e })),
+        api.get('/outcomes/wage-progression', { params: district && district !== 'All' ? { district } : {} }).catch((e) => ({ error: e })),
+        api.get('/outcomes/relevance-and-gaps', { params: district && district !== 'All' ? { district } : {} }).catch((e) => ({ error: e })),
+        api.get('/ai/interventions').catch((e) => ({ error: e })),
       ]);
 
-      if (fRes?.data?.success && fRes.data.data?.stages) setFunnelStages(fRes.data.data.stages);
-      if (dRes?.data?.success && dRes.data.data?.length) setDistrictData(dRes.data.data);
-      if (wRes?.data?.success && wRes.data.data?.progressionCurve) setWageCurve(wRes.data.data.progressionCurve);
-      if (bRes?.data?.success && bRes.data.data?.nonPlacementReasons) setBarrierData(bRes.data.data.nonPlacementReasons);
-      if (iRes?.data?.success && iRes.data.data?.length) setInterventions(iRes.data.data);
+      let hasSuccess = false;
 
-      toast.success('Live state skilling telemetry synchronized');
-    } catch {
-      toast.success('Telemetry synchronized with verified state registry');
+      // 1. Funnel Pipeline
+      if ('data' in fRes && fRes.data?.success && fRes.data.data) {
+        setFunnelStages(fRes.data.data.stages || []);
+        setFunnelBreakdown(fRes.data.data.breakdown || null);
+        hasSuccess = true;
+      }
+
+      // 2. District Drill-down
+      if ('data' in dRes && dRes.data?.success && Array.isArray(dRes.data.data)) {
+        setDistrictData(dRes.data.data);
+        // Extract distinct districts for dropdown filter if not yet populated
+        setDistrictOptions((prev) => {
+          if (prev.length > 0) return prev;
+          const unique = Array.from(new Set(dRes.data.data.map((d: any) => d.district).filter(Boolean))) as string[];
+          return unique.sort();
+        });
+        hasSuccess = true;
+      }
+
+      // 3. Wage Progression
+      if ('data' in wRes && wRes.data?.success && wRes.data.data) {
+        setWageCurve(wRes.data.data.progressionCurve || []);
+        setWageSummary(wRes.data.data.summary || null);
+        // Extract program list for course filter
+        if (Array.isArray(wRes.data.data.courseBreakdown)) {
+          setProgramOptions((prev) => {
+            if (prev.length > 0) return prev;
+            const progs = wRes.data.data.courseBreakdown.map((c: any) => c.program).filter(Boolean);
+            return Array.from(new Set(progs)) as string[];
+          });
+        }
+        hasSuccess = true;
+      }
+
+      // 4. Barriers & Attrition Reasons
+      if ('data' in bRes && bRes.data?.success && bRes.data.data) {
+        const rawBarriers = bRes.data.data.nonPlacementReasons || [];
+        const total = rawBarriers.reduce((acc: number, item: any) => acc + (item.count || 0), 0);
+        const formatted = rawBarriers.map((item: any) => ({
+          ...item,
+          pct: total > 0 ? Math.round((item.count / total) * 100) : 0,
+        }));
+        setBarrierData(formatted);
+        hasSuccess = true;
+      }
+
+      // 5. Active Policy Interventions
+      if ('data' in iRes && iRes.data?.success && Array.isArray(iRes.data.data)) {
+        setInterventions(iRes.data.data);
+        hasSuccess = true;
+      }
+
+      if (!hasSuccess) {
+        setError('Unable to synchronize live state skilling telemetry. Please verify backend connectivity.');
+      }
+    } catch (err: any) {
+      setError(err?.response?.data?.message || 'Failed to load government analytics data.');
+      toast.error('Telemetry synchronization failed');
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedDistrict, selectedProgram]);
 
   useEffect(() => {
-    loadAllData();
+    loadDashboardData();
+  }, [loadDashboardData]);
+
+  // ── Initial Grounded Policy Copilot Summary ─────────────────────────────
+  useEffect(() => {
+    let isMounted = true;
+    api
+      .post('/ai/policy-copilot', { query: 'Summarize key skilling outcome trends and retention in Maharashtra' })
+      .then((res) => {
+        if (isMounted && res.data?.success && res.data.data) {
+          setCopilotResponse(res.data.data);
+        }
+      })
+      .catch(() => {
+        // Leave null; user can trigger query manually
+      });
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
+  // ── District / Program Filter Handlers ──────────────────────────────────
+  const handleDistrictChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const val = e.target.value;
+    setSelectedDistrict(val);
+    loadDashboardData(val, selectedProgram);
+  };
+
+  const handleProgramChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const val = e.target.value;
+    setSelectedProgram(val);
+    loadDashboardData(selectedDistrict, val);
+  };
+
+  const handleResetFilters = () => {
+    setSelectedDistrict('All');
+    setSelectedProgram('All');
+    loadDashboardData('All', 'All');
+  };
+
+  // ── Copilot Query Handler ───────────────────────────────────────────────
   const handleCopilotSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!copilotQuery.trim() || copilotLoading) return;
@@ -177,35 +277,61 @@ export default function GovernmentMacroDashboardPage() {
 
     try {
       const res = await api.post('/ai/policy-copilot', { query: copilotQuery.trim() });
-      if (res.data?.success) {
+      if (res.data?.success && res.data.data) {
         setCopilotResponse(res.data.data);
+      } else {
+        setCopilotResponse({
+          answer: 'The Policy Copilot was unable to synthesize an evidence-grounded answer for this query.',
+          citedMetrics: [],
+        });
       }
-    } catch {
-      // Intelligent fallback answer based on query keywords
-      const q = copilotQuery.toLowerCase();
-      let answer = `Analysis for "${copilotQuery}": Statewide longitudinal tracking demonstrates strong outcome resilience in Tier-1 IT hubs (Pune, Mumbai). Non-placement attrition is primarily driven by geographical relocation reluctance (34%) and communication gaps (27%).`;
-      if (q.includes('wage') || q.includes('salary')) {
-        answer = `Wage Progression Intelligence: Verified candidate earnings scale from ₹26,000/mo at initial placement to ₹49,000/mo at Month 24 (+88.4% growth), with top quartile candidates in Cloud and AI roles achieving ₹68,000/mo.`;
-      } else if (q.includes('district') || q.includes('retention')) {
-        answer = `District Comparison: Pune (91%) and Mumbai (89%) lead in 90-day employment retention. Nashik and Nagpur demonstrate steady retention at 82-84%, while rural polytechnics benefit most from targeted apprenticeship subsidies.`;
-      }
-
+    } catch (err: any) {
+      toast.error('AI Policy Copilot service is currently unavailable.');
       setCopilotResponse({
-        answer,
-        citedMetrics: [
-          { label: 'Grounded Query', value: copilotQuery },
-          { label: 'NSQF Compliance', value: '100% Verified' },
-          { label: 'State Database Nodes', value: '9 Clusters' },
-        ],
+        answer: 'Policy Copilot service is temporarily unreachable. Please check backend connection or try again shortly.',
+        citedMetrics: [],
       });
     } finally {
       setCopilotLoading(false);
     }
   };
 
-  const filteredDistricts = districtData.filter((d) =>
-    d.district.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // ── Filtered District Table Data ────────────────────────────────────────
+  const filteredDistricts = useMemo(() => {
+    return districtData.filter((d) =>
+      d.district.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [districtData, searchTerm]);
+
+  // ── Calculated KPI Values from Real Backend Responses ───────────────────
+  const totalTraineesDisplay = useMemo(() => {
+    if (loading) return '...';
+    if (!funnelBreakdown || funnelBreakdown.totalEnrolled === 0) return 'Insufficient data';
+    return funnelBreakdown.totalEnrolled.toLocaleString('en-IN');
+  }, [loading, funnelBreakdown]);
+
+  const placementRateDisplay = useMemo(() => {
+    if (loading) return '...';
+    if (!funnelBreakdown || funnelBreakdown.totalEnrolled === 0) return 'N/A';
+    const rate = Math.round((funnelBreakdown.placed / funnelBreakdown.totalEnrolled) * 100);
+    return `${rate}%`;
+  }, [loading, funnelBreakdown]);
+
+  const retentionRateDisplay = useMemo(() => {
+    if (loading) return '...';
+    if (!funnelBreakdown || funnelBreakdown.placed === 0) return 'N/A';
+    const rate = Math.round((funnelBreakdown.retained90d / funnelBreakdown.placed) * 100);
+    return `${rate}%`;
+  }, [loading, funnelBreakdown]);
+
+  const wageGrowthDisplay = useMemo(() => {
+    if (loading) return '...';
+    if (!wageSummary || wageSummary.avgInitialSalary === 0) return 'Insufficient data';
+    const pct = wageSummary.wageProgressionPercent;
+    return pct >= 0 ? `+${pct}%` : `${pct}%`;
+  }, [loading, wageSummary]);
+
+  const isFiltered = selectedDistrict !== 'All' || selectedProgram !== 'All';
 
   return (
     <ErrorBoundary>
@@ -214,9 +340,9 @@ export default function GovernmentMacroDashboardPage() {
         <div
           className="card-accent"
           style={{
-            padding: 26,
+            padding: 24,
             borderRadius: 16,
-            marginBottom: 24,
+            marginBottom: 20,
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
@@ -228,21 +354,37 @@ export default function GovernmentMacroDashboardPage() {
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, flexWrap: 'wrap' }}>
               <AIBadge type="nsqf" label="GOVERNMENT OF MAHARASHTRA" />
               <AIBadge type="verified" label="LONGITUDINAL COCKPIT · SIH26135" />
+              {isFiltered && (
+                <span
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: 'var(--gold)',
+                    background: 'rgba(245,158,11,0.12)',
+                    padding: '2px 8px',
+                    borderRadius: 4,
+                    border: '1px solid var(--gold-border)',
+                  }}
+                >
+                  FILTER ACTIVE
+                </span>
+              )}
             </div>
             <h1 className="font-display" style={{ fontSize: 26, fontWeight: 800, color: '#f8fafc', margin: 0, letterSpacing: '-0.02em' }}>
               State Longitudinal Skilling & <span style={{ color: 'var(--gold)' }}>Outcome Cockpit</span>
             </h1>
             <p style={{ color: 'var(--text-secondary)', fontSize: 13.5, marginTop: 6, lineHeight: 1.5, maxWidth: 720 }}>
-              Real-time outcome intelligence tracking candidate transition from enrollment to 365-day retention, verified wage progression curves, and district skill shortages.
+              Live, database-grounded outcome intelligence tracking candidate transition from enrollment to 365-day retention, verified wage progression, and district skill deficits.
             </p>
           </div>
 
-          <div style={{ display: 'flex', gap: 10 }}>
+          <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
             <button
               type="button"
-              onClick={loadAllData}
+              onClick={() => loadDashboardData(selectedDistrict, selectedProgram)}
               disabled={loading}
               className="btn-gold"
+              aria-label="Refresh telemetry data from backend"
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -254,110 +396,375 @@ export default function GovernmentMacroDashboardPage() {
               }}
             >
               <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
-              <span>{loading ? 'Updating...' : 'Sync Telemetry'}</span>
+              <span>{loading ? 'Synchronizing...' : 'Sync Telemetry'}</span>
             </button>
           </div>
         </div>
 
-        {/* ── Top 4 KPI Metric Cards ── */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14, marginBottom: 24 }}>
-          {[
-            { label: 'Total Tracked Trainees', value: '20,490', sub: '100% NSQF Benchmarked', icon: Users, color: 'var(--gold)' },
-            { label: 'State Transition Rate', value: '78.0%', sub: '15,980 Placed / Employed', icon: Briefcase, color: '#10b981' },
-            { label: '90-Day Retention', value: '86.0%', sub: '13,740 Verified Retained', icon: ShieldCheck, color: '#60a5fa' },
-            { label: 'Median Salary Growth', value: '+88.4%', sub: '₹26k → ₹49k at M24', icon: TrendingUp, color: '#a855f7' },
-          ].map((card, idx) => {
-            const Icon = card.icon;
-            return (
-              <div key={idx} className="card-linear" style={{ padding: '18px 20px', borderRadius: 12 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                  <span style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                    {card.label}
-                  </span>
-                  <div style={{ padding: 6, borderRadius: 6, background: 'rgba(255,255,255,0.04)', color: card.color }}>
-                    <Icon size={16} />
-                  </div>
-                </div>
-                <div className="font-display" style={{ fontSize: 26, fontWeight: 800, color: card.color }}>
-                  {card.value}
-                </div>
-                <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 4 }}>
-                  {card.sub}
-                </div>
-              </div>
-            );
-          })}
+        {/* ── Filter Bar: District & Cohort Program Controls ── */}
+        <div
+          className="card-linear"
+          style={{
+            padding: '14px 20px',
+            borderRadius: 12,
+            marginBottom: 22,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: 12,
+            border: '1px solid rgba(255,255,255,0.06)',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', flex: 1 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--text-muted)', fontSize: 12, fontWeight: 700 }}>
+              <Filter size={14} color="var(--gold)" />
+              <span>MACRO FILTERS:</span>
+            </div>
+
+            {/* District Selector */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <label htmlFor="district-select" style={{ fontSize: 12, color: '#94a3b8' }}>
+                District:
+              </label>
+              <select
+                id="district-select"
+                value={selectedDistrict}
+                onChange={handleDistrictChange}
+                disabled={loading}
+                style={{
+                  background: 'var(--bg-input, #0f111a)',
+                  color: '#fff',
+                  border: '1px solid var(--border)',
+                  borderRadius: 6,
+                  padding: '5px 10px',
+                  fontSize: 12,
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+              >
+                <option value="All">All Maharashtra Districts</option>
+                {districtOptions.map((dist) => (
+                  <option key={dist} value={dist}>
+                    {dist}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Program / Cohort Selector */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <label htmlFor="program-select" style={{ fontSize: 12, color: '#94a3b8' }}>
+                Program:
+              </label>
+              <select
+                id="program-select"
+                value={selectedProgram}
+                onChange={handleProgramChange}
+                disabled={loading}
+                style={{
+                  background: 'var(--bg-input, #0f111a)',
+                  color: '#fff',
+                  border: '1px solid var(--border)',
+                  borderRadius: 6,
+                  padding: '5px 10px',
+                  fontSize: 12,
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  maxWidth: 240,
+                }}
+              >
+                <option value="All">All Skilling Programs</option>
+                {programOptions.map((prog) => (
+                  <option key={prog} value={prog}>
+                    {prog}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {isFiltered && (
+              <button
+                type="button"
+                onClick={handleResetFilters}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 4,
+                  fontSize: 11.5,
+                  padding: '4px 8px',
+                  borderRadius: 6,
+                  background: 'rgba(239,68,68,0.1)',
+                  color: '#ef4444',
+                  border: '1px solid rgba(239,68,68,0.25)',
+                  cursor: 'pointer',
+                }}
+              >
+                <X size={12} />
+                <span>Reset Filters</span>
+              </button>
+            )}
+          </div>
+
+          <div style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>
+            {selectedDistrict !== 'All' ? `Target District: ${selectedDistrict}` : 'Statewide Maharashtra Cohort'}
+          </div>
         </div>
 
-        {/* ── Visual Section: Longitudinal Outcome Conversion Pipeline ── */}
+        {/* ── Error Banner ── */}
+        {error && (
+          <div
+            style={{
+              padding: '14px 18px',
+              borderRadius: 10,
+              background: 'rgba(239,68,68,0.1)',
+              border: '1px solid rgba(239,68,68,0.3)',
+              color: '#f87171',
+              marginBottom: 20,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              fontSize: 13,
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <AlertTriangle size={18} />
+              <span>{error}</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => loadDashboardData(selectedDistrict, selectedProgram)}
+              style={{
+                background: '#ef4444',
+                color: '#fff',
+                border: 'none',
+                padding: '4px 10px',
+                borderRadius: 4,
+                fontSize: 12,
+                cursor: 'pointer',
+                fontWeight: 700,
+              }}
+            >
+              Retry
+            </button>
+          </div>
+        )}
+
+        {/* ── Top 4 Live KPI Metric Cards (Database-Driven) ── */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14, marginBottom: 14 }}>
+          {/* Card 1: Total Enrolled */}
+          <div className="card-linear" style={{ padding: '18px 20px', borderRadius: 12 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+              <span style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                Total Tracked Trainees
+              </span>
+              <div style={{ padding: 6, borderRadius: 6, background: 'rgba(245,158,11,0.1)', color: 'var(--gold)' }}>
+                <Users size={16} />
+              </div>
+            </div>
+            <div className="font-display" style={{ fontSize: 26, fontWeight: 800, color: 'var(--gold)' }}>
+              {totalTraineesDisplay}
+            </div>
+            <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 4 }}>
+              {funnelBreakdown
+                ? `${funnelBreakdown.certified.toLocaleString()} Certified (${funnelBreakdown.completed} Completed)`
+                : 'Real-time state enrollment ledger'}
+            </div>
+          </div>
+
+          {/* Card 2: Placement / Transition Rate */}
+          <div className="card-linear" style={{ padding: '18px 20px', borderRadius: 12 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+              <span style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                State Transition Rate
+              </span>
+              <div style={{ padding: 6, borderRadius: 6, background: 'rgba(16,185,129,0.1)', color: '#10b981' }}>
+                <Briefcase size={16} />
+              </div>
+            </div>
+            <div className="font-display" style={{ fontSize: 26, fontWeight: 800, color: '#10b981' }}>
+              {placementRateDisplay}
+            </div>
+            <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 4 }}>
+              {funnelBreakdown
+                ? `${funnelBreakdown.placed.toLocaleString()} Placed / Transitioned`
+                : 'No placement records'}
+            </div>
+          </div>
+
+          {/* Card 3: 90-Day Retention */}
+          <div className="card-linear" style={{ padding: '18px 20px', borderRadius: 12 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+              <span style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                90-Day Retention
+              </span>
+              <div style={{ padding: 6, borderRadius: 6, background: 'rgba(96,165,250,0.1)', color: '#60a5fa' }}>
+                <ShieldCheck size={16} />
+              </div>
+            </div>
+            <div className="font-display" style={{ fontSize: 26, fontWeight: 800, color: '#60a5fa' }}>
+              {retentionRateDisplay}
+            </div>
+            <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 4 }}>
+              {funnelBreakdown
+                ? `${funnelBreakdown.retained90d.toLocaleString()} Verified Retained at 90d`
+                : 'Surveys pending response'}
+            </div>
+          </div>
+
+          {/* Card 4: Wage Growth */}
+          <div className="card-linear" style={{ padding: '18px 20px', borderRadius: 12 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+              <span style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                Median Salary Growth
+              </span>
+              <div style={{ padding: 6, borderRadius: 6, background: 'rgba(168,85,247,0.1)', color: '#a855f7' }}>
+                <TrendingUp size={16} />
+              </div>
+            </div>
+            <div className="font-display" style={{ fontSize: 26, fontWeight: 800, color: '#a855f7' }}>
+              {wageGrowthDisplay}
+            </div>
+            <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 4 }}>
+              {wageSummary && wageSummary.avgInitialSalary > 0
+                ? `₹${wageSummary.avgInitialSalary.toLocaleString('en-IN')} → ₹${wageSummary.avgCurrentSalary.toLocaleString('en-IN')}/mo`
+                : 'No verified compensation data'}
+            </div>
+          </div>
+        </div>
+
+        {/* ── Granular Outcome Breakdown Bar (Salaried vs Self-Employed vs Apprenticeship) ── */}
+        {funnelBreakdown && (
+          <div
+            className="card-linear"
+            style={{
+              padding: '12px 18px',
+              borderRadius: 10,
+              marginBottom: 24,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: 12,
+              background: 'rgba(255,255,255,0.02)',
+              fontSize: 12,
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
+              <span style={{ fontWeight: 700, color: '#94a3b8' }}>Employment Modalities:</span>
+              <span style={{ color: '#f8fafc' }}>
+                Salaried: <strong>{funnelBreakdown.salaried}</strong>
+              </span>
+              <span style={{ color: 'var(--gold)' }}>
+                Self-Employed: <strong>{funnelBreakdown.selfEmployed}</strong>
+              </span>
+              <span style={{ color: '#60a5fa' }}>
+                Apprenticeship: <strong>{funnelBreakdown.apprenticeship}</strong>
+              </span>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
+              <span style={{ fontWeight: 700, color: '#94a3b8' }}>Retention Milestones:</span>
+              <span style={{ color: '#cbd5e1' }}>
+                30d: <strong>{funnelBreakdown.retained30d}</strong>
+              </span>
+              <span style={{ color: '#10b981' }}>
+                90d: <strong>{funnelBreakdown.retained90d}</strong>
+              </span>
+              <span style={{ color: '#60a5fa' }}>
+                180d: <strong>{funnelBreakdown.retained180d}</strong>
+              </span>
+              <span style={{ color: '#a855f7' }}>
+                365d: <strong>{funnelBreakdown.retained365d}</strong>
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* ── Visual Section: Maharashtra 9-Stage Longitudinal Outcome Pipeline ── */}
         <div className="card-linear" style={{ padding: 24, borderRadius: 14, marginBottom: 24 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18, borderBottom: '1px solid var(--border)', paddingBottom: 14, flexWrap: 'wrap', gap: 10 }}>
             <div>
               <h2 className="font-display" style={{ fontSize: 16, fontWeight: 700, color: '#f8fafc', margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
-                <Layers size={17} color="var(--gold)" /> Maharashtra 9-Stage Longitudinal Outcome Pipeline
+                <Layers size={17} color="var(--gold)" /> Maharashtra Longitudinal Conversion Pipeline
               </h2>
               <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '4px 0 0' }}>
-                End-to-end skilling conversion pipeline from enrollment to 1-year job retention.
+                Live skilling conversion progression from candidate enrollment to 365-day employment retention.
               </p>
             </div>
             <span style={{ fontSize: 11, fontWeight: 700, color: '#10b981', background: 'rgba(16,185,129,0.12)', padding: '3px 10px', borderRadius: 6, border: '1px solid rgba(16,185,129,0.25)' }}>
-              Live State Pipeline
+              Live Telemetry Pipeline
             </span>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(105px, 1fr))', gap: 8 }}>
-            {funnelStages.map((st: any) => (
-              <div
-                key={st.id}
-                style={{
-                  padding: 12,
-                  background: 'rgba(255,255,255,0.02)',
-                  borderRadius: 10,
-                  border: '1px solid var(--border)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between',
-                  gap: 8,
-                }}
-              >
-                <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {st.label}
+          {loading ? (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(105px, 1fr))', gap: 8 }}>
+              {Array.from({ length: 9 }).map((_, i) => (
+                <div key={i} style={{ height: 75, background: 'rgba(255,255,255,0.03)', borderRadius: 10 }} />
+              ))}
+            </div>
+          ) : funnelStages.length === 0 ? (
+            <div style={{ padding: '30px 0', textAlign: 'center', color: 'var(--text-muted)', fontSize: 13 }}>
+              No longitudinal stage progression data available for this filter.
+            </div>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(105px, 1fr))', gap: 8 }}>
+              {funnelStages.map((st) => (
+                <div
+                  key={st.id}
+                  style={{
+                    padding: 12,
+                    background: 'rgba(255,255,255,0.02)',
+                    borderRadius: 10,
+                    border: '1px solid var(--border)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    gap: 8,
+                  }}
+                >
+                  <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={st.label}>
+                    {st.label}
+                  </div>
+                  <div className="font-display" style={{ fontSize: 17, fontWeight: 800, color: '#f8fafc' }}>
+                    {typeof st.count === 'number' ? st.count.toLocaleString() : st.count}
+                  </div>
+                  <div style={{ height: 4, background: 'rgba(255,255,255,0.06)', borderRadius: 2, overflow: 'hidden' }}>
+                    <div
+                      style={{
+                        width: `${Math.min(100, Math.max(8, st.percent))}%`,
+                        height: '100%',
+                        background: 'var(--gold)',
+                        borderRadius: 2,
+                      }}
+                    />
+                  </div>
+                  <div style={{ fontSize: 10.5, fontWeight: 800, color: 'var(--gold)', textAlign: 'right' }}>
+                    {st.percent}%
+                  </div>
                 </div>
-                <div className="font-display" style={{ fontSize: 17, fontWeight: 800, color: '#f8fafc' }}>
-                  {typeof st.count === 'number' ? st.count.toLocaleString() : st.count}
-                </div>
-                <div style={{ height: 4, background: 'rgba(255,255,255,0.06)', borderRadius: 2, overflow: 'hidden' }}>
-                  <div
-                    style={{
-                      width: `${Math.min(100, Math.max(8, st.percent))}%`,
-                      height: '100%',
-                      background: 'var(--gold)',
-                      borderRadius: 2,
-                    }}
-                  />
-                </div>
-                <div style={{ fontSize: 10.5, fontWeight: 800, color: 'var(--gold)', textAlign: 'right' }}>
-                  {st.percent}%
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* ── AI Policy Copilot Interactive Query Panel ── */}
         <div className="card-linear" style={{ padding: 24, borderRadius: 14, marginBottom: 24, border: '1px solid rgba(245,158,11,0.3)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
-            <div style={{ padding: 8, borderRadius: 8, background: 'var(--gold)', color: '#000' }}>
-              <Bot size={18} />
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, flexWrap: 'wrap', gap: 10 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ padding: 8, borderRadius: 8, background: 'var(--gold)', color: '#000' }}>
+                <Bot size={18} />
+              </div>
+              <div>
+                <h2 className="font-display" style={{ fontSize: 16, fontWeight: 700, color: '#f8fafc', margin: 0 }}>
+                  AI Policy Copilot (Grounded in Verified Telemetry)
+                </h2>
+                <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '2px 0 0' }}>
+                  Real-time query engine grounded in the live Maharashtra skilling database.
+                </p>
+              </div>
             </div>
-            <div>
-              <h2 className="font-display" style={{ fontSize: 16, fontWeight: 700, color: '#f8fafc', margin: 0 }}>
-                AI Policy Copilot (Grounded in Verified Telemetry)
-              </h2>
-              <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '2px 0 0' }}>
-                Query the live Maharashtra skilling ledger with zero statistical hallucinations.
-              </p>
-            </div>
+            <AIBadge type="ai" label="AI Recommendation · Grounded" />
           </div>
 
           <form onSubmit={handleCopilotSubmit} style={{ display: 'flex', gap: 10, marginBottom: 12 }}>
@@ -366,6 +773,7 @@ export default function GovernmentMacroDashboardPage() {
               value={copilotQuery}
               onChange={(e) => setCopilotQuery(e.target.value)}
               placeholder="Ask policy questions e.g. 'Which districts have low employment outcomes and why?' or 'Compare wage growth across courses'"
+              aria-label="Policy query input"
               style={{
                 flex: 1,
                 padding: '11px 16px',
@@ -380,6 +788,7 @@ export default function GovernmentMacroDashboardPage() {
               type="submit"
               disabled={copilotLoading || !copilotQuery.trim()}
               className="btn-gold"
+              aria-label="Submit policy query"
               style={{
                 padding: '10px 20px',
                 fontSize: 13,
@@ -402,7 +811,10 @@ export default function GovernmentMacroDashboardPage() {
               <button
                 key={idx}
                 type="button"
-                onClick={() => setCopilotQuery(sq.replace('⚡ ', ''))}
+                onClick={() => {
+                  const text = sq.replace('⚡ ', '');
+                  setCopilotQuery(text);
+                }}
                 style={{
                   fontSize: 11.5,
                   padding: '4px 10px',
@@ -422,7 +834,7 @@ export default function GovernmentMacroDashboardPage() {
             <div
               style={{
                 padding: 16,
-                background: 'rgba(0,0,0,0.3)',
+                background: 'rgba(0,0,0,0.35)',
                 borderRadius: 10,
                 border: '1px solid rgba(245,158,11,0.2)',
               }}
@@ -434,9 +846,9 @@ export default function GovernmentMacroDashboardPage() {
               {copilotResponse.citedMetrics && copilotResponse.citedMetrics.length > 0 && (
                 <div style={{ paddingTop: 10, borderTop: '1px solid var(--border)', display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
                   <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 700 }}>
-                    Verified Evidence:
+                    Verified Database Citations:
                   </span>
-                  {copilotResponse.citedMetrics.map((cm: any, idx: number) => (
+                  {copilotResponse.citedMetrics.map((cm, idx) => (
                     <span
                       key={idx}
                       style={{
@@ -458,7 +870,7 @@ export default function GovernmentMacroDashboardPage() {
           )}
         </div>
 
-        {/* ── District Intelligence Table (Maharashtra) ── */}
+        {/* ── District Intelligence Table (Maharashtra with N < 5 Privacy Protection) ── */}
         <div className="card-linear" style={{ padding: 24, borderRadius: 14, marginBottom: 24 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 12 }}>
             <div>
@@ -466,7 +878,7 @@ export default function GovernmentMacroDashboardPage() {
                 <Building size={17} color="var(--gold)" /> Maharashtra District Intelligence Drill-down
               </h2>
               <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '3px 0 0' }}>
-                Comparative outcome statistics across 9 major skilling clusters.
+                District-level skilling telemetry with automatic DPDP Act small-sample privacy protection (N &lt; 5).
               </p>
             </div>
 
@@ -477,6 +889,7 @@ export default function GovernmentMacroDashboardPage() {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Filter district..."
+                aria-label="Filter district"
                 style={{
                   width: '100%',
                   padding: '7px 12px 7px 32px',
@@ -499,41 +912,81 @@ export default function GovernmentMacroDashboardPage() {
                   <th style={{ padding: '10px 12px' }}>Placement Rate</th>
                   <th style={{ padding: '10px 12px' }}>90-Day Retention</th>
                   <th style={{ padding: '10px 12px' }}>Median Salary</th>
-                  <th style={{ padding: '10px 12px' }}>Employer Verification</th>
+                  <th style={{ padding: '10px 12px' }}>Employer Verified</th>
                   <th style={{ padding: '10px 12px' }}>Data Reliability</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredDistricts.map((row, idx) => (
-                  <tr key={idx} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)', transition: 'background 0.15s ease' }}>
-                    <td style={{ padding: '12px', fontWeight: 700, color: '#f8fafc', display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--gold)' }} />
-                      {row.district}
-                    </td>
-                    <td style={{ padding: '12px', fontFamily: 'monospace', color: '#cbd5e1' }}>{row.totalTrainees?.toLocaleString()}</td>
-                    <td style={{ padding: '12px', fontWeight: 800, color: '#10b981' }}>{row.employmentRate}%</td>
-                    <td style={{ padding: '12px', fontWeight: 700, color: '#60a5fa' }}>{row.retention90dRate}%</td>
-                    <td style={{ padding: '12px', fontFamily: 'monospace', color: '#f8fafc' }}>
-                      ₹{row.medianSalary?.toLocaleString('en-IN')}/mo
-                    </td>
-                    <td style={{ padding: '12px', color: 'var(--gold)', fontWeight: 600 }}>{row.verificationRate}% Verified</td>
-                    <td style={{ padding: '12px' }}>
-                      <span
-                        style={{
-                          fontSize: 10.5,
-                          fontWeight: 700,
-                          padding: '2px 8px',
-                          borderRadius: 4,
-                          background: 'rgba(16,185,129,0.12)',
-                          color: '#10b981',
-                          border: '1px solid rgba(16,185,129,0.25)',
-                        }}
-                      >
-                        {row.statusLabel}
-                      </span>
+                {loading ? (
+                  <tr>
+                    <td colSpan={7} style={{ padding: 24, textAlign: 'center', color: 'var(--text-muted)' }}>
+                      Loading district intelligence...
                     </td>
                   </tr>
-                ))}
+                ) : filteredDistricts.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} style={{ padding: 24, textAlign: 'center', color: 'var(--text-muted)' }}>
+                      No district telemetry records found matching your filter.
+                    </td>
+                  </tr>
+                ) : (
+                  filteredDistricts.map((row, idx) => (
+                    <tr key={idx} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)', transition: 'background 0.15s ease' }}>
+                      <td style={{ padding: '12px', fontWeight: 700, color: '#f8fafc', display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <span style={{ width: 6, height: 6, borderRadius: '50%', background: row.isSmallSample ? '#ef4444' : 'var(--gold)' }} />
+                        {row.district}
+                      </td>
+                      <td style={{ padding: '12px', fontFamily: 'monospace', color: '#cbd5e1' }}>
+                        {row.totalTrainees.toLocaleString()}
+                      </td>
+                      <td style={{ padding: '12px', fontWeight: 800 }}>
+                        {row.isSmallSample ? (
+                          <span style={{ color: '#94a3b8', fontSize: 11 }} title="Suppressed under DPDP Act privacy guidelines (N < 5)">
+                            Insufficient Data
+                          </span>
+                        ) : (
+                          <span style={{ color: '#10b981' }}>{row.employmentRate}%</span>
+                        )}
+                      </td>
+                      <td style={{ padding: '12px', fontWeight: 700 }}>
+                        {row.isSmallSample ? (
+                          <span style={{ color: '#94a3b8', fontSize: 11 }}>N/A</span>
+                        ) : (
+                          <span style={{ color: '#60a5fa' }}>{row.retention90dRate}%</span>
+                        )}
+                      </td>
+                      <td style={{ padding: '12px', fontFamily: 'monospace' }}>
+                        {row.isSmallSample || !row.medianSalary ? (
+                          <span style={{ color: '#94a3b8', fontSize: 11 }}>N/A</span>
+                        ) : (
+                          <span style={{ color: '#f8fafc' }}>₹{row.medianSalary.toLocaleString('en-IN')}/mo</span>
+                        )}
+                      </td>
+                      <td style={{ padding: '12px' }}>
+                        {row.isSmallSample ? (
+                          <span style={{ color: '#94a3b8', fontSize: 11 }}>N/A</span>
+                        ) : (
+                          <span style={{ color: 'var(--gold)', fontWeight: 600 }}>{row.verificationRate}% Verified</span>
+                        )}
+                      </td>
+                      <td style={{ padding: '12px' }}>
+                        <span
+                          style={{
+                            fontSize: 10.5,
+                            fontWeight: 700,
+                            padding: '2px 8px',
+                            borderRadius: 4,
+                            background: row.isSmallSample ? 'rgba(239,68,68,0.12)' : 'rgba(16,185,129,0.12)',
+                            color: row.isSmallSample ? '#ef4444' : '#10b981',
+                            border: `1px solid ${row.isSmallSample ? 'rgba(239,68,68,0.25)' : 'rgba(16,185,129,0.25)'}`,
+                          }}
+                        >
+                          {row.statusLabel}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
@@ -547,32 +1000,47 @@ export default function GovernmentMacroDashboardPage() {
               <h3 className="font-display" style={{ fontSize: 15, fontWeight: 700, color: '#f8fafc', margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
                 <TrendingUp size={16} color="var(--gold)" /> Longitudinal Wage Progression Curve
               </h3>
-              <span style={{ fontSize: 11.5, fontWeight: 700, color: '#10b981' }}>+88.4% Average Growth</span>
+              <span style={{ fontSize: 11.5, fontWeight: 700, color: wageSummary && wageSummary.wageProgressionPercent >= 0 ? '#10b981' : '#94a3b8' }}>
+                {wageSummary && wageSummary.avgInitialSalary > 0
+                  ? `${wageSummary.wageProgressionPercent >= 0 ? `+${wageSummary.wageProgressionPercent}%` : `${wageSummary.wageProgressionPercent}%`} Average Growth`
+                  : 'No Wage Data'}
+              </span>
             </div>
             <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 14 }}>
-              Traces verified candidate salary evolution from initial placement to 24 months post-training.
+              Traces verified candidate salary evolution from initial placement across {wageSummary?.totalTrackedWithSalary || 0} tracked salary histories.
             </p>
 
-            <div style={{ height: 240, width: '100%' }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={wageCurve}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                  <XAxis dataKey="milestone" stroke="#64748b" fontSize={11} tick={{ fill: '#94a3b8' }} />
-                  <YAxis stroke="#64748b" fontSize={11} tickFormatter={(v) => `₹${v / 1000}k`} tick={{ fill: '#94a3b8' }} />
-                  <Tooltip
-                    contentStyle={{ background: '#090A0F', border: '1px solid rgba(245,158,11,0.3)', borderRadius: '8px', fontSize: 12 }}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="medianSalary"
-                    stroke="#f59e0b"
-                    strokeWidth={3}
-                    dot={{ fill: '#f59e0b', r: 4 }}
-                    name="Median Salary (INR)"
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
+            {loading ? (
+              <div style={{ height: 240, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
+                Loading salary curve...
+              </div>
+            ) : wageCurve.length === 0 ? (
+              <div style={{ height: 240, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', fontSize: 13 }}>
+                No wage progression data available for this selection.
+              </div>
+            ) : (
+              <div style={{ height: 240, width: '100%' }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={wageCurve}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                    <XAxis dataKey="milestone" stroke="#64748b" fontSize={11} tick={{ fill: '#94a3b8' }} />
+                    <YAxis stroke="#64748b" fontSize={11} tickFormatter={(v) => `₹${Math.round(v / 1000)}k`} tick={{ fill: '#94a3b8' }} />
+                    <Tooltip
+                      contentStyle={{ background: '#090A0F', border: '1px solid rgba(245,158,11,0.3)', borderRadius: '8px', fontSize: 12 }}
+                      formatter={(val: any) => [`₹${Number(val).toLocaleString('en-IN')}/mo`, 'Median Salary']}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="medianSalary"
+                      stroke="#f59e0b"
+                      strokeWidth={3}
+                      dot={{ fill: '#f59e0b', r: 4 }}
+                      name="Median Salary (INR)"
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            )}
           </div>
 
           {/* Non-Placement Barriers */}
@@ -584,33 +1052,45 @@ export default function GovernmentMacroDashboardPage() {
               <span style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>Empirical Barriers</span>
             </div>
             <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 14 }}>
-              Structured candidate barriers identified through 30d follow-ups and unplaced candidate telemetry.
+              Empirical candidate barriers identified through follow-up surveys and placement logs.
             </p>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {barrierData.map((item: any, idx: number) => (
-                <div key={idx}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12.5, marginBottom: 4 }}>
-                    <span style={{ color: '#e2e8f0', fontWeight: 600 }}>{item.reason}</span>
-                    <span style={{ fontFamily: 'monospace', color: 'var(--text-muted)' }}>{item.count} Cases ({item.pct}%)</span>
+            {loading ? (
+              <div style={{ height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
+                Loading barrier analysis...
+              </div>
+            ) : barrierData.length === 0 ? (
+              <div style={{ height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', fontSize: 13 }}>
+                No candidate non-placement barriers recorded for this cohort.
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {barrierData.map((item, idx) => (
+                  <div key={idx}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12.5, marginBottom: 4 }}>
+                      <span style={{ color: '#e2e8f0', fontWeight: 600 }}>{item.reason}</span>
+                      <span style={{ fontFamily: 'monospace', color: 'var(--text-muted)' }}>
+                        {item.count} Cases ({item.pct}%)
+                      </span>
+                    </div>
+                    <div style={{ height: 5, background: 'rgba(255,255,255,0.06)', borderRadius: 3, overflow: 'hidden' }}>
+                      <div
+                        style={{
+                          width: `${item.pct}%`,
+                          height: '100%',
+                          background: '#ef4444',
+                          borderRadius: 3,
+                        }}
+                      />
+                    </div>
                   </div>
-                  <div style={{ height: 5, background: 'rgba(255,255,255,0.06)', borderRadius: 3, overflow: 'hidden' }}>
-                    <div
-                      style={{
-                        width: `${item.pct}%`,
-                        height: '100%',
-                        background: '#ef4444',
-                        borderRadius: 3,
-                      }}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
-        {/* ── Active Policy Interventions Panel ── */}
+        {/* ── Active Policy Interventions Panel (AI-Generated Recommendations Grounded in DB) ── */}
         <div className="card-linear" style={{ padding: 24, borderRadius: 14 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18, borderBottom: '1px solid var(--border)', paddingBottom: 14, flexWrap: 'wrap', gap: 10 }}>
             <div>
@@ -618,51 +1098,64 @@ export default function GovernmentMacroDashboardPage() {
                 <Sparkles size={17} color="var(--gold)" /> Evidence-Based Policy & Curriculum Directives
               </h2>
               <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '3px 0 0' }}>
-                AI-generated policy interventions grounded in verified outcome gaps and employer verification telemetry.
+                AI-generated policy interventions grounded in verified skilling outcome gaps and employer verification telemetry.
               </p>
             </div>
-            <span style={{ fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 6, background: 'rgba(16,185,129,0.12)', color: '#10b981', border: '1px solid rgba(16,185,129,0.25)' }}>
-              {interventions.length} Active Directives
-            </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <AIBadge type="ai" label="AI Policy Directive" />
+              <span style={{ fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 6, background: 'rgba(16,185,129,0.12)', color: '#10b981', border: '1px solid rgba(16,185,129,0.25)' }}>
+                {interventions.length} Active Directives
+              </span>
+            </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16 }}>
-            {interventions.map((iv, idx) => (
-              <div
-                key={idx}
-                style={{
-                  padding: 18,
-                  background: 'rgba(255,255,255,0.02)',
-                  borderRadius: 12,
-                  border: '1px solid var(--border)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between',
-                  gap: 12,
-                }}
-              >
-                <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                    <span style={{ fontSize: 10.5, fontWeight: 800, textTransform: 'uppercase', padding: '2px 8px', borderRadius: 4, background: 'rgba(245,158,11,0.12)', color: 'var(--gold)', border: '1px solid var(--gold-border)' }}>
-                      {iv.targetType}: {iv.targetName}
-                    </span>
-                    <span style={{ fontSize: 11, fontWeight: 800, color: '#10b981', fontFamily: 'monospace' }}>
-                      {Math.round(iv.confidence * 100)}% Confidence
-                    </span>
+          {loading ? (
+            <div style={{ padding: 24, textAlign: 'center', color: 'var(--text-muted)' }}>
+              Loading policy directives...
+            </div>
+          ) : interventions.length === 0 ? (
+            <div style={{ padding: 24, textAlign: 'center', color: 'var(--text-muted)', fontSize: 13 }}>
+              No active policy directives registered in the state database.
+            </div>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16 }}>
+              {interventions.map((iv, idx) => (
+                <div
+                  key={idx}
+                  style={{
+                    padding: 18,
+                    background: 'rgba(255,255,255,0.02)',
+                    borderRadius: 12,
+                    border: '1px solid var(--border)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    gap: 12,
+                  }}
+                >
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                      <span style={{ fontSize: 10.5, fontWeight: 800, textTransform: 'uppercase', padding: '2px 8px', borderRadius: 4, background: 'rgba(245,158,11,0.12)', color: 'var(--gold)', border: '1px solid var(--gold-border)' }}>
+                        {iv.targetType}: {iv.targetName}
+                      </span>
+                      <span style={{ fontSize: 11, fontWeight: 800, color: '#10b981', fontFamily: 'monospace' }}>
+                        {Math.round(iv.confidence * 100)}% Confidence
+                      </span>
+                    </div>
+                    <h4 style={{ fontSize: 14, fontWeight: 700, color: '#f8fafc', margin: '0 0 6px' }}>{iv.title}</h4>
+                    <p style={{ fontSize: 12, color: '#cbd5e1', lineHeight: 1.5, margin: 0 }}>{iv.observation}</p>
                   </div>
-                  <h4 style={{ fontSize: 14, fontWeight: 700, color: '#f8fafc', margin: '0 0 6px' }}>{iv.title}</h4>
-                  <p style={{ fontSize: 12, color: '#cbd5e1', lineHeight: 1.5, margin: 0 }}>{iv.observation}</p>
-                </div>
 
-                <div style={{ padding: 12, borderRadius: 8, background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.06)' }}>
-                  <div style={{ fontSize: 10.5, fontWeight: 800, textTransform: 'uppercase', color: 'var(--gold)', marginBottom: 2 }}>
-                    Action Directive:
+                  <div style={{ padding: 12, borderRadius: 8, background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                    <div style={{ fontSize: 10.5, fontWeight: 800, textTransform: 'uppercase', color: 'var(--gold)', marginBottom: 2 }}>
+                      Recommended State Directive:
+                    </div>
+                    <div style={{ fontSize: 12, color: '#f8fafc', lineHeight: 1.4 }}>{iv.recommendedAction}</div>
                   </div>
-                  <div style={{ fontSize: 12, color: '#f8fafc', lineHeight: 1.4 }}>{iv.recommendedAction}</div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </FadeIn>
     </ErrorBoundary>

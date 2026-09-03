@@ -1,4 +1,8 @@
-/* ─── Sample Data: Employer Integration Module ─── */
+/**
+ * OFFLINE DEVELOPMENT TEST FIXTURE ONLY
+ * Note: Production dashboard pages query live longitudinal MongoDB collections via `/api/employers` and `/api/verification`.
+ * This static dataset is retained strictly as an offline reference fixture and is not imported in active routes.
+ */
 
 export interface Employer {
     id: string;

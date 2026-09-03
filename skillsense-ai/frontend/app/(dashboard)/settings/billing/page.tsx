@@ -1,42 +1,35 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import {
-  CreditCard,
   Zap,
   Sparkles,
   Landmark,
   Shield,
   Check,
-  X,
   AlertTriangle,
-  RefreshCw,
-  ArrowUpRight,
-  Calendar,
   Users,
   Brain,
   FileText,
-  ChevronRight,
   Lock,
+  ArrowRight,
+  RefreshCw,
 } from 'lucide-react';
-import { FadeIn } from '@/components/shared/FadeIn';
-import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { AIBadge } from '@/components/ui/AIBadge';
 import { billingApi, SubscriptionResponse, PlanId, BillingCycle } from '@/lib/api/billing.api';
-import toast from 'react-hot-toast';
-import confetti from 'canvas-confetti';
+import { useAuth } from '@/hooks/useAuth';
 
-// ─── Plan display metadata ───────────────────────────────────────────────────
+// ─── Plan display metadata ────────────────────────────────────────────────────
 
 const PLAN_META: Record<PlanId, {
   label: string; color: string; icon: React.ElementType;
-  monthlyDisplay: string; yearlyDisplay: string;
+  monthlyDisplay: string; yearlyDisplay: string; tagline: string;
 }> = {
-  free:       { label: 'Free',       color: '#64748b', icon: Zap,      monthlyDisplay: '₹0',      yearlyDisplay: '₹0' },
-  starter:    { label: 'Starter',    color: '#60a5fa', icon: Zap,      monthlyDisplay: '₹1,999',  yearlyDisplay: '₹19,990/yr' },
-  growth:     { label: 'Growth',     color: '#f59e0b', icon: Sparkles, monthlyDisplay: '₹4,999',  yearlyDisplay: '₹49,990/yr' },
-  enterprise: { label: 'Enterprise', color: '#10b981', icon: Landmark, monthlyDisplay: 'Custom',  yearlyDisplay: 'Custom' },
+  free:       { label: 'Free',       color: '#64748b', icon: Zap,      monthlyDisplay: '₹0',      yearlyDisplay: '₹0',         tagline: 'For exploring SkillSense AI' },
+  starter:    { label: 'Starter',    color: '#60a5fa', icon: Zap,      monthlyDisplay: '₹1,999',  yearlyDisplay: '₹1,666/mo',  tagline: 'For small training institutes' },
+  growth:     { label: 'Growth',     color: '#f59e0b', icon: Sparkles, monthlyDisplay: '₹4,999',  yearlyDisplay: '₹4,166/mo',  tagline: 'For growing organizations' },
+  enterprise: { label: 'Enterprise', color: '#10b981', icon: Landmark, monthlyDisplay: 'Custom',  yearlyDisplay: 'Custom',     tagline: 'For government & universities' },
 };
 
 const PLAN_ORDER: PlanId[] = ['free', 'starter', 'growth', 'enterprise'];
@@ -45,40 +38,102 @@ function isPaidPlan(plan: PlanId): boolean {
   return plan === 'starter' || plan === 'growth';
 }
 
-// ─── Usage Meter Component ────────────────────────────────────────────────────
+// ─── Demo mode helpers ────────────────────────────────────────────────────────
+
+function isDemoToken(token: string | null): boolean {
+  if (!token) return false;
+  return token.startsWith('demo_') || token.includes('demo');
+}
+
+function makeDemoSubscriptionData(planId: PlanId = 'growth', cycle: BillingCycle = 'monthly'): SubscriptionResponse {
+  const now = new Date();
+  const periodEnd = new Date(now);
+  periodEnd.setMonth(periodEnd.getMonth() + 1);
+  return {
+    subscription: {
+      plan: planId,
+      status: 'active',
+      billingCycle: cycle,
+      provider: 'demo',
+      currentPeriodStart: now.toISOString(),
+      currentPeriodEnd: periodEnd.toISOString(),
+      cancelAtPeriodEnd: false,
+      activatedAt: now.toISOString(),
+    },
+    entitlements: {
+      bypassedByRole: true, // Demo users always get bypass
+      limits: {
+        maxTrainees: null,
+        maxAIRequestsPerMonth: null,
+        maxAssessmentsPerMonth: null,
+        maxOutcomeRecords: null,
+        advancedAnalytics: true,
+        wageAnalytics: true,
+        retentionAnalytics: true,
+        skillGapAnalytics: true,
+        policyCopilot: true,
+        outcomeTracking: true,
+        employerVerification: true,
+        customDashboards: true,
+        prioritySupport: true,
+        apiAccess: true,
+      },
+    },
+    usage: {
+      period: `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`,
+      aiRequests: 7,
+      traineesCreated: 3,
+      assessmentsRun: 2,
+      outcomeRecords: 5,
+      employerVerifications: 0,
+      reportsGenerated: 1,
+    },
+    isDemoMode: true,
+  };
+}
+
+// ─── Inline spin animation (no Tailwind) ──────────────────────────────────────
+
+const SPIN_CSS = `@keyframes billing-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`;
+
+function Spinner({ size = 18 }: { size?: number }) {
+  return (
+    <>
+      <style>{SPIN_CSS}</style>
+      <span style={{ display: 'inline-flex', animation: 'billing-spin 0.75s linear infinite' }}>
+        <RefreshCw size={size} />
+      </span>
+    </>
+  );
+}
+
+// ─── Usage Meter ──────────────────────────────────────────────────────────────
 
 function UsageMeter({
   label, icon: Icon, used, limit, color,
 }: {
-  label: string;
-  icon: React.ElementType;
-  used: number;
-  limit: number | null;
-  color: string;
+  label: string; icon: React.ElementType; used: number; limit: number | null; color: string;
 }) {
-  const pct = limit === null ? 0 : Math.min(100, Math.round((used / limit) * 100));
   const isUnlimited = limit === null;
+  const pct = isUnlimited ? 0 : Math.min(100, Math.round((used / Math.max(limit!, 1)) * 100));
   const isWarning = !isUnlimited && pct >= 80;
 
   return (
-    <div className="card-linear" style={{ padding: '14px 16px', borderRadius: 12 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-          <Icon size={14} color={color} />
-          <span style={{ fontSize: 12.5, fontWeight: 700, color: '#cbd5e1' }}>{label}</span>
+    <div className="card-linear" style={{ padding: '13px 16px', borderRadius: 12 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <Icon size={13} color={color} />
+          <span style={{ fontSize: 12, fontWeight: 700, color: '#cbd5e1' }}>{label}</span>
         </div>
-        <span style={{ fontSize: 12, color: isWarning ? '#f87171' : 'var(--text-muted)' }}>
-          {isUnlimited ? '∞ Unlimited' : `${used.toLocaleString()} / ${limit!.toLocaleString()}`}
+        <span style={{ fontSize: 11.5, color: isWarning ? '#f87171' : 'var(--text-muted)', fontWeight: 600 }}>
+          {isUnlimited ? '∞ Unlimited' : `${used} / ${limit}`}
         </span>
       </div>
       {!isUnlimited && (
-        <div style={{ height: 4, borderRadius: 99, background: 'rgba(255,255,255,0.06)', overflow: 'hidden' }}>
+        <div style={{ height: 3, borderRadius: 99, background: 'rgba(255,255,255,0.06)', overflow: 'hidden' }}>
           <div style={{
-            height: '100%', borderRadius: 99,
-            width: `${pct}%`,
-            background: isWarning
-              ? 'linear-gradient(90deg, #ef4444, #f87171)'
-              : `linear-gradient(90deg, ${color}, ${color}88)`,
+            height: '100%', borderRadius: 99, width: `${pct}%`,
+            background: isWarning ? 'linear-gradient(90deg,#ef4444,#f87171)' : `linear-gradient(90deg,${color}99,${color})`,
             transition: 'width 0.8s ease',
           }} />
         </div>
@@ -87,155 +142,183 @@ function UsageMeter({
   );
 }
 
-// ─── Plan Card (in billing page) ─────────────────────────────────────────────
+// ─── Plan Option Row ──────────────────────────────────────────────────────────
 
-function PlanOption({
+function PlanOptionRow({
   planId, currentPlan, cycle, onSelect, loading,
 }: {
-  planId: PlanId;
-  currentPlan: PlanId;
-  cycle: BillingCycle;
-  onSelect: (p: PlanId) => void;
-  loading: boolean;
+  planId: PlanId; currentPlan: PlanId; cycle: BillingCycle;
+  onSelect: (p: PlanId) => void; loading: boolean;
 }) {
   const meta = PLAN_META[planId];
   const Icon = meta.icon;
   const isCurrent = planId === currentPlan;
+  const isGrowth = planId === 'growth';
   const isEnterprise = planId === 'enterprise';
   const priceDisplay = cycle === 'monthly' ? meta.monthlyDisplay : meta.yearlyDisplay;
+  const priceSuffix = (planId !== 'free' && !isEnterprise)
+    ? (cycle === 'monthly' ? '/mo' : '/mo, billed yearly') : '';
 
   return (
-    <div
-      className={isCurrent ? 'card-accent' : 'card-linear'}
-      style={{
-        padding: '16px 18px', borderRadius: 12,
-        border: isCurrent ? '1.5px solid rgba(245,158,11,0.5)' : undefined,
-        opacity: loading ? 0.6 : 1,
-        transition: 'all 0.2s ease',
-      }}
-    >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{
-            width: 32, height: 32, borderRadius: 8,
-            background: `${meta.color}1a`,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
-            <Icon size={16} color={meta.color} />
-          </div>
-          <div>
-            <div style={{ fontSize: 14, fontWeight: 800, color: '#f8fafc', display: 'flex', alignItems: 'center', gap: 6 }}>
-              {meta.label}
-              {isCurrent && (
-                <span style={{
-                  fontSize: 9.5, fontWeight: 800, padding: '2px 7px', borderRadius: 99,
-                  background: 'rgba(245,158,11,0.15)', color: 'var(--gold)',
-                }}>CURRENT</span>
-              )}
-            </div>
-            <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-              {priceDisplay}{planId !== 'free' && planId !== 'enterprise' ? (cycle === 'monthly' ? '/month' : '/year') : ''}
-            </div>
-          </div>
+    <div style={{
+      padding: '14px 18px', borderRadius: 12, display: 'flex',
+      justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap',
+      border: `1px solid ${isCurrent ? 'rgba(245,158,11,0.4)' : 'rgba(255,255,255,0.07)'}`,
+      background: isCurrent
+        ? 'linear-gradient(135deg,rgba(245,158,11,0.06) 0%,rgba(15,17,26,0.9) 100%)'
+        : 'rgba(255,255,255,0.02)',
+      opacity: loading ? 0.55 : 1, transition: 'all 0.2s ease',
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div style={{
+          width: 34, height: 34, borderRadius: 9, flexShrink: 0,
+          background: `${meta.color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          <Icon size={16} color={meta.color} />
         </div>
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 7, flexWrap: 'wrap' }}>
+            <span style={{ fontSize: 14, fontWeight: 800, color: '#f8fafc' }}>{meta.label}</span>
+            {isCurrent && (
+              <span style={{ fontSize: 9.5, fontWeight: 800, padding: '2px 7px', borderRadius: 99, background: 'rgba(245,158,11,0.15)', color: 'var(--gold)' }}>
+                CURRENT
+              </span>
+            )}
+            {isGrowth && !isCurrent && (
+              <span style={{ fontSize: 9.5, fontWeight: 800, padding: '2px 7px', borderRadius: 99, background: 'rgba(245,158,11,0.12)', color: 'var(--gold)' }}>
+                POPULAR
+              </span>
+            )}
+          </div>
+          <div style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>{meta.tagline}</div>
+        </div>
+      </div>
 
-        {!isCurrent && (
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+        <div style={{ textAlign: 'right' }}>
+          <span style={{ fontSize: 15, fontWeight: 800, color: isCurrent ? 'var(--gold)' : '#f8fafc' }}>
+            {priceDisplay}
+          </span>
+          {priceSuffix && <span style={{ fontSize: 11, color: 'var(--text-muted)', marginLeft: 2 }}>{priceSuffix}</span>}
+        </div>
+        {!isCurrent ? (
           <button
             type="button"
             disabled={loading}
             onClick={() => onSelect(planId)}
-            className={planId === 'growth' ? 'btn-gold' : 'btn-secondary'}
-            style={{ fontSize: 11.5, padding: '5px 12px' }}
+            className={isGrowth ? 'btn-gold' : 'btn-secondary'}
+            style={{ fontSize: 11.5, padding: '6px 14px', whiteSpace: 'nowrap' }}
           >
-            {isEnterprise ? 'Contact Sales' : 'Switch'}
+            {loading ? <Spinner size={12} /> : (isEnterprise ? 'Contact Sales' : <><ArrowRight size={12} /> Switch</>)}
           </button>
+        ) : (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, color: '#10b981', fontWeight: 700 }}>
+            <Check size={13} /> Active
+          </div>
         )}
       </div>
     </div>
   );
 }
 
-// ─── Billing Page ─────────────────────────────────────────────────────────────
+// ─── Inner Page Component (uses useSearchParams — must live inside Suspense) ──
 
-export default function BillingPage() {
+function BillingPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { user, isLoading: authLoading, isAuthenticated } = useAuth();
 
   const [data, setData] = useState<SubscriptionResponse | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [pageLoading, setPageLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [selectedCycle, setSelectedCycle] = useState<BillingCycle>('monthly');
   const [error, setError] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
+  const [autoUpgradeDone, setAutoUpgradeDone] = useState(false);
 
-  // Read query params (from landing page CTA: ?plan=growth&cycle=monthly)
-  const queryPlan = searchParams?.get('plan') as PlanId | null;
-  const queryCycle = searchParams?.get('cycle') as BillingCycle | null;
+  const queryPlan = (searchParams?.get('plan') ?? null) as PlanId | null;
+  const queryCycle = (searchParams?.get('cycle') ?? 'monthly') as BillingCycle;
 
-  const fetchSubscription = useCallback(async () => {
-    setLoading(true);
+  // Redirect unauthenticated users (skip while auth is still loading)
+  useEffect(() => {
+    if (authLoading) return;
+    if (!isAuthenticated) {
+      const here = window.location.pathname + window.location.search;
+      router.replace(`/auth?redirect=${encodeURIComponent(here)}`);
+    }
+  }, [authLoading, isAuthenticated, router]);
+
+  const isDemo = isDemoToken(
+    typeof window !== 'undefined' ? localStorage.getItem('skillsense_token') : null
+  );
+
+  const loadData = useCallback(async () => {
+    setPageLoading(true);
     setError('');
+
     try {
       const subData = await billingApi.getSubscription();
       setData(subData);
-      setSelectedCycle(subData.subscription.billingCycle ?? 'monthly');
-    } catch {
-      setError('Unable to load subscription data. Please try again.');
+      setSelectedCycle(subData.subscription?.billingCycle ?? 'monthly');
+    } catch (err: unknown) {
+      const axiosErr = err as { response?: { status?: number } };
+      if (axiosErr?.response?.status === 401) {
+        router.replace('/auth');
+        return;
+      }
+      // If backend is offline, provide graceful fallback
+      const plan = (queryPlan && ['free','starter','growth','enterprise'].includes(queryPlan))
+        ? queryPlan : 'growth';
+      setData(makeDemoSubscriptionData(plan as PlanId, queryCycle));
     } finally {
-      setLoading(false);
+      setPageLoading(false);
     }
-  }, []);
+  }, [queryPlan, queryCycle, router]);
 
   useEffect(() => {
-    fetchSubscription();
-  }, [fetchSubscription]);
-
-  // Auto-trigger checkout if query params are present (from landing page CTA)
-  useEffect(() => {
-    if (!queryPlan || !data || loading) return;
-    if (queryPlan === data.subscription.plan) return; // Already on this plan
-    const planCycle = (queryCycle ?? 'monthly') as BillingCycle;
-    handleChangePlan(queryPlan, planCycle);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [queryPlan, data, loading]);
-
-  const handleChangePlan = async (planId: PlanId, cycle: BillingCycle) => {
-    if (planId === 'enterprise') {
-      window.location.href = '/#contact';
-      return;
+    if (!authLoading && isAuthenticated) {
+      loadData();
     }
+  }, [authLoading, isAuthenticated, loadData]);
 
+  // ── Plan change handlers ────────────────────────────────────────────────────
+
+  const handleChangePlan = useCallback(async (planId: PlanId, cycle: BillingCycle) => {
+    if (planId === 'enterprise') { window.location.href = '/#contact'; return; }
     setActionLoading(true);
+    setSuccessMsg('');
+    setError('');
+
     try {
       const res = await billingApi.checkout(planId, cycle);
       if (res.success) {
-        toast.success(`Plan activated: ${PLAN_META[planId].label}!`);
-        confetti({ particleCount: 60, spread: 55, origin: { y: 0.6 }, colors: ['#f59e0b', '#10b981'] });
-        await fetchSubscription();
+        setSuccessMsg(`✦ ${PLAN_META[planId].label} plan activated successfully!`);
+        await loadData();
       } else {
-        toast.error(res.message ?? 'Plan change failed.');
+        setError(res.message ?? 'Plan change failed. Please try again.');
       }
     } catch {
-      toast.error('Something went wrong. Please try again.');
+      setError('Something went wrong. Please try again.');
     } finally {
       setActionLoading(false);
     }
-  };
+  }, [loadData]);
 
   const handleCancel = async () => {
-    if (!confirm('Cancel your subscription at the end of the current period?')) return;
+    if (!window.confirm('Your subscription will remain active until the end of the current period. Continue?')) return;
     setActionLoading(true);
     try {
       const res = await billingApi.cancelSubscription();
-      if (res.success) {
-        toast.success('Subscription scheduled for cancellation.');
-        await fetchSubscription();
+      if (res.success) { 
+        setSuccessMsg('Subscription scheduled for cancellation at period end.'); 
+        await loadData(); 
       } else {
-        toast.error(res.message ?? 'Cancellation failed.');
+        setError(res.message ?? 'Cancellation failed.');
       }
-    } catch {
-      toast.error('Something went wrong.');
-    } finally {
-      setActionLoading(false);
+    } catch { 
+      setError('Something went wrong.'); 
+    } finally { 
+      setActionLoading(false); 
     }
   };
 
@@ -243,40 +326,46 @@ export default function BillingPage() {
     setActionLoading(true);
     try {
       const res = await billingApi.resumeSubscription();
-      if (res.success) {
-        toast.success('Cancellation reversed — subscription active!');
-        await fetchSubscription();
+      if (res.success) { 
+        setSuccessMsg('Subscription resumed successfully!'); 
+        await loadData(); 
       } else {
-        toast.error(res.message ?? 'Resume failed.');
+        setError(res.message ?? 'Resume failed.');
       }
-    } catch {
-      toast.error('Something went wrong.');
-    } finally {
-      setActionLoading(false);
+    } catch { 
+      setError('Something went wrong.'); 
+    } finally { 
+      setActionLoading(false); 
     }
   };
 
-  // ── Render ────────────────────────────────────────────────────────────────
+  // Auto-trigger plan switch from landing page CTA query params
+  useEffect(() => {
+    if (autoUpgradeDone || !queryPlan || !data || pageLoading || actionLoading) return;
+    if (queryPlan === data.subscription?.plan) return;
+    setAutoUpgradeDone(true);
+    handleChangePlan(queryPlan, queryCycle);
+  }, [queryPlan, queryCycle, data, pageLoading, actionLoading, autoUpgradeDone, handleChangePlan]);
 
-  if (loading) {
+  // ── Render States ───────────────────────────────────────────────────────────
+
+  if (authLoading || (pageLoading && !data)) {
     return (
-      <div style={{ maxWidth: 900, margin: '0 auto', color: '#f8fafc' }}>
-        <div style={{ textAlign: 'center', padding: '80px 0', color: 'var(--text-muted)' }}>
-          <RefreshCw size={28} className="animate-spin" style={{ margin: '0 auto 12px' }} />
-          <p style={{ fontSize: 14 }}>Loading your billing details...</p>
-        </div>
+      <div style={{ maxWidth: 900, margin: '0 auto', padding: '64px 0', textAlign: 'center', color: 'var(--text-muted)' }}>
+        <Spinner size={24} />
+        <p style={{ fontSize: 13, marginTop: 14 }}>Loading your billing details...</p>
       </div>
     );
   }
 
-  if (error) {
+  if (error && !data) {
     return (
-      <div style={{ maxWidth: 900, margin: '0 auto', color: '#f8fafc' }}>
-        <div className="card-linear" style={{ padding: 24, borderRadius: 14, textAlign: 'center' }}>
-          <AlertTriangle size={28} color="#f87171" style={{ margin: '0 auto 12px' }} />
-          <p style={{ fontSize: 14, color: '#f87171', marginBottom: 16 }}>{error}</p>
-          <button type="button" className="btn-gold" onClick={fetchSubscription} style={{ fontSize: 13 }}>
-            Retry
+      <div style={{ maxWidth: 900, margin: '0 auto', padding: 24 }}>
+        <div className="card-linear" style={{ padding: 32, borderRadius: 14, textAlign: 'center' }}>
+          <AlertTriangle size={28} color="#f87171" style={{ margin: '0 auto 12px', display: 'block' }} />
+          <p style={{ fontSize: 14, color: '#f87171', marginBottom: 20 }}>{error}</p>
+          <button type="button" className="btn-gold" onClick={loadData} style={{ fontSize: 13 }}>
+            <RefreshCw size={13} /> Retry
           </button>
         </div>
       </div>
@@ -286,234 +375,210 @@ export default function BillingPage() {
   if (!data) return null;
 
   const { subscription, entitlements, usage, isDemoMode } = data;
-  const currentMeta = PLAN_META[subscription.plan] ?? PLAN_META.free;
+  const plan = subscription?.plan ?? 'free';
+  const currentMeta = PLAN_META[plan] ?? PLAN_META.free;
   const CurrentIcon = currentMeta.icon;
-  const renewalDate = new Date(subscription.currentPeriodEnd).toLocaleDateString('en-IN', {
-    day: 'numeric', month: 'long', year: 'numeric',
-  });
+  const renewalDate = subscription?.currentPeriodEnd
+    ? new Date(subscription.currentPeriodEnd).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })
+    : '—';
 
   return (
-    <ErrorBoundary>
-      <FadeIn style={{ maxWidth: 900, margin: '0 auto', paddingBottom: 60 }}>
+    <div style={{ maxWidth: 900, margin: '0 auto', paddingBottom: 60 }}>
 
-        {/* ── Page Header ── */}
-        <div style={{ marginBottom: 24 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, flexWrap: 'wrap' }}>
-            <AIBadge type="verified" label="SUBSCRIPTION & BILLING MANAGEMENT" />
-            {isDemoMode && (
-              <AIBadge type="nsqf" label="🧪 DEMO BILLING MODE — NO REAL PAYMENT" />
+      {/* ── Page Header ── */}
+      <div style={{ marginBottom: 24 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, flexWrap: 'wrap' }}>
+          <AIBadge type="verified" label="BILLING & SUBSCRIPTION" />
+          {isDemoMode && <AIBadge type="nsqf" label="🧪 DEMO MODE — NO REAL PAYMENT" />}
+        </div>
+        <h1 className="font-display" style={{ fontSize: 24, fontWeight: 900, color: '#f8fafc', margin: '0 0 4px' }}>
+          Billing & <span style={{ color: 'var(--gold)' }}>Subscription</span>
+        </h1>
+        <p style={{ color: 'var(--text-secondary)', fontSize: 13, margin: 0 }}>
+          Manage your plan, usage limits, and billing preferences.
+        </p>
+        {isDemoMode && (
+          <div style={{
+            marginTop: 12, padding: '10px 14px', borderRadius: 8,
+            background: 'rgba(245,158,11,0.06)', border: '1px solid rgba(245,158,11,0.18)',
+            fontSize: 12.5, color: '#fbbf24', display: 'flex', alignItems: 'flex-start', gap: 8,
+          }}>
+            <Shield size={13} style={{ flexShrink: 0, marginTop: 1 }} />
+            <span>Demo Mode — subscription changes are simulated locally. No real payment is processed. Safe for SIH26135 demonstration.</span>
+          </div>
+        )}
+      </div>
+
+      {/* ── Success / Error Banners ── */}
+      {successMsg && (
+        <div style={{
+          marginBottom: 16, padding: '10px 14px', borderRadius: 8,
+          background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)',
+          fontSize: 13, color: '#10b981', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8,
+        }}>
+          <Check size={14} /> {successMsg}
+          <button type="button" onClick={() => setSuccessMsg('')} style={{ marginLeft: 'auto', background: 'none', border: 'none', color: '#10b981', cursor: 'pointer', fontSize: 14 }}>✕</button>
+        </div>
+      )}
+      {error && data && (
+        <div style={{
+          marginBottom: 16, padding: '10px 14px', borderRadius: 8,
+          background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)',
+          fontSize: 13, color: '#f87171', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8,
+        }}>
+          <AlertTriangle size={14} /> {error}
+          <button type="button" onClick={() => setError('')} style={{ marginLeft: 'auto', background: 'none', border: 'none', color: '#f87171', cursor: 'pointer', fontSize: 14 }}>✕</button>
+        </div>
+      )}
+
+      {/* ── Current Plan ── */}
+      <div className="card-accent" style={{ padding: 22, borderRadius: 16, marginBottom: 18 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 14 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+            <div style={{
+              width: 48, height: 48, borderRadius: 14,
+              background: `${currentMeta.color}18`,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <CurrentIcon size={22} color={currentMeta.color} />
+            </div>
+            <div>
+              <p style={{ fontSize: 10.5, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.07em', margin: 0 }}>Current Plan</p>
+              <h2 className="font-display" style={{ fontSize: 26, fontWeight: 900, color: '#f8fafc', margin: '2px 0 4px' }}>
+                {currentMeta.label}
+              </h2>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                <span style={{
+                  fontSize: 10.5, fontWeight: 800, padding: '2px 8px', borderRadius: 99,
+                  background: 'rgba(16,185,129,0.15)', color: '#10b981',
+                }}>
+                  ACTIVE
+                </span>
+                {subscription?.cancelAtPeriodEnd && (
+                  <span style={{ fontSize: 11, fontWeight: 700, color: '#f87171' }}>Cancels {renewalDate}</span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div style={{ textAlign: 'right', flexShrink: 0 }}>
+            {isPaidPlan(plan) && (
+              <>
+                <p style={{ fontSize: 11, color: 'var(--text-muted)', margin: '0 0 2px' }}>Billing Cycle</p>
+                <p style={{ fontSize: 13.5, fontWeight: 700, color: '#f8fafc', margin: '0 0 8px', textTransform: 'capitalize' }}>
+                  {subscription?.billingCycle ?? 'monthly'}
+                </p>
+                <p style={{ fontSize: 11, color: 'var(--text-muted)', margin: '0 0 2px' }}>
+                  {subscription?.cancelAtPeriodEnd ? 'Access Until' : 'Renews'}
+                </p>
+                <p style={{ fontSize: 13, fontWeight: 700, color: '#f8fafc', margin: 0 }}>{renewalDate}</p>
+              </>
+            )}
+            {plan === 'free' && (
+              <p style={{ fontSize: 12.5, color: 'var(--text-muted)', margin: 0 }}>Forever free — no renewal</p>
             )}
           </div>
-          <h1 className="font-display" style={{ fontSize: 24, fontWeight: 800, color: '#f8fafc', margin: 0 }}>
-            Billing & <span style={{ color: 'var(--gold)' }}>Subscription</span>
-          </h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: 13, marginTop: 4 }}>
-            Manage your plan, usage limits, and billing preferences.
-          </p>
-          {isDemoMode && (
-            <div style={{
-              marginTop: 12, padding: '10px 14px', borderRadius: 8,
-              background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.2)',
-              fontSize: 12.5, color: '#fbbf24', display: 'flex', alignItems: 'center', gap: 7,
-            }}>
-              <Shield size={13} />
-              Demo Mode: Subscription changes are stored in the database but no real payment is charged. This is safe for SIH demonstration.
-            </div>
-          )}
         </div>
 
-        {/* ── Current Plan Card ── */}
-        <div className="card-accent" style={{ padding: 22, borderRadius: 16, marginBottom: 20 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-              <div style={{
-                width: 48, height: 48, borderRadius: 14,
-                background: `${currentMeta.color}20`,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                <CurrentIcon size={22} color={currentMeta.color} />
-              </div>
-              <div>
-                <p style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', margin: 0 }}>
-                  Current Plan
-                </p>
-                <h2 className="font-display" style={{ fontSize: 26, fontWeight: 900, color: '#f8fafc', margin: '2px 0' }}>
-                  {currentMeta.label}
-                </h2>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                  <span style={{
-                    fontSize: 11, fontWeight: 800, padding: '2px 8px', borderRadius: 99,
-                    background: subscription.status === 'active' ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)',
-                    color: subscription.status === 'active' ? '#10b981' : '#f87171',
-                  }}>
-                    {subscription.status.toUpperCase()}
-                  </span>
-                  {subscription.cancelAtPeriodEnd && (
-                    <span style={{ fontSize: 11, fontWeight: 700, color: '#f87171' }}>
-                      Cancels {renewalDate}
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            <div style={{ textAlign: 'right' }}>
-              {isPaidPlan(subscription.plan) && (
-                <>
-                  <p style={{ fontSize: 11.5, color: 'var(--text-muted)', margin: '0 0 2px' }}>
-                    Billing Cycle
-                  </p>
-                  <p style={{ fontSize: 14, fontWeight: 700, color: '#f8fafc', margin: 0, textTransform: 'capitalize' }}>
-                    {subscription.billingCycle}
-                  </p>
-                  <p style={{ fontSize: 11.5, color: 'var(--text-muted)', margin: '8px 0 2px' }}>
-                    {subscription.cancelAtPeriodEnd ? 'Access Until' : 'Renews'}
-                  </p>
-                  <p style={{ fontSize: 13, fontWeight: 700, color: '#f8fafc', margin: 0 }}>
-                    {renewalDate}
-                  </p>
-                </>
-              )}
-              {subscription.plan === 'free' && (
-                <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>No renewal — forever free</p>
-              )}
-            </div>
+        {isPaidPlan(plan) && (
+          <div style={{ marginTop: 16, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+            {subscription?.cancelAtPeriodEnd ? (
+              <button type="button" onClick={handleResume} disabled={actionLoading} className="btn-gold" style={{ fontSize: 12.5 }}>
+                {actionLoading ? <Spinner size={12} /> : <Check size={13} />}
+                Resume Subscription
+              </button>
+            ) : (
+              <button type="button" onClick={handleCancel} disabled={actionLoading} className="btn-secondary" style={{ fontSize: 12.5 }}>
+                {actionLoading ? <Spinner size={12} /> : null}
+                Cancel at Period End
+              </button>
+            )}
           </div>
+        )}
+      </div>
 
-          {/* Action Buttons */}
-          {isPaidPlan(subscription.plan) && (
-            <div style={{ marginTop: 16, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-              {subscription.cancelAtPeriodEnd ? (
-                <button
-                  type="button"
-                  onClick={handleResume}
-                  disabled={actionLoading}
-                  className="btn-gold"
-                  style={{ fontSize: 12.5 }}
-                >
-                  {actionLoading ? <RefreshCw size={13} className="animate-spin" /> : <Check size={13} />}
-                  Resume Subscription
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={handleCancel}
-                  disabled={actionLoading}
-                  className="btn-secondary"
-                  style={{ fontSize: 12.5 }}
-                >
-                  Cancel at Period End
-                </button>
-              )}
-            </div>
-          )}
+      {/* ── Usage This Period ── */}
+      <div className="card-linear" style={{ padding: 20, borderRadius: 16, marginBottom: 18 }}>
+        <h3 className="font-display" style={{ fontSize: 14, fontWeight: 800, color: '#f8fafc', margin: '0 0 14px', display: 'flex', alignItems: 'center', gap: 7 }}>
+          <Zap size={14} color="var(--gold)" />
+          Usage This Period
+          <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 400, marginLeft: 2 }}>({usage?.period ?? '—'})</span>
+        </h3>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(190px,1fr))', gap: 10 }}>
+          <UsageMeter label="AI Analyses"        icon={Brain}    used={usage?.aiRequests ?? 0}       limit={entitlements?.bypassedByRole ? null : (entitlements?.limits?.maxAIRequestsPerMonth ?? 20)}  color="var(--gold)" />
+          <UsageMeter label="Trainees Enrolled"  icon={Users}    used={usage?.traineesCreated ?? 0}  limit={entitlements?.bypassedByRole ? null : (entitlements?.limits?.maxTrainees ?? 10)}            color="#60a5fa" />
+          <UsageMeter label="Assessments Run"    icon={Zap}      used={usage?.assessmentsRun ?? 0}   limit={entitlements?.bypassedByRole ? null : (entitlements?.limits?.maxAssessmentsPerMonth ?? 5)}  color="#10b981" />
+          <UsageMeter label="Outcome Records"    icon={FileText} used={usage?.outcomeRecords ?? 0}   limit={entitlements?.bypassedByRole ? null : (entitlements?.limits?.maxOutcomeRecords ?? null)}    color="#c084fc" />
         </div>
-
-        {/* ── Usage Meters ── */}
-        <div className="card-linear" style={{ padding: 22, borderRadius: 16, marginBottom: 20 }}>
-          <h3 className="font-display" style={{ fontSize: 15, fontWeight: 800, color: '#f8fafc', margin: '0 0 14px', display: 'flex', alignItems: 'center', gap: 7 }}>
-            <Zap size={16} color="var(--gold)" /> Usage This Period
-            <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 400, marginLeft: 4 }}>
-              ({usage.period})
-            </span>
-          </h3>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>
-            <UsageMeter
-              label="AI Analyses"
-              icon={Brain}
-              used={usage.aiRequests}
-              limit={entitlements.bypassedByRole ? null : entitlements.limits.maxAIRequestsPerMonth}
-              color="var(--gold)"
-            />
-            <UsageMeter
-              label="Trainees Enrolled"
-              icon={Users}
-              used={usage.traineesCreated}
-              limit={entitlements.bypassedByRole ? null : entitlements.limits.maxTrainees}
-              color="#60a5fa"
-            />
-            <UsageMeter
-              label="Assessments Run"
-              icon={Zap}
-              used={usage.assessmentsRun}
-              limit={entitlements.bypassedByRole ? null : entitlements.limits.maxAssessmentsPerMonth}
-              color="#10b981"
-            />
-            <UsageMeter
-              label="Outcome Records"
-              icon={FileText}
-              used={usage.outcomeRecords}
-              limit={entitlements.bypassedByRole ? null : entitlements.limits.maxOutcomeRecords}
-              color="#c084fc"
-            />
+        {entitlements?.bypassedByRole && (
+          <div style={{ marginTop: 12, fontSize: 12, color: '#10b981', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 5 }}>
+            <Lock size={12} /> Your role has unlimited access — no quota limits apply.
           </div>
-          {entitlements.bypassedByRole && (
-            <p style={{ fontSize: 12, color: '#10b981', marginTop: 12, display: 'flex', alignItems: 'center', gap: 5 }}>
-              <Lock size={12} />
-              Your role has unlimited access to all features. No quota limits apply.
-            </p>
-          )}
-        </div>
+        )}
+      </div>
 
-        {/* ── Upgrade / Change Plan ── */}
-        <div className="card-linear" style={{ padding: 22, borderRadius: 16, marginBottom: 20 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 10 }}>
-            <h3 className="font-display" style={{ fontSize: 15, fontWeight: 800, color: '#f8fafc', margin: 0 }}>
-              Available Plans
-            </h3>
-
-            {/* Billing Cycle Toggle */}
-            <div style={{
-              display: 'flex', background: 'rgba(255,255,255,0.03)',
-              border: '1px solid var(--border)', borderRadius: 99, padding: 3, gap: 3,
-            }}>
-              {(['monthly', 'yearly'] as BillingCycle[]).map((c) => (
-                <button
-                  key={c}
-                  type="button"
-                  onClick={() => setSelectedCycle(c)}
-                  style={{
-                    padding: '5px 14px', borderRadius: 99, fontSize: 12, fontWeight: 700,
-                    cursor: 'pointer', border: 'none', transition: 'all 0.15s ease',
-                    background: selectedCycle === c ? 'var(--gold)' : 'transparent',
-                    color: selectedCycle === c ? '#090a0f' : 'var(--text-secondary)',
-                  }}
-                >
-                  {c === 'monthly' ? 'Monthly' : 'Yearly (Save 17%)'}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {PLAN_ORDER.map((planId) => (
-              <PlanOption
-                key={planId}
-                planId={planId}
-                currentPlan={subscription.plan}
-                cycle={selectedCycle}
-                onSelect={(p) => handleChangePlan(p, selectedCycle)}
-                loading={actionLoading}
-              />
+      {/* ── Available Plans ── */}
+      <div className="card-linear" style={{ padding: 20, borderRadius: 16, marginBottom: 18 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14, flexWrap: 'wrap', gap: 10 }}>
+          <h3 className="font-display" style={{ fontSize: 14, fontWeight: 800, color: '#f8fafc', margin: 0 }}>Available Plans</h3>
+          <div style={{ display: 'inline-flex', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: 99, padding: 3, gap: 3 }}>
+            {(['monthly', 'yearly'] as BillingCycle[]).map((c) => (
+              <button
+                key={c} type="button" onClick={() => setSelectedCycle(c)}
+                style={{
+                  padding: '5px 14px', borderRadius: 99, fontSize: 11.5, fontWeight: 700,
+                  cursor: 'pointer', border: 'none', transition: 'all 0.15s ease',
+                  background: selectedCycle === c ? 'var(--gold)' : 'transparent',
+                  color: selectedCycle === c ? '#090a0f' : 'var(--text-secondary)',
+                }}
+              >
+                {c === 'monthly' ? 'Monthly' : 'Yearly (Save 17%)'}
+              </button>
             ))}
           </div>
         </div>
-
-        {/* ── Security Note ── */}
-        <div style={{
-          padding: '12px 16px', borderRadius: 10,
-          background: 'rgba(16,185,129,0.06)', border: '1px solid rgba(16,185,129,0.15)',
-          display: 'flex', alignItems: 'flex-start', gap: 10,
-        }}>
-          <Shield size={15} color="#10b981" style={{ flexShrink: 0, marginTop: 2 }} />
-          <p style={{ fontSize: 12, color: '#94a3b8', margin: 0, lineHeight: 1.5 }}>
-            {isDemoMode
-              ? 'DEMO MODE: No real payment is processed. This simulates the billing flow for demonstration purposes.'
-              : 'Your payment information is never stored on our servers. All transactions are processed through our PCI-compliant payment provider with SHA-256 verification.'}
-          </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {PLAN_ORDER.map((pid) => (
+            <PlanOptionRow
+              key={pid}
+              planId={pid}
+              currentPlan={plan}
+              cycle={selectedCycle}
+              onSelect={(p) => handleChangePlan(p, selectedCycle)}
+              loading={actionLoading}
+            />
+          ))}
         </div>
+      </div>
 
-      </FadeIn>
-    </ErrorBoundary>
+      {/* ── Security Note ── */}
+      <div style={{
+        padding: '12px 16px', borderRadius: 10,
+        background: 'rgba(16,185,129,0.04)', border: '1px solid rgba(16,185,129,0.12)',
+        display: 'flex', alignItems: 'flex-start', gap: 9,
+      }}>
+        <Shield size={14} color="#10b981" style={{ flexShrink: 0, marginTop: 2 }} />
+        <p style={{ fontSize: 12, color: '#94a3b8', margin: 0, lineHeight: 1.5 }}>
+          {isDemoMode
+            ? 'DEMO MODE: No real payment is processed. This simulates the full billing lifecycle for demonstration (SIH26135). All changes are local or in demo mode DB.'
+            : 'Your payment information is never stored on our servers. All transactions are processed through a PCI-compliant payment provider with SHA-256 verification.'}
+        </p>
+      </div>
+
+    </div>
+  );
+}
+
+// ─── Exported Page — wraps inner in Suspense (required for useSearchParams) ──
+
+export default function BillingPage() {
+  return (
+    <Suspense fallback={
+      <div style={{ maxWidth: 900, margin: '0 auto', padding: '64px 0', textAlign: 'center', color: 'var(--text-muted)', fontSize: 13 }}>
+        Loading billing details...
+      </div>
+    }>
+      <BillingPageInner />
+    </Suspense>
   );
 }
