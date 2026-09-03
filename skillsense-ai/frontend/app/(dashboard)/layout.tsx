@@ -724,35 +724,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
           {/* Right: Telemetry, Notifications, Theme & Profile */}
           <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 6, flexShrink: 0, whiteSpace: 'nowrap' }}>
-            {/* Stakeholder Workspace Switcher (Desktop Only) */}
-            <div className="hidden lg:flex" style={{ alignItems: 'center', gap: 3, background: 'var(--bg-surface-elevated)', padding: 3, borderRadius: 8, border: '1px solid var(--border)' }}>
-              {[
-                { role: 'student', label: 'Student', href: '/student' },
-                { role: 'institute', label: 'College', href: '/institute' },
-                { role: 'employer', label: 'Employer', href: '/employer' },
-                { role: 'government', label: 'Gov', href: '/government' },
-              ].map((sw) => {
-                const isCur = pathname.startsWith(sw.href);
-                return (
-                  <Link
-                    key={sw.role}
-                    href={sw.href}
-                    style={{
-                      fontSize: 11,
-                      fontWeight: isCur ? 700 : 500,
-                      padding: '3px 8px',
-                      borderRadius: 6,
-                      background: isCur ? 'var(--gold-muted)' : 'transparent',
-                      color: isCur ? 'var(--gold)' : 'var(--text-muted)',
-                      textDecoration: 'none',
-                      transition: 'all 0.15s ease',
-                    }}
-                  >
-                    {sw.label}
-                  </Link>
-                );
-              })}
-            </div>
 
             {/* Live AI Telemetry Pill */}
             <Link
@@ -906,38 +877,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   >
                     <X size={16} />
                   </button>
-                </div>
-
-                {/* Workspace Role Switcher */}
-                <div style={{ marginBottom: 14, background: 'var(--bg-surface-elevated)', padding: 3, borderRadius: 8, border: '1px solid var(--border)', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 2 }}>
-                  {[
-                    { role: 'student', label: 'Student', href: '/student' },
-                    { role: 'institute', label: 'College', href: '/institute' },
-                    { role: 'employer', label: 'Employer', href: '/employer' },
-                    { role: 'government', label: 'Gov', href: '/government' },
-                  ].map((sw) => {
-                    const isCur = pathname.startsWith(sw.href);
-                    return (
-                      <Link
-                        key={sw.role}
-                        href={sw.href}
-                        onClick={() => setMobileOpen(false)}
-                        style={{
-                          fontSize: 10.5,
-                          fontWeight: isCur ? 700 : 500,
-                          padding: '5px 2px',
-                          borderRadius: 6,
-                          textAlign: 'center',
-                          background: isCur ? 'var(--gold-muted)' : 'transparent',
-                          color: isCur ? 'var(--gold)' : 'var(--text-muted)',
-                          textDecoration: 'none',
-                          transition: 'all 0.15s ease',
-                        }}
-                      >
-                        {sw.label}
-                      </Link>
-                    );
-                  })}
                 </div>
 
                 {/* Mobile Navigation Links */}
