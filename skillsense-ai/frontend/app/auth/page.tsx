@@ -147,21 +147,20 @@ export default function AuthPage() {
   };
 
   // ── Instant 1-Click Demo Login ──────────────────────────────────────────────
-  const { demoLogin } = useAuthStore();
-
-  const handleInstantDemoLogin = async (role: UserRole) => {
+  const handleInstantDemoLogin = (role: UserRole) => {
     const demo = DEMO_ACCOUNTS[role];
-    setLoading(true);
-    try {
-      removeTokens();
-      const user = await demoLogin(role);
-      const targetRole = (user?.role || role).toLowerCase();
-      const destination = ROLE_DASHBOARD[targetRole] || demo.defaultRoute;
-      toast.success(`Logged in as ${user?.name || demo.name} (${targetRole.toUpperCase()})`);
-      window.location.replace(destination);
-    } catch {
-      window.location.replace(demo.defaultRoute);
-    }
+    const demoUser = {
+      _id: `demo_${role}_001`,
+      id: `demo_${role}_001`,
+      name: demo.name,
+      email: demo.email,
+      role,
+      isVerified: true,
+      authProvider: 'local' as const,
+    };
+    const demoToken = `demo_token_${role}_${Date.now()}`;
+    setAuth(demoUser, demoToken);
+    router.push(demo.defaultRoute);
   };
 
   return (
@@ -271,7 +270,7 @@ export default function AuthPage() {
                     e.currentTarget.style.background = 'rgba(255,255,255,0.03)';
                   }}
                 >
-                  <div style={{ padding: 8, borderRadius: 8, background: 'rgba(245,158,11,0.12)', color: 'var(--gold)' }}>
+                  <div style={{ padding: 8, borderRadius: 8, background: 'rgba(245,158,11,0.12)', color: 'var(--gold)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <Icon size={18} />
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>

@@ -221,6 +221,7 @@ function TableCell({ value, isGrowth }: { value: string | boolean; isGrowth?: bo
 export default function PricingSection() {
   const [cycle, setCycle] = useState<BillingCycle>('monthly');
   const [showComparison, setShowComparison] = useState(false);
+  const [hoveredPlanId, setHoveredPlanId] = useState<string | null>('growth');
   const sectionRef = useRef<HTMLElement>(null);
   const inView = useInView(sectionRef);
   const router = useRouter();
@@ -325,16 +326,19 @@ export default function PricingSection() {
         </div>
 
         {/* ── Plan Cards ── */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-          gap: 20,
-          alignItems: 'start',
-          marginBottom: 48,
-        }}>
+        <div
+          onMouseLeave={() => setHoveredPlanId('growth')}
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+            gap: 20,
+            alignItems: 'start',
+            marginBottom: 48,
+          }}
+        >
           {PLANS.map((plan, i) => {
             const Icon = plan.icon;
-            const isGrowth = plan.id === 'growth';
+            const isHighlighted = (hoveredPlanId || 'growth') === plan.id;
             const displayPrice = cycle === 'monthly'
               ? (plan.isCustom ? 'Custom' : plan.monthlyPrice === 0 ? '₹0' : fmtPrice(plan.monthlyPrice))
               : (plan.isCustom ? 'Custom' : plan.yearlyPrice === 0 ? '₹0' : fmtPrice(plan.yearlyPerMonth));
@@ -346,26 +350,21 @@ export default function PricingSection() {
             return (
               <div
                 key={plan.id}
-                className={isGrowth ? 'pricing-card-growth' : 'pricing-card-standard'}
+                className={isHighlighted ? 'pricing-card-growth' : 'pricing-card-standard'}
+                onMouseEnter={() => setHoveredPlanId(plan.id)}
                 style={{
                   position: 'relative',
                   borderRadius: 18,
                   padding: '28px 24px',
-                  transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-                  transform: isGrowth ? 'scale(1.03)' : 'scale(1)',
+                  transition: 'transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s ease, border-color 0.25s ease, background 0.25s ease',
+                  transform: isHighlighted ? 'scale(1.03) translateY(-8px)' : 'scale(1)',
+                  boxShadow: isHighlighted
+                    ? '0 24px 64px rgba(245,158,11,0.22)'
+                    : 'none',
                   opacity: inView ? 1 : 0,
                   animationDelay: `${i * 100}ms`,
                   backdropFilter: 'blur(12px)',
-                }}
-                onMouseEnter={e => {
-                  (e.currentTarget as HTMLElement).style.transform = isGrowth ? 'scale(1.03) translateY(-8px)' : 'translateY(-8px)';
-                  (e.currentTarget as HTMLElement).style.boxShadow = isGrowth
-                    ? '0 24px 64px rgba(245,158,11,0.2)'
-                    : '0 16px 48px rgba(0,0,0,0.15)';
-                }}
-                onMouseLeave={e => {
-                  (e.currentTarget as HTMLElement).style.transform = isGrowth ? 'scale(1.03)' : 'scale(1)';
-                  (e.currentTarget as HTMLElement).style.boxShadow = 'none';
+                  cursor: 'pointer',
                 }}
               >
                 {/* Most Popular badge */}
@@ -388,7 +387,7 @@ export default function PricingSection() {
                     background: `rgba(${plan.id === 'free' ? '100,116,139' : plan.id === 'starter' ? '96,165,250' : plan.id === 'growth' ? '245,158,11' : '16,185,129'},0.12)`,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}>
-                    <Icon size={18} color={plan.color} />
+                    <Icon size={18} color={isHighlighted ? 'var(--gold)' : plan.color} />
                   </div>
                   <div>
                     <h3 className="font-display" style={{ fontSize: 17, fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
@@ -405,7 +404,12 @@ export default function PricingSection() {
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
                     <span
                       className="font-display"
-                      style={{ fontSize: plan.isCustom ? 28 : 38, fontWeight: 900, color: isGrowth ? 'var(--gold)' : 'var(--text-primary)' }}
+                      style={{
+                        fontSize: plan.isCustom ? 28 : 38,
+                        fontWeight: 900,
+                        color: isHighlighted ? 'var(--gold)' : 'var(--text-primary)',
+                        transition: 'color 0.2s ease',
+                      }}
                     >
                       {displayPrice}
                     </span>
@@ -432,7 +436,7 @@ export default function PricingSection() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 9, marginBottom: 24 }}>
                   {plan.features.map((f, j) => (
                     <div key={j} style={{ display: 'flex', alignItems: 'flex-start', gap: 9 }}>
-                      <Check size={14} color={isGrowth ? 'var(--gold)' : '#10b981'} style={{ flexShrink: 0, marginTop: 2 }} />
+                      <Check size={14} color={isHighlighted ? 'var(--gold)' : '#10b981'} style={{ flexShrink: 0, marginTop: 2, transition: 'color 0.2s ease' }} />
                       <span style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.4 }}>{f}</span>
                     </div>
                   ))}
@@ -452,16 +456,17 @@ export default function PricingSection() {
                     width: '100%', padding: '12px 0', borderRadius: 12,
                     fontSize: 14, fontWeight: 700, cursor: 'pointer',
                     fontFamily: "'Space Grotesk', sans-serif",
-                    transition: 'all 0.2s ease',
-                    background: isGrowth
+                    transition: 'all 0.25s ease',
+                    background: isHighlighted
                       ? 'linear-gradient(135deg, #f59e0b, #fbbf24)'
                       : 'transparent',
-                    border: isGrowth ? 'none' : `1px solid rgba(255,255,255,0.12)`,
-                    color: isGrowth ? '#090a0f' : '#f8fafc',
+                    border: isHighlighted ? 'none' : `1px solid rgba(255,255,255,0.12)`,
+                    color: isHighlighted ? '#090a0f' : '#f8fafc',
+                    boxShadow: isHighlighted ? '0 4px 20px rgba(245, 158, 11, 0.35)' : 'none',
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
                   }}
                   onMouseEnter={e => {
-                    if (!isGrowth) {
+                    if (!isHighlighted) {
                       (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)';
                       (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.2)';
                     } else {
@@ -469,7 +474,7 @@ export default function PricingSection() {
                     }
                   }}
                   onMouseLeave={e => {
-                    if (!isGrowth) {
+                    if (!isHighlighted) {
                       (e.currentTarget as HTMLElement).style.background = 'transparent';
                       (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.12)';
                     } else {

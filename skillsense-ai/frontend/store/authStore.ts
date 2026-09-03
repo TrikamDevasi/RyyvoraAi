@@ -116,7 +116,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   demoLogin: async (role: UserRole) => {
     set({ loading: true, error: null });
     try {
-      const response = await api.post('/auth/demo-login', { role });
+      const response = await api.post('/auth/demo-login', { role }, { timeout: 600 });
       const { user, token } = response.data.data;
       setTokens(token, user.role);
       persistUser(user);
