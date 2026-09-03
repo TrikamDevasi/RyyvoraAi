@@ -27,7 +27,7 @@ export default function KPICard({
 
     return (
         <div
-            className="card-kpi card-interactive"
+            className="card-kpi card-interactive card-3d"
             style={{
                 borderRadius: compact ? 'var(--radius-md)' : 'var(--radius-lg)',
                 padding: compact ? '14px 16px' : '18px 22px',
@@ -69,7 +69,7 @@ export default function KPICard({
                 </p>
                 {icon && (
                     <div
-                        className="card-icon-container"
+                        className="card-icon-container interactive-icon"
                         style={{
                             width: compact ? 28 : 34,
                             height: compact ? 28 : 34,
@@ -109,7 +109,7 @@ export default function KPICard({
                         style={{
                             display: 'inline-flex',
                             alignItems: 'center',
-                            gap: 3,
+                            gap: 4,
                             padding: '2px 7px',
                             borderRadius: 'var(--radius-pill)',
                             fontSize: 11,
@@ -135,7 +135,7 @@ export default function KPICard({
                             }`,
                         }}
                     >
-                        {trendDirection === 'up' ? '↑' : trendDirection === 'down' ? '↓' : '→'}
+                        <span className="interactive-arrow">{trendDirection === 'up' ? '↑' : trendDirection === 'down' ? '↓' : '→'}</span>
                         {' '}{Math.abs(trend)}%
                     </span>
                     <span style={{ color: 'var(--text-muted)', fontSize: 11 }}>vs previous</span>

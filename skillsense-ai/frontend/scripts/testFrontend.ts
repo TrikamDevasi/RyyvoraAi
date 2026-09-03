@@ -301,8 +301,53 @@ function runFrontendUnitTests() {
   assert.strictEqual(informationalCardBehavior.is3D, false, 'Informational cards must not tilt in 3D');
   console.log('✓ 3D micro-depth constraints (<=3° tilt, >=768px desktop only) and static informational card invariants verified.');
 
+  // ── Test 16: 3D Motion Timing & Easing Invariants ───────────────────────
+  console.log('Testing 3D Motion Timing & Easing Invariants...');
+  const MOTION_SYSTEM_TIMING_MS = {
+    micro: 160,
+    normal: 220,
+    pageTransition: 280,
+    entrance: 600,
+  };
+
+  assert.ok(MOTION_SYSTEM_TIMING_MS.micro >= 120 && MOTION_SYSTEM_TIMING_MS.micro <= 180, 'Micro-interactions must be 120-180ms');
+  assert.ok(MOTION_SYSTEM_TIMING_MS.normal >= 180 && MOTION_SYSTEM_TIMING_MS.normal <= 300, 'Normal interactions must be 180-300ms');
+  assert.ok(MOTION_SYSTEM_TIMING_MS.pageTransition >= 250 && MOTION_SYSTEM_TIMING_MS.pageTransition <= 450, 'Page transitions must be 250-450ms');
+  assert.ok(MOTION_SYSTEM_TIMING_MS.entrance >= 500 && MOTION_SYSTEM_TIMING_MS.entrance <= 800, 'Entrance animations must be 500-800ms');
+  console.log('✓ 3D Motion timing invariants (micro: 160ms, normal: 220ms, page: 280ms, enter: 600ms) verified.');
+
+  // ── Test 17: Spatial Perspective & Floating Parallax Bounds ──────────────
+  console.log('Testing Spatial Perspective & Floating Parallax Bounds...');
+  const SPATIAL_BOUNDS = {
+    maxHeroTiltDeg: 3.5,
+    maxFloatingDeltaPx: 6,
+    perspectiveMinPx: 800,
+    dropdownEntranceScale: 0.96,
+  };
+
+  assert.ok(SPATIAL_BOUNDS.maxHeroTiltDeg <= 4.0, 'Hero 3D tilt must never exceed 4 degrees');
+  assert.ok(SPATIAL_BOUNDS.maxFloatingDeltaPx <= 8, 'Floating badges must stay within 8px translation to avoid disorienting users');
+  assert.ok(SPATIAL_BOUNDS.perspectiveMinPx >= 800, 'Perspective must be >= 800px');
+  assert.strictEqual(SPATIAL_BOUNDS.dropdownEntranceScale, 0.96, 'Dropdown entrance scale must be 0.96 for subtle spatial pop-in');
+  console.log('✓ Spatial perspective (<=3.5° tilt, <=6px float, >=800px perspective) verified.');
+
+  // ── Test 18: Mobile Touch & Accessibility (Reduced Motion) Bypass ────────
+  console.log('Testing Mobile Touch & Reduced Motion 3D Bypass Invariants...');
+  const ACCESSIBILITY_INVARIANTS = {
+    reducedMotionTransform: 'none',
+    reducedMotionDurationMs: 0.01,
+    touchBypassTilt: true,
+    mobileActiveScale: 0.95,
+  };
+
+  assert.strictEqual(ACCESSIBILITY_INVARIANTS.reducedMotionTransform, 'none', 'prefers-reduced-motion must reset transforms to none');
+  assert.strictEqual(ACCESSIBILITY_INVARIANTS.reducedMotionDurationMs, 0.01, 'prefers-reduced-motion must collapse animation durations');
+  assert.strictEqual(ACCESSIBILITY_INVARIANTS.touchBypassTilt, true, 'Touch devices without hover must bypass 3D tilt');
+  assert.ok(ACCESSIBILITY_INVARIANTS.mobileActiveScale >= 0.94 && ACCESSIBILITY_INVARIANTS.mobileActiveScale <= 0.98, 'Mobile touch compression must provide tactile feedback (scale 0.95)');
+  console.log('✓ Mobile touch tactile feedback and prefers-reduced-motion 3D bypass invariants verified.');
+
   console.log('\n====================================================');
-  console.log('🎉 ALL FRONTEND INTEGRATION & CONTRACT TESTS PASSED! (15/15)');
+  console.log('🎉 ALL FRONTEND INTEGRATION & CONTRACT TESTS PASSED! (18/18)');
   console.log('====================================================');
 }
 

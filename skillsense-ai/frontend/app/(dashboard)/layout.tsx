@@ -759,7 +759,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* Verification banner if applicable */}
         <VerificationBanner />
 
-        {/* Main Content Area */}
+        {/* Main Content Area with Hardware-Accelerated Route Transitions */}
         <main
           style={{
             flex: 1,
@@ -770,7 +770,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           }}
           className="dashboard-main-content sm:p-5 md:p-7"
         >
-          {children}
+          <motion.div
+            key={pathname}
+            initial={{ opacity: 0, y: 8, scale: 0.995 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+            style={{ width: '100%' }}
+          >
+            {children}
+          </motion.div>
         </main>
 
         {/* ── Fixed Mobile Bottom Navigation Bar (Mobile Only: <768px) ── */}

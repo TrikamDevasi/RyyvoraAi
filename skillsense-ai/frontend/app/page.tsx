@@ -42,6 +42,7 @@ import {
 } from 'lucide-react';
 
 import { AIBadge } from '@/components/ui/AIBadge';
+import Tilt3D from '@/components/ui/Tilt3D';
 import PricingSection from '@/components/sections/PricingSection';
 import ThemeToggle from '@/components/shared/ThemeToggle';
 
@@ -214,15 +215,15 @@ export default function LandingPage() {
           >
             <Link
               href="/government"
-              className="btn-gold"
+              className="btn-gold btn-3d"
               style={{ fontSize: 13.5, padding: '12px 24px', boxShadow: '0 4px 20px rgba(245,158,11,0.3)' }}
             >
-              <Landmark size={16} /> Government State Cockpit <ArrowRight size={15} />
+              <Landmark size={16} /> Government State Cockpit <ArrowRight size={15} className="interactive-arrow" />
             </Link>
 
             <Link
               href="/student/journey"
-              className="btn-secondary"
+              className="btn-secondary btn-3d"
               style={{ fontSize: 13.5, padding: '12px 22px' }}
             >
               <Milestone size={16} /> Trainee Outcome Journey
@@ -230,7 +231,7 @@ export default function LandingPage() {
 
             <Link
               href="/employer/validations"
-              className="btn-secondary"
+              className="btn-secondary btn-3d"
               style={{ fontSize: 13.5, padding: '12px 22px' }}
             >
               <ShieldCheck size={16} /> Employer Verification Ledger
@@ -238,78 +239,128 @@ export default function LandingPage() {
           </motion.div>
 
 
-          {/* ── Realistic Product Dashboard Preview ── */}
+          {/* ── Realistic Product Dashboard Preview with 3D Spatial Tilt ── */}
           <motion.div
             initial={{ opacity: 0, scale: 0.96, y: 30 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="card-accent"
-            style={{
-              maxWidth: 1040,
-              margin: '0 auto',
-              padding: 24,
-              borderRadius: 18,
-              textAlign: 'left',
-              boxShadow: '0 20px 80px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.08)',
-            }}
+            style={{ position: 'relative', maxWidth: 1040, margin: '0 auto' }}
           >
-            {/* Top Preview Bar */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18, borderBottom: '1px solid var(--border)', paddingBottom: 14 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#ef4444' }} />
-                <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#f59e0b' }} />
-                <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#10b981' }} />
-                <span style={{ fontSize: 12, color: 'var(--text-muted)', marginLeft: 8, fontFamily: 'monospace' }}>
-                  skillsense.ai/student/intelligence-cockpit
-                </span>
-              </div>
-              <AIBadge type="verified" label="SHA-256 VERIFIED" />
+            {/* Spatial Floating Badge 1 (Top-Right) */}
+            <div
+              className="floating-badge-1 hidden sm:flex"
+              style={{
+                position: 'absolute',
+                top: -14,
+                right: 24,
+                background: 'var(--bg-surface)',
+                border: '1px solid var(--gold-border)',
+                boxShadow: '0 8px 24px -4px rgba(245,158,11,0.22)',
+                borderRadius: 'var(--radius-pill)',
+                padding: '6px 14px',
+                alignItems: 'center',
+                gap: 8,
+                zIndex: 10,
+              }}
+            >
+              <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#10b981', boxShadow: '0 0 6px #10b981' }} />
+              <span style={{ fontSize: 11.5, fontWeight: 800, color: 'var(--text-primary)' }}>
+                98.4% Cryptographically Verified
+              </span>
             </div>
 
-            {/* Mock Cockpit Content */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
-              {/* Score & Profile */}
-              <div className="card-standard" style={{ padding: 18, borderRadius: 'var(--radius-lg)' }}>
-                <div style={{ fontSize: 11, fontWeight: 800, color: 'var(--gold)', textTransform: 'uppercase' }}>
-                  Verified Readiness Score
-                </div>
-                <div className="font-display" style={{ fontSize: 32, fontWeight: 900, color: 'var(--text-primary)', marginTop: 2 }}>
-                  84<span style={{ fontSize: 16, color: 'var(--text-muted)' }}>/100</span>
-                </div>
-                <div style={{ fontSize: 12, color: 'var(--success)', fontWeight: 600, marginTop: 4 }}>
-                  ✓ NSQF Level 5 (Software Engineering)
-                </div>
-                <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 8 }}>
-                  Top Strengths: TypeScript, Node.js REST APIs, Database Optimization.
-                </div>
-              </div>
-
-              {/* Career Match */}
-              <div className="card-standard" style={{ padding: 18, borderRadius: 'var(--radius-lg)' }}>
-                <div style={{ fontSize: 11, fontWeight: 800, color: 'var(--info)', textTransform: 'uppercase' }}>
-                  Top Career Match
-                </div>
-                <div className="font-display" style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-primary)', marginTop: 4 }}>
-                  Full-Stack Cloud Engineer
-                </div>
-                <div style={{ fontSize: 12, color: 'var(--gold)', fontWeight: 700, marginTop: 2 }}>
-                  92% Compatibility · ₹8L–₹16L/yr (Est.)
-                </div>
-                <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 8 }}>
-                  Targeted Upskilling: Distributed Caching & Docker CI/CD (+8%).
-                </div>
-              </div>
-
-              {/* AI Insight Pill */}
-              <div className="card-ai" style={{ padding: 18, borderRadius: 'var(--radius-lg)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, fontWeight: 800, color: 'var(--gold)', textTransform: 'uppercase' }}>
-                  <Sparkles size={13} /> Active AI Copilot Recommendation
-                </div>
-                <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.5, margin: '8px 0 0' }}>
-                  "Candidate has demonstrated advanced API and state management capabilities. Closing the container orchestration gap will accelerate placement readiness in Tier-1 tech hubs."
-                </p>
-              </div>
+            {/* Spatial Floating Badge 2 (Bottom-Left) */}
+            <div
+              className="floating-badge-2 hidden sm:flex"
+              style={{
+                position: 'absolute',
+                bottom: -14,
+                left: 24,
+                background: 'var(--bg-surface)',
+                border: '1px solid var(--border)',
+                boxShadow: '0 8px 24px -4px rgba(0, 0, 0, 0.3)',
+                borderRadius: 'var(--radius-pill)',
+                padding: '6px 14px',
+                alignItems: 'center',
+                gap: 8,
+                zIndex: 10,
+              }}
+            >
+              <Sparkles size={13} color="var(--gold)" />
+              <span style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--text-secondary)' }}>
+                NSQF Level 6 Competency Matrix
+              </span>
             </div>
+
+            <Tilt3D maxRotation={2.5} translateZ={10}>
+              <div
+                className="card-accent"
+                style={{
+                  padding: 24,
+                  borderRadius: 18,
+                  textAlign: 'left',
+                  boxShadow: '0 20px 80px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.08)',
+                }}
+              >
+                {/* Top Preview Bar */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18, borderBottom: '1px solid var(--border)', paddingBottom: 14 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#ef4444' }} />
+                    <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#f59e0b' }} />
+                    <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#10b981' }} />
+                    <span style={{ fontSize: 12, color: 'var(--text-muted)', marginLeft: 8, fontFamily: 'monospace' }}>
+                      skillsense.ai/student/intelligence-cockpit
+                    </span>
+                  </div>
+                  <AIBadge type="verified" label="SHA-256 VERIFIED" />
+                </div>
+
+                {/* Mock Cockpit Content */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
+                  {/* Score & Profile */}
+                  <div className="card-standard" style={{ padding: 18, borderRadius: 'var(--radius-lg)' }}>
+                    <div style={{ fontSize: 11, fontWeight: 800, color: 'var(--gold)', textTransform: 'uppercase' }}>
+                      Verified Readiness Score
+                    </div>
+                    <div className="font-display" style={{ fontSize: 32, fontWeight: 900, color: 'var(--text-primary)', marginTop: 2 }}>
+                      84<span style={{ fontSize: 16, color: 'var(--text-muted)' }}>/100</span>
+                    </div>
+                    <div style={{ fontSize: 12, color: 'var(--success)', fontWeight: 600, marginTop: 4 }}>
+                      ✓ NSQF Level 5 (Software Engineering)
+                    </div>
+                    <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 8 }}>
+                      Top Strengths: TypeScript, Node.js REST APIs, Database Optimization.
+                    </div>
+                  </div>
+
+                  {/* Career Match */}
+                  <div className="card-standard" style={{ padding: 18, borderRadius: 'var(--radius-lg)' }}>
+                    <div style={{ fontSize: 11, fontWeight: 800, color: 'var(--info)', textTransform: 'uppercase' }}>
+                      Top Career Match
+                    </div>
+                    <div className="font-display" style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-primary)', marginTop: 4 }}>
+                      Full-Stack Cloud Engineer
+                    </div>
+                    <div style={{ fontSize: 12, color: 'var(--gold)', fontWeight: 700, marginTop: 2 }}>
+                      92% Compatibility · ₹8L–₹16L/yr (Est.)
+                    </div>
+                    <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 8 }}>
+                      Targeted Upskilling: Distributed Caching & Docker CI/CD (+8%).
+                    </div>
+                  </div>
+
+                  {/* AI Insight Pill */}
+                  <div className="card-ai" style={{ padding: 18, borderRadius: 'var(--radius-lg)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, fontWeight: 800, color: 'var(--gold)', textTransform: 'uppercase' }}>
+                      <Sparkles size={13} className="interactive-ai-icon" /> Active AI Copilot Recommendation
+                    </div>
+                    <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.5, margin: '8px 0 0' }}>
+                      "Candidate has demonstrated advanced API and state management capabilities. Closing the container orchestration gap will accelerate placement readiness in Tier-1 tech hubs."
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </Tilt3D>
           </motion.div>
         </div>
       </section>

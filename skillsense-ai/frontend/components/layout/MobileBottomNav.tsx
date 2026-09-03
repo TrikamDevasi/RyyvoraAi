@@ -126,8 +126,8 @@ export default function MobileBottomNav({ onOpenMore, isMoreOpen }: MobileBottom
                   strokeWidth={active ? 2.4 : 1.8}
                   style={{
                     color: active ? 'var(--gold)' : 'currentColor',
-                    transition: 'transform 0.18s ease',
-                    transform: active ? 'scale(1.06)' : 'scale(1)',
+                    transition: 'transform 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
+                    transform: active ? 'translateY(-2px) scale(1.06)' : 'scale(1)',
                   }}
                 />
               </div>
@@ -196,8 +196,8 @@ export default function MobileBottomNav({ onOpenMore, isMoreOpen }: MobileBottom
               strokeWidth={isMoreOpen || isSecondaryActive ? 2.4 : 1.8}
               style={{
                 color: isMoreOpen || isSecondaryActive ? 'var(--gold)' : 'currentColor',
-                transition: 'transform 0.15s ease',
-                transform: isMoreOpen ? 'rotate(90deg)' : 'scale(1)',
+                transition: 'transform 0.18s cubic-bezier(0.16, 1, 0.3, 1)',
+                transform: isMoreOpen ? 'rotate(90deg) scale(1.06)' : isSecondaryActive ? 'translateY(-2px) scale(1.06)' : 'scale(1)',
               }}
             />
           </div>

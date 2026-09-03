@@ -27,7 +27,7 @@ export function AIInsightCard({
 }: AIInsightCardProps) {
   return (
     <div
-      className="card-ai card-interactive"
+      className="card-ai card-interactive card-3d"
       style={{
         borderRadius: 'var(--radius-lg)',
         padding: '20px 22px',
@@ -37,8 +37,8 @@ export function AIInsightCard({
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12, marginBottom: 10 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div className="card-icon-container" style={{ width: 34, height: 34 }}>
-            <Lightbulb size={17} />
+          <div className="card-icon-container ai-intelligence-halo" style={{ width: 34, height: 34 }}>
+            <Lightbulb size={17} className="interactive-ai-icon" />
           </div>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -74,7 +74,7 @@ export function AIInsightCard({
           {actionHref ? (
             <Link
               href={actionHref}
-              className="btn-gold"
+              className="btn-gold btn-3d"
               style={{ fontSize: 12.5, padding: '7px 16px' }}
             >
               {actionText} <ArrowRight size={14} className="interactive-arrow" />
@@ -83,7 +83,7 @@ export function AIInsightCard({
             <button
               type="button"
               onClick={onAction}
-              className="btn-gold"
+              className="btn-gold btn-3d"
               style={{ fontSize: 12.5, padding: '7px 16px' }}
             >
               {actionText} <ArrowRight size={14} className="interactive-arrow" />

@@ -417,6 +417,180 @@ tbody tr {
   transform: translateY(0) scale(0.98);
 }
 
+/* ── 3D Button Depth ── */
+.btn-3d {
+  perspective: 800px;
+  transform-style: preserve-3d;
+  transition: transform 0.18s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.18s cubic-bezier(0.4, 0, 0.2, 1),
+              background-color 0.18s ease,
+              border-color 0.18s ease;
+}
+
+@media (hover: hover) {
+  .btn-3d:hover {
+    transform: translate3d(0, -2px, 4px);
+    box-shadow: 0 8px 20px -4px rgba(245, 158, 11, 0.35);
+  }
+}
+
+.btn-3d:active {
+  transform: translate3d(0, 1px, 0) scale(0.98);
+  box-shadow: 0 2px 8px -2px rgba(245, 158, 11, 0.2);
+}
+
+/* ── Mobile Bottom Navigation Tactile Press ── */
+.mobile-nav-item {
+  transition: transform 0.14s cubic-bezier(0.4, 0, 0.2, 1), color 0.14s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mobile-nav-item:active {
+  transform: scale(0.95);
+}
+
+/* ── 3D Directional Icon Effects ── */
+.interactive-ai-icon {
+  display: inline-block;
+  transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.interactive-chevron {
+  display: inline-block;
+  transition: transform 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (hover: hover) {
+  .card-interactive:hover .interactive-ai-icon,
+  .interactive-card:hover .interactive-ai-icon {
+    transform: rotateY(12deg) scale(1.08);
+  }
+
+  .card-interactive:hover .interactive-chevron,
+  .interactive-card:hover .interactive-chevron {
+    transform: translateX(2px);
+  }
+}
+
+/* ── Spatial Floating Keyframes (Hero Badges & Accents) ── */
+@keyframes float-subtle-1 {
+  0%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -6px, 0);
+  }
+}
+
+@keyframes float-subtle-2 {
+  0%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -5px, 0);
+  }
+}
+
+.floating-badge-1 {
+  animation: float-subtle-1 4.2s ease-in-out infinite;
+  will-change: transform;
+}
+
+.floating-badge-2 {
+  animation: float-subtle-2 3.6s ease-in-out 0.8s infinite;
+  will-change: transform;
+}
+
+/* ── AI Intelligence Halo Animation ── */
+@keyframes intelligence-halo-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.ai-intelligence-halo {
+  position: relative;
+}
+
+.ai-intelligence-halo::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  background: conic-gradient(from 0deg, var(--gold), #d97706, #10b981, var(--gold));
+  opacity: 0.35;
+  animation: intelligence-halo-spin 8s linear infinite;
+  z-index: -1;
+}
+
+/* ── Spatial Popover & Dropdown Entrance ── */
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -6px, 0) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+/* ── 3D Chart Container ── */
+.chart-container-3d {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (hover: hover) and (min-width: 768px) {
+  .chart-container-3d:hover {
+    border-color: var(--border-active);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+}
+
+/* ── 3D Accessible Flip Card ── */
+.flip-card-container {
+  perspective: 1000px;
+  background: transparent;
+}
+
+.flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: left;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+}
+
+.flip-card-container.is-flipped .flip-card-inner,
+.flip-card-container:hover .flip-card-inner {
+  transform: rotateY(180deg);
+}
+
+.flip-card-front,
+.flip-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  border-radius: var(--radius-lg);
+}
+
+.flip-card-back {
+  transform: rotateY(180deg);
+}
+
 /* Glass Surface Utilities */
 .glass {
   background: var(--bg-surface);
