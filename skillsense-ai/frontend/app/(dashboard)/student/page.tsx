@@ -334,10 +334,10 @@ export default function StudentDashboardPage() {
             {/* Charts Grid: Radar Matrix & Growth Trajectory */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: 20 }}>
               {/* Radar Chart */}
-              <div className="card-linear" style={{ padding: 22, borderRadius: 14 }}>
+              <div className="card-standard" style={{ padding: 22, borderRadius: 'var(--radius-lg)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
                   <div>
-                    <h3 className="font-display" style={{ fontSize: 15, fontWeight: 700, color: '#f8fafc', margin: 0 }}>
+                    <h3 className="font-display" style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>
                       Competency Radar Analysis
                     </h3>
                     <p style={{ fontSize: 11.5, color: 'var(--text-muted)', margin: '2px 0 0' }}>
@@ -360,17 +360,17 @@ export default function StudentDashboardPage() {
               </div>
 
               {/* Trajectory Area Chart */}
-              <div className="card-linear" style={{ padding: 22, borderRadius: 14 }}>
+              <div className="card-standard" style={{ padding: 22, borderRadius: 'var(--radius-lg)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
                   <div>
-                    <h3 className="font-display" style={{ fontSize: 15, fontWeight: 700, color: '#f8fafc', margin: 0 }}>
+                    <h3 className="font-display" style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>
                       Score Growth Trajectory
                     </h3>
                     <p style={{ fontSize: 11.5, color: 'var(--text-muted)', margin: '2px 0 0' }}>
                       Progression across recent evaluation cycles vs industry benchmark
                     </p>
                   </div>
-                  <span style={{ fontSize: 11, color: '#10b981', fontWeight: 700 }}>+22% YoY</span>
+                  <span style={{ fontSize: 11, color: 'var(--success)', fontWeight: 700 }}>+22% YoY</span>
                 </div>
 
                 <div style={{ height: 260, width: '100%' }}>
@@ -401,10 +401,10 @@ export default function StudentDashboardPage() {
             {/* Strengths & Growth Areas */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16 }}>
               {/* Strongest Skills */}
-              <div className="card-linear" style={{ padding: 20, borderLeft: '4px solid #10b981', borderRadius: 14 }}>
+              <div className="card-status-success" style={{ padding: 20, borderRadius: 'var(--radius-lg)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-                  <CheckCircle2 size={16} color="#10b981" />
-                  <h4 style={{ fontSize: 14, fontWeight: 700, color: '#f8fafc', margin: 0 }}>
+                  <CheckCircle2 size={16} color="var(--success)" />
+                  <h4 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>
                     Demonstrated Technical Strengths
                   </h4>
                 </div>
@@ -412,13 +412,13 @@ export default function StudentDashboardPage() {
                   {strongestSkills.map((s: any, i: number) => (
                     <div key={i}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, marginBottom: 4 }}>
-                        <span style={{ color: '#f8fafc', fontWeight: 600 }}>
+                        <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
                           {typeof s.skillId === 'object' && s.skillId?.name ? s.skillId.name : String(s.skillId)}
                         </span>
-                        <span style={{ fontWeight: 800, color: '#10b981' }}>{s.score}%</span>
+                        <span style={{ fontWeight: 800, color: 'var(--success)' }}>{s.score}%</span>
                       </div>
-                      <div style={{ height: 4, background: 'rgba(255,255,255,0.06)', borderRadius: 2, overflow: 'hidden' }}>
-                        <div style={{ width: `${s.score}%`, height: '100%', background: '#10b981', borderRadius: 2 }} />
+                      <div style={{ height: 4, background: 'var(--border)', borderRadius: 2, overflow: 'hidden' }}>
+                        <div style={{ width: `${s.score}%`, height: '100%', background: 'var(--success)', borderRadius: 2 }} />
                       </div>
                     </div>
                   ))}
@@ -426,10 +426,10 @@ export default function StudentDashboardPage() {
               </div>
 
               {/* Priority Upskilling Areas */}
-              <div className="card-linear" style={{ padding: 20, borderLeft: '4px solid var(--gold)', borderRadius: 14 }}>
+              <div className="card-status-warning" style={{ padding: 20, borderRadius: 'var(--radius-lg)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
                   <AlertTriangle size={16} color="var(--gold)" />
-                  <h4 style={{ fontSize: 14, fontWeight: 700, color: '#f8fafc', margin: 0 }}>
+                  <h4 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>
                     Priority Upskilling Targets
                   </h4>
                 </div>
@@ -437,17 +437,17 @@ export default function StudentDashboardPage() {
                   {weakestSkills.map((w: any, i: number) => (
                     <div key={i}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, marginBottom: 4 }}>
-                        <span style={{ color: '#f8fafc', fontWeight: 600 }}>
+                        <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
                           {typeof w.skillId === 'object' && w.skillId?.name ? w.skillId.name : String(w.skillId)}
                         </span>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                           <span style={{ fontWeight: 800, color: 'var(--gold)' }}>{w.score}%</span>
-                          <Link href="/student/analyzer" style={{ fontSize: 11, color: '#f59e0b', fontWeight: 700 }}>
+                          <Link href="/student/analyzer" className="link-hover" style={{ fontSize: 11, color: 'var(--gold)', fontWeight: 700 }}>
                             Upskill →
                           </Link>
                         </div>
                       </div>
-                      <div style={{ height: 4, background: 'rgba(255,255,255,0.06)', borderRadius: 2, overflow: 'hidden' }}>
+                      <div style={{ height: 4, background: 'var(--border)', borderRadius: 2, overflow: 'hidden' }}>
                         <div style={{ width: `${w.score}%`, height: '100%', background: 'var(--gold)', borderRadius: 2 }} />
                       </div>
                     </div>

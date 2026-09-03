@@ -8,16 +8,6 @@ interface KPICardProps extends KPIData {
     compact?: boolean;
 }
 
-const GOLD = '#F59E0B';
-const MUTED = '#94A3B8';
-const WHITE = '#FFFFFF';
-
-const TREND_COLORS = {
-    up: '#22c55e',
-    down: '#ef4444',
-    neutral: MUTED,
-};
-
 export default function KPICard({
     label,
     value,
@@ -37,12 +27,10 @@ export default function KPICard({
 
     return (
         <div
-            className="interactive-card"
+            className="card-kpi card-interactive"
             style={{
-                background: 'var(--bg-surface)',
-                border: '1px solid var(--border)',
-                borderRadius: compact ? 10 : 14,
-                padding: compact ? '14px 18px' : '20px 24px',
+                borderRadius: compact ? 'var(--radius-md)' : 'var(--radius-lg)',
+                padding: compact ? '14px 16px' : '18px 22px',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: 8,
@@ -51,14 +39,14 @@ export default function KPICard({
                 cursor: 'default',
             }}
         >
-            {/* Background glow */}
+            {/* Background subtle radial glow */}
             <div
                 style={{
                     position: 'absolute',
                     top: -20,
                     right: -20,
-                    width: 80,
-                    height: 80,
+                    width: 70,
+                    height: 70,
                     borderRadius: '50%',
                     background: 'radial-gradient(circle, var(--gold-muted) 0%, transparent 70%)',
                     pointerEvents: 'none',
@@ -69,9 +57,9 @@ export default function KPICard({
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <p
                     style={{
-                        color: MUTED,
-                        fontSize: compact ? 11 : 12,
-                        fontWeight: 500,
+                        color: 'var(--text-muted)',
+                        fontSize: compact ? 11 : 11.5,
+                        fontWeight: 700,
                         textTransform: 'uppercase',
                         letterSpacing: '0.06em',
                         margin: 0,
@@ -80,59 +68,89 @@ export default function KPICard({
                     {label}
                 </p>
                 {icon && (
-                    <span className="interactive-icon" style={{ fontSize: compact ? 16 : 20, opacity: 0.85 }}>{icon}</span>
+                    <div
+                        className="card-icon-container"
+                        style={{
+                            width: compact ? 28 : 34,
+                            height: compact ? 28 : 34,
+                            borderRadius: compact ? 'var(--radius-sm)' : 'var(--radius-md)',
+                        }}
+                    >
+                        <span style={{ fontSize: compact ? 13 : 15, fontWeight: 700 }}>{icon}</span>
+                    </div>
                 )}
             </div>
 
             {/* Value */}
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
                 <span
+                    className="font-display"
                     style={{
-                        background: 'linear-gradient(135deg, #FFF 0%, #FBBF24 50%, #F59E0B 100%)',
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent',
-                        backgroundClip: 'text',
-                        fontSize: compact ? 22 : 30,
+                        color: 'var(--text-primary)',
+                        fontSize: compact ? 22 : 28,
                         fontWeight: 800,
-                        lineHeight: 1,
-                        filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))',
+                        lineHeight: 1.1,
+                        letterSpacing: '-0.02em',
                     }}
                 >
                     {displayValue}
                 </span>
                 {unit && (
-                    <span style={{ color: '#FBBF24', fontSize: compact ? 12 : 15, fontWeight: 600 }}>
+                    <span style={{ color: 'var(--gold)', fontSize: compact ? 12 : 14, fontWeight: 700 }}>
                         {unit}
                     </span>
                 )}
             </div>
 
-            {/* Trend */}
+            {/* Trend indicator */}
             {trend !== undefined && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
                     <span
                         style={{
-                            color: TREND_COLORS[trendDirection],
-                            fontSize: 12,
-                            fontWeight: 600,
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: 3,
+                            padding: '2px 7px',
+                            borderRadius: 'var(--radius-pill)',
+                            fontSize: 11,
+                            fontWeight: 700,
+                            background:
+                                trendDirection === 'up'
+                                    ? 'var(--success-bg)'
+                                    : trendDirection === 'down'
+                                    ? 'var(--error-bg)'
+                                    : 'var(--bg-surface-elevated)',
+                            color:
+                                trendDirection === 'up'
+                                    ? 'var(--success)'
+                                    : trendDirection === 'down'
+                                    ? 'var(--error)'
+                                    : 'var(--text-muted)',
+                            border: `1px solid ${
+                                trendDirection === 'up'
+                                    ? 'var(--success-border)'
+                                    : trendDirection === 'down'
+                                    ? 'var(--error-border)'
+                                    : 'var(--border)'
+                            }`,
                         }}
                     >
                         {trendDirection === 'up' ? '↑' : trendDirection === 'down' ? '↓' : '→'}
                         {' '}{Math.abs(trend)}%
                     </span>
-                    <span style={{ color: MUTED, fontSize: 11 }}>vs last period</span>
+                    <span style={{ color: 'var(--text-muted)', fontSize: 11 }}>vs previous</span>
                 </div>
             )}
 
-            {/* Gold bottom bar */}
+            {/* Gold bottom accent indicator */}
             <div
                 style={{
                     position: 'absolute',
                     bottom: 0,
                     left: 0,
                     height: 2,
-                    width: '40%',
-                    background: `linear-gradient(90deg, ${GOLD}, transparent)`,
+                    width: '35%',
+                    background: 'linear-gradient(90deg, var(--gold), transparent)',
                 }}
             />
         </div>

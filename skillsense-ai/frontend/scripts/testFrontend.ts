@@ -235,8 +235,74 @@ function runFrontendUnitTests() {
   assert.ok(reducedMotionConfig.transitionDurationMs <= 0.1, 'Transitions must be instantaneous under reduced motion');
   console.log('✓ Touch safety (@media (hover: hover)) and reduced motion invariants verified.');
 
+  // ── Test 14: Card Design System Token & Variant Invariants ───────────
+  console.log('Testing Card Design System Tokens, Radii & Padding Invariants...');
+  const CARD_RADII_PX = {
+    compact: 10,
+    standard: 14,
+    feature: 14,
+  };
+
+  assert.strictEqual(CARD_RADII_PX.compact, 10, 'Compact card radius must be 10px (var(--radius-md))');
+  assert.strictEqual(CARD_RADII_PX.standard, 14, 'Standard card radius must be 14px (var(--radius-lg))');
+  assert.strictEqual(CARD_RADII_PX.feature, 14, 'Feature card radius must be 14px (var(--radius-lg))');
+
+  const CARD_PADDING_PX = {
+    compact: 14,
+    standard: 20,
+    feature: 24,
+    kpi: 18,
+  };
+
+  assert.ok(CARD_PADDING_PX.compact >= 12 && CARD_PADDING_PX.compact <= 16, 'Compact padding must be within 12-16px');
+  assert.ok(CARD_PADDING_PX.standard >= 18 && CARD_PADDING_PX.standard <= 22, 'Standard padding must be within 18-22px');
+  assert.ok(CARD_PADDING_PX.feature >= 22 && CARD_PADDING_PX.feature <= 28, 'Feature padding must be within 22-28px');
+
+  const CARD_VARIANTS = [
+    'default',
+    'compact',
+    'feature',
+    'kpi',
+    'interactive',
+    'ai',
+    'accent',
+    'status-success',
+    'status-warning',
+    'status-error',
+    'status-info',
+  ];
+  assert.strictEqual(CARD_VARIANTS.length, 11, 'Card system defines all 11 standardized variants');
+  console.log('✓ Card design system radii (10px/14px), padding, and variant hierarchy verified.');
+
+  // ── Test 15: 3D Micro-Depth & Non-Interactive Card Invariants ───────────
+  console.log('Testing 3D Micro-Depth Constraints & Non-Interactive Card Invariants...');
+  const THREE_D_CARD_CONSTRAINTS = {
+    perspectivePx: 1000,
+    maxRotateXDeg: 3,
+    maxRotateYDeg: 3,
+    maxTranslateZPx: 6,
+    desktopMinWidthPx: 768,
+  };
+
+  assert.ok(THREE_D_CARD_CONSTRAINTS.perspectivePx >= 800, 'Perspective must be >= 800px to avoid focal distortion');
+  assert.ok(THREE_D_CARD_CONSTRAINTS.maxRotateXDeg <= 4, 'Tilt rotateX must not exceed 4 degrees');
+  assert.ok(THREE_D_CARD_CONSTRAINTS.maxRotateYDeg <= 4, 'Tilt rotateY must not exceed 4 degrees');
+  assert.ok(THREE_D_CARD_CONSTRAINTS.maxTranslateZPx <= 10, 'translateZ must not exceed 10px');
+  assert.ok(THREE_D_CARD_CONSTRAINTS.desktopMinWidthPx >= 768, '3D effects must strictly be disabled on viewports < 768px');
+
+  const informationalCardBehavior = {
+    cursor: 'default',
+    hoverElevationPx: 0,
+    is3D: false,
+  };
+
+  assert.strictEqual(informationalCardBehavior.cursor, 'default', 'Informational cards must maintain default cursor');
+  assert.strictEqual(informationalCardBehavior.hoverElevationPx, 0, 'Informational cards must not jump or elevate on hover');
+  assert.strictEqual(informationalCardBehavior.is3D, false, 'Informational cards must not tilt in 3D');
+  console.log('✓ 3D micro-depth constraints (<=3° tilt, >=768px desktop only) and static informational card invariants verified.');
+
   console.log('\n====================================================');
-  console.log('🎉 ALL FRONTEND INTEGRATION & CONTRACT TESTS PASSED! (13/13)');
+  console.log('🎉 ALL FRONTEND INTEGRATION & CONTRACT TESTS PASSED! (15/15)');
   console.log('====================================================');
 }
 

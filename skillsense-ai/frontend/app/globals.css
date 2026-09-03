@@ -235,29 +235,191 @@ tbody tr {
   }
 }
 
-/* ── Modern Card & Surface Utility Classes ── */
+/* ── Standardized Card Design System ── */
+.card-standard,
 .card-linear {
   background: var(--bg-surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
-  transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+  color: var(--text-primary);
+  transition: border-color 0.18s ease, background-color 0.18s ease;
 }
 
-.card-linear:hover {
-  border-color: rgba(255, 255, 255, 0.14);
-  background: var(--bg-surface-elevated);
+.card-compact {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  box-shadow: var(--shadow-sm);
+  color: var(--text-primary);
+}
+
+.card-feature {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+  color: var(--text-primary);
+  transition: transform 0.18s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.18s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-kpi {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+  color: var(--text-primary);
+}
+
+.card-ai {
+  background: linear-gradient(145deg, var(--gold-muted) 0%, var(--bg-surface) 65%);
+  border: 1px solid var(--gold-border);
+  border-radius: var(--radius-lg);
+  padding: 20px 22px;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+  color: var(--text-primary);
 }
 
 .card-accent {
-  background: linear-gradient(180deg, rgba(245, 158, 11, 0.04) 0%, rgba(15, 17, 26, 0.95) 100%);
+  background: linear-gradient(180deg, rgba(245, 158, 11, 0.04) 0%, var(--bg-surface) 100%);
   border: 1px solid var(--gold-border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-md);
+  color: var(--text-primary);
 }
 
+/* Status Cards */
+.card-status-success {
+  background: var(--success-bg);
+  border: 1px solid var(--success-border);
+  border-left: 4px solid var(--success);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+  color: var(--text-primary);
+}
+
+.card-status-warning {
+  background: var(--warning-bg);
+  border: 1px solid var(--warning-border);
+  border-left: 4px solid var(--warning);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+  color: var(--text-primary);
+}
+
+.card-status-error {
+  background: var(--error-bg);
+  border: 1px solid var(--error-border);
+  border-left: 4px solid var(--error);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+  color: var(--text-primary);
+}
+
+.card-status-info {
+  background: var(--info-bg);
+  border: 1px solid var(--info-border);
+  border-left: 4px solid var(--info);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+  color: var(--text-primary);
+}
+
+/* Standardized Icon Containers */
+.card-icon-container {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border);
+  color: var(--gold);
+  flex-shrink: 0;
+  transition: transform 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-icon-container-sm {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+}
+
+.card-icon-container-lg {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+}
+
+/* Interactive Card Variant */
+.card-interactive,
+.interactive-card {
+  cursor: pointer;
+  transition: transform 0.18s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.18s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.18s cubic-bezier(0.4, 0, 0.2, 1),
+              background-color 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (hover: hover) {
+  .card-interactive:hover,
+  .interactive-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--border-active) !important;
+    box-shadow: var(--shadow-md) !important;
+  }
+
+  .card-interactive:hover .card-icon-container,
+  .interactive-card:hover .card-icon-container,
+  .interactive-card:hover .interactive-icon {
+    transform: scale(1.06);
+  }
+
+  .card-interactive:hover .interactive-arrow,
+  .interactive-card:hover .interactive-arrow {
+    transform: translateX(3px);
+  }
+}
+
+.card-interactive:active,
+.interactive-card:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Subtle Desktop-Only 3D Depth Card */
+.card-3d {
+  perspective: 1000px;
+  transform-style: preserve-3d;
+  transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.22s ease;
+}
+
+@media (hover: hover) and (min-width: 768px) {
+  .card-3d:hover {
+    transform: translateY(-3px) rotateX(2deg) rotateY(-2deg) translateZ(6px);
+    border-color: var(--border-active) !important;
+    box-shadow: var(--shadow-lg) !important;
+  }
+}
+
+.card-3d:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Glass Surface Utilities */
 .glass {
-  background: rgba(15, 17, 26, 0.85);
+  background: var(--bg-surface);
   border: 1px solid var(--border);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -825,20 +987,31 @@ td {
 }
 
 /* ── Light Mode Surface & Card Styles ── */
-[data-theme="light"] .card-linear {
+[data-theme="light"] .card-standard,
+[data-theme="light"] .card-linear,
+[data-theme="light"] .card-compact,
+[data-theme="light"] .card-kpi,
+[data-theme="light"] .card-feature {
   background: var(--bg-surface);
   border: 1px solid var(--border);
   box-shadow: var(--shadow-sm);
+  color: var(--text-primary);
 }
 
-[data-theme="light"] .card-linear:hover {
-  background: var(--bg-surface);
-  border-color: #cbd5e1;
-  box-shadow: var(--shadow-md);
+[data-theme="light"] .card-interactive:hover,
+[data-theme="light"] .interactive-card:hover {
+  border-color: var(--border-active) !important;
+  box-shadow: var(--shadow-md) !important;
 }
 
 [data-theme="light"] .card-accent {
   background: linear-gradient(180deg, rgba(217, 119, 6, 0.04) 0%, #ffffff 100%);
+  border: 1px solid var(--gold-border);
+  box-shadow: var(--shadow-sm);
+}
+
+[data-theme="light"] .card-ai {
+  background: linear-gradient(145deg, rgba(217, 119, 6, 0.06) 0%, #ffffff 65%);
   border: 1px solid var(--gold-border);
   box-shadow: var(--shadow-sm);
 }

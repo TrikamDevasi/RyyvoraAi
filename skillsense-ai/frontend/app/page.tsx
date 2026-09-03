@@ -269,14 +269,14 @@ export default function LandingPage() {
             {/* Mock Cockpit Content */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
               {/* Score & Profile */}
-              <div style={{ padding: 18, borderRadius: 12, background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border)' }}>
+              <div className="card-standard" style={{ padding: 18, borderRadius: 'var(--radius-lg)' }}>
                 <div style={{ fontSize: 11, fontWeight: 800, color: 'var(--gold)', textTransform: 'uppercase' }}>
                   Verified Readiness Score
                 </div>
-                <div className="font-display" style={{ fontSize: 32, fontWeight: 900, color: '#f8fafc', marginTop: 2 }}>
+                <div className="font-display" style={{ fontSize: 32, fontWeight: 900, color: 'var(--text-primary)', marginTop: 2 }}>
                   84<span style={{ fontSize: 16, color: 'var(--text-muted)' }}>/100</span>
                 </div>
-                <div style={{ fontSize: 12, color: '#10b981', fontWeight: 600, marginTop: 4 }}>
+                <div style={{ fontSize: 12, color: 'var(--success)', fontWeight: 600, marginTop: 4 }}>
                   ✓ NSQF Level 5 (Software Engineering)
                 </div>
                 <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 8 }}>
@@ -285,11 +285,11 @@ export default function LandingPage() {
               </div>
 
               {/* Career Match */}
-              <div style={{ padding: 18, borderRadius: 12, background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border)' }}>
-                <div style={{ fontSize: 11, fontWeight: 800, color: '#60a5fa', textTransform: 'uppercase' }}>
+              <div className="card-standard" style={{ padding: 18, borderRadius: 'var(--radius-lg)' }}>
+                <div style={{ fontSize: 11, fontWeight: 800, color: 'var(--info)', textTransform: 'uppercase' }}>
                   Top Career Match
                 </div>
-                <div className="font-display" style={{ fontSize: 20, fontWeight: 800, color: '#f8fafc', marginTop: 4 }}>
+                <div className="font-display" style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-primary)', marginTop: 4 }}>
                   Full-Stack Cloud Engineer
                 </div>
                 <div style={{ fontSize: 12, color: 'var(--gold)', fontWeight: 700, marginTop: 2 }}>
@@ -301,11 +301,11 @@ export default function LandingPage() {
               </div>
 
               {/* AI Insight Pill */}
-              <div style={{ padding: 18, borderRadius: 12, background: 'rgba(245,158,11,0.05)', border: '1px solid rgba(245,158,11,0.25)' }}>
+              <div className="card-ai" style={{ padding: 18, borderRadius: 'var(--radius-lg)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, fontWeight: 800, color: 'var(--gold)', textTransform: 'uppercase' }}>
                   <Sparkles size={13} /> Active AI Copilot Recommendation
                 </div>
-                <p style={{ fontSize: 12.5, color: '#cbd5e1', lineHeight: 1.5, margin: '8px 0 0' }}>
+                <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.5, margin: '8px 0 0' }}>
                   "Candidate has demonstrated advanced API and state management capabilities. Closing the container orchestration gap will accelerate placement readiness in Tier-1 tech hubs."
                 </p>
               </div>

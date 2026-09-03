@@ -27,47 +27,45 @@ export function AIInsightCard({
 }: AIInsightCardProps) {
   return (
     <div
-      className="interactive-card"
+      className="card-ai card-interactive"
       style={{
-        background: 'linear-gradient(135deg, rgba(245,158,11,0.06) 0%, rgba(15,17,26,0.98) 60%)',
-        border: '1px solid rgba(245,158,11,0.22)',
-        borderRadius: 14,
+        borderRadius: 'var(--radius-lg)',
         padding: '20px 22px',
         position: 'relative',
         overflow: 'hidden',
       }}
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12, marginBottom: 10 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{ width: 28, height: 28, borderRadius: 7, background: 'rgba(245,158,11,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#f59e0b' }}>
-            <Lightbulb size={16} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div className="card-icon-container" style={{ width: 34, height: 34 }}>
+            <Lightbulb size={17} />
           </div>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span style={{ fontSize: 10, fontWeight: 800, color: '#f59e0b', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+              <span style={{ fontSize: 10, fontWeight: 800, color: 'var(--gold)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
                 {badgeText}
               </span>
               {category && (
-                <span style={{ fontSize: 10, color: '#94a3b8', background: 'rgba(255,255,255,0.05)', padding: '1px 6px', borderRadius: 4 }}>
+                <span style={{ fontSize: 10, color: 'var(--text-muted)', background: 'var(--bg-surface-elevated)', padding: '1px 6px', borderRadius: 4, border: '1px solid var(--border)' }}>
                   {category}
                 </span>
               )}
             </div>
-            <h4 style={{ fontSize: 15, fontWeight: 700, color: '#f8fafc', margin: 0, marginTop: 2 }}>
+            <h4 className="font-display" style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', margin: 0, marginTop: 2 }}>
               {title}
             </h4>
           </div>
         </div>
 
         {typeof confidence === 'number' && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 4, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', padding: '3px 8px', borderRadius: 99, fontSize: 11, color: '#94a3b8' }}>
-            <Zap size={11} color="#f59e0b" />
-            <span>Confidence: <strong style={{ color: '#f8fafc' }}>{Math.round(confidence <= 1 ? confidence * 100 : confidence)}%</strong></span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4, background: 'var(--gold-muted)', border: '1px solid var(--gold-border)', padding: '3px 8px', borderRadius: 'var(--radius-pill)', fontSize: 11, color: 'var(--gold)' }}>
+            <Zap size={11} />
+            <span>Confidence: <strong style={{ color: 'var(--text-primary)' }}>{Math.round(confidence <= 1 ? confidence * 100 : confidence)}%</strong></span>
           </div>
         )}
       </div>
 
-      <p style={{ color: '#cbd5e1', fontSize: 13.5, lineHeight: 1.6, margin: '10px 0 16px', maxWidth: 850 }}>
+      <p style={{ color: 'var(--text-secondary)', fontSize: 13.5, lineHeight: 1.6, margin: '10px 0 16px', maxWidth: 850 }}>
         {insight}
       </p>
 
@@ -79,7 +77,7 @@ export function AIInsightCard({
               className="btn-gold"
               style={{ fontSize: 12.5, padding: '7px 16px' }}
             >
-              {actionText} <ArrowRight size={14} />
+              {actionText} <ArrowRight size={14} className="interactive-arrow" />
             </Link>
           ) : (
             <button
@@ -88,7 +86,7 @@ export function AIInsightCard({
               className="btn-gold"
               style={{ fontSize: 12.5, padding: '7px 16px' }}
             >
-              {actionText} <ArrowRight size={14} />
+              {actionText} <ArrowRight size={14} className="interactive-arrow" />
             </button>
           )}
         </div>

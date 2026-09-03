@@ -249,25 +249,25 @@ export default function EmployerPage() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14, marginBottom: 24 }}>
           {[
             { label: 'Pre-Assessed Candidates', value: '48,200+', sub: 'Verified across Maharashtra', color: 'var(--gold)', icon: Users },
-            { label: 'Avg Time-to-Hire', value: '9.4 Days', sub: '-62% vs Traditional Recruiting', color: '#10b981', icon: Zap },
-            { label: 'Ledger Verifications', value: '1,840 Passports', sub: 'Cryptographically Confirmed', color: '#60a5fa', icon: ShieldCheck },
+            { label: 'Avg Time-to-Hire', value: '9.4 Days', sub: '-62% vs Traditional Recruiting', color: 'var(--success)', icon: Zap },
+            { label: 'Ledger Verifications', value: '1,840 Passports', sub: 'Cryptographically Confirmed', color: 'var(--info)', icon: ShieldCheck },
             { label: 'Placement Retention Rate', value: '91.8%', sub: '365d Industry Tenure Index', color: '#a855f7', icon: TrendingUp },
           ].map((stat, idx) => {
             const Icon = stat.icon;
             return (
-              <div key={idx} className="card-linear" style={{ padding: '16px 18px', borderRadius: 12 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+              <div key={idx} className="card-kpi card-interactive" style={{ padding: '16px 18px', borderRadius: 'var(--radius-lg)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                     {stat.label}
                   </span>
-                  <div style={{ padding: 6, borderRadius: 6, background: 'rgba(255,255,255,0.04)', color: stat.color }}>
-                    <Icon size={16} />
+                  <div className="card-icon-container" style={{ width: 30, height: 30, color: stat.color }}>
+                    <Icon size={15} />
                   </div>
                 </div>
-                <div className="font-display" style={{ fontSize: 22, fontWeight: 800, color: stat.color }}>
+                <div className="font-display" style={{ fontSize: 22, fontWeight: 800, color: stat.color, letterSpacing: '-0.02em' }}>
                   {stat.value}
                 </div>
-                <div style={{ fontSize: 11.5, color: 'var(--text-secondary)', marginTop: 2 }}>
+                <div style={{ fontSize: 11.5, color: 'var(--text-secondary)', marginTop: 3 }}>
                   {stat.sub}
                 </div>
               </div>
@@ -402,10 +402,10 @@ export default function EmployerPage() {
             {filteredCandidates.map((c) => (
               <div
                 key={c.id}
-                className="card-accent"
+                className="card-accent card-interactive card-3d"
                 style={{
                   padding: 18,
-                  borderRadius: 14,
+                  borderRadius: 'var(--radius-lg)',
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'space-between',
@@ -415,19 +415,19 @@ export default function EmployerPage() {
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
                     <div>
-                      <h3 className="font-display" style={{ fontSize: 15.5, fontWeight: 800, color: '#f8fafc', margin: 0 }}>
+                      <h3 className="font-display" style={{ fontSize: 15.5, fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
                         {c.name}
                       </h3>
                       <div style={{ fontSize: 12, color: 'var(--gold)', fontWeight: 600 }}>{c.roleTitle}</div>
                     </div>
-                    <span style={{ fontSize: 10, fontWeight: 800, padding: '2px 6px', borderRadius: 4, background: 'rgba(16,185,129,0.12)', color: '#10b981' }}>
+                    <span style={{ fontSize: 10, fontWeight: 800, padding: '2px 6px', borderRadius: 4, background: 'var(--success-bg)', border: '1px solid var(--success-border)', color: 'var(--success)' }}>
                       {c.nsqfLevel}
                     </span>
                   </div>
 
                   <div style={{ display: 'flex', gap: 12, margin: '10px 0', fontSize: 11.5, color: 'var(--text-muted)' }}>
                     <span>📍 {c.location}</span>
-                    <span>⚡ Score: <strong style={{ color: '#10b981' }}>{c.score}%</strong></span>
+                    <span>⚡ Score: <strong style={{ color: 'var(--success)' }}>{c.score}%</strong></span>
                     <span>💻 Code Audit: <strong style={{ color: 'var(--gold)' }}>{c.githubScore}%</strong></span>
                   </div>
 
@@ -439,9 +439,10 @@ export default function EmployerPage() {
                           fontSize: 10.5,
                           padding: '2px 7px',
                           borderRadius: 4,
-                          background: 'rgba(255,255,255,0.04)',
-                          color: '#cbd5e1',
-                          border: '1px solid rgba(255,255,255,0.06)',
+                          background: 'var(--bg-surface-elevated)',
+                          color: 'var(--text-secondary)',
+                          border: '1px solid var(--border)',
+                          fontWeight: 500,
                         }}
                       >
                         {s}
@@ -450,7 +451,7 @@ export default function EmployerPage() {
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: 10 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border-subtle)', paddingTop: 10 }}>
                   <span style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: 'monospace' }}>
                     {c.hash}
                   </span>

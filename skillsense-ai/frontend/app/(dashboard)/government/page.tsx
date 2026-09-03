@@ -553,16 +553,16 @@ export default function GovernmentMacroDashboardPage() {
         {/* ── Top 4 Live KPI Metric Cards (Database-Driven) ── */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14, marginBottom: 14 }}>
           {/* Card 1: Total Enrolled */}
-          <div className="card-linear" style={{ padding: '18px 20px', borderRadius: 12 }}>
+          <div className="card-kpi card-interactive" style={{ padding: '18px 20px', borderRadius: 'var(--radius-lg)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-              <span style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              <span style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                 Total Tracked Trainees
               </span>
-              <div style={{ padding: 6, borderRadius: 6, background: 'rgba(245,158,11,0.1)', color: 'var(--gold)' }}>
+              <div className="card-icon-container" style={{ width: 32, height: 32, background: 'var(--gold-muted)', border: '1px solid var(--gold-border)', color: 'var(--gold)' }}>
                 <Users size={16} />
               </div>
             </div>
-            <div className="font-display" style={{ fontSize: 26, fontWeight: 800, color: 'var(--gold)' }}>
+            <div className="font-display" style={{ fontSize: 26, fontWeight: 800, color: 'var(--gold)', letterSpacing: '-0.02em' }}>
               {totalTraineesDisplay}
             </div>
             <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 4 }}>
@@ -573,16 +573,16 @@ export default function GovernmentMacroDashboardPage() {
           </div>
 
           {/* Card 2: Placement / Transition Rate */}
-          <div className="card-linear" style={{ padding: '18px 20px', borderRadius: 12 }}>
+          <div className="card-kpi card-interactive" style={{ padding: '18px 20px', borderRadius: 'var(--radius-lg)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-              <span style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              <span style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                 State Transition Rate
               </span>
-              <div style={{ padding: 6, borderRadius: 6, background: 'rgba(16,185,129,0.1)', color: '#10b981' }}>
+              <div className="card-icon-container" style={{ width: 32, height: 32, background: 'var(--success-bg)', border: '1px solid var(--success-border)', color: 'var(--success)' }}>
                 <Briefcase size={16} />
               </div>
             </div>
-            <div className="font-display" style={{ fontSize: 26, fontWeight: 800, color: '#10b981' }}>
+            <div className="font-display" style={{ fontSize: 26, fontWeight: 800, color: 'var(--success)', letterSpacing: '-0.02em' }}>
               {placementRateDisplay}
             </div>
             <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 4 }}>
@@ -593,16 +593,16 @@ export default function GovernmentMacroDashboardPage() {
           </div>
 
           {/* Card 3: 90-Day Retention */}
-          <div className="card-linear" style={{ padding: '18px 20px', borderRadius: 12 }}>
+          <div className="card-kpi card-interactive" style={{ padding: '18px 20px', borderRadius: 'var(--radius-lg)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-              <span style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              <span style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                 90-Day Retention
               </span>
-              <div style={{ padding: 6, borderRadius: 6, background: 'rgba(96,165,250,0.1)', color: '#60a5fa' }}>
+              <div className="card-icon-container" style={{ width: 32, height: 32, background: 'var(--info-bg)', border: '1px solid var(--info-border)', color: 'var(--info)' }}>
                 <ShieldCheck size={16} />
               </div>
             </div>
-            <div className="font-display" style={{ fontSize: 26, fontWeight: 800, color: '#60a5fa' }}>
+            <div className="font-display" style={{ fontSize: 26, fontWeight: 800, color: 'var(--info)', letterSpacing: '-0.02em' }}>
               {retentionRateDisplay}
             </div>
             <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 4 }}>
@@ -613,16 +613,16 @@ export default function GovernmentMacroDashboardPage() {
           </div>
 
           {/* Card 4: Wage Growth */}
-          <div className="card-linear" style={{ padding: '18px 20px', borderRadius: 12 }}>
+          <div className="card-kpi card-interactive" style={{ padding: '18px 20px', borderRadius: 'var(--radius-lg)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-              <span style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              <span style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                 Median Salary Growth
               </span>
-              <div style={{ padding: 6, borderRadius: 6, background: 'rgba(168,85,247,0.1)', color: '#a855f7' }}>
+              <div className="card-icon-container" style={{ width: 32, height: 32, background: 'rgba(168,85,247,0.1)', border: '1px solid rgba(168,85,247,0.25)', color: '#a855f7' }}>
                 <TrendingUp size={16} />
               </div>
             </div>
-            <div className="font-display" style={{ fontSize: 26, fontWeight: 800, color: '#a855f7' }}>
+            <div className="font-display" style={{ fontSize: 26, fontWeight: 800, color: '#a855f7', letterSpacing: '-0.02em' }}>
               {wageGrowthDisplay}
             </div>
             <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 4 }}>
