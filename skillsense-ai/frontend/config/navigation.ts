@@ -21,6 +21,11 @@ import {
   Sparkles,
   Milestone,
   Lock,
+  CreditCard,
+  FileCheck2,
+  PieChart,
+  HelpCircle,
+  FileSpreadsheet,
 } from 'lucide-react';
 import React from 'react';
 
@@ -38,99 +43,212 @@ export interface NavGroup {
 }
 
 export const NAVIGATION_CONFIG: Record<string, NavGroup[]> = {
+  // ── 1. STUDENT / TRAINEE ROLE ─────────────────────────────────────────────
   student: [
     {
-      group: 'Longitudinal Journey & Outcomes',
+      group: 'Overview',
       routes: [
-        { label: 'Overview', href: '/student', icon: LayoutDashboard },
+        { label: 'Dashboard', href: '/student', icon: LayoutDashboard },
         { label: 'Employment Journey', href: '/student/journey', icon: Milestone, badge: 'TIMELINE' },
-        { label: 'Skill Passport', href: '/student/passport', icon: Award, badge: 'VERIFIED' },
-        { label: 'Consent & Privacy', href: '/student/consent', icon: Lock, badge: 'DPDP' },
       ],
     },
     {
       group: 'Intelligence & Skills',
       routes: [
         { label: 'AI Skill Analyzer', href: '/student/analyzer', icon: Brain, badge: 'AI' },
-        { label: 'Evaluations & Tests', href: '/student/assessment', icon: CheckSquare },
         { label: 'Career Predictor', href: '/student/career', icon: Compass },
         { label: 'Market Demand', href: '/student/market', icon: TrendingUp },
       ],
     },
     {
-      group: 'Community & Profile',
+      group: 'Assessments & Credentials',
       routes: [
-        { label: 'Find Jobs', href: '/student/jobs', icon: Briefcase, badge: 'NEW' },
+        { label: 'Evaluations & Tests', href: '/student/assessment', icon: CheckSquare },
+        { label: 'Project Submissions', href: '/student/submissions', icon: FileSpreadsheet },
+        { label: 'Skill Passport', href: '/student/passport', icon: Award, badge: 'VERIFIED' },
+      ],
+    },
+    {
+      group: 'Opportunities & Community',
+      routes: [
+        { label: 'Job Matches', href: '/student/jobs', icon: Briefcase, badge: 'NEW' },
         { label: 'Leaderboard', href: '/student/leaderboard', icon: Trophy },
+      ],
+    },
+    {
+      group: 'Account & Trust',
+      routes: [
+        { label: 'DPDP Consent & Privacy', href: '/student/consent', icon: Lock, badge: 'DPDP' },
         { label: 'Profile & Settings', href: '/student/profile', icon: User },
       ],
     },
   ],
 
+  // ── 2. TRAINING PROVIDER / INSTITUTE ROLE ─────────────────────────────────
   institute: [
     {
-      group: 'Institutional Cockpit',
+      group: 'Overview',
       routes: [
-        { label: 'Dashboard', href: '/institute', icon: LayoutDashboard },
+        { label: 'Institutional Cockpit', href: '/institute', icon: LayoutDashboard },
+      ],
+    },
+    {
+      group: 'Students & Training',
+      routes: [
         { label: 'Student Roster', href: '/institute/students', icon: Users },
-        { label: 'Placement & Outcomes', href: '/institute/placement', icon: TrendingUp },
-        { label: 'Upload Cohort', href: '/institute/upload', icon: FileCode, badge: 'BATCH' },
-        { label: 'Curriculum & ROI', href: '/institute/roi', icon: BarChart3 },
+        { label: 'Upload Batch Cohort', href: '/institute/upload', icon: FileCode, badge: 'BATCH' },
         { label: 'AI Evaluations', href: '/institute/evaluations', icon: Brain },
+      ],
+    },
+    {
+      group: 'Outcomes & ROI',
+      routes: [
+        { label: 'Placement Tracker', href: '/institute/placement', icon: TrendingUp },
+        { label: 'Curriculum & ROI', href: '/institute/roi', icon: BarChart3, badge: 'FINANCIAL' },
+      ],
+    },
+    {
+      group: 'Account & Billing',
+      routes: [
+        { label: 'Institute Profile', href: '/student/profile', icon: User },
+        { label: 'Billing & Quotas', href: '/settings/billing', icon: CreditCard },
+      ],
+    },
+  ],
+
+  // ── 3. EMPLOYER / INDUSTRY ROLE ──────────────────────────────────────────
+  employer: [
+    {
+      group: 'Overview',
+      routes: [
+        { label: 'Employer Dashboard', href: '/employer', icon: LayoutDashboard },
+      ],
+    },
+    {
+      group: 'Verification & Outcomes',
+      routes: [
+        { label: 'Candidate Validations', href: '/employer/validations', icon: Award, badge: 'LEDGER' },
+        { label: 'Hired Placements', href: '/employer/placements', icon: Briefcase },
+        { label: 'Feedback & Claims', href: '/employer/feedback', icon: FileCheck2 },
+      ],
+    },
+    {
+      group: 'Talent & Campus',
+      routes: [
+        { label: 'Verified Talent Pool', href: '/industry/talent', icon: Users, badge: 'VERIFIED' },
+        { label: 'Campus Connect', href: '/industry/campus', icon: Building },
+        { label: 'Market Demand', href: '/industry/demand', icon: TrendingUp },
+        { label: 'Hiring News', href: '/industry/news', icon: Newspaper },
+      ],
+    },
+    {
+      group: 'Account & Billing',
+      routes: [
+        { label: 'Company Profile', href: '/student/profile', icon: User },
+        { label: 'Subscription & Tier', href: '/settings/billing', icon: CreditCard },
       ],
     },
   ],
 
   industry: [
     {
-      group: 'Enterprise Talent Pool',
+      group: 'Overview',
       routes: [
-        { label: 'Talent Dashboard', href: '/industry', icon: LayoutDashboard },
+        { label: 'Industry Cockpit', href: '/industry', icon: LayoutDashboard },
+      ],
+    },
+    {
+      group: 'Talent & Campus',
+      routes: [
         { label: 'Verified Candidates', href: '/industry/talent', icon: Users, badge: 'VERIFIED' },
         { label: 'Campus Drives', href: '/industry/campus', icon: Building },
         { label: 'Market Demand', href: '/industry/demand', icon: TrendingUp },
-        { label: 'Hiring News', href: '/industry/news', icon: Newspaper },
+        { label: 'Industry News', href: '/industry/news', icon: Newspaper },
+      ],
+    },
+    {
+      group: 'Verification & Placements',
+      routes: [
+        { label: 'Candidate Validations', href: '/employer/validations', icon: Award },
+        { label: 'Placements Tracker', href: '/employer/placements', icon: Briefcase },
+      ],
+    },
+    {
+      group: 'Account & Billing',
+      routes: [
+        { label: 'Organization Profile', href: '/student/profile', icon: User },
+        { label: 'Enterprise Billing', href: '/settings/billing', icon: CreditCard },
       ],
     },
   ],
 
+  // ── 4. GOVERNMENT / POLICY ROLE ──────────────────────────────────────────
   government: [
     {
-      group: 'State Workforce Intelligence (Maharashtra)',
+      group: 'Overview',
       routes: [
         { label: 'State Macro Dashboard', href: '/government', icon: Landmark, badge: 'LIVE' },
-        { label: 'Regional Heatmap', href: '/government/heatmap', icon: BarChart3 },
-        { label: 'NSQF Compliance', href: '/government/compliance', icon: Shield },
-        { label: 'Fund Targeting', href: '/government/fund-targeting', icon: TrendingUp },
-        { label: 'Policy News', href: '/government/news', icon: Newspaper },
       ],
     },
-  ],
-
-  employer: [
     {
-      group: 'Employer Verification Portal',
+      group: 'Analytics & Regions',
       routes: [
-        { label: 'Overview', href: '/employer', icon: LayoutDashboard },
-        { label: 'Candidate Validations', href: '/employer/validations', icon: Award, badge: 'LEDGER' },
-        { label: 'Placements', href: '/employer/placements', icon: Briefcase },
-        { label: 'Feedback & Demand', href: '/employer/feedback', icon: CheckSquare },
+        { label: 'Regional Heatmap', href: '/government/heatmap', icon: BarChart3 },
+        { label: 'Fund Targeting', href: '/government/fund-targeting', icon: TrendingUp, badge: 'BUDGET' },
+      ],
+    },
+    {
+      group: 'Compliance & Governance',
+      routes: [
+        { label: 'NSQF Compliance', href: '/government/compliance', icon: Shield },
+        { label: 'Policy Intelligence', href: '/government/news', icon: Newspaper },
+      ],
+    },
+    {
+      group: 'Auditing & System Reports',
+      routes: [
+        { label: 'Algorithmic Fairness', href: '/admin/fairness', icon: Shield, badge: '4/5th' },
+        { label: 'System Reports', href: '/admin/reports', icon: BarChart3 },
+      ],
+    },
+    {
+      group: 'Account & Security',
+      routes: [
+        { label: 'Official Profile', href: '/student/profile', icon: User },
+        { label: 'DPDP Security & Trust', href: '/student/consent', icon: Lock },
       ],
     },
   ],
 
+  // ── 5. SYSTEM ADMIN ROLE ─────────────────────────────────────────────────
   admin: [
     {
-      group: 'System Governance',
+      group: 'Overview',
       routes: [
-        { label: 'Admin Overview', href: '/admin', icon: LayoutDashboard },
+        { label: 'System Overview', href: '/admin', icon: LayoutDashboard },
+      ],
+    },
+    {
+      group: 'Management & Directory',
+      routes: [
         { label: 'User Directory', href: '/admin/users', icon: Users },
-        { label: 'Fairness Engine', href: '/admin/fairness', icon: Shield, badge: '4/5th' },
-        { label: 'Audit Logs', href: '/admin/audit-logs', icon: Activity },
-        { label: 'Institutes', href: '/admin/institutes', icon: Building },
-        { label: 'System Reports', href: '/admin/reports', icon: BarChart3 },
+        { label: 'Institute Registry', href: '/admin/institutes', icon: Building },
+      ],
+    },
+    {
+      group: 'Auditing & Governance',
+      routes: [
+        { label: 'Algorithmic Fairness', href: '/admin/fairness', icon: Shield, badge: '4/5th' },
+        { label: 'System Audit Logs', href: '/admin/audit-logs', icon: Activity },
+        { label: 'Platform Reports', href: '/admin/reports', icon: BarChart3 },
+      ],
+    },
+    {
+      group: 'Account & Billing',
+      routes: [
+        { label: 'Administrator Profile', href: '/student/profile', icon: User },
+        { label: 'Platform Billing Engine', href: '/settings/billing', icon: CreditCard },
       ],
     },
   ],
 };
-
