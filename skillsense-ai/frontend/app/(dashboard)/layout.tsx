@@ -38,6 +38,7 @@ import { FeatureTipsGuideModal } from '@/components/shared/FeatureTipsGuide';
 import ThemeToggle from '@/components/shared/ThemeToggle';
 import NotificationDropdown from '@/components/dashboard/NotificationDropdown';
 import UserProfileDropdown from '@/components/dashboard/UserProfileDropdown';
+import MobileBottomNav from '@/components/layout/MobileBottomNav';
 
 function VerificationBanner() {
   const { user } = useAuth();
@@ -792,10 +793,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             width: '100%',
             margin: '0 auto',
           }}
-          className="sm:p-5 md:p-7"
+          className="dashboard-main-content sm:p-5 md:p-7"
         >
           {children}
         </main>
+
+        {/* ── Fixed Mobile Bottom Navigation Bar (Mobile Only: <768px) ── */}
+        <MobileBottomNav
+          onOpenMore={() => setMobileOpen((prev) => !prev)}
+          isMoreOpen={mobileOpen}
+        />
       </div>
 
       {/* ═════════════════════════════════════════════════════════════════════════ */}

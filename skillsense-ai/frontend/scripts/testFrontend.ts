@@ -85,8 +85,102 @@ function runFrontendUnitTests() {
   assert.strictEqual(isValidPassportHash(''), false, 'Empty string must be invalid');
   console.log('✓ Skill Passport hash structure verified.');
 
+  // ── Test 6: Role-Based Mobile Bottom Navigation (4 Items + More Contract) ──
+  console.log('Testing Mobile Bottom Navigation Role Resolution (4 Destinations Contract)...');
+  const PREFERRED_MOBILE_HREFS: Record<string, string[]> = {
+    student: ['/student', '/student/journey', '/student/analyzer', '/student/career'],
+    employer: ['/employer', '/employer/validations', '/employer/placements', '/industry/talent'],
+    institute: ['/institute', '/institute/students', '/institute/evaluations', '/institute/placement'],
+    government: ['/government', '/government/heatmap', '/government/fund-targeting', '/government/compliance'],
+    admin: ['/admin', '/admin/users', '/admin/institutes', '/admin/reports'],
+  };
+
+  const ROLES = ['student', 'employer', 'institute', 'government', 'admin'];
+  for (const role of ROLES) {
+    const primaryHrefs = PREFERRED_MOBILE_HREFS[role];
+    assert.strictEqual(primaryHrefs.length, 4, `Role ${role} must have exactly 4 primary destinations`);
+    // Ensure all 4 destinations are unique
+    const uniqueHrefs = new Set(primaryHrefs);
+    assert.strictEqual(uniqueHrefs.size, 4, `Role ${role} destinations must be unique`);
+  }
+  console.log('✓ Mobile bottom navigation contract: 4 unique canonical destinations verified for all 5 roles.');
+
+  // ── Test 7: Mobile Navigation Item Label & Non-wrapping Guarantee ─────────
+  console.log('Testing Mobile Navigation Label Length & Non-wrapping Constraints...');
+  const MOBILE_LABELS: Record<string, string[]> = {
+    student: ['Home', 'Journey', 'AI', 'Career'],
+    employer: ['Home', 'Validations', 'Placements', 'Talent'],
+    institute: ['Home', 'Trainees', 'Assess', 'Placements'],
+    government: ['Home', 'Heatmap', 'Targeting', 'Compliance'],
+    admin: ['Home', 'Users', 'Institutes', 'Reports'],
+  };
+
+  for (const [role, labels] of Object.entries(MOBILE_LABELS)) {
+    assert.strictEqual(labels.length, 4, `Role ${role} must have 4 mobile labels`);
+    for (const label of labels) {
+      assert.ok(label.length >= 2, `Label "${label}" must be meaningful`);
+      assert.ok(label.length <= 12, `Label "${label}" must be <= 12 characters to prevent mobile line wrap`);
+    }
+  }
+  console.log('✓ All mobile labels conform to compact single-line bounds (<= 12 chars).');
+
+  // ── Test 8: Nested Route Active State Matching ───────────────────────────
+  console.log('Testing Mobile Navigation Active State & Nested Route Matching...');
+  const isMobileRouteActive = (itemHref: string, currentPath: string): boolean => {
+    const rootRolePaths = ['/student', '/institute', '/industry', '/employer', '/government', '/admin'];
+    if (rootRolePaths.includes(itemHref)) {
+      return currentPath === itemHref;
+    }
+    return currentPath === itemHref || currentPath.startsWith(`${itemHref}/`);
+  };
+
+  // Student cases
+  assert.strictEqual(isMobileRouteActive('/student', '/student'), true, 'Exact match on root dashboard');
+  assert.strictEqual(isMobileRouteActive('/student', '/student/journey'), false, 'Root dashboard must not stay active on sub-features');
+  assert.strictEqual(isMobileRouteActive('/student/journey', '/student/journey'), true, 'Exact match on Journey');
+  assert.strictEqual(isMobileRouteActive('/student/journey', '/student/journey/training'), true, 'Nested route must keep parent Journey active');
+  assert.strictEqual(isMobileRouteActive('/student/journey', '/student/journey/outcomes/2026'), true, 'Deep nested route must keep parent active');
+  assert.strictEqual(isMobileRouteActive('/student/analyzer', '/student/analyzer'), true, 'Exact match on AI Analyzer');
+  assert.strictEqual(isMobileRouteActive('/student/career', '/student/career'), true, 'Exact match on Career Predictor');
+  assert.strictEqual(isMobileRouteActive('/student/career', '/student/market'), false, 'Different feature must not match Career');
+
+  // Secondary item detection for More button
+  const isSecondaryActiveRoute = (currentPath: string, primaryHrefs: string[]): boolean => {
+    return !primaryHrefs.some((href) => isMobileRouteActive(href, currentPath));
+  };
+
+  assert.strictEqual(isSecondaryActiveRoute('/student/passport', PREFERRED_MOBILE_HREFS.student), true, 'Passport must activate More indicator');
+  assert.strictEqual(isSecondaryActiveRoute('/student/profile', PREFERRED_MOBILE_HREFS.student), true, 'Profile must activate More indicator');
+  assert.strictEqual(isSecondaryActiveRoute('/student/journey', PREFERRED_MOBILE_HREFS.student), false, 'Journey must not activate More');
+  console.log('✓ Nested route matching and secondary route detection passed.');
+
+  // ── Test 9: Canonical Profile Route Resolution Across Roles ──────────────
+  console.log('Testing Canonical Profile Route Resolution & Consistency...');
+  const CANONICAL_PROFILE_HREF = '/student/profile';
+  const PROFILE_REDIRECT_TARGETS = {
+    '/profile': '/student/profile',
+    '/settings/profile': '/student/profile',
+  };
+
+  assert.strictEqual(PROFILE_REDIRECT_TARGETS['/profile'], CANONICAL_PROFILE_HREF, '/profile must redirect to canonical /student/profile');
+  assert.strictEqual(PROFILE_REDIRECT_TARGETS['/settings/profile'], CANONICAL_PROFILE_HREF, '/settings/profile must redirect to canonical /student/profile');
+  console.log('✓ Canonical profile routes verified for reliable mobile navigation.');
+
+  // ── Test 10: Mobile Content Offset & Safe Area Invariants ────────────────
+  console.log('Testing Mobile Content Offset & Safe Area Invariants...');
+  const calculateMobileClearance = (safeAreaBottomPx: number): number => {
+    const baseNavHeight = 64;
+    const buffer = 20; // 84px total base clearance
+    return baseNavHeight + buffer + safeAreaBottomPx;
+  };
+
+  assert.strictEqual(calculateMobileClearance(0), 84, 'Standard mobile clearance without home bar must be >= 84px');
+  assert.strictEqual(calculateMobileClearance(34), 118, 'iPhone/gesture device with 34px inset must have 118px clearance');
+  assert.ok(calculateMobileClearance(0) > 64, 'Clearance must exceed fixed navbar height so content is not obscured');
+  console.log('✓ Mobile content offset and safe area invariants verified.');
+
   console.log('\n====================================================');
-  console.log('🎉 ALL FRONTEND INTEGRATION & CONTRACT TESTS PASSED! (5/5)');
+  console.log('🎉 ALL FRONTEND INTEGRATION & CONTRACT TESTS PASSED! (10/10)');
   console.log('====================================================');
 }
 

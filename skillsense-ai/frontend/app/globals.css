@@ -435,7 +435,17 @@ body {
   .lg\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
 }
 
-/* ── Employer Page Mobile Fixes ── */
+/* ── Employer Page Mobile Fixes & Mobile Content Offset ── */
+.dashboard-main-content {
+  padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px)) !important;
+}
+
+@media (min-width: 768px) {
+  .dashboard-main-content {
+    padding-bottom: 28px !important;
+  }
+}
+
 @media (max-width: 768px) {
   .card-accent,
   .card-linear {
