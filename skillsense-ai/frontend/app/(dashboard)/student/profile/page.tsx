@@ -337,8 +337,8 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* ── Section 2: Navigation Layout Preferences ── */}
-        <div className="card-linear" style={{ padding: 24, background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 14 }}>
+        {/* ── Section 2: Navigation Layout Preferences (Desktop Only) ── */}
+        <div className="desktop-only card-linear" style={{ padding: 24, background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 14 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
             <div
               style={{

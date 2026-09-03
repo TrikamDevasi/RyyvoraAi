@@ -405,6 +405,14 @@ body {
   }
 }
 
+.hidden {
+  display: none !important;
+}
+
+.desktop-only {
+  display: none !important;
+}
+
 @media (min-width: 640px) {
   .sm\:flex { display: flex !important; }
   .sm\:inline-flex { display: inline-flex !important; }
@@ -424,6 +432,7 @@ body {
   .md\:flex-row { flex-direction: row !important; }
   .mobile-only { display: none !important; }
   .mobile-flex { display: none !important; }
+  .desktop-only { display: block !important; }
 }
 
 @media (min-width: 1024px) {
