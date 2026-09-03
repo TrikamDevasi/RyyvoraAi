@@ -30,32 +30,49 @@ interface Connection {
   pulseSpeed: number;
 }
 
+// ── Easing Helpers for Cinematic Smoothness ──────────────────────────────────
+function easeOutCubic(x: number): number {
+  return 1 - Math.pow(1 - x, 3);
+}
+
+function easeInOutCubic(x: number): number {
+  return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+}
+
+function easeOutQuad(x: number): number {
+  return 1 - (1 - x) * (1 - x);
+}
+
+function smoothstep(min: number, max: number, value: number): number {
+  const x = Math.max(0, Math.min(1, (value - min) / (max - min)));
+  return x * x * (3 - 2 * x);
+}
+
 // ── Procedural Anatomical AI Brain Generation ─────────────────────────────
 function generateBrainMesh(): { points: Point3D[]; connections: Connection[] } {
   const points: Point3D[] = [];
-  const TOTAL_SYNAPSES = 520;
-  const AMBIENT_PARTICLES = 680;
+  const TOTAL_SYNAPSES = 380;
+  const AMBIENT_PARTICLES = 420;
 
-  // 1. Generate Core Synaptic Nodes on Organic Cortical Hemispheres
+  // 1. Core Synaptic Nodes on Organic Cortical Hemispheres
   for (let i = 0; i < TOTAL_SYNAPSES; i++) {
     const hemisphere = i % 2 === 0 ? 1 : -1;
     const u = Math.random();
     const v = Math.random();
-    const theta = u * Math.PI - Math.PI / 2; // Latitude [-PI/2, PI/2]
-    const phi = v * Math.PI; // Longitude [0, PI]
+    const theta = u * Math.PI - Math.PI / 2;
+    const phi = v * Math.PI;
 
     const rx = 1.08;
     const ry = 0.92;
     const rz = 1.28;
 
-    // Organic cortical folds harmonics (gyri and sulci undulations)
+    // Organic cortical folds harmonics
     const foldHarmonics =
       1 +
       0.13 * Math.sin(7 * theta) * Math.cos(6 * phi) +
       0.08 * Math.cos(11 * theta) * Math.sin(9 * phi) +
       0.05 * Math.sin(16 * theta);
 
-    // Interhemispheric longitudinal fissure separation
     const fissure = 0.12;
 
     let x = hemisphere * (fissure + (0.16 + 0.84 * Math.cos(theta) * Math.sin(phi)) * rx) * foldHarmonics;
@@ -69,38 +86,38 @@ function generateBrainMesh(): { points: Point3D[]; connections: Connection[] } {
       z = z * 0.95 - 0.12;
     }
 
-    // Frontal lobe lift and curvature
+    // Frontal lobe curvature
     if (z > 0.45) {
       y += 0.09 * (z - 0.45);
     }
 
-    // Scale to standard view dimensions
-    const scale = 1.4;
+    const scale = 1.38;
     x *= scale;
     y *= scale;
     z *= scale;
 
-    // Initial scattered coordinates (Scene 1-2 space drift)
-    const scatterDist = 4.5 + Math.random() * 6.5;
+    // Initial scattered coordinates (smooth outer cloud)
+    const scatterDist = 4.2 + Math.random() * 5.0;
     const sTheta = Math.random() * Math.PI * 2;
     const sPhi = Math.random() * Math.PI;
     const scatterX = Math.sin(sPhi) * Math.cos(sTheta) * scatterDist;
     const scatterY = Math.cos(sPhi) * scatterDist;
     const scatterZ = Math.sin(sPhi) * Math.sin(sTheta) * scatterDist;
 
-    // Outward explosion vectors for Scene 6
+    // Fly-through velocity vectors
     const norm = Math.hypot(x, y, z) || 1;
-    const speed = 7 + Math.random() * 9;
-    const vx = (x / norm) * speed + (Math.random() - 0.5) * 3;
-    const vy = (y / norm) * speed + (Math.random() - 0.5) * 3;
-    const vz = (z / norm) * speed + (Math.random() - 0.5) * 3;
+    const speed = 4.5 + Math.random() * 6.0;
+    const vx = (x / norm) * speed + (Math.random() - 0.5) * 2;
+    const vy = (y / norm) * speed + (Math.random() - 0.5) * 2;
+    const vz = (z / norm) * speed + (Math.random() - 0.5) * 2;
 
-    // Color palette: SkillSense Brand Gold (#f59e0b), Light Gold (#fbbf24), Deep Amber (#d97706), Cyan pulse (#38bdf8)
+    // Brand Palette: Pure Amber, Warm Gold, Cyan Accent, Crisp Pearl
     const roll = Math.random();
     let color = '#f59e0b';
-    if (roll < 0.28) color = '#fbbf24';
-    else if (roll < 0.42) color = '#38bdf8';
-    else if (roll < 0.58) color = '#d97706';
+    if (roll < 0.32) color = '#fbbf24';
+    else if (roll < 0.46) color = '#38bdf8';
+    else if (roll < 0.62) color = '#d97706';
+    else if (roll < 0.72) color = '#ffffff';
 
     points.push({
       x: scatterX,
@@ -115,26 +132,26 @@ function generateBrainMesh(): { points: Point3D[]; connections: Connection[] } {
       vx,
       vy,
       vz,
-      size: Math.random() * 2.2 + 1.4,
-      baseAlpha: Math.random() * 0.4 + 0.6,
+      size: Math.random() * 2.0 + 1.2,
+      baseAlpha: Math.random() * 0.35 + 0.65,
       color,
       isSynapse: true,
       pulsePhase: Math.random() * Math.PI * 2,
     });
   }
 
-  // 2. Generate Ambient Neural Telemetry Halo Particles
+  // 2. Ambient Neural Halo Particles
   for (let i = 0; i < AMBIENT_PARTICLES; i++) {
     const angle = Math.random() * Math.PI * 2;
-    const dist = 1.5 + Math.random() * 1.8;
-    const height = (Math.random() - 0.5) * 2.6;
-    const zOffset = (Math.random() - 0.5) * 2.2;
+    const dist = 1.6 + Math.random() * 2.0;
+    const height = (Math.random() - 0.5) * 2.8;
+    const zOffset = (Math.random() - 0.5) * 2.4;
 
     const x = Math.cos(angle) * dist;
     const y = height;
-    const z = Math.sin(angle) * dist * 0.88 + zOffset;
+    const z = Math.sin(angle) * dist * 0.9 + zOffset;
 
-    const sDist = 5 + Math.random() * 7;
+    const sDist = 4.5 + Math.random() * 6.0;
     const sAngle = Math.random() * Math.PI * 2;
 
     points.push({
@@ -147,21 +164,21 @@ function generateBrainMesh(): { points: Point3D[]; connections: Connection[] } {
       scatterX: Math.cos(sAngle) * sDist,
       scatterY: (Math.random() - 0.5) * sDist,
       scatterZ: Math.sin(sAngle) * sDist,
-      vx: (Math.random() - 0.5) * 14,
-      vy: (Math.random() - 0.5) * 14,
-      vz: (Math.random() - 0.5) * 14,
-      size: Math.random() * 1.5 + 0.6,
-      baseAlpha: Math.random() * 0.3 + 0.15,
-      color: Math.random() > 0.3 ? '#f59e0b' : '#38bdf8',
+      vx: (Math.random() - 0.5) * 8,
+      vy: (Math.random() - 0.5) * 8,
+      vz: (Math.random() - 0.5) * 8,
+      size: Math.random() * 1.4 + 0.6,
+      baseAlpha: Math.random() * 0.3 + 0.2,
+      color: Math.random() > 0.35 ? '#f59e0b' : '#38bdf8',
       isSynapse: false,
       pulsePhase: Math.random() * Math.PI * 2,
     });
   }
 
-  // 3. Precompute Synaptic Axon Connections between nearby primary nodes
+  // 3. Precompute Synaptic Axon Connections
   const connections: Connection[] = [];
-  const MAX_CONNECT_DIST = 0.44;
-  const MAX_CONNECTIONS_PER_NODE = 4;
+  const MAX_CONNECT_DIST = 0.42;
+  const MAX_CONNECTIONS_PER_NODE = 3;
 
   for (let i = 0; i < TOTAL_SYNAPSES; i++) {
     let connectCount = 0;
@@ -171,8 +188,7 @@ function generateBrainMesh(): { points: Point3D[]; connections: Connection[] } {
       const p1 = points[i];
       const p2 = points[j];
 
-      // Avoid connecting across the deep hemisphere gap unless close to corpus callosum
-      if (Math.sign(p1.origX) !== Math.sign(p2.origX) && Math.abs(p1.origY) > 0.3) {
+      if (Math.sign(p1.origX) !== Math.sign(p2.origX) && Math.abs(p1.origY) > 0.32) {
         continue;
       }
 
@@ -187,7 +203,7 @@ function generateBrainMesh(): { points: Point3D[]; connections: Connection[] } {
           p2: j,
           distance: dist,
           pulseOffset: Math.random(),
-          pulseSpeed: 0.8 + Math.random() * 1.4,
+          pulseSpeed: 0.7 + Math.random() * 1.1,
         });
         connectCount++;
       }
@@ -199,19 +215,47 @@ function generateBrainMesh(): { points: Point3D[]; connections: Connection[] } {
 
 export default function SkillSenseIntro({ children }: { children?: React.ReactNode }) {
   const [shouldRender, setShouldRender] = useState(true);
-  const [scene, setScene] = useState<number>(1);
-  const [opacity, setOpacity] = useState<number>(1);
-  const [textStyle, setTextStyle] = useState<React.CSSProperties>({ opacity: 0 });
-  const [lightDotStyle, setLightDotStyle] = useState<React.CSSProperties>({ opacity: 0, transform: 'scale(0)' });
-  const [lightBeamStyle, setLightBeamStyle] = useState<React.CSSProperties>({ opacity: 0, transform: 'scaleX(0)' });
 
+  // Direct DOM refs to avoid triggering React re-renders on every animation frame (prevents frame drops)
+  const overlayRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const textRef = useRef<HTMLDivElement | null>(null);
+  const lightDotRef = useRef<HTMLDivElement | null>(null);
+  const lightBeamRef = useRef<HTMLDivElement | null>(null);
+  const centerGlowRef = useRef<HTMLDivElement | null>(null);
+  const skipBtnRef = useRef<HTMLButtonElement | null>(null);
+
   const animFrameRef = useRef<number | null>(null);
   const startTimeRef = useRef<number>(0);
   const isCompleteRef = useRef<boolean>(false);
-  const pageReadyRef = useRef<boolean>(false);
 
-  // Fast skip if previously seen in session unless ?intro=true or #intro
+  const handleFinish = useCallback(() => {
+    if (isCompleteRef.current) return;
+    isCompleteRef.current = true;
+
+    if (overlayRef.current) {
+      overlayRef.current.style.transition = 'opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1)';
+      overlayRef.current.style.opacity = '0';
+      overlayRef.current.style.pointerEvents = 'none';
+    }
+
+    setTimeout(() => {
+      setShouldRender(false);
+    }, 720);
+  }, []);
+
+  // Keyboard shortcut: Esc to instantly skip
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        handleFinish();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleFinish]);
+
+  // Session check
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
@@ -226,28 +270,6 @@ export default function SkillSenseIntro({ children }: { children?: React.ReactNo
     }
 
     sessionStorage.setItem('skillsense_intro_seen', 'true');
-
-    // Check document readiness
-    if (document.readyState === 'complete') {
-      pageReadyRef.current = true;
-    } else {
-      const onReady = () => { pageReadyRef.current = true; };
-      window.addEventListener('load', onReady);
-      return () => window.removeEventListener('load', onReady);
-    }
-  }, []);
-
-  const handleFinish = useCallback(() => {
-    if (isCompleteRef.current) return;
-    isCompleteRef.current = true;
-
-    // Smooth website reveal transition (Scene 7)
-    setScene(7);
-    setOpacity(0);
-
-    setTimeout(() => {
-      setShouldRender(false);
-    }, 550);
   }, []);
 
   useEffect(() => {
@@ -258,7 +280,6 @@ export default function SkillSenseIntro({ children }: { children?: React.ReactNo
     const ctx = canvas.getContext('2d', { alpha: true });
     if (!ctx) return;
 
-    // Handle high-DPI retina rendering
     let width = (canvas.width = window.innerWidth);
     let height = (canvas.height = window.innerHeight);
 
@@ -270,9 +291,9 @@ export default function SkillSenseIntro({ children }: { children?: React.ReactNo
     window.addEventListener('resize', handleResize);
 
     const { points, connections } = generateBrainMesh();
-
     startTimeRef.current = performance.now();
 
+    // ── Ultra-Smooth 60/120 FPS Animation Loop ────────────────────────────
     const render = (now: number) => {
       const elapsed = (now - startTimeRef.current) / 1000; // in seconds
 
@@ -283,173 +304,181 @@ export default function SkillSenseIntro({ children }: { children?: React.ReactNo
       const baseRadius = Math.min(width, height) * 0.28;
 
       // ────────────────────────────────────────────────────────────────────────
-      // SCENE TIMINGS & PROGRESS CALCULATIONS
-      // Total optimal sequence: ~3.7s
-      // Scene 1: 0.0s – 0.5s (Pure Black)
-      // Scene 2: 0.5s – 1.1s ("SkillSense" Text Forms from Light)
-      // Scene 3: 1.0s – 1.8s (AI Brain Neural Mesh Assembles)
-      // Scene 4: 1.8s – 2.4s (Brain Pulses with Power)
-      // Scene 5: 2.4s – 3.1s (Massive Dramatic Zoom of "SkillSense")
-      // Scene 6: 3.1s – 3.4s (Dissolve/Disperse & Blackout)
-      // Scene 7: 3.4s – 3.9s (Smooth Website Reveal)
+      // CINEMATIC TIMELINE CHOREOGRAPHY (Total Duration: ~3.6s)
+      //
+      // 0.0s – 0.7s: Inception of Light (Smooth singularity flare & beam expand)
+      // 0.5s – 1.6s: Neural mesh smoothly converges from space; logo crystallizes
+      // 1.6s – 2.6s: Harmonic breathing, synaptic impulses flow, golden resonance
+      // 2.6s – 3.3s: Seamless forward camera glide (particles & logo part smoothly)
+      // 3.3s+:       Velvety dissolve into the live web page
       // ────────────────────────────────────────────────────────────────────────
 
-      // ── SCENE 1: Pure Black (0.0s - 0.5s) ──
-      if (elapsed < 0.5) {
-        setScene(1);
-        setTextStyle({ opacity: 0, transform: 'scale(0.95)' });
-        setLightDotStyle({ opacity: 0, transform: 'scale(0)' });
-        setLightBeamStyle({ opacity: 0, transform: 'scaleX(0)' });
-      }
-
-      // ── SCENE 2: Light Emerges & "SkillSense" Forms (0.5s - 1.1s) ──
-      else if (elapsed >= 0.5 && elapsed < 1.1) {
-        setScene(2);
-        const t = (elapsed - 0.5) / 0.6; // 0 to 1
-
-        // Light point flare
-        const dotScale = Math.min(t * 2.5, 1);
-        const dotOpacity = t < 0.4 ? t / 0.4 : 1 - (t - 0.4) / 0.6;
-        setLightDotStyle({
-          opacity: dotOpacity,
-          transform: `translate(-50%, -50%) scale(${dotScale})`,
-        });
-
-        // Horizontal lens flare beam
-        const beamScale = Math.min(t * 1.8, 1);
-        const beamOpacity = t < 0.6 ? t / 0.6 : 1 - (t - 0.6) / 0.4;
-        setLightBeamStyle({
-          opacity: beamOpacity * 0.85,
-          transform: `translate(-50%, -50%) scaleX(${beamScale}) scaleY(${1 - t * 0.5})`,
-        });
-
-        // "SkillSense" typography forms from the light
-        const textProgress = Math.max(0, (elapsed - 0.65) / 0.45);
-        const textBlur = Math.max(0, (1 - textProgress) * 16);
-        const textLetterSpacing = (1 - textProgress) * 0.18;
-
-        setTextStyle({
-          opacity: textProgress,
-          transform: `scale(${0.96 + textProgress * 0.04})`,
-          filter: `blur(${textBlur}px) drop-shadow(0 0 ${20 * textProgress}px rgba(245, 158, 11, 0.6))`,
-          letterSpacing: `${textLetterSpacing}em`,
-        });
-      }
-
-      // ── SCENE 3 & 4: Brain Forms & Becomes Powerful (1.1s - 2.4s) ──
-      else if (elapsed >= 1.1 && elapsed < 2.4) {
-        const isScene4 = elapsed >= 1.8;
-        setScene(isScene4 ? 4 : 3);
-
-        const formProgress = Math.min((elapsed - 1.1) / 0.85, 1); // 0 to 1
-        // Smooth easeOutCubic
-        const easeForm = 1 - Math.pow(1 - formProgress, 3);
-
-        // Steady sharp text in front of brain
-        const pulse = 1 + Math.sin((elapsed - 1.1) * 4) * 0.015;
-        const glowStrength = isScene4 ? 28 + Math.sin(elapsed * 6) * 10 : 20;
-
-        setTextStyle({
-          opacity: 1,
-          transform: `scale(${pulse})`,
-          filter: `drop-shadow(0 0 ${glowStrength}px rgba(245, 158, 11, 0.75)) drop-shadow(0 0 ${glowStrength * 2}px rgba(217, 119, 6, 0.4))`,
-          letterSpacing: '-0.03em',
-        });
-        setLightDotStyle({ opacity: 0 });
-        setLightBeamStyle({ opacity: 0 });
-
-        // Update 3D particle positions (converging from scatter to brain)
-        for (let i = 0; i < points.length; i++) {
-          const p = points[i];
-          p.x = p.scatterX + (p.origX - p.scatterX) * easeForm;
-          p.y = p.scatterY + (p.origY - p.scatterY) * easeForm;
-          p.z = p.scatterZ + (p.origZ - p.scatterZ) * easeForm;
+      // 1. Light Dot Flare (0.0s – 0.9s)
+      if (lightDotRef.current) {
+        if (elapsed < 0.05) {
+          lightDotRef.current.style.opacity = '0';
+          lightDotRef.current.style.transform = 'translate(-50%, -50%) scale(0)';
+        } else if (elapsed < 0.9) {
+          const t = elapsed / 0.9;
+          const scale = easeOutQuad(Math.min(t * 2.2, 1));
+          const dotAlpha = t < 0.35 ? t / 0.35 : 1 - (t - 0.35) / 0.55;
+          lightDotRef.current.style.opacity = String(dotAlpha);
+          lightDotRef.current.style.transform = `translate(-50%, -50%) scale(${scale})`;
+        } else {
+          lightDotRef.current.style.opacity = '0';
         }
       }
 
-      // ── SCENE 5: Massive "SkillSense" Zoom (2.4s - 3.1s) ──
-      else if (elapsed >= 2.4 && elapsed < 3.1) {
-        setScene(5);
-        const zoomT = (elapsed - 2.4) / 0.7; // 0 to 1
-        // Dramatic cinematic exponential acceleration
-        const zoomEased = Math.pow(zoomT, 3.2);
-
-        const scale = 1.0 + zoomEased * 18.0;
-        const motionBlur = Math.min(zoomEased * 22, 18);
-        const textOpacity = zoomT > 0.85 ? 1 - (zoomT - 0.85) / 0.15 : 1;
-
-        setTextStyle({
-          opacity: textOpacity,
-          transform: `scale(${scale})`,
-          filter: `blur(${motionBlur}px) brightness(${1 + zoomT * 2.2}) drop-shadow(0 0 ${35 + zoomT * 40}px rgba(245, 158, 11, 0.9))`,
-          letterSpacing: `${-0.03 + zoomT * 0.12}em`,
-        });
-
-        // Brain expands in tandem with energetic shockwave
-        const brainExpand = 1 + zoomEased * 3.2;
-        for (let i = 0; i < points.length; i++) {
-          const p = points[i];
-          p.x = p.origX * brainExpand;
-          p.y = p.origY * brainExpand;
-          p.z = p.origZ * brainExpand;
+      // 2. Horizontal Lens Flare Beam (0.1s – 0.95s)
+      if (lightBeamRef.current) {
+        if (elapsed < 0.1) {
+          lightBeamRef.current.style.opacity = '0';
+          lightBeamRef.current.style.transform = 'translate(-50%, -50%) scaleX(0)';
+        } else if (elapsed < 0.95) {
+          const t = (elapsed - 0.1) / 0.85;
+          const beamScale = easeOutCubic(Math.min(t * 1.5, 1));
+          const beamAlpha = t < 0.4 ? (t / 0.4) * 0.9 : (1 - (t - 0.4) / 0.6) * 0.9;
+          lightBeamRef.current.style.opacity = String(beamAlpha);
+          lightBeamRef.current.style.transform = `translate(-50%, -50%) scaleX(${beamScale}) scaleY(${1 - t * 0.4})`;
+        } else {
+          lightBeamRef.current.style.opacity = '0';
         }
       }
 
-      // ── SCENE 6: Dissolve & Outward Explosion (3.1s - 3.4s) ──
-      else if (elapsed >= 3.1 && elapsed < 3.4) {
-        setScene(6);
-        const explodeT = (elapsed - 3.1) / 0.3; // 0 to 1
-
-        setTextStyle({
-          opacity: 0,
-          transform: `scale(${22 + explodeT * 10})`,
-          filter: 'blur(30px)',
-        });
-
-        // Particles disperse outward into tiny stars
-        for (let i = 0; i < points.length; i++) {
-          const p = points[i];
-          p.x = p.origX * 3.8 + p.vx * explodeT * 18;
-          p.y = p.origY * 3.8 + p.vy * explodeT * 18;
-          p.z = p.origZ * 3.8 + p.vz * explodeT * 18;
+      // 3. Ambient Center Glow
+      if (centerGlowRef.current) {
+        if (elapsed < 0.4) {
+          centerGlowRef.current.style.opacity = '0';
+        } else if (elapsed < 2.6) {
+          const glowAlpha = smoothstep(0.4, 1.2, elapsed) * 0.85;
+          centerGlowRef.current.style.opacity = String(glowAlpha);
+        } else if (elapsed < 3.4) {
+          const fadeAlpha = Math.max(0, 1 - (elapsed - 2.6) / 0.7) * 0.85;
+          centerGlowRef.current.style.opacity = String(fadeAlpha);
+        } else {
+          centerGlowRef.current.style.opacity = '0';
         }
       }
 
-      // ── SCENE 7: Website Reveal (3.4s+) ──
-      else {
+      // 4. "SkillSense AI" Typography State & Transitions
+      if (textRef.current) {
+        if (elapsed < 0.45) {
+          textRef.current.style.opacity = '0';
+          textRef.current.style.transform = 'scale(0.96)';
+          textRef.current.style.filter = 'blur(12px)';
+        }
+        // Ingress: Smooth fade-in and crystallization (0.45s – 1.4s)
+        else if (elapsed >= 0.45 && elapsed < 1.4) {
+          const t = (elapsed - 0.45) / 0.95;
+          const easedT = easeOutCubic(t);
+          const opacity = smoothstep(0.45, 1.1, elapsed);
+          const blur = Math.max(0, (1 - easedT) * 12);
+          const scale = 0.96 + easedT * 0.04;
+          const letterSpacing = (1 - easedT) * 0.06;
+
+          textRef.current.style.opacity = String(opacity);
+          textRef.current.style.transform = `scale(${scale})`;
+          textRef.current.style.filter = blur > 0.2 ? `blur(${blur}px)` : 'none';
+          textRef.current.style.letterSpacing = `${-0.03 + letterSpacing}em`;
+        }
+        // Resonance & Breathing (1.4s – 2.6s)
+        else if (elapsed >= 1.4 && elapsed < 2.6) {
+          const pulse = 1 + Math.sin((elapsed - 1.4) * 3.2) * 0.008;
+          textRef.current.style.opacity = '1';
+          textRef.current.style.transform = `scale(${pulse})`;
+          textRef.current.style.filter = 'none';
+          textRef.current.style.letterSpacing = '-0.03em';
+        }
+        // Cinematic Glide-Through & Dissolve (2.6s – 3.3s)
+        else if (elapsed >= 2.6 && elapsed < 3.3) {
+          const t = (elapsed - 2.6) / 0.7;
+          const easedZoom = easeInOutCubic(t);
+          const scale = 1.0 + easedZoom * 1.6;
+          const opacity = Math.max(0, 1 - Math.pow(t, 2.2));
+          const blur = easedZoom * 8;
+
+          textRef.current.style.opacity = String(opacity);
+          textRef.current.style.transform = `scale(${scale})`;
+          textRef.current.style.filter = blur > 0.2 ? `blur(${blur}px)` : 'none';
+          textRef.current.style.letterSpacing = `${-0.03 + t * 0.04}em`;
+        } else {
+          textRef.current.style.opacity = '0';
+        }
+      }
+
+      // 5. Skip Button Fade-In
+      if (skipBtnRef.current) {
+        if (elapsed > 1.2 && elapsed < 3.0) {
+          skipBtnRef.current.style.opacity = String(smoothstep(1.2, 1.8, elapsed) * 0.7);
+        } else if (elapsed >= 3.0) {
+          skipBtnRef.current.style.opacity = '0';
+        }
+      }
+
+      // 6. Finish / Reveal trigger
+      if (elapsed >= 3.35) {
         handleFinish();
         return;
       }
 
       // ────────────────────────────────────────────────────────────────────────
-      // CANVAS 3D NEURAL BRAIN RENDERING ENGINE
+      // 3D NEURAL BRAIN PARTICLE SIMULATION
       // ────────────────────────────────────────────────────────────────────────
-      if (elapsed >= 0.9 && elapsed < 3.4) {
-        const brainFadeIn = Math.min((elapsed - 0.9) / 0.5, 1);
-        const brainFadeOut = elapsed > 3.1 ? Math.max(0, 1 - (elapsed - 3.1) / 0.3) : 1;
+      if (elapsed >= 0.3 && elapsed < 3.35) {
+        // Smooth particle positioning interpolation
+        const formProgress = Math.min(Math.max((elapsed - 0.4) / 1.15, 0), 1);
+        const easeForm = easeOutCubic(formProgress);
+
+        let expandScale = 1.0;
+        if (elapsed >= 2.6) {
+          const zoomProgress = (elapsed - 2.6) / 0.75;
+          expandScale = 1.0 + easeInOutCubic(zoomProgress) * 2.4;
+        }
+
+        for (let i = 0; i < points.length; i++) {
+          const p = points[i];
+          const baseX = p.scatterX + (p.origX - p.scatterX) * easeForm;
+          const baseY = p.scatterY + (p.origY - p.scatterY) * easeForm;
+          const baseZ = p.scatterZ + (p.origZ - p.scatterZ) * easeForm;
+
+          if (elapsed < 2.6) {
+            p.x = baseX;
+            p.y = baseY;
+            p.z = baseZ;
+          } else {
+            const explodeT = (elapsed - 2.6) / 0.75;
+            p.x = baseX * expandScale + p.vx * explodeT * 1.5;
+            p.y = baseY * expandScale + p.vy * explodeT * 1.5;
+            p.z = baseZ * expandScale + p.vz * explodeT * 1.5;
+          }
+        }
+
+        // Global Brain alpha curve
+        const brainFadeIn = smoothstep(0.3, 0.9, elapsed);
+        const brainFadeOut = elapsed > 2.6 ? Math.max(0, 1 - (elapsed - 2.6) / 0.7) : 1;
         const globalAlpha = brainFadeIn * brainFadeOut;
 
-        // 3D Rotation angles: gentle yaw tilt + pitch breathing
-        const rotY = Math.sin(elapsed * 0.75) * 0.28;
-        const rotX = 0.12 + Math.cos(elapsed * 0.6) * 0.1;
+        // Gentle camera rotation angles (slow, elegant, no harsh oscillation)
+        const rotY = Math.sin(elapsed * 0.5) * 0.22;
+        const rotX = 0.08 + Math.cos(elapsed * 0.4) * 0.07;
         const cosY = Math.cos(rotY);
         const sinY = Math.sin(rotY);
         const cosX = Math.cos(rotX);
         const sinX = Math.sin(rotX);
 
-        const FOV = 4.2;
+        const FOV = 4.4;
 
-        // Project 3D coordinates to 2D screen space
+        // Project 3D points to 2D screen coordinates
         const projected: { sx: number; sy: number; sz: number; scale: number; alpha: number; color: string; size: number; isSynapse: boolean }[] = [];
 
         for (let i = 0; i < points.length; i++) {
           const p = points[i];
 
-          // Rotate Y
+          // Y Rotation
           const x1 = p.x * cosY + p.z * sinY;
           const z1 = -p.x * sinY + p.z * cosY;
 
-          // Rotate X
+          // X Rotation
           const y2 = p.y * cosX - z1 * sinX;
           const z2 = p.y * sinX + z1 * cosX;
 
@@ -459,7 +488,6 @@ export default function SkillSenseIntro({ children }: { children?: React.ReactNo
           const sx = centerX + x1 * baseRadius * pScale;
           const sy = centerY + y2 * baseRadius * pScale;
 
-          // Depth-based shading
           const depthAlpha = Math.min(Math.max((z2 + 2.5) / 5, 0.15), 1.0);
 
           projected.push({
@@ -474,49 +502,67 @@ export default function SkillSenseIntro({ children }: { children?: React.ReactNo
           });
         }
 
-        // Draw Synaptic Connection Axons (Thin connecting glowing lines)
-        if (elapsed >= 1.2 && elapsed < 3.25) {
-          const connectFade = Math.min((elapsed - 1.2) / 0.6, 1) * brainFadeOut;
+        // Draw Synaptic Axon Connections (Batched for peak 60/120fps performance)
+        if (elapsed >= 0.8 && elapsed < 3.2) {
+          const connectFade = smoothstep(0.8, 1.4, elapsed) * brainFadeOut;
+
+          ctx.beginPath();
+          let hasLines = false;
 
           for (let i = 0; i < connections.length; i++) {
             const conn = connections[i];
             const p1 = projected[conn.p1];
             const p2 = projected[conn.p2];
 
-            if (!p1 || !p2 || p1.scale < 0.1 || p2.scale < 0.1) continue;
+            if (!p1 || !p2 || p1.scale < 0.15 || p2.scale < 0.15) continue;
 
-            const lineAlpha = (1 - conn.distance / 0.45) * Math.min(p1.alpha, p2.alpha) * 0.45 * connectFade;
+            const lineAlpha = (1 - conn.distance / 0.42) * Math.min(p1.alpha, p2.alpha) * 0.4 * connectFade;
             if (lineAlpha <= 0.02) continue;
 
-            ctx.beginPath();
             ctx.moveTo(p1.sx, p1.sy);
             ctx.lineTo(p2.sx, p2.sy);
-            ctx.strokeStyle = `rgba(245, 158, 11, ${lineAlpha})`;
-            ctx.lineWidth = 0.85 * Math.min(p1.scale, p2.scale);
-            ctx.stroke();
+            hasLines = true;
+          }
 
-            // Synaptic action potential energy impulse (spark traveling along line)
-            if (elapsed >= 1.6 && elapsed < 3.1) {
+          if (hasLines) {
+            ctx.strokeStyle = `rgba(245, 158, 11, ${0.28 * connectFade})`;
+            ctx.lineWidth = 0.75;
+            ctx.stroke();
+          }
+
+          // Synaptic Impulse Sparks (Hardware-accelerated without software shadowBlur)
+          if (elapsed >= 1.2 && elapsed < 3.0) {
+            for (let i = 0; i < connections.length; i += 2) {
+              const conn = connections[i];
+              const p1 = projected[conn.p1];
+              const p2 = projected[conn.p2];
+
+              if (!p1 || !p2 || p1.alpha < 0.3 || p2.alpha < 0.3) continue;
+
               const impulseT = (elapsed * conn.pulseSpeed + conn.pulseOffset) % 1.0;
               const sparkX = p1.sx + (p2.sx - p1.sx) * impulseT;
               const sparkY = p1.sy + (p2.sy - p1.sy) * impulseT;
-              const sparkAlpha = lineAlpha * 1.8;
+              const sparkAlpha = Math.min(p1.alpha, p2.alpha) * 0.9 * connectFade;
 
+              // Outer soft aura
               ctx.beginPath();
-              ctx.arc(sparkX, sparkY, 1.2 * p1.scale, 0, Math.PI * 2);
-              ctx.fillStyle = conn.pulseOffset > 0.6 ? `rgba(56, 189, 248, ${sparkAlpha})` : `rgba(251, 191, 36, ${sparkAlpha})`;
-              ctx.shadowColor = '#f59e0b';
-              ctx.shadowBlur = 4;
+              ctx.arc(sparkX, sparkY, 2.4 * p1.scale, 0, Math.PI * 2);
+              ctx.fillStyle = `rgba(245, 158, 11, ${sparkAlpha * 0.35})`;
+              ctx.fill();
+
+              // Inner bright core
+              ctx.beginPath();
+              ctx.arc(sparkX, sparkY, 1.1 * p1.scale, 0, Math.PI * 2);
+              ctx.fillStyle = conn.pulseOffset > 0.5 ? `rgba(56, 189, 248, ${sparkAlpha})` : `rgba(251, 191, 36, ${sparkAlpha})`;
               ctx.fill();
             }
           }
         }
 
         // Draw Neural Nodes & Synapses
-        ctx.shadowBlur = 0;
         for (let i = 0; i < projected.length; i++) {
           const p = projected[i];
-          if (p.alpha <= 0.01) continue;
+          if (p.alpha <= 0.02) continue;
 
           ctx.beginPath();
           ctx.arc(p.sx, p.sy, Math.max(p.size, 0.6), 0, Math.PI * 2);
@@ -524,11 +570,11 @@ export default function SkillSenseIntro({ children }: { children?: React.ReactNo
           ctx.globalAlpha = p.alpha;
           ctx.fill();
 
-          // Subtle glow on key synapses
+          // Subtle soft halo around prominent synapses
           if (p.isSynapse && p.scale > 0.85 && p.alpha > 0.5) {
             ctx.beginPath();
-            ctx.arc(p.sx, p.sy, p.size * 2.2, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(245, 158, 11, ${p.alpha * 0.25})`;
+            ctx.arc(p.sx, p.sy, p.size * 1.8, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(245, 158, 11, ${p.alpha * 0.2})`;
             ctx.fill();
           }
         }
@@ -557,6 +603,7 @@ export default function SkillSenseIntro({ children }: { children?: React.ReactNo
 
       {/* Cinematic Full-Screen Introductory Overlay */}
       <div
+        ref={overlayRef}
         role="dialog"
         aria-label="SkillSense AI Initialization"
         aria-modal="true"
@@ -564,16 +611,14 @@ export default function SkillSenseIntro({ children }: { children?: React.ReactNo
           position: 'fixed',
           inset: 0,
           zIndex: 999999,
-          backgroundColor: '#000000',
+          backgroundColor: '#050608',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           overflow: 'hidden',
-          opacity,
-          pointerEvents: opacity === 0 ? 'none' : 'auto',
-          transition: 'opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1)',
           cursor: 'default',
           userSelect: 'none',
+          willChange: 'opacity',
         }}
       >
         {/* Background Neural Canvas */}
@@ -591,24 +636,26 @@ export default function SkillSenseIntro({ children }: { children?: React.ReactNo
 
         {/* Ambient Center Glow */}
         <div
+          ref={centerGlowRef}
           style={{
             position: 'absolute',
             top: '50%',
             left: '50%',
             transform: 'translate(-50%, -50%)',
-            width: '50vw',
-            height: '50vh',
+            width: 'min(65vw, 680px)',
+            height: 'min(65vh, 680px)',
             borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(245, 158, 11, 0.12) 0%, rgba(217, 119, 6, 0.04) 45%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(245, 158, 11, 0.15) 0%, rgba(217, 119, 6, 0.05) 45%, transparent 70%)',
             pointerEvents: 'none',
-            filter: 'blur(50px)',
-            opacity: scene >= 2 && scene <= 5 ? 1 : 0,
-            transition: 'opacity 0.6s ease',
+            filter: 'blur(60px)',
+            opacity: 0,
+            willChange: 'opacity',
           }}
         />
 
-        {/* Scene 2 Initial Center Light Dot Flare */}
+        {/* Initial Center Light Dot Flare */}
         <div
+          ref={lightDotRef}
           style={{
             position: 'absolute',
             top: '50%',
@@ -617,31 +664,33 @@ export default function SkillSenseIntro({ children }: { children?: React.ReactNo
             height: 14,
             borderRadius: '50%',
             background: '#ffffff',
-            boxShadow: '0 0 25px 8px rgba(245, 158, 11, 0.95), 0 0 60px 16px rgba(251, 191, 36, 0.6)',
+            boxShadow: '0 0 24px 6px rgba(245, 158, 11, 0.9), 0 0 50px 14px rgba(251, 191, 36, 0.5)',
             pointerEvents: 'none',
-            transition: 'transform 0.3s ease, opacity 0.3s ease',
-            ...lightDotStyle,
+            opacity: 0,
+            willChange: 'transform, opacity',
           }}
         />
 
-        {/* Scene 2 Expanding Horizontal Lens Flare Beam */}
+        {/* Expanding Horizontal Lens Flare Beam */}
         <div
+          ref={lightBeamRef}
           style={{
             position: 'absolute',
             top: '50%',
             left: '50%',
-            width: 'min(90vw, 680px)',
+            width: 'min(88vw, 700px)',
             height: 2,
-            background: 'linear-gradient(90deg, transparent 0%, rgba(245, 158, 11, 0.4) 20%, #ffffff 50%, rgba(245, 158, 11, 0.4) 80%, transparent 100%)',
-            boxShadow: '0 0 16px 2px rgba(245, 158, 11, 0.8)',
+            background: 'linear-gradient(90deg, transparent 0%, rgba(245, 158, 11, 0.4) 25%, #ffffff 50%, rgba(245, 158, 11, 0.4) 75%, transparent 100%)',
+            boxShadow: '0 0 14px 2px rgba(245, 158, 11, 0.7)',
             pointerEvents: 'none',
-            transition: 'transform 0.4s ease, opacity 0.4s ease',
-            ...lightBeamStyle,
+            opacity: 0,
+            willChange: 'transform, opacity',
           }}
         />
 
-        {/* Hero "SkillSense" Typography (Centerpiece) */}
+        {/* Hero "SkillSense AI" Typography */}
         <div
+          ref={textRef}
           style={{
             position: 'relative',
             zIndex: 10,
@@ -651,22 +700,22 @@ export default function SkillSenseIntro({ children }: { children?: React.ReactNo
             textAlign: 'center',
             pointerEvents: 'none',
             transformOrigin: 'center center',
-            transition: 'all 0.1s cubic-bezier(0.2, 0.9, 0.3, 1)',
-            ...textStyle,
+            opacity: 0,
+            willChange: 'transform, opacity, filter',
           }}
         >
           <h1
             className="font-display"
             style={{
-              fontSize: 'clamp(44px, 8.5vw, 108px)',
+              fontSize: 'clamp(44px, 8vw, 104px)',
               fontWeight: 900,
               color: '#ffffff',
-              letterSpacing: '-0.035em',
+              letterSpacing: '-0.03em',
               margin: 0,
               padding: 0,
               lineHeight: 1,
               whiteSpace: 'nowrap',
-              textShadow: '0 0 40px rgba(0, 0, 0, 0.9), 0 4px 20px rgba(0,0,0,0.8)',
+              textShadow: '0 2px 24px rgba(0, 0, 0, 0.8), 0 0 35px rgba(245, 158, 11, 0.35)',
             }}
           >
             SkillSense
@@ -674,14 +723,14 @@ export default function SkillSenseIntro({ children }: { children?: React.ReactNo
               style={{
                 display: 'inline-block',
                 marginLeft: 'clamp(6px, 1.2vw, 18px)',
-                background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%)',
+                background: 'linear-gradient(135deg, #fef08a 0%, #fbbf24 35%, #f59e0b 70%, #d97706 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
-                fontSize: '0.62em',
+                fontSize: '0.64em',
                 verticalAlign: 'super',
                 fontWeight: 900,
                 letterSpacing: '-0.01em',
-                filter: 'drop-shadow(0 0 14px rgba(245, 158, 11, 0.8))',
+                filter: 'drop-shadow(0 0 16px rgba(245, 158, 11, 0.65))',
               }}
             >
               AI
@@ -691,6 +740,7 @@ export default function SkillSenseIntro({ children }: { children?: React.ReactNo
 
         {/* Keyboard accessibility / Skip indicator */}
         <button
+          ref={skipBtnRef}
           type="button"
           onClick={handleFinish}
           aria-label="Skip introductory animation"
@@ -701,23 +751,24 @@ export default function SkillSenseIntro({ children }: { children?: React.ReactNo
             background: 'rgba(255, 255, 255, 0.05)',
             border: '1px solid rgba(255, 255, 255, 0.12)',
             borderRadius: 99,
-            padding: '5px 14px',
-            color: 'rgba(255, 255, 255, 0.45)',
+            padding: '6px 15px',
+            color: 'rgba(255, 255, 255, 0.55)',
             fontSize: 11,
             fontWeight: 600,
             letterSpacing: '0.04em',
             cursor: 'pointer',
-            transition: 'all 0.2s ease',
+            transition: 'color 0.2s ease, border-color 0.2s ease, background 0.2s ease',
             zIndex: 20,
-            opacity: scene >= 3 ? 0.7 : 0,
+            opacity: 0,
+            willChange: 'opacity',
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.color = '#ffffff';
             e.currentTarget.style.borderColor = 'rgba(245, 158, 11, 0.5)';
-            e.currentTarget.style.background = 'rgba(245, 158, 11, 0.1)';
+            e.currentTarget.style.background = 'rgba(245, 158, 11, 0.12)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.color = 'rgba(255, 255, 255, 0.45)';
+            e.currentTarget.style.color = 'rgba(255, 255, 255, 0.55)';
             e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.12)';
             e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
           }}

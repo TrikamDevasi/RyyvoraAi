@@ -166,7 +166,6 @@ export default function LandingPage() {
             transition={{ duration: 0.5 }}
             style={{ display: 'inline-flex', alignItems: 'center', gap: 8, marginBottom: 20 }}
           >
-            <AIBadge type="live" label="SMART INDIA HACKATHON 2026 · PS SIH26135" />
             <AIBadge type="nsqf" label="GOVERNMENT OF MAHARASHTRA" />
           </motion.div>
 

@@ -69,8 +69,9 @@ export default function UserProfileDropdown() {
         style={{
           display: 'flex',
           alignItems: 'center',
-          gap: 8,
-          padding: '4px 8px 4px 4px',
+          gap: 10,
+          padding: '4px 10px 4px 5px',
+          height: 40,
           borderRadius: 10,
           background: isOpen ? 'var(--bg-surface-elevated)' : 'transparent',
           border: '1px solid',
@@ -85,16 +86,16 @@ export default function UserProfileDropdown() {
           if (!isOpen) e.currentTarget.style.background = 'transparent';
         }}
       >
-        {/* Avatar */}
+        {/* Avatar (36px) */}
         <div
           style={{
-            width: 28,
-            height: 28,
+            width: 34,
+            height: 34,
             borderRadius: '50%',
             background: 'linear-gradient(135deg, #f59e0b, #d97706)',
             color: '#090a0f',
             fontWeight: 800,
-            fontSize: 11,
+            fontSize: 12,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -106,23 +107,23 @@ export default function UserProfileDropdown() {
         </div>
 
         {/* Name & Role on Desktop */}
-        <div className="hidden sm:block" style={{ textAlign: 'left', lineHeight: 1.2 }}>
+        <div className="hidden sm:block" style={{ textAlign: 'left', lineHeight: 1.25 }}>
           <div
             style={{
-              fontSize: 12,
+              fontSize: 13,
               fontWeight: 700,
               color: 'var(--text-primary)',
-              maxWidth: 110,
+              maxWidth: 130,
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
             }}
           >
-            {user?.name || 'Candidate'}
+            {user?.name || 'Aarav Deshmukh'}
           </div>
           <div
             style={{
-              fontSize: 10,
+              fontSize: 11,
               color: 'var(--text-muted)',
               textTransform: 'capitalize',
             }}
@@ -132,11 +133,12 @@ export default function UserProfileDropdown() {
         </div>
 
         <ChevronDown
-          size={14}
+          size={15}
           style={{
-            color: 'var(--text-muted)',
+            color: 'var(--text-secondary)',
             transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
             transition: 'transform 0.2s ease',
+            marginLeft: 2,
           }}
         />
       </button>

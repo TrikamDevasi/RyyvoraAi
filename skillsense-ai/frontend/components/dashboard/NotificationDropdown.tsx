@@ -117,9 +117,9 @@ export default function NotificationDropdown() {
           display: 'inline-flex',
           alignItems: 'center',
           justifyContent: 'center',
-          width: 34,
-          height: 34,
-          borderRadius: 8,
+          width: 38,
+          height: 38,
+          borderRadius: 10,
           background: 'var(--bg-surface-elevated)',
           border: '1px solid var(--border)',
           color: unreadCount > 0 ? 'var(--text-primary)' : 'var(--text-secondary)',
@@ -128,18 +128,18 @@ export default function NotificationDropdown() {
           position: 'relative',
         }}
       >
-        <Bell size={16} />
+        <Bell size={18} />
         {unreadCount > 0 && (
           <span
             style={{
               position: 'absolute',
-              top: 5,
-              right: 5,
+              top: 7,
+              right: 7,
               width: 7,
               height: 7,
               borderRadius: '50%',
               background: 'var(--gold)',
-              boxShadow: '0 0 8px rgba(245, 158, 11, 0.8)',
+              boxShadow: '0 0 6px rgba(245, 158, 11, 0.7)',
             }}
           />
         )}

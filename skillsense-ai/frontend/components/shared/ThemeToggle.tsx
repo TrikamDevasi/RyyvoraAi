@@ -93,10 +93,10 @@ export function ThemeToggle({ variant = 'icon', className = '', style }: ThemeTo
         display: 'inline-flex',
         alignItems: 'center',
         justifyContent: 'center',
-        width: 34,
-        height: 34,
+        width: 38,
+        height: 38,
         padding: 0,
-        borderRadius: 8,
+        borderRadius: 10,
         background: 'var(--bg-surface-elevated)',
         border: '1px solid var(--border)',
         color: 'var(--text-primary)',
@@ -109,7 +109,7 @@ export function ThemeToggle({ variant = 'icon', className = '', style }: ThemeTo
     >
       {isDark ? (
         <Sun
-          size={16}
+          size={18}
           style={{
             color: 'var(--gold)',
             transform: 'rotate(0deg)',
@@ -118,7 +118,7 @@ export function ThemeToggle({ variant = 'icon', className = '', style }: ThemeTo
         />
       ) : (
         <Moon
-          size={16}
+          size={18}
           style={{
             color: 'var(--text-primary)',
             transform: 'rotate(0deg)',

@@ -31,6 +31,7 @@ import React from 'react';
 
 export interface RouteItem {
   label: string;
+  shortLabel?: string;
   href: string;
   icon: React.ElementType;
   badge?: string;
@@ -48,24 +49,24 @@ export const NAVIGATION_CONFIG: Record<string, NavGroup[]> = {
     {
       group: 'Overview',
       routes: [
-        { label: 'Dashboard', href: '/student', icon: LayoutDashboard },
-        { label: 'Employment Journey', href: '/student/journey', icon: Milestone, badge: 'TIMELINE' },
+        { label: 'Dashboard', shortLabel: 'Dashboard', href: '/student', icon: LayoutDashboard },
+        { label: 'Employment Journey', shortLabel: 'Employment', href: '/student/journey', icon: Milestone, badge: 'TIMELINE' },
       ],
     },
     {
       group: 'Intelligence & Skills',
       routes: [
-        { label: 'AI Skill Analyzer', href: '/student/analyzer', icon: Brain, badge: 'AI' },
-        { label: 'Career Predictor', href: '/student/career', icon: Compass },
-        { label: 'Market Demand', href: '/student/market', icon: TrendingUp },
+        { label: 'AI Skill Analyzer', shortLabel: 'AI Analyzer', href: '/student/analyzer', icon: Brain, badge: 'AI' },
+        { label: 'Career Predictor', shortLabel: 'Career', href: '/student/career', icon: Compass },
+        { label: 'Market Demand', shortLabel: 'Market', href: '/student/market', icon: TrendingUp },
       ],
     },
     {
       group: 'Assessments & Credentials',
       routes: [
-        { label: 'Evaluations & Tests', href: '/student/assessment', icon: CheckSquare },
-        { label: 'Project Submissions', href: '/student/submissions', icon: FileSpreadsheet },
-        { label: 'Skill Passport', href: '/student/passport', icon: Award, badge: 'VERIFIED' },
+        { label: 'Evaluations & Tests', shortLabel: 'Evaluations', href: '/student/assessment', icon: CheckSquare },
+        { label: 'Project Submissions', shortLabel: 'Submissions', href: '/student/submissions', icon: FileSpreadsheet },
+        { label: 'Skill Passport', shortLabel: 'Passport', href: '/student/passport', icon: Award, badge: 'VERIFIED' },
       ],
     },
     {

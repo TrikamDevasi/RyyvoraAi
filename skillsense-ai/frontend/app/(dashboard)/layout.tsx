@@ -452,7 +452,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <header
           aria-label="Primary top application navigation"
           style={{
-            height: 64,
+            height: 68,
             background: 'var(--bg-surface)',
             borderBottom: '1px solid var(--border)',
             position: 'sticky',
@@ -462,90 +462,159 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           }}
           className="hidden md:block"
         >
-          <div style={{ maxWidth: 1440, margin: '0 auto', padding: '0 24px', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            {/* Left: Brand Logo & Status */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-              <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
+          <div
+            style={{
+              maxWidth: 1440,
+              margin: '0 auto',
+              padding: '0 20px',
+              height: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 16,
+            }}
+          >
+            {/* 1. LEFT: Brand Logo (clean single line, flex-shrink: 0) */}
+            <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0, minWidth: 175 }}>
+              <Link
+                href="/"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 10,
+                  textDecoration: 'none',
+                  whiteSpace: 'nowrap',
+                }}
+              >
                 <div
                   style={{
-                    width: 30,
-                    height: 30,
+                    width: 34,
+                    height: 34,
                     borderRadius: 8,
                     background: 'linear-gradient(135deg, #f59e0b, #d97706)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     fontWeight: 900,
-                    fontSize: 13,
+                    fontSize: 14,
                     color: '#090a0f',
                     boxShadow: '0 2px 8px rgba(245,158,11,0.25)',
+                    flexShrink: 0,
                   }}
                 >
                   SK
                 </div>
-                <span className="font-display" style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-primary)' }}>
+                <span
+                  className="font-display"
+                  style={{
+                    fontSize: 16,
+                    fontWeight: 800,
+                    color: 'var(--text-primary)',
+                    letterSpacing: '-0.02em',
+                    whiteSpace: 'nowrap',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 4,
+                  }}
+                >
                   SkillSense <span style={{ color: 'var(--gold)' }}>AI</span>
                 </span>
               </Link>
-
-              {/* Horizontal Navigation Items */}
-              <nav style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                {allRoutes.slice(0, 6).map((route) => {
-                  const Icon = route.icon;
-                  const active = isRouteActive(route.href);
-
-                  return (
-                    <Link
-                      key={route.href}
-                      href={route.href}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 6,
-                        padding: '6px 11px',
-                        borderRadius: 6,
-                        fontSize: 12.5,
-                        fontWeight: active ? 700 : 500,
-                        color: active ? 'var(--gold)' : 'var(--text-secondary)',
-                        background: active ? 'var(--gold-muted)' : 'transparent',
-                        textDecoration: 'none',
-                        transition: 'all 0.15s ease',
-                      }}
-                    >
-                      <Icon size={14} style={{ color: active ? 'var(--gold)' : 'currentColor' }} />
-                      <span>{route.label}</span>
-                    </Link>
-                  );
-                })}
-              </nav>
             </div>
 
-            {/* Right: Controls & Profile */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            {/* 2. CENTER: Main Navigation (flex: 1, centered, clean gap, concise non-wrapping labels) */}
+            <nav
+              style={{
+                flex: 1,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 'clamp(4px, 0.8vw, 8px)',
+                overflow: 'hidden',
+              }}
+            >
+              {allRoutes.slice(0, 6).map((route) => {
+                const Icon = route.icon;
+                const active = isRouteActive(route.href);
+
+                return (
+                  <Link
+                    key={route.href}
+                    href={route.href}
+                    title={route.label}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 7,
+                      padding: '7px 12px',
+                      height: 38,
+                      borderRadius: 8,
+                      fontSize: 13,
+                      fontWeight: active ? 700 : 500,
+                      color: active ? 'var(--gold)' : 'var(--text-secondary)',
+                      background: active ? 'var(--gold-muted)' : 'transparent',
+                      border: active ? '1px solid var(--gold-border)' : '1px solid transparent',
+                      textDecoration: 'none',
+                      whiteSpace: 'nowrap',
+                      transition: 'all 0.15s ease',
+                      flexShrink: 0,
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!active) {
+                        e.currentTarget.style.background = 'var(--bg-surface-elevated)';
+                        e.currentTarget.style.color = 'var(--text-primary)';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!active) {
+                        e.currentTarget.style.background = 'transparent';
+                        e.currentTarget.style.color = 'var(--text-secondary)';
+                      }
+                    }}
+                  >
+                    <Icon size={16} style={{ color: active ? 'var(--gold)' : 'currentColor', flexShrink: 0 }} />
+                    <span className="hidden xl:inline">{route.label}</span>
+                    <span className="inline xl:hidden">{route.shortLabel || route.label}</span>
+                  </Link>
+                );
+              })}
+            </nav>
+
+            {/* 3. RIGHT: Controls & Profile (flex-shrink: 0, 38px standardized height buttons) */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+              {/* Compact Toggle Sidebar Button (38x38 icon-only with tooltip) */}
               <button
                 type="button"
                 onClick={() => setNavigationStyle('sidebar')}
-                aria-label="Switch to sidebar layout"
-                title="Switch to sidebar layout"
+                aria-label="Toggle Sidebar"
+                title="Toggle Sidebar (Switch to Sidebar Layout)"
                 style={{
+                  width: 38,
+                  height: 38,
+                  borderRadius: 10,
                   background: 'var(--bg-surface-elevated)',
                   border: '1px solid var(--border)',
-                  borderRadius: 8,
-                  padding: '5px 9px',
                   color: 'var(--text-secondary)',
-                  fontSize: 11,
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 5,
+                  justifyContent: 'center',
+                  transition: 'all 0.15s ease',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = 'var(--text-primary)';
+                  e.currentTarget.style.borderColor = 'var(--gold)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = 'var(--text-secondary)';
+                  e.currentTarget.style.borderColor = 'var(--border)';
                 }}
               >
-                <SidebarIcon size={13} />
-                <span>Sidebar Mode</span>
+                <SidebarIcon size={18} />
               </button>
 
               <NotificationDropdown />
-              <ThemeToggle variant="icon" style={{ width: 34, height: 34 }} />
+              <ThemeToggle variant="icon" style={{ width: 38, height: 38 }} />
               <UserProfileDropdown />
             </div>
           </div>
@@ -559,22 +628,25 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* Top Sticky Header (in Sidebar mode or on Mobile) */}
         <header
           style={{
-            height: 64,
+            height: 60,
             background: 'var(--bg-surface)',
             borderBottom: '1px solid var(--border)',
-            padding: '0 16px',
-            display: mounted && navigationStyle === 'navbar' ? 'none' : 'flex',
+            padding: '0 12px',
+            display: 'flex',
+            flexDirection: 'row',
+            flexWrap: 'nowrap',
             alignItems: 'center',
             justifyContent: 'space-between',
             position: 'sticky',
             top: 0,
             zIndex: 30,
             boxShadow: 'var(--shadow-sm)',
+            width: '100%',
           }}
-          className={mounted && navigationStyle === 'navbar' ? 'md:hidden' : 'sm:px-6'}
+          className={mounted && navigationStyle === 'navbar' ? 'md:hidden sm:px-6' : 'sm:px-6'}
         >
-          {/* Left: Mobile Toggle & Breadcrumbs */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          {/* Left: Mobile Toggle & Brand Logo */}
+          <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 8, flexShrink: 0, whiteSpace: 'nowrap' }}>
             <button
               type="button"
               onClick={() => setMobileOpen(!mobileOpen)}
@@ -585,10 +657,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 borderRadius: 8,
                 color: 'var(--text-primary)',
                 cursor: 'pointer',
-                padding: '6px 8px',
+                width: 36,
+                height: 36,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
+                flexShrink: 0,
               }}
               className="md:hidden"
             >
@@ -596,7 +670,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </button>
 
             {/* Mobile Logo Brand */}
-            <div className="flex md:hidden" style={{ alignItems: 'center', gap: 8 }}>
+            <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 7, flexShrink: 0, whiteSpace: 'nowrap' }} className="md:hidden">
               <div
                 style={{
                   width: 28,
@@ -609,11 +683,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   fontWeight: 900,
                   fontSize: 12,
                   color: '#090a0f',
+                  flexShrink: 0,
                 }}
               >
                 SK
               </div>
-              <span className="font-display" style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-primary)' }}>
+              <span className="font-display" style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-primary)', whiteSpace: 'nowrap' }}>
                 SkillSense <span style={{ color: 'var(--gold)' }}>AI</span>
               </span>
             </div>
@@ -631,7 +706,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
 
           {/* Right: Telemetry, Notifications, Theme & Profile */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 6, flexShrink: 0, whiteSpace: 'nowrap' }}>
             {/* Stakeholder Workspace Switcher (Desktop Only) */}
             <div className="hidden lg:flex" style={{ alignItems: 'center', gap: 3, background: 'var(--bg-surface-elevated)', padding: 3, borderRadius: 8, border: '1px solid var(--border)' }}>
               {[
@@ -687,10 +762,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <button
               type="button"
               onClick={() => setGuideOpen(true)}
+              className="hidden sm:inline-flex"
               style={{
                 fontSize: 11.5,
                 padding: '5px 9px',
-                display: 'inline-flex',
                 alignItems: 'center',
                 gap: 5,
                 color: 'var(--gold)',
@@ -703,14 +778,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               aria-label="Open UI Feature Guide and Pro Tips"
             >
               <Lightbulb size={13} color="var(--gold)" />
-              <span className="hidden sm:inline">UI Guide</span>
+              <span>UI Guide</span>
             </button>
 
             {/* Notification Dropdown */}
             <NotificationDropdown />
 
             {/* Theme Mode Toggle */}
-            <ThemeToggle variant="icon" style={{ width: 34, height: 34 }} />
+            <ThemeToggle variant="icon" style={{ width: 38, height: 38 }} />
 
             {/* User Profile Dropdown */}
             <UserProfileDropdown />
