@@ -914,3 +914,78 @@
     opacity: 0;
     transform: translateX(-50%) translateY(10px);
 }
+
+/* =============================================
+   LIGHT MODE OVERRIDES FOR AUTH
+============================================= */
+[data-theme="light"] .auth-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(217, 119, 6, 0.12);
+}
+
+[data-theme="light"] .auth-title {
+    color: #0f172a;
+}
+
+[data-theme="light"] .auth-subtitle {
+    color: #475569;
+}
+
+[data-theme="light"] .auth-tagline {
+    color: #64748b !important;
+}
+
+[data-theme="light"] .auth-field-label {
+    color: #334155;
+}
+
+[data-theme="light"] .auth-input {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    color: #0f172a;
+}
+
+[data-theme="light"] .auth-input:focus {
+    background: #ffffff;
+    border-color: #d97706;
+    box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.12);
+}
+
+[data-theme="light"] .auth-input-icon {
+    color: #64748b;
+}
+
+[data-theme="light"] .auth-tabs {
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+}
+
+[data-theme="light"] .auth-tab {
+    color: #64748b;
+}
+
+[data-theme="light"] .auth-tab.active {
+    background: #ffffff;
+    color: #0f172a;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .auth-demo-btn {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    color: #0f172a;
+}
+
+[data-theme="light"] .auth-demo-btn:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+}
+
+[data-theme="light"] .auth-footer {
+    color: #64748b;
+}
+
+[data-theme="light"] .auth-link {
+    color: #d97706;
+}

@@ -43,6 +43,7 @@ import {
 
 import { AIBadge } from '@/components/ui/AIBadge';
 import PricingSection from '@/components/sections/PricingSection';
+import ThemeToggle from '@/components/shared/ThemeToggle';
 
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
@@ -74,7 +75,7 @@ export default function LandingPage() {
           right: 0,
           height: 64,
           zIndex: 100,
-          background: scrolled ? 'rgba(9, 10, 15, 0.88)' : 'transparent',
+          background: scrolled ? 'var(--bg-surface)' : 'transparent',
           backdropFilter: scrolled ? 'blur(16px)' : 'none',
           borderBottom: scrolled ? '1px solid var(--border)' : '1px solid transparent',
           transition: 'all 0.25s ease',
@@ -110,7 +111,7 @@ export default function LandingPage() {
             >
               SK
             </div>
-            <span className="font-display" style={{ fontSize: 16, fontWeight: 800, color: '#f8fafc', letterSpacing: '-0.02em' }}>
+            <span className="font-display" style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
               SkillSense <span style={{ color: 'var(--gold)' }}>AI</span>
             </span>
           </Link>
@@ -126,8 +127,9 @@ export default function LandingPage() {
             <a href="#trust" style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none' }}>DPDP Trust</a>
           </div>
 
-          {/* Auth Actions */}
+          {/* Auth Actions & Theme Toggle */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <ThemeToggle variant="icon" />
             <Link
               href="/auth"
               className="btn-secondary hidden sm:inline-flex"

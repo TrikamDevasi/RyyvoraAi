@@ -276,7 +276,7 @@ export default function PricingSection() {
 
           <h2
             className="font-display"
-            style={{ fontSize: 'clamp(30px, 4vw, 50px)', fontWeight: 900, color: '#f8fafc', margin: '0 0 14px', lineHeight: 1.1 }}
+            style={{ fontSize: 'clamp(30px, 4vw, 50px)', fontWeight: 900, color: 'var(--text-primary)', margin: '0 0 14px', lineHeight: 1.1 }}
           >
             Start Small.{' '}
             <span style={{ background: 'linear-gradient(135deg, #f59e0b, #fbbf24)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
@@ -291,7 +291,7 @@ export default function PricingSection() {
           {/* ── Billing Cycle Toggle ── */}
           <div style={{
             display: 'inline-flex', alignItems: 'center',
-            background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)',
+            background: 'var(--bg-surface-elevated)', border: '1px solid var(--border)',
             borderRadius: 99, padding: 4, gap: 4,
           }}>
             {(['monthly', 'yearly'] as BillingCycle[]).map((c) => (
@@ -346,12 +346,9 @@ export default function PricingSection() {
             return (
               <div
                 key={plan.id}
+                className={isGrowth ? 'pricing-card-growth' : 'pricing-card-standard'}
                 style={{
                   position: 'relative',
-                  background: isGrowth
-                    ? 'linear-gradient(145deg, #1a1200 0%, #0f111a 60%)'
-                    : 'rgba(255,255,255,0.02)',
-                  border: `1px solid ${isGrowth ? 'rgba(245,158,11,0.4)' : 'rgba(255,255,255,0.07)'}`,
                   borderRadius: 18,
                   padding: '28px 24px',
                   transition: 'transform 0.3s ease, box-shadow 0.3s ease',
@@ -364,7 +361,7 @@ export default function PricingSection() {
                   (e.currentTarget as HTMLElement).style.transform = isGrowth ? 'scale(1.03) translateY(-8px)' : 'translateY(-8px)';
                   (e.currentTarget as HTMLElement).style.boxShadow = isGrowth
                     ? '0 24px 64px rgba(245,158,11,0.2)'
-                    : '0 16px 48px rgba(0,0,0,0.4)';
+                    : '0 16px 48px rgba(0,0,0,0.15)';
                 }}
                 onMouseLeave={e => {
                   (e.currentTarget as HTMLElement).style.transform = isGrowth ? 'scale(1.03)' : 'scale(1)';
@@ -394,7 +391,7 @@ export default function PricingSection() {
                     <Icon size={18} color={plan.color} />
                   </div>
                   <div>
-                    <h3 className="font-display" style={{ fontSize: 17, fontWeight: 800, color: '#f8fafc', margin: 0 }}>
+                    <h3 className="font-display" style={{ fontSize: 17, fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
                       {plan.name}
                     </h3>
                     <p style={{ fontSize: 11.5, color: 'var(--text-muted)', margin: 0 }}>
@@ -408,7 +405,7 @@ export default function PricingSection() {
                   <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
                     <span
                       className="font-display"
-                      style={{ fontSize: plan.isCustom ? 28 : 38, fontWeight: 900, color: isGrowth ? 'var(--gold)' : '#f8fafc' }}
+                      style={{ fontSize: plan.isCustom ? 28 : 38, fontWeight: 900, color: isGrowth ? 'var(--gold)' : 'var(--text-primary)' }}
                     >
                       {displayPrice}
                     </span>
@@ -436,13 +433,13 @@ export default function PricingSection() {
                   {plan.features.map((f, j) => (
                     <div key={j} style={{ display: 'flex', alignItems: 'flex-start', gap: 9 }}>
                       <Check size={14} color={isGrowth ? 'var(--gold)' : '#10b981'} style={{ flexShrink: 0, marginTop: 2 }} />
-                      <span style={{ fontSize: 13, color: '#94a3b8', lineHeight: 1.4 }}>{f}</span>
+                      <span style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.4 }}>{f}</span>
                     </div>
                   ))}
                   {plan.notIncluded.slice(0, 2).map((f, j) => (
                     <div key={`x${j}`} style={{ display: 'flex', alignItems: 'flex-start', gap: 9 }}>
-                      <X size={13} color='#334155' style={{ flexShrink: 0, marginTop: 2 }} />
-                      <span style={{ fontSize: 12.5, color: '#475569', lineHeight: 1.4 }}>{f}</span>
+                      <X size={13} color='var(--text-disabled)' style={{ flexShrink: 0, marginTop: 2 }} />
+                      <span style={{ fontSize: 12.5, color: 'var(--text-muted)', lineHeight: 1.4 }}>{f}</span>
                     </div>
                   ))}
                 </div>

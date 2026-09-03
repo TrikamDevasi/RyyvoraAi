@@ -6,7 +6,8 @@
   padding: 0;
 }
 
-:root {
+:root,
+[data-theme="dark"] {
   /* ── Core Background & Surfaces (Obsidian Dark-First) ── */
   --bg: #090a0f;
   --bg-surface: #0f111a;
@@ -61,6 +62,64 @@
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
   --shadow-md: 0 4px 16px -2px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
   --shadow-lg: 0 12px 32px -4px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="light"],
+.light {
+  /* ── Core Background & Surfaces: Warm Slate-50 off-white, clean white cards ── */
+  --bg: #f8fafc;
+  --bg-surface: #ffffff;
+  --bg-surface-elevated: #f1f5f9;
+  --bg-surface-hover: #e2e8f0;
+  --bg-input: #ffffff;
+
+  /* ── Borders & Separators (Crisp 1px Light Gray) ── */
+  --border: #e2e8f0;
+  --border-subtle: #f1f5f9;
+  --border-active: rgba(217, 119, 6, 0.5);
+  --border-focus: #d97706;
+
+  /* ── Typography & Text Contrast: Slate-900 charcoal primary, slate-600 secondary ── */
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --text-disabled: #94a3b8;
+
+  /* ── Restrained Accents: Rich Amber Gold with WCAG AA 4.5:1 text contrast ── */
+  --gold: #d97706;
+  --gold-light: #f59e0b;
+  --gold-dim: #b45309;
+  --gold-muted: rgba(217, 119, 6, 0.08);
+  --gold-border: rgba(217, 119, 6, 0.28);
+
+  /* ── Semantic System Status (High-contrast accessible on light) ── */
+  --success: #059669;
+  --success-bg: rgba(5, 150, 105, 0.08);
+  --success-border: rgba(5, 150, 105, 0.25);
+
+  --warning: #d97706;
+  --warning-bg: rgba(217, 119, 6, 0.08);
+  --warning-border: rgba(217, 119, 6, 0.25);
+
+  --error: #dc2626;
+  --error-bg: rgba(220, 38, 38, 0.08);
+  --error-border: rgba(220, 38, 38, 0.25);
+
+  --info: #2563eb;
+  --info-bg: rgba(37, 99, 235, 0.08);
+  --info-border: rgba(37, 99, 235, 0.25);
+
+  /* ── Radii ── */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
+  --radius-pill: 9999px;
+
+  /* ── Shadows (Clean SaaS depth elevation) ── */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.03);
 }
 
 html,
@@ -409,4 +468,231 @@ body {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* ==========================================================================
+   ── LIGHT MODE COMPONENT & UTILITY OVERRIDES ──────────────────────────────
+   ========================================================================== */
+
+/* ── Smooth Theme Transitions ── */
+html,
+body,
+.card-linear,
+.card-accent,
+.glass,
+.glass-card,
+aside,
+header,
+nav,
+.btn-secondary,
+.btn-ghost,
+table,
+th,
+td {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.15s ease, box-shadow 0.2s ease;
+}
+
+/* ── Light Mode Surface & Card Styles ── */
+[data-theme="light"] .card-linear {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+[data-theme="light"] .card-linear:hover {
+  background: var(--bg-surface);
+  border-color: #cbd5e1;
+  box-shadow: var(--shadow-md);
+}
+
+[data-theme="light"] .card-accent {
+  background: linear-gradient(180deg, rgba(217, 119, 6, 0.04) 0%, #ffffff 100%);
+  border: 1px solid var(--gold-border);
+  box-shadow: var(--shadow-sm);
+}
+
+[data-theme="light"] .glass {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+.pricing-card-growth {
+  background: linear-gradient(145deg, #1a1200 0%, #0f111a 60%);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+}
+
+.pricing-card-standard {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+[data-theme="light"] .pricing-card-growth {
+  background: linear-gradient(145deg, rgba(217, 119, 6, 0.05) 0%, #ffffff 65%);
+  border: 1px solid rgba(217, 119, 6, 0.35);
+  box-shadow: 0 4px 20px -2px rgba(217, 119, 6, 0.1);
+}
+
+[data-theme="light"] .pricing-card-standard {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+[data-theme="light"] .glass-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ── Light Mode Text Gradients ── */
+[data-theme="light"] .text-gradient-gold {
+  background: linear-gradient(135deg, #0f172a 0%, #334155 50%, #d97706 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+[data-theme="light"] .text-gradient-amber {
+  background: linear-gradient(135deg, #b45309 0%, #d97706 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Light Mode Buttons ── */
+[data-theme="light"] .btn-secondary {
+  background: #ffffff;
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="light"] .btn-secondary:hover {
+  background: var(--bg-surface-elevated);
+  border-color: #cbd5e1;
+  color: var(--text-primary);
+}
+
+[data-theme="light"] .btn-ghost {
+  color: var(--text-secondary);
+}
+
+[data-theme="light"] .btn-ghost:hover {
+  background: var(--bg-surface-elevated);
+  color: var(--text-primary);
+}
+
+/* ── Light Mode Badges & Pills ── */
+[data-theme="light"] .badge-neutral {
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+
+/* ── Light Mode Form Inputs, Selects & Textareas ── */
+[data-theme="light"] input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+[data-theme="light"] select,
+[data-theme="light"] textarea {
+  background-color: #ffffff;
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
+[data-theme="light"] input::placeholder,
+[data-theme="light"] textarea::placeholder {
+  color: var(--text-disabled);
+}
+
+[data-theme="light"] input:focus,
+[data-theme="light"] select:focus,
+[data-theme="light"] textarea:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.12);
+}
+
+/* ── Light Mode Tables ── */
+[data-theme="light"] table thead tr {
+  border-bottom: 1px solid var(--border);
+}
+
+[data-theme="light"] table tbody tr {
+  border-bottom: 1px solid #f1f5f9;
+}
+
+[data-theme="light"] table tbody tr:hover {
+  background-color: rgba(241, 245, 249, 0.6);
+}
+
+/* ── Light Mode Charts (Recharts SVG Overrides) ── */
+[data-theme="light"] .recharts-cartesian-grid line {
+  stroke: rgba(0, 0, 0, 0.06) !important;
+}
+
+[data-theme="light"] .recharts-text {
+  fill: #64748b !important;
+}
+
+[data-theme="light"] .recharts-default-tooltip {
+  background-color: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04) !important;
+  color: #0f172a !important;
+  border-radius: 10px !important;
+}
+
+[data-theme="light"] .recharts-tooltip-item {
+  color: #0f172a !important;
+}
+
+/* ── Light Mode Scrollbars & Selection ── */
+[data-theme="light"] ::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.14);
+}
+
+[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
+  background: rgba(217, 119, 6, 0.35);
+}
+
+[data-theme="light"] ::selection {
+  background: rgba(217, 119, 6, 0.18);
+  color: #0f172a;
+}
+
+/* ── Light Mode Semantic Safety Overrides for Hardcoded Inline Colors ── */
+[data-theme="light"] [style*="color: #f8fafc"],
+[data-theme="light"] [style*="color:#f8fafc"],
+[data-theme="light"] [style*="color: rgb(248, 250, 252)"],
+[data-theme="light"] [style*="color: #ffffff"],
+[data-theme="light"] [style*="color:#ffffff"],
+[data-theme="light"] [style*="color: white"] {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="light"] [style*="background: #090a0f"],
+[data-theme="light"] [style*="background:#090a0f"],
+[data-theme="light"] [style*="background: #050a14"],
+[data-theme="light"] [style*="background: rgb(9, 10, 15)"] {
+  background: var(--bg) !important;
+}
+
+[data-theme="light"] [style*="background: #0f111a"],
+[data-theme="light"] [style*="background:#0f111a"],
+[data-theme="light"] [style*="background: #151824"],
+[data-theme="light"] [style*="background: rgb(15, 17, 26)"] {
+  background: var(--bg-surface) !important;
+}
+
+[data-theme="light"] [style*="background: rgba(255, 255, 255, 0.03)"],
+[data-theme="light"] [style*="background: rgba(255, 255, 255, 0.04)"],
+[data-theme="light"] [style*="background: rgba(255, 255, 255, 0.05)"],
+[data-theme="light"] [style*="background: rgba(255, 255, 255, 0.06)"],
+[data-theme="light"] [style*="background: rgba(255, 255, 255, 0.08)"] {
+  background: var(--bg-surface-elevated) !important;
+}
+
+[data-theme="light"] [style*="border: 1px solid rgba(255, 255, 255, 0.08)"],
+[data-theme="light"] [style*="border: 1px solid rgba(255, 255, 255, 0.04)"],
+[data-theme="light"] [style*="border-bottom: 1px solid rgba(255, 255, 255, 0.03)"] {
+  border-color: var(--border) !important;
 }

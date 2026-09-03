@@ -33,6 +33,7 @@ import {
   Lightbulb,
 } from 'lucide-react';
 import { FeatureTipsGuideModal } from '@/components/shared/FeatureTipsGuide';
+import ThemeToggle from '@/components/shared/ThemeToggle';
 
 function VerificationBanner() {
   const { user } = useAuth();
@@ -304,7 +305,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     {user?.name?.charAt(0) || 'U'}
                   </div>
                   <div>
-                    <div style={{ fontSize: 12, fontWeight: 700, color: '#f8fafc', maxWidth: 110, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-primary)', maxWidth: 100, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       {user?.name || 'Candidate'}
                     </div>
                     <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'capitalize' }}>
@@ -313,7 +314,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', gap: 4 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                  <ThemeToggle variant="icon" style={{ width: 26, height: 26 }} />
                   <Link
                     href="/student/profile"
                     aria-label="Settings"
@@ -478,6 +480,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <span>Sidebar</span>
               </button>
 
+              {/* Theme Toggle */}
+              <ThemeToggle variant="icon" style={{ width: 28, height: 28 }} />
+
               {/* User Dropdown / Settings Link */}
               <Link
                 href="/student/profile"
@@ -632,6 +637,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <Layout size={12} />
               <span>{navigationStyle === 'sidebar' ? 'Navbar Mode' : 'Sidebar Mode'}</span>
             </button>
+
+            {/* Theme Mode Toggle */}
+            <ThemeToggle variant="icon" style={{ width: 28, height: 28 }} />
 
             {/* UI Guide Button */}
             <button
@@ -893,7 +901,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <div style={{ borderTop: '1px solid var(--border)', paddingTop: 12, marginTop: 4 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
-                      <div style={{ fontSize: 12, color: '#f8fafc', fontWeight: 700, maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      <div style={{ fontSize: 12, color: 'var(--text-primary)', fontWeight: 700, maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {user?.name || 'Candidate'}
                       </div>
                       <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'capitalize' }}>
@@ -901,14 +909,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                       </div>
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={handleLogout}
-                      className="btn-ghost"
-                      style={{ fontSize: 11, padding: '4px 8px', display: 'flex', alignItems: 'center', gap: 4 }}
-                    >
-                      <LogOut size={12} /> Sign Out
-                    </button>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <ThemeToggle variant="icon" style={{ width: 28, height: 28 }} />
+                      <button
+                        type="button"
+                        onClick={handleLogout}
+                        className="btn-ghost"
+                        style={{ fontSize: 11, padding: '4px 8px', display: 'flex', alignItems: 'center', gap: 4 }}
+                      >
+                        <LogOut size={12} /> Sign Out
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>

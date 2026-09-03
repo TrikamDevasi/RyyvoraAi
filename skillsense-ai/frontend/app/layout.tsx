@@ -3,6 +3,7 @@ import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import SplashScreen from "../components/SplashScreen";
 import ChatWidgetLoader from "../components/ChatWidgetLoader";
+import ThemeScript from "../components/shared/ThemeScript";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -73,6 +74,9 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable}`} suppressHydrationWarning>
+      <head>
+        <ThemeScript />
+      </head>
       <body className="antialiased font-sans" suppressHydrationWarning>
         <SplashScreen>{children}</SplashScreen>
         <ChatWidgetLoader />

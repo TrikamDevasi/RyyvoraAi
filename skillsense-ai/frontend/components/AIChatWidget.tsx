@@ -509,7 +509,7 @@ export default function AIChatWidget() {
 
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <h3 style={{ fontSize: 13.5, fontWeight: 800, color: '#f8fafc', margin: 0 }}>
+                  <h3 style={{ fontSize: 13.5, fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
                     SkillSense Copilot
                   </h3>
                   <AIBadge type="live" label="LIVE" />
@@ -609,14 +609,14 @@ export default function AIChatWidget() {
                         background: isAssistant
                           ? m.isError
                             ? 'rgba(239, 68, 68, 0.12)'
-                            : '#141724'
+                            : 'var(--bg-surface-elevated)'
                           : 'linear-gradient(135deg, #f59e0b, #d97706)',
-                        color: isAssistant ? (m.isError ? '#fca5a5' : '#f1f5f9') : '#090a0f',
+                        color: isAssistant ? (m.isError ? '#fca5a5' : 'var(--text-primary)') : '#090a0f',
                         border: isAssistant
-                          ? `1px solid ${m.isError ? 'rgba(239,68,68,0.35)' : 'rgba(255,255,255,0.09)'}`
+                          ? `1px solid ${m.isError ? 'rgba(239,68,68,0.35)' : 'var(--border)'}`
                           : 'none',
                         boxShadow: isAssistant
-                          ? '0 4px 16px rgba(0,0,0,0.3)'
+                          ? 'var(--shadow-sm)'
                           : '0 4px 12px rgba(245,158,11,0.25)',
                         fontFamily: 'var(--font-inter), system-ui, -apple-system, sans-serif',
                         fontSize: 13,
@@ -755,7 +755,7 @@ export default function AIChatWidget() {
                 borderRadius: 8,
                 background: 'var(--bg-input)',
                 border: '1px solid var(--border)',
-                color: '#fff',
+                color: 'var(--text-primary)',
                 fontSize: 12.5,
               }}
             />
