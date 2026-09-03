@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import SkillSenseLoader from './SkillSenseLoader';
+import SkillSenseIntro from './SkillSenseIntro';
 
 export default function SplashScreen({ children }: { children: React.ReactNode }) {
-  return <SkillSenseLoader>{children}</SkillSenseLoader>;
+  return <SkillSenseIntro>{children}</SkillSenseIntro>;
 }
