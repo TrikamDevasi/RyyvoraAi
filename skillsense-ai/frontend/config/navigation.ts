@@ -56,7 +56,7 @@ export const NAVIGATION_CONFIG: Record<string, NavGroup[]> = {
     {
       group: 'Intelligence & Skills',
       routes: [
-        { label: 'AI Skill Analyzer', shortLabel: 'AI Analyzer', href: '/student/analyzer', icon: Brain, badge: 'AI' },
+        { label: 'AI Skill Analyzer', shortLabel: 'AI Tools', href: '/student/analyzer', icon: Brain, badge: 'AI' },
         { label: 'Career Predictor', shortLabel: 'Career', href: '/student/career', icon: Compass },
         { label: 'Market Demand', shortLabel: 'Market', href: '/student/market', icon: TrendingUp },
       ],

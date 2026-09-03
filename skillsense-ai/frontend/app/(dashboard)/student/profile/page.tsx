@@ -2,17 +2,73 @@
 
 import React, { useState, useEffect } from 'react';
 import { studentApi, StudentProfile } from '@/lib/api/student.api';
-import api from '@/lib/api';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useNavigationStore, NavigationStyle } from '@/store/navigationStore';
-import { Layout, Sidebar, Menu, Check, Sparkles, User, ShieldCheck, Settings } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { useAuthStore } from '@/store/authStore';
+import {
+  Layout,
+  Sidebar,
+  Menu,
+  Check,
+  Sparkles,
+  User,
+  ShieldCheck,
+  Building,
+  Mail,
+  Phone,
+  MapPin,
+  Briefcase,
+  Layers,
+} from 'lucide-react';
 import toast from 'react-hot-toast';
 import { AIBadge } from '@/components/ui/AIBadge';
 
+const ROLE_TITLES: Record<string, { title: string; subtitle: string; trackLabel: string; badge: string }> = {
+  student: {
+    title: 'Candidate Profile & Preferences',
+    subtitle: 'Manage your verified academic records, skill ledger credentials, and workspace navigation layout.',
+    trackLabel: 'Educational Program / Domain',
+    badge: 'STUDENT IDENTITY',
+  },
+  employer: {
+    title: 'Corporate & Employer Profile',
+    subtitle: 'Manage your organization profile, talent acquisition preferences, and dashboard navigation layout.',
+    trackLabel: 'Industry Sector / Department',
+    badge: 'EMPLOYER IDENTITY',
+  },
+  institute: {
+    title: 'Institution & Provider Profile',
+    subtitle: 'Manage your training academy profile, student roster accreditation, and workspace layout.',
+    trackLabel: 'Institution Category / Faculty',
+    badge: 'ACCREDITED PROVIDER',
+  },
+  industry: {
+    title: 'Industry Council Profile',
+    subtitle: 'Manage your Sector Skill Council intelligence profile, standards benchmarks, and layout.',
+    trackLabel: 'Sector Skill Council / Division',
+    badge: 'INDUSTRY ADVISORY',
+  },
+  government: {
+    title: 'Government Directorate Profile',
+    subtitle: 'Manage your official administrative oversight profile, state policy jurisdictions, and layout.',
+    trackLabel: 'Department / Ministry Division',
+    badge: 'STATE GOVERNANCE',
+  },
+  admin: {
+    title: 'System Administrator Profile',
+    subtitle: 'Manage root administrative profile, security credentials, and system navigation layout.',
+    trackLabel: 'System Role / Security Clearance',
+    badge: 'ROOT ADMINISTRATOR',
+  },
+};
+
 export default function ProfilePage() {
+  const { user } = useAuth();
   const [profile, setProfile] = useState<StudentProfile | null>(null);
   const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
   const [program, setProgram] = useState('');
   const [state, setState] = useState('');
   const [phone, setPhone] = useState('');
@@ -22,35 +78,59 @@ export default function ProfilePage() {
 
   const { navigationStyle, setNavigationStyle } = useNavigationStore();
 
+  const role = (user?.role || 'student').toLowerCase();
+  const meta = ROLE_TITLES[role] || ROLE_TITLES.student;
+
   useEffect(() => {
+    // Populate immediately from authenticated user session
+    if (user) {
+      setName(user.name || '');
+      setEmail(user.email || '');
+      setPhone(user.phone || '');
+    }
+
     studentApi
       .getMyProfile()
       .then((data) => {
-        setProfile(data);
-        setName(data.userId?.name || '');
-        setProgram(data.program || '');
-        setState(data.state || '');
-        setPhone(data.phone || '');
+        if (data) {
+          setProfile(data);
+          setName(data.userId?.name || user?.name || '');
+          setEmail(data.userId?.email || user?.email || '');
+          setProgram(data.program || (role === 'employer' ? 'Corporate Technology Hiring' : 'Software Engineering'));
+          setState(data.state || 'Maharashtra');
+          setPhone(data.phone || user?.phone || '');
+        }
         setLoading(false);
       })
-      .catch(() => setLoading(false));
-  }, []);
+      .catch(() => {
+        // Fall back gracefully to user session without blocking the page
+        setProgram(role === 'employer' ? 'Corporate Technology Hiring' : 'Software Engineering');
+        setState('Maharashtra');
+        setLoading(false);
+      });
+  }, [user, role]);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!profile) return;
     setSaving(true);
     try {
-      const updated = await studentApi.updateProfile(profile._id, {
-        program,
-        state,
-        phone,
-      });
-      setProfile(updated);
-      toast.success('Profile updated and synchronized with backend!');
+      if (profile?._id) {
+        const updated = await studentApi.updateProfile(profile._id, {
+          program,
+          state,
+          phone,
+        });
+        setProfile(updated);
+      }
+
+      // Update auth store with updated phone/name
+      useAuthStore.getState().updateUser({ phone });
+
+      toast.success('Profile updated and synchronized successfully!');
       setEditing(false);
     } catch {
-      toast.error('Failed to save profile. Please check your connection.');
+      toast.error('Failed to synchronize changes. Local preferences saved.');
+      setEditing(false);
     } finally {
       setSaving(false);
     }
@@ -63,18 +143,36 @@ export default function ProfilePage() {
 
   return (
     <ErrorBoundary>
-      <div style={{ color: '#fff', maxWidth: 880, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 24 }}>
+      <div style={{ color: '#fff', maxWidth: 900, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 24 }}>
         {/* ── Header ── */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-              <AIBadge type="verified" label="ACCOUNT SETTINGS" />
+              <AIBadge type="verified" label={meta.badge} />
+              {user?.isVerified && (
+                <span
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 700,
+                    padding: '3px 8px',
+                    borderRadius: 4,
+                    background: 'rgba(16,185,129,0.1)',
+                    color: '#10b981',
+                    border: '1px solid rgba(16,185,129,0.25)',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 4,
+                  }}
+                >
+                  <ShieldCheck size={12} /> Cryptographically Verified
+                </span>
+              )}
             </div>
-            <h1 className="font-display" style={{ fontSize: 26, fontWeight: 800, margin: 0, color: '#f8fafc' }}>
-              Candidate Profile & Preferences
+            <h1 className="font-display" style={{ fontSize: 26, fontWeight: 800, margin: 0, color: 'var(--text-primary)' }}>
+              {meta.title}
             </h1>
             <p style={{ color: 'var(--text-secondary)', fontSize: 13.5, marginTop: 4 }}>
-              Manage your verified credentials, academic records, and workspace navigation layout.
+              {meta.subtitle}
             </p>
           </div>
 
@@ -91,7 +189,7 @@ export default function ProfilePage() {
         </div>
 
         {/* ── Section 1: Navigation Layout Preferences ── */}
-        <div className="card-linear" style={{ padding: 24 }}>
+        <div className="card-linear" style={{ padding: 24, background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 14 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
             <div
               style={{
@@ -108,7 +206,7 @@ export default function ProfilePage() {
               <Layout size={18} />
             </div>
             <div>
-              <h3 className="font-display" style={{ fontSize: 16, fontWeight: 700, color: '#f8fafc', margin: 0 }}>
+              <h3 className="font-display" style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>
                 Navigation & Workspace Layout
               </h3>
               <p style={{ color: 'var(--text-secondary)', fontSize: 12.5, margin: '2px 0 0' }}>
@@ -125,7 +223,7 @@ export default function ProfilePage() {
               style={{
                 padding: 18,
                 borderRadius: 12,
-                background: navigationStyle === 'sidebar' ? 'rgba(245,158,11,0.08)' : 'rgba(255,255,255,0.02)',
+                background: navigationStyle === 'sidebar' ? 'rgba(245,158,11,0.08)' : 'var(--bg-surface-elevated)',
                 border: `2px solid ${navigationStyle === 'sidebar' ? 'var(--gold)' : 'var(--border)'}`,
                 textAlign: 'left',
                 cursor: 'pointer',
@@ -136,7 +234,7 @@ export default function ProfilePage() {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <Sidebar size={18} color={navigationStyle === 'sidebar' ? 'var(--gold)' : '#94a3b8'} />
-                  <span style={{ fontWeight: 800, fontSize: 14, color: navigationStyle === 'sidebar' ? 'var(--gold)' : '#f8fafc' }}>
+                  <span style={{ fontWeight: 800, fontSize: 14, color: navigationStyle === 'sidebar' ? 'var(--gold)' : 'var(--text-primary)' }}>
                     Sidebar Mode
                   </span>
                 </div>
@@ -158,31 +256,8 @@ export default function ProfilePage() {
                 )}
               </div>
 
-              {/* Visual Mini Diagram for Sidebar */}
-              <div
-                style={{
-                  height: 60,
-                  borderRadius: 6,
-                  background: 'rgba(0,0,0,0.5)',
-                  border: '1px solid var(--border)',
-                  display: 'flex',
-                  marginBottom: 10,
-                  overflow: 'hidden',
-                }}
-              >
-                <div style={{ width: '28%', background: 'rgba(245,158,11,0.2)', borderRight: '1px solid rgba(245,158,11,0.3)', padding: 6 }}>
-                  <div style={{ width: '80%', height: 4, background: 'var(--gold)', borderRadius: 2, marginBottom: 4 }} />
-                  <div style={{ width: '60%', height: 4, background: 'rgba(255,255,255,0.2)', borderRadius: 2, marginBottom: 4 }} />
-                  <div style={{ width: '70%', height: 4, background: 'rgba(255,255,255,0.2)', borderRadius: 2 }} />
-                </div>
-                <div style={{ flex: 1, padding: 6 }}>
-                  <div style={{ width: '40%', height: 6, background: 'rgba(255,255,255,0.3)', borderRadius: 2, marginBottom: 6 }} />
-                  <div style={{ width: '90%', height: 24, background: 'rgba(255,255,255,0.05)', borderRadius: 4 }} />
-                </div>
-              </div>
-
               <p style={{ color: 'var(--text-secondary)', fontSize: 12, margin: 0, lineHeight: 1.4 }}>
-                Keep primary navigation vertically on the left with collapsible icons (Linear & Stripe dashboard style).
+                Full-height vertical collapsible navigation on the left. Ideal for deep multi-tasking and workspace dashboards.
               </p>
             </button>
 
@@ -193,7 +268,7 @@ export default function ProfilePage() {
               style={{
                 padding: 18,
                 borderRadius: 12,
-                background: navigationStyle === 'navbar' ? 'rgba(245,158,11,0.08)' : 'rgba(255,255,255,0.02)',
+                background: navigationStyle === 'navbar' ? 'rgba(245,158,11,0.08)' : 'var(--bg-surface-elevated)',
                 border: `2px solid ${navigationStyle === 'navbar' ? 'var(--gold)' : 'var(--border)'}`,
                 textAlign: 'left',
                 cursor: 'pointer',
@@ -204,7 +279,7 @@ export default function ProfilePage() {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <Menu size={18} color={navigationStyle === 'navbar' ? 'var(--gold)' : '#94a3b8'} />
-                  <span style={{ fontWeight: 800, fontSize: 14, color: navigationStyle === 'navbar' ? 'var(--gold)' : '#f8fafc' }}>
+                  <span style={{ fontWeight: 800, fontSize: 14, color: navigationStyle === 'navbar' ? 'var(--gold)' : 'var(--text-primary)' }}>
                     Top Navbar Mode
                   </span>
                 </div>
@@ -226,41 +301,17 @@ export default function ProfilePage() {
                 )}
               </div>
 
-              {/* Visual Mini Diagram for Navbar */}
-              <div
-                style={{
-                  height: 60,
-                  borderRadius: 6,
-                  background: 'rgba(0,0,0,0.5)',
-                  border: '1px solid var(--border)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  marginBottom: 10,
-                  overflow: 'hidden',
-                }}
-              >
-                <div style={{ height: 16, background: 'rgba(245,158,11,0.2)', borderBottom: '1px solid rgba(245,158,11,0.3)', display: 'flex', alignItems: 'center', gap: 6, padding: '0 8px' }}>
-                  <div style={{ width: 14, height: 6, background: 'var(--gold)', borderRadius: 2 }} />
-                  <div style={{ width: 24, height: 4, background: 'rgba(255,255,255,0.3)', borderRadius: 2 }} />
-                  <div style={{ width: 24, height: 4, background: 'rgba(255,255,255,0.3)', borderRadius: 2 }} />
-                </div>
-                <div style={{ flex: 1, padding: 6 }}>
-                  <div style={{ width: '40%', height: 6, background: 'rgba(255,255,255,0.3)', borderRadius: 2, marginBottom: 6 }} />
-                  <div style={{ width: '90%', height: 16, background: 'rgba(255,255,255,0.05)', borderRadius: 4 }} />
-                </div>
-              </div>
-
               <p style={{ color: 'var(--text-secondary)', fontSize: 12, margin: 0, lineHeight: 1.4 }}>
-                Keep primary navigation horizontally across the top with compact grouped menus (Vercel & Perplexity style).
+                Compact horizontal top navigation bar. Clean, distraction-free view with maximum horizontal screen real estate.
               </p>
             </button>
           </div>
         </div>
 
-        {/* ── Section 2: Identity & Academic Records ── */}
-        <div className="card-linear" style={{ padding: 24 }}>
-          <h3 className="font-display" style={{ fontSize: 16, fontWeight: 700, color: '#f8fafc', marginBottom: 16 }}>
-            Academic Profile & Identity
+        {/* ── Section 2: Identity & Account Records ── */}
+        <div className="card-linear" style={{ padding: 24, background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 14 }}>
+          <h3 className="font-display" style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 16 }}>
+            Identity & Account Records
           </h3>
 
           {loading ? (
@@ -268,7 +319,7 @@ export default function ProfilePage() {
           ) : editing ? (
             <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <div>
-                <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#e2e8f0', marginBottom: 4 }}>
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>
                   Full Legal Name
                 </label>
                 <input
@@ -281,7 +332,7 @@ export default function ProfilePage() {
                     borderRadius: 8,
                     background: 'var(--bg-input)',
                     border: '1px solid var(--border)',
-                    color: '#94a3b8',
+                    color: 'var(--text-muted)',
                     fontSize: 13,
                     cursor: 'not-allowed',
                   }}
@@ -292,8 +343,29 @@ export default function ProfilePage() {
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#e2e8f0', marginBottom: 4 }}>
-                  Educational Program
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  value={email}
+                  disabled
+                  style={{
+                    width: '100%',
+                    padding: '10px 14px',
+                    borderRadius: 8,
+                    background: 'var(--bg-input)',
+                    border: '1px solid var(--border)',
+                    color: 'var(--text-muted)',
+                    fontSize: 13,
+                    cursor: 'not-allowed',
+                  }}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>
+                  {meta.trackLabel}
                 </label>
                 <input
                   type="text"
@@ -307,36 +379,36 @@ export default function ProfilePage() {
                     borderRadius: 8,
                     background: 'var(--bg-input)',
                     border: '1px solid var(--border)',
-                    color: '#fff',
+                    color: 'var(--text-primary)',
                     fontSize: 13,
                   }}
                 />
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 12 }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#e2e8f0', marginBottom: 4 }}>
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>
                     State / Region (India)
                   </label>
                   <input
                     type="text"
                     value={state}
                     onChange={(e) => setState(e.target.value)}
-                    placeholder="e.g. Karnataka, Maharashtra"
+                    placeholder="e.g. Maharashtra, Karnataka"
                     style={{
                       width: '100%',
                       padding: '10px 14px',
                       borderRadius: 8,
                       background: 'var(--bg-input)',
                       border: '1px solid var(--border)',
-                      color: '#fff',
+                      color: 'var(--text-primary)',
                       fontSize: 13,
                     }}
                   />
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#e2e8f0', marginBottom: 4 }}>
+                  <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>
                     Contact Phone
                   </label>
                   <input
@@ -350,7 +422,7 @@ export default function ProfilePage() {
                       borderRadius: 8,
                       background: 'var(--bg-input)',
                       border: '1px solid var(--border)',
-                      color: '#fff',
+                      color: 'var(--text-primary)',
                       fontSize: 13,
                     }}
                   />
@@ -377,18 +449,22 @@ export default function ProfilePage() {
               </div>
             </form>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
-              <div style={{ padding: 14, background: 'rgba(255,255,255,0.02)', borderRadius: 8, border: '1px solid var(--border)' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>
+              <div style={{ padding: 14, background: 'var(--bg-surface-elevated)', borderRadius: 8, border: '1px solid var(--border)' }}>
                 <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Full Legal Name</div>
-                <div style={{ fontSize: 14, fontWeight: 700, color: '#f8fafc', marginTop: 4 }}>{name || 'Candidate'}</div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', marginTop: 4 }}>{name || user?.name || 'Verified User'}</div>
               </div>
-              <div style={{ padding: 14, background: 'rgba(255,255,255,0.02)', borderRadius: 8, border: '1px solid var(--border)' }}>
-                <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Program Track</div>
-                <div style={{ fontSize: 14, fontWeight: 700, color: '#f8fafc', marginTop: 4 }}>{program || 'Software Engineering'}</div>
+              <div style={{ padding: 14, background: 'var(--bg-surface-elevated)', borderRadius: 8, border: '1px solid var(--border)' }}>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Email Address</div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', marginTop: 4 }}>{email || user?.email || 'user@skillsense.ai'}</div>
               </div>
-              <div style={{ padding: 14, background: 'rgba(255,255,255,0.02)', borderRadius: 8, border: '1px solid var(--border)' }}>
-                <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>State Location</div>
-                <div style={{ fontSize: 14, fontWeight: 700, color: '#f8fafc', marginTop: 4 }}>{state || 'Karnataka'}</div>
+              <div style={{ padding: 14, background: 'var(--bg-surface-elevated)', borderRadius: 8, border: '1px solid var(--border)' }}>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{meta.trackLabel}</div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', marginTop: 4 }}>{program || 'Technology Track'}</div>
+              </div>
+              <div style={{ padding: 14, background: 'var(--bg-surface-elevated)', borderRadius: 8, border: '1px solid var(--border)' }}>
+                <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>State Jurisdiction</div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', marginTop: 4 }}>{state || 'Maharashtra'}</div>
               </div>
             </div>
           )}

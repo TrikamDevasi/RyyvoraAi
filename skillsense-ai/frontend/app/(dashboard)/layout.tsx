@@ -393,7 +393,23 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </button>
             ) : (
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <Link
+                  href="/student/profile"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    textDecoration: 'none',
+                    minWidth: 0,
+                    flex: 1,
+                    padding: '3px 4px',
+                    borderRadius: 8,
+                    transition: 'background 0.15s ease',
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--bg-surface-elevated)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+                  title="View Profile & Settings"
+                >
                   <div
                     style={{
                       width: 28,
@@ -407,19 +423,20 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                       fontWeight: 800,
                       fontSize: 11,
                       boxShadow: '0 2px 6px rgba(245, 158, 11, 0.25)',
+                      flexShrink: 0,
                     }}
                   >
                     {user?.name?.charAt(0) || 'U'}
                   </div>
-                  <div>
+                  <div style={{ minWidth: 0 }}>
                     <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-primary)', maxWidth: 105, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {user?.name || 'Candidate'}
+                      {user?.name || 'Verified User'}
                     </div>
                     <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'capitalize' }}>
                       {role}
                     </div>
                   </div>
-                </div>
+                </Link>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
                   <ThemeToggle variant="icon" style={{ width: 26, height: 26 }} />
@@ -998,14 +1015,44 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 {/* Mobile Drawer Footer */}
                 <div style={{ borderTop: '1px solid var(--border)', paddingTop: 12, marginTop: 4 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div>
-                      <div style={{ fontSize: 12, color: 'var(--text-primary)', fontWeight: 700, maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {user?.name || 'Candidate'}
+                    <Link
+                      href="/student/profile"
+                      onClick={() => setMobileOpen(false)}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 8,
+                        textDecoration: 'none',
+                        minWidth: 0,
+                        flex: 1,
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: 28,
+                          height: 28,
+                          borderRadius: '50%',
+                          background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+                          color: '#090a0f',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontWeight: 800,
+                          fontSize: 11,
+                          flexShrink: 0,
+                        }}
+                      >
+                        {user?.name?.charAt(0) || 'U'}
                       </div>
-                      <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'capitalize' }}>
-                        {role} account
+                      <div style={{ minWidth: 0 }}>
+                        <div style={{ fontSize: 12, color: 'var(--text-primary)', fontWeight: 700, maxWidth: 130, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {user?.name || 'Verified User'}
+                        </div>
+                        <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'capitalize' }}>
+                          {role} · Profile →
+                        </div>
                       </div>
-                    </div>
+                    </Link>
 
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                       <ThemeToggle variant="icon" style={{ width: 30, height: 30 }} />
