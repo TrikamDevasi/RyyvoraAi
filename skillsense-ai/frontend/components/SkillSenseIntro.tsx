@@ -203,7 +203,7 @@ function generateBrainMesh(): { points: Point3D[]; connections: Connection[] } {
           p2: j,
           distance: dist,
           pulseOffset: Math.random(),
-          pulseSpeed: 0.7 + Math.random() * 1.1,
+          pulseSpeed: 0.5 + Math.random() * 0.7,
         });
         connectCount++;
       }
@@ -234,14 +234,14 @@ export default function SkillSenseIntro({ children }: { children?: React.ReactNo
     isCompleteRef.current = true;
 
     if (overlayRef.current) {
-      overlayRef.current.style.transition = 'opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1)';
+      overlayRef.current.style.transition = 'opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1)';
       overlayRef.current.style.opacity = '0';
       overlayRef.current.style.pointerEvents = 'none';
     }
 
     setTimeout(() => {
       setShouldRender(false);
-    }, 720);
+    }, 880);
   }, []);
 
   // Keyboard shortcut: Esc to instantly skip
@@ -304,24 +304,24 @@ export default function SkillSenseIntro({ children }: { children?: React.ReactNo
       const baseRadius = Math.min(width, height) * 0.28;
 
       // ────────────────────────────────────────────────────────────────────────
-      // CINEMATIC TIMELINE CHOREOGRAPHY (Total Duration: ~3.6s)
+      // CINEMATIC TIMELINE CHOREOGRAPHY (Total Duration: ~5.0s)
       //
-      // 0.0s – 0.7s: Inception of Light (Smooth singularity flare & beam expand)
-      // 0.5s – 1.6s: Neural mesh smoothly converges from space; logo crystallizes
-      // 1.6s – 2.6s: Harmonic breathing, synaptic impulses flow, golden resonance
-      // 2.6s – 3.3s: Seamless forward camera glide (particles & logo part smoothly)
-      // 3.3s+:       Velvety dissolve into the live web page
+      // 0.0s – 1.3s: Inception of Light (Smooth singularity flare & beam expand)
+      // 0.8s – 2.4s: Neural mesh smoothly converges from space; logo crystallizes
+      // 2.2s – 4.0s: Harmonic breathing, synaptic impulses flow, golden resonance
+      // 4.0s – 4.9s: Seamless forward camera glide (particles & logo part smoothly)
+      // 4.9s+:       Velvety dissolve into the live web page
       // ────────────────────────────────────────────────────────────────────────
 
-      // 1. Light Dot Flare (0.0s – 0.9s)
+      // 1. Light Dot Flare (0.0s – 1.3s)
       if (lightDotRef.current) {
         if (elapsed < 0.05) {
           lightDotRef.current.style.opacity = '0';
           lightDotRef.current.style.transform = 'translate(-50%, -50%) scale(0)';
-        } else if (elapsed < 0.9) {
-          const t = elapsed / 0.9;
-          const scale = easeOutQuad(Math.min(t * 2.2, 1));
-          const dotAlpha = t < 0.35 ? t / 0.35 : 1 - (t - 0.35) / 0.55;
+        } else if (elapsed < 1.3) {
+          const t = elapsed / 1.3;
+          const scale = easeOutQuad(Math.min(t * 2.0, 1));
+          const dotAlpha = t < 0.35 ? t / 0.35 : 1 - (t - 0.35) / 0.65;
           lightDotRef.current.style.opacity = String(dotAlpha);
           lightDotRef.current.style.transform = `translate(-50%, -50%) scale(${scale})`;
         } else {
@@ -329,15 +329,15 @@ export default function SkillSenseIntro({ children }: { children?: React.ReactNo
         }
       }
 
-      // 2. Horizontal Lens Flare Beam (0.1s – 0.95s)
+      // 2. Horizontal Lens Flare Beam (0.1s – 1.4s)
       if (lightBeamRef.current) {
         if (elapsed < 0.1) {
           lightBeamRef.current.style.opacity = '0';
           lightBeamRef.current.style.transform = 'translate(-50%, -50%) scaleX(0)';
-        } else if (elapsed < 0.95) {
-          const t = (elapsed - 0.1) / 0.85;
+        } else if (elapsed < 1.4) {
+          const t = (elapsed - 0.1) / 1.3;
           const beamScale = easeOutCubic(Math.min(t * 1.5, 1));
-          const beamAlpha = t < 0.4 ? (t / 0.4) * 0.9 : (1 - (t - 0.4) / 0.6) * 0.9;
+          const beamAlpha = t < 0.35 ? (t / 0.35) * 0.9 : (1 - (t - 0.35) / 0.65) * 0.9;
           lightBeamRef.current.style.opacity = String(beamAlpha);
           lightBeamRef.current.style.transform = `translate(-50%, -50%) scaleX(${beamScale}) scaleY(${1 - t * 0.4})`;
         } else {
@@ -347,13 +347,13 @@ export default function SkillSenseIntro({ children }: { children?: React.ReactNo
 
       // 3. Ambient Center Glow
       if (centerGlowRef.current) {
-        if (elapsed < 0.4) {
+        if (elapsed < 0.5) {
           centerGlowRef.current.style.opacity = '0';
-        } else if (elapsed < 2.6) {
-          const glowAlpha = smoothstep(0.4, 1.2, elapsed) * 0.85;
+        } else if (elapsed < 4.0) {
+          const glowAlpha = smoothstep(0.5, 1.8, elapsed) * 0.85;
           centerGlowRef.current.style.opacity = String(glowAlpha);
-        } else if (elapsed < 3.4) {
-          const fadeAlpha = Math.max(0, 1 - (elapsed - 2.6) / 0.7) * 0.85;
+        } else if (elapsed < 5.0) {
+          const fadeAlpha = Math.max(0, 1 - (elapsed - 4.0) / 1.0) * 0.85;
           centerGlowRef.current.style.opacity = String(fadeAlpha);
         } else {
           centerGlowRef.current.style.opacity = '0';
@@ -362,16 +362,16 @@ export default function SkillSenseIntro({ children }: { children?: React.ReactNo
 
       // 4. "SkillSense AI" Typography State & Transitions
       if (textRef.current) {
-        if (elapsed < 0.45) {
+        if (elapsed < 0.6) {
           textRef.current.style.opacity = '0';
           textRef.current.style.transform = 'scale(0.96)';
           textRef.current.style.filter = 'blur(12px)';
         }
-        // Ingress: Smooth fade-in and crystallization (0.45s – 1.4s)
-        else if (elapsed >= 0.45 && elapsed < 1.4) {
-          const t = (elapsed - 0.45) / 0.95;
+        // Ingress: Smooth fade-in and crystallization (0.6s – 2.2s)
+        else if (elapsed >= 0.6 && elapsed < 2.2) {
+          const t = (elapsed - 0.6) / 1.6;
           const easedT = easeOutCubic(t);
-          const opacity = smoothstep(0.45, 1.1, elapsed);
+          const opacity = smoothstep(0.6, 1.8, elapsed);
           const blur = Math.max(0, (1 - easedT) * 12);
           const scale = 0.96 + easedT * 0.04;
           const letterSpacing = (1 - easedT) * 0.06;
@@ -381,20 +381,20 @@ export default function SkillSenseIntro({ children }: { children?: React.ReactNo
           textRef.current.style.filter = blur > 0.2 ? `blur(${blur}px)` : 'none';
           textRef.current.style.letterSpacing = `${-0.03 + letterSpacing}em`;
         }
-        // Resonance & Breathing (1.4s – 2.6s)
-        else if (elapsed >= 1.4 && elapsed < 2.6) {
-          const pulse = 1 + Math.sin((elapsed - 1.4) * 3.2) * 0.008;
+        // Resonance & Breathing (2.2s – 4.0s)
+        else if (elapsed >= 2.2 && elapsed < 4.0) {
+          const pulse = 1 + Math.sin((elapsed - 2.2) * 2.5) * 0.008;
           textRef.current.style.opacity = '1';
           textRef.current.style.transform = `scale(${pulse})`;
           textRef.current.style.filter = 'none';
           textRef.current.style.letterSpacing = '-0.03em';
         }
-        // Cinematic Glide-Through & Dissolve (2.6s – 3.3s)
-        else if (elapsed >= 2.6 && elapsed < 3.3) {
-          const t = (elapsed - 2.6) / 0.7;
+        // Cinematic Glide-Through & Dissolve (4.0s – 4.9s)
+        else if (elapsed >= 4.0 && elapsed < 4.9) {
+          const t = (elapsed - 4.0) / 0.9;
           const easedZoom = easeInOutCubic(t);
-          const scale = 1.0 + easedZoom * 1.6;
-          const opacity = Math.max(0, 1 - Math.pow(t, 2.2));
+          const scale = 1.0 + easedZoom * 1.5;
+          const opacity = Math.max(0, 1 - Math.pow(t, 2.0));
           const blur = easedZoom * 8;
 
           textRef.current.style.opacity = String(opacity);
@@ -408,15 +408,15 @@ export default function SkillSenseIntro({ children }: { children?: React.ReactNo
 
       // 5. Skip Button Fade-In
       if (skipBtnRef.current) {
-        if (elapsed > 1.2 && elapsed < 3.0) {
-          skipBtnRef.current.style.opacity = String(smoothstep(1.2, 1.8, elapsed) * 0.7);
-        } else if (elapsed >= 3.0) {
+        if (elapsed > 1.8 && elapsed < 4.4) {
+          skipBtnRef.current.style.opacity = String(smoothstep(1.8, 2.6, elapsed) * 0.7);
+        } else if (elapsed >= 4.4) {
           skipBtnRef.current.style.opacity = '0';
         }
       }
 
       // 6. Finish / Reveal trigger
-      if (elapsed >= 3.35) {
+      if (elapsed >= 4.95) {
         handleFinish();
         return;
       }
@@ -424,14 +424,14 @@ export default function SkillSenseIntro({ children }: { children?: React.ReactNo
       // ────────────────────────────────────────────────────────────────────────
       // 3D NEURAL BRAIN PARTICLE SIMULATION
       // ────────────────────────────────────────────────────────────────────────
-      if (elapsed >= 0.3 && elapsed < 3.35) {
+      if (elapsed >= 0.4 && elapsed < 4.95) {
         // Smooth particle positioning interpolation
-        const formProgress = Math.min(Math.max((elapsed - 0.4) / 1.15, 0), 1);
+        const formProgress = Math.min(Math.max((elapsed - 0.5) / 1.7, 0), 1);
         const easeForm = easeOutCubic(formProgress);
 
         let expandScale = 1.0;
-        if (elapsed >= 2.6) {
-          const zoomProgress = (elapsed - 2.6) / 0.75;
+        if (elapsed >= 4.0) {
+          const zoomProgress = (elapsed - 4.0) / 0.95;
           expandScale = 1.0 + easeInOutCubic(zoomProgress) * 2.4;
         }
 
@@ -441,12 +441,12 @@ export default function SkillSenseIntro({ children }: { children?: React.ReactNo
           const baseY = p.scatterY + (p.origY - p.scatterY) * easeForm;
           const baseZ = p.scatterZ + (p.origZ - p.scatterZ) * easeForm;
 
-          if (elapsed < 2.6) {
+          if (elapsed < 4.0) {
             p.x = baseX;
             p.y = baseY;
             p.z = baseZ;
           } else {
-            const explodeT = (elapsed - 2.6) / 0.75;
+            const explodeT = (elapsed - 4.0) / 0.95;
             p.x = baseX * expandScale + p.vx * explodeT * 1.5;
             p.y = baseY * expandScale + p.vy * explodeT * 1.5;
             p.z = baseZ * expandScale + p.vz * explodeT * 1.5;
@@ -454,13 +454,13 @@ export default function SkillSenseIntro({ children }: { children?: React.ReactNo
         }
 
         // Global Brain alpha curve
-        const brainFadeIn = smoothstep(0.3, 0.9, elapsed);
-        const brainFadeOut = elapsed > 2.6 ? Math.max(0, 1 - (elapsed - 2.6) / 0.7) : 1;
+        const brainFadeIn = smoothstep(0.4, 1.4, elapsed);
+        const brainFadeOut = elapsed > 4.0 ? Math.max(0, 1 - (elapsed - 4.0) / 0.95) : 1;
         const globalAlpha = brainFadeIn * brainFadeOut;
 
         // Gentle camera rotation angles (slow, elegant, no harsh oscillation)
-        const rotY = Math.sin(elapsed * 0.5) * 0.22;
-        const rotX = 0.08 + Math.cos(elapsed * 0.4) * 0.07;
+        const rotY = Math.sin(elapsed * 0.38) * 0.22;
+        const rotX = 0.08 + Math.cos(elapsed * 0.32) * 0.06;
         const cosY = Math.cos(rotY);
         const sinY = Math.sin(rotY);
         const cosX = Math.cos(rotX);
@@ -503,8 +503,8 @@ export default function SkillSenseIntro({ children }: { children?: React.ReactNo
         }
 
         // Draw Synaptic Axon Connections (Batched for peak 60/120fps performance)
-        if (elapsed >= 0.8 && elapsed < 3.2) {
-          const connectFade = smoothstep(0.8, 1.4, elapsed) * brainFadeOut;
+        if (elapsed >= 1.0 && elapsed < 4.8) {
+          const connectFade = smoothstep(1.0, 1.8, elapsed) * brainFadeOut;
 
           ctx.beginPath();
           let hasLines = false;
@@ -531,7 +531,7 @@ export default function SkillSenseIntro({ children }: { children?: React.ReactNo
           }
 
           // Synaptic Impulse Sparks (Hardware-accelerated without software shadowBlur)
-          if (elapsed >= 1.2 && elapsed < 3.0) {
+          if (elapsed >= 1.6 && elapsed < 4.5) {
             for (let i = 0; i < connections.length; i += 2) {
               const conn = connections[i];
               const p1 = projected[conn.p1];
