@@ -15,6 +15,7 @@ import {
   Tooltip,
 } from 'recharts';
 import { studentApi, StudentProfile } from '@/lib/api/student.api';
+import { resolveBranch } from '@/lib/branches';
 import api from '@/lib/api';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AIInsightCard } from '@/components/ui/AIInsightCard';
@@ -142,6 +143,7 @@ export default function StudentDashboardPage() {
   const overallScore = profile?.overallScore ?? 0;
   const nsqfLevel = profile?.nsqfLevel ?? 5;
   const program = profile?.program || 'Vocational Program';
+  const branch = resolveBranch(program);
   const skills = profile?.skills || [];
   const growthData = profile?.growthData || [];
 
@@ -149,10 +151,15 @@ export default function StudentDashboardPage() {
   const strongestSkills = sortedSkills.slice(0, 3);
   const weakestSkills = sortedSkills.slice(-2).reverse();
 
-  const radarData = skills.map((s: any) => ({
-    subject: typeof s.skillId === 'object' && s.skillId?.name ? s.skillId.name : String(s.skillId),
-    score: s.score || 75,
-  }));
+  const radarData = skills.length > 0
+    ? skills.map((s: any) => ({
+        subject: typeof s.skillId === 'object' && s.skillId?.name ? s.skillId.name : String(s.skillId),
+        score: s.score || 75,
+      }))
+    : branch.radarDimensions.map((dim) => ({
+        subject: dim.subject,
+        score: Math.min(95, Math.max(65, 75 + dim.baseScoreOffset)),
+      }));
 
   const careers = careerData?.topCareerPaths || [];
   const topCareer = careers[0] || null;

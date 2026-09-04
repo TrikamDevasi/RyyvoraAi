@@ -35,7 +35,7 @@ export default function CareerPage() {
           <AIInsightCard
             title="Precision Workforce Calibration"
             badgeText="AI METHODOLOGY"
-            insight="SkillSense neural matching compares student capability across 50+ granular competency dimensions against real-time job market requisitions from top Indian IT enterprises (TCS, Infosys, Wipro, Swiggy, Razorpay) to predict the most viable high-growth trajectories."
+            insight="SkillSense neural matching compares student capability across 50+ granular competency dimensions against real-time job market requisitions from top Indian industry leaders across core engineering, manufacturing, and tech sectors (Tata Motors, L&T, Qualcomm, Biocon, TCS, Infosys) to predict the most viable high-growth trajectories."
             category="Algorithmic Matching"
           />
         </div>

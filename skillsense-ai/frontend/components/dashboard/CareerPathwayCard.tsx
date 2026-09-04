@@ -30,8 +30,9 @@ function MatchRing({ percent }: { percent: number }) {
                 strokeDasharray={`${filled} ${circ - filled}`}
                 strokeDashoffset={circ / 4}
                 strokeLinecap="round"
+                className="match-ring-circle"
             />
-            <text x={28} y={33} textAnchor="middle" fill={color} fontSize={12} fontWeight={700}>
+            <text x={28} y={33} textAnchor="middle" fill={color} fontSize={12} fontWeight={700} className="number-pop">
                 {percent}%
             </text>
         </svg>
@@ -43,7 +44,7 @@ export default function CareerPathwayCard({ pathway, onSelect }: Props) {
 
     return (
         <div
-            className="interactive-card card-3d"
+            className="interactive-card card-3d card-shine"
             style={{
                 background: pathway.isRecommended
                     ? 'linear-gradient(145deg, var(--gold-muted) 0%, var(--bg-surface) 60%)'
@@ -112,6 +113,7 @@ export default function CareerPathwayCard({ pathway, onSelect }: Props) {
                         {pathway.requiredSkills.slice(0, 5).map((skill: string) => (
                             <span
                                 key={skill}
+                                className="skill-tag"
                                 style={{
                                     background: 'var(--bg-surface-elevated)',
                                     border: '1px solid var(--border)',
@@ -147,13 +149,13 @@ export default function CareerPathwayCard({ pathway, onSelect }: Props) {
 
             {/* Roadmap Expansion */}
             {isExpanded && pathway.roadmap && (
-                <div style={{ marginTop: 20, padding: '16px', background: 'var(--bg-surface-elevated)', borderRadius: 'var(--radius-md)', border: '1px solid var(--gold-border)' }} className="animate-in fade-in slide-in-from-top-2 duration-300">
+                <div style={{ marginTop: 20, padding: '16px', background: 'var(--bg-surface-elevated)', borderRadius: 'var(--radius-md)', border: '1px solid var(--gold-border)' }} className="expand-enter">
                     <h5 className="font-display" style={{ margin: '0 0 12px', fontSize: 12, fontWeight: 700, color: 'var(--gold)', display: 'flex', alignItems: 'center', gap: 6 }}>
                         <MapIcon size={14} /> AI-Generated Roadmap
                     </h5>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                         {pathway.roadmap.map((step: string, i: number) => (
-                            <div key={i} style={{ display: 'flex', gap: 12 }}>
+                            <div key={i} className="roadmap-step" style={{ display: 'flex', gap: 12 }}>
                                 <div style={{ flexShrink: 0, width: 20, height: 20, borderRadius: '50%', background: 'var(--gold)', color: '#090a0f', fontSize: 10, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                     {i + 1}
                                 </div>

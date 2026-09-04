@@ -30,6 +30,7 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { AIBadge } from '@/components/ui/AIBadge';
+import { getAllBranchesSummary } from '@/lib/branches';
 
 const ROLE_TITLES: Record<string, { title: string; subtitle: string; trackLabel: string; badge: string }> = {
   student: {
@@ -112,7 +113,7 @@ export default function ProfilePage() {
           setProfile(data);
           setName(data.userId?.name || user?.name || '');
           setEmail(data.userId?.email || user?.email || '');
-          setProgram(data.program || (role === 'employer' ? 'Corporate Technology Hiring' : 'Software Engineering'));
+          setProgram(data.program || (role === 'employer' ? 'Corporate Technology Hiring' : 'Computer Science & Engineering'));
           setState(data.state || 'Maharashtra');
           setPhone(data.phone || user?.phone || '');
         }
@@ -120,7 +121,7 @@ export default function ProfilePage() {
       })
       .catch(() => {
         // Fall back gracefully to user session without blocking the page
-        setProgram(role === 'employer' ? 'Corporate Technology Hiring' : 'Software Engineering');
+        setProgram(role === 'employer' ? 'Corporate Technology Hiring' : 'Computer Science & Engineering');
         setState('Maharashtra');
         setLoading(false);
       });
@@ -516,22 +517,70 @@ export default function ProfilePage() {
                 <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 4 }}>
                   {meta.trackLabel}
                 </label>
-                <input
-                  type="text"
-                  value={program}
-                  onChange={(e) => setProgram(e.target.value)}
-                  placeholder="e.g. Computer Science & Engineering"
-                  required
-                  style={{
-                    width: '100%',
-                    padding: '10px 14px',
-                    borderRadius: 8,
-                    background: 'var(--bg-input)',
-                    border: '1px solid var(--border)',
-                    color: 'var(--text-primary)',
-                    fontSize: 13,
-                  }}
-                />
+                {role === 'student' ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    <select
+                      value={getAllBranchesSummary().some(b => b.name.toLowerCase() === program.toLowerCase()) ? (getAllBranchesSummary().find(b => b.name.toLowerCase() === program.toLowerCase())?.name || program) : 'custom'}
+                      onChange={(e) => {
+                        if (e.target.value !== 'custom') {
+                          setProgram(e.target.value);
+                        }
+                      }}
+                      style={{
+                        width: '100%',
+                        padding: '10px 14px',
+                        borderRadius: 8,
+                        background: 'var(--bg-input)',
+                        border: '1px solid var(--border)',
+                        color: 'var(--text-primary)',
+                        fontSize: 13,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      {getAllBranchesSummary().map((b) => (
+                        <option key={b.id} value={b.name} style={{ background: '#0f172a', color: '#fff' }}>
+                          {b.name} ({b.code}) — {b.domain}
+                        </option>
+                      ))}
+                      <option value="custom" style={{ background: '#0f172a', color: '#fff' }}>Other / Custom Branch...</option>
+                    </select>
+                    {(!getAllBranchesSummary().some(b => b.name.toLowerCase() === program.toLowerCase()) || program === '') && (
+                      <input
+                        type="text"
+                        value={program}
+                        onChange={(e) => setProgram(e.target.value)}
+                        placeholder="Enter your exact academic discipline / branch"
+                        required
+                        style={{
+                          width: '100%',
+                          padding: '10px 14px',
+                          borderRadius: 8,
+                          background: 'var(--bg-input)',
+                          border: '1px solid var(--border)',
+                          color: 'var(--text-primary)',
+                          fontSize: 13,
+                        }}
+                      />
+                    )}
+                  </div>
+                ) : (
+                  <input
+                    type="text"
+                    value={program}
+                    onChange={(e) => setProgram(e.target.value)}
+                    placeholder="e.g. Corporate Technology Hiring"
+                    required
+                    style={{
+                      width: '100%',
+                      padding: '10px 14px',
+                      borderRadius: 8,
+                      background: 'var(--bg-input)',
+                      border: '1px solid var(--border)',
+                      color: 'var(--text-primary)',
+                      fontSize: 13,
+                    }}
+                  />
+                )}
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 12 }}>

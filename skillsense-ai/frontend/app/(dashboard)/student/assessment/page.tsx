@@ -4,6 +4,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import api from '@/lib/api';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
+import { studentApi } from '@/lib/api/student.api';
+import { resolveBranch, getAllBranchesSummary, BranchData, AssessmentTopic, BranchQuestion, saveBranchId } from '@/lib/branches';
 import {
   FileJson,
   Atom,
@@ -29,6 +31,8 @@ import {
   Terminal,
   HelpCircle,
   TrendingUp,
+  Building2,
+  GraduationCap,
 } from 'lucide-react';
 import { FadeIn } from '@/components/shared/FadeIn';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
@@ -36,26 +40,6 @@ import { AIBadge } from '@/components/ui/AIBadge';
 import { ConfidenceScore } from '@/components/ui/ConfidenceScore';
 import toast from 'react-hot-toast';
 import confetti from 'canvas-confetti';
-
-interface TopicConfig {
-  id: string;
-  name: string;
-  icon: any;
-  desc: string;
-  nsqfLevel: number;
-  badge: string;
-}
-
-const TOPICS: TopicConfig[] = [
-  { id: 'JavaScript', name: 'JavaScript & TypeScript', icon: FileJson, desc: 'Async event loop, closures, generics, promises, prototype chain', nsqfLevel: 5, badge: 'Core Frontend' },
-  { id: 'React', name: 'React 19 & Next.js', icon: Atom, desc: 'Server Actions, hooks, component lifecycle, hydration, SSR', nsqfLevel: 5, badge: 'Modern UI' },
-  { id: 'Python', name: 'Python & Applied AI', icon: FileTerminal, desc: 'Data structures, NumPy, PyTorch models, OOP, algorithmic logic', nsqfLevel: 6, badge: 'AI / Data' },
-  { id: 'Node.js', name: 'Node.js & Backend APIs', icon: Box, desc: 'Express REST, streams, buffers, clustering, JWT authentication', nsqfLevel: 5, badge: 'Backend' },
-  { id: 'SQL', name: 'SQL & Database Architecture', icon: Database, desc: 'Complex joins, indexing, transactions, Prisma ORM, normal forms', nsqfLevel: 5, badge: 'Databases' },
-  { id: 'Cloud', name: 'Docker & Cloud DevOps', icon: Cloud, desc: 'Container orchestration, CI/CD actions, AWS ECS, Linux admin', nsqfLevel: 6, badge: 'DevOps' },
-  { id: 'System Design', name: 'System Design & Scalability', icon: Layers, desc: 'Redis caching, message queues, rate limiting, microservices', nsqfLevel: 6, badge: 'Architecture' },
-  { id: 'Security', name: 'Cybersecurity & OWASP', icon: Lock, desc: 'SQLi, XSS, CSRF defense, cryptographic hashing, RBAC', nsqfLevel: 5, badge: 'Security' },
-];
 
 interface Question {
   question: string;
@@ -77,215 +61,26 @@ interface EvalResult {
   nextSteps: string[];
 }
 
-// ── Curated High-Standard Question Banks ───────────────────────────────────────
-const QUESTION_BANK: Record<string, Question[]> = {
-  JavaScript: [
-    {
-      question: 'What is the output of the following microtask vs macrotask execution order?',
-      codeSnippet: `console.log('1');\nsetTimeout(() => console.log('2'), 0);\nPromise.resolve().then(() => console.log('3'));\nconsole.log('4');`,
-      options: ['A) 1, 2, 3, 4', 'B) 1, 4, 3, 2', 'C) 1, 4, 2, 3', 'D) 1, 3, 4, 2'],
-      correct: 'B',
-      explanation: 'Synchronous code runs first (1, 4), then microtasks in Promise.then() (3), and finally macrotasks in setTimeout (2).',
-    },
-    {
-      question: 'How does the JavaScript prototype chain resolve property lookups?',
-      options: [
-        'A) It searches only the immediate object instance and throws ReferenceError',
-        'B) It traverses up the __proto__ chain until Object.prototype or null is reached',
-        'C) It queries global window object first before local scope',
-        'D) It compiles prototype properties directly into bytecode at runtime',
-      ],
-      correct: 'B',
-      explanation: 'Property lookup ascends the prototype chain via [[Prototype]] until found or null is encountered.',
-    },
-    {
-      question: 'Which TypeScript operator performs strict type narrowing against null and undefined?',
-      codeSnippet: `type User = { profile?: { name: string } };\nconst name = user.profile?.name ?? 'Anonymous';`,
-      options: ['A) Nullish Coalescing (??)', 'B) Logical OR (||)', 'C) Ternary Operator', 'D) Type Assertion (as)'],
-      correct: 'A',
-      explanation: 'Nullish coalescing (??) checks specifically for null or undefined, unlike || which coerces falsey values like "" or 0.',
-    },
-    {
-      question: 'What happens when a closure captures a variable in JavaScript?',
-      options: [
-        'A) It copies the primitive value once and destroys the reference',
-        'B) It retains a live reference to the outer lexical environment',
-        'C) It serializes the variable to heap storage on each execution',
-        'D) It converts the variable into a global constant',
-      ],
-      correct: 'B',
-      explanation: 'A closure maintains a direct reference to variables in its outer lexical scope across execution cycles.',
-    },
-    {
-      question: 'Which array method executes without mutating the original array in modern ES2023+?',
-      options: ['A) Array.prototype.sort()', 'B) Array.prototype.toSorted()', 'C) Array.prototype.reverse()', 'D) Array.prototype.splice()'],
-      correct: 'B',
-      explanation: 'ES2023 introduced non-mutating array methods including toSorted(), toReversed(), and toSpliced().',
-    },
-  ],
-  React: [
-    {
-      question: 'What is the primary architectural benefit of React Server Components (RSC)?',
-      options: [
-        'A) They increase client-side bundle size to speed up SPA routing',
-        'B) They execute on the server with zero client bundle impact and direct database access',
-        'C) They replace all useState and useEffect client hooks entirely',
-        'D) They convert CSS files into server-side JSON structures',
-      ],
-      correct: 'B',
-      explanation: 'RSCs render purely on the server, transferring zero JavaScript code to the client browser while enabling fast data colocation.',
-    },
-    {
-      question: 'When should you pass a dependencies array to useCallback in React?',
-      codeSnippet: `const handleClick = useCallback(() => {\n  trackEvent(userId);\n}, [userId]);`,
-      options: [
-        'A) Always leave it empty to maximize memoization speed',
-        'B) Include every reactive value referenced inside the callback',
-        'C) Only include DOM references and state setters',
-        'D) React 19 completely forbids dependency arrays',
-      ],
-      correct: 'B',
-      explanation: 'All reactive values (state, props, context) referenced inside the callback must be listed to prevent stale closures.',
-    },
-    {
-      question: 'What problem does the useOptimistic hook solve in React 19 / Next.js?',
-      options: [
-        'A) Compresses PNG images on the server before client download',
-        'B) Instantly updates UI with expected outcome while an asynchronous Server Action executes',
-        'C) Forces React to bypass DOM diffing algorithms',
-        'D) Encrypts JWT tokens in memory',
-      ],
-      correct: 'B',
-      explanation: 'useOptimistic allows immediate optimistic UI updates while the async server mutation completes in the background.',
-    },
-    {
-      question: 'Why must React keys in mapped lists be stable and unique identifiers instead of array index?',
-      options: [
-        'A) Index keys cause incorrect state retention and DOM recreation during reorders/deletions',
-        'B) React throws a fatal runtime exception if index is used',
-        'C) Index keys increase CSS memory consumption',
-        'D) Index keys disable TypeScript type checking',
-      ],
-      correct: 'A',
-      explanation: 'Array indices change when items are inserted or removed, causing React reconciliation to mismatch component instances and internal state.',
-    },
-    {
-      question: 'What does React.Suspense boundary provide during asynchronous streaming?',
-      options: [
-        'A) A fallback loading UI while async components or data promises resolve',
-        'B) Automatic error logging to Sentry server',
-        'C) Automatic conversion of GraphQL to REST',
-        'D) Memory garbage collection',
-      ],
-      correct: 'A',
-      explanation: 'Suspense catches pending promises from server components or lazy modules and displays a declarative fallback state.',
-    },
-  ],
-  SQL: [
-    {
-      question: 'Which index type is optimal for high-cardinality exact matches and range queries (e.g. BETWEEN)?',
-      options: ['A) Hash Index', 'B) B-Tree Index', 'C) Bitmap Index', 'D) Spatial Index'],
-      correct: 'B',
-      explanation: 'B-Tree indexes maintain sorted order, making them ideal for both point lookups and range scans.',
-    },
-    {
-      question: 'What does the ACID property "Isolation" guarantee in relational databases?',
-      options: [
-        'A) Transactions survive hardware power failures',
-        'B) Concurrent transactions execute without interfering with one another based on isolation level',
-        'C) Constraints like foreign keys are never checked',
-        'D) Data is replicated across multiple geographical zones',
-      ],
-      correct: 'B',
-      explanation: 'Isolation ensures that concurrent transactions operate independently without seeing uncommitted intermediate states.',
-    },
-    {
-      question: 'What is the effect of an EXPLAIN ANALYZE command in PostgreSQL?',
-      options: [
-        'A) Executes the query and returns both the optimizer plan and actual runtime telemetry',
-        'B) Deletes duplicate records across tables',
-        'C) Re-indexes all tables in the database schema',
-        'D) Converts the database into NoSQL format',
-      ],
-      correct: 'A',
-      explanation: 'EXPLAIN ANALYZE executes the SQL statement and displays actual execution time, scan methods, and row counts.',
-    },
-    {
-      question: 'When should you use a LEFT JOIN instead of an INNER JOIN?',
-      options: [
-        'A) When you only want rows that have matching records in both tables',
-        'B) When you want all rows from the left table regardless of whether a match exists on the right',
-        'C) When performing arithmetic aggregations like SUM()',
-        'D) When indexing foreign keys',
-      ],
-      correct: 'B',
-      explanation: 'LEFT JOIN preserves all records from the primary (left) table and populates NULL for non-matching right table columns.',
-    },
-    {
-      question: 'What does Database Normalization (3NF) achieve?',
-      options: [
-        'A) Eliminates transitive dependencies and reduces data redundancy',
-        'B) Combines all tables into a single denormalized schema',
-        'C) Disables all primary key constraints',
-        'D) Multiplies database storage footprint',
-      ],
-      correct: 'A',
-      explanation: 'Third Normal Form (3NF) requires 2NF plus removing all transitive functional dependencies where non-key attributes depend on other non-key attributes.',
-    },
-  ],
-  Python: [
-    {
-      question: 'What is the purpose of the Global Interpreter Lock (GIL) in CPython?',
-      options: [
-        'A) Prevents race conditions by ensuring only one native thread executes Python bytecode at a time',
-        'B) Compiles Python scripts into machine assembly code',
-        'C) Encrypts source code files on disk',
-        'D) Manages HTTP REST connections in FastAPI',
-      ],
-      correct: 'A',
-      explanation: 'The GIL is a mutex that protects access to Python objects, preventing multiple threads from executing Python bytecodes simultaneously in CPython.',
-    },
-    {
-      question: 'Which PyTorch method sets model layers (e.g. Dropout, BatchNorm) to evaluation inference mode?',
-      codeSnippet: `model = NeuralNetwork()\nmodel.eval()\nwith torch.no_grad():\n    outputs = model(inputs)`,
-      options: ['A) model.eval()', 'B) model.train()', 'C) model.fit()', 'D) model.compile()'],
-      correct: 'A',
-      explanation: 'model.eval() configures Dropout and BatchNorm layers for deterministic test-time inference.',
-    },
-    {
-      question: 'What is a Python Generator and what keyword defines it?',
-      options: [
-        'A) A function that returns an iterator using the yield keyword for memory-efficient lazy evaluation',
-        'B) A decorator that compiles Cython modules',
-        'C) A class constructor using __init__',
-        'D) A threading worker pool',
-      ],
-      correct: 'A',
-      explanation: 'Generators use yield to produce sequence elements on-demand without loading entire datasets into RAM.',
-    },
-    {
-      question: 'How does Python handle memory management for objects with zero references?',
-      options: [
-        'A) Immediate deallocation via Reference Counting, supplemented by Cyclic Garbage Collection',
-        'B) Manual memory deallocation using free()',
-        'C) All objects persist in RAM until process termination',
-        'D) Objects are swapped to hard drive paging file',
-      ],
-      correct: 'A',
-      explanation: 'Python utilizes reference counting for immediate cleanup and a generational garbage collector to resolve circular references.',
-    },
-    {
-      question: 'In FastAPI, what handles asynchronous request validation and serialization?',
-      options: ['A) Pydantic Schemas', 'B) Django ORM', 'C) Jinja2 Templates', 'D) Flask Blueprint'],
-      correct: 'A',
-      explanation: 'FastAPI relies on Pydantic models for automatic request data validation, type coercion, and OpenAPI schema generation.',
-    },
-  ],
+const getTopicIcon = (id: string, name: string) => {
+  const text = `${id} ${name}`.toLowerCase();
+  if (text.includes('code') || text.includes('script') || text.includes('software') || text.includes('web') || text.includes('react') || text.includes('frontend')) return Code;
+  if (text.includes('data') || text.includes('sql') || text.includes('cloud') || text.includes('devops') || text.includes('database')) return Database;
+  if (text.includes('system') || text.includes('network') || text.includes('iot') || text.includes('cad') || text.includes('mechanic')) return Layers;
+  if (text.includes('circuit') || text.includes('power') || text.includes('electron') || text.includes('electric')) return Zap;
+  if (text.includes('civil') || text.includes('struct') || text.includes('concrete') || text.includes('construct') || text.includes('survey')) return Building2;
+  if (text.includes('security') || text.includes('cyber') || text.includes('safety')) return ShieldCheck;
+  if (text.includes('ai') || text.includes('learn') || text.includes('intel') || text.includes('bio') || text.includes('gene')) return Sparkles;
+  if (text.includes('auto') || text.includes('engine') || text.includes('thermo') || text.includes('fluid') || text.includes('chem')) return Box;
+  return Terminal;
 };
 
 export default function AssessmentPage() {
+  const { user } = useAuth();
+  const [activeBranch, setActiveBranch] = useState<BranchData>(() => resolveBranch((user as any)?.program));
+  const [allBranches, setAllBranches] = useState<{ id: string; code: string; name: string; domain: string }[]>(() => getAllBranchesSummary());
+
   const [phase, setPhase] = useState<'select' | 'quiz' | 'result'>('select');
-  const [selectedTopic, setSelectedTopic] = useState<string>('JavaScript');
+  const [selectedTopic, setSelectedTopic] = useState<string>('');
   const [difficulty, setDifficulty] = useState<string>('Intermediate');
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentQ, setCurrentQ] = useState(0);
@@ -296,6 +91,37 @@ export default function AssessmentPage() {
   const [evalResult, setEvalResult] = useState<EvalResult | null>(null);
   const [loading, setLoading] = useState(false);
   const timerRef = useRef<any>(null);
+
+  // Initialize and load student profile to resolve active academic discipline
+  useEffect(() => {
+    let isMounted = true;
+    studentApi.getMyProfile().then((prof) => {
+      if (!isMounted) return;
+      const b = resolveBranch(prof?.program || (user as any)?.program);
+      setActiveBranch(b);
+      if (b.assessmentTopics?.length > 0) {
+        setSelectedTopic(b.assessmentTopics[0].id);
+      }
+    }).catch(() => {
+      if (!isMounted) return;
+      const b = resolveBranch((user as any)?.program);
+      setActiveBranch(b);
+      if (b.assessmentTopics?.length > 0) {
+        setSelectedTopic(b.assessmentTopics[0].id);
+      }
+    });
+    return () => { isMounted = false; };
+  }, [user]);
+
+  // Handle switching branch discipline on demand
+  const handleBranchChange = (branchId: string) => {
+    const b = resolveBranch(branchId);
+    saveBranchId(b.id);
+    setActiveBranch(b);
+    if (b.assessmentTopics?.length > 0) {
+      setSelectedTopic(b.assessmentTopics[0].id);
+    }
+  };
 
   // ── Keyboard Shortcuts (A, B, C, D, Enter) ──────────────────────────────────
   useEffect(() => {
@@ -340,16 +166,21 @@ export default function AssessmentPage() {
   const startAssessment = async () => {
     setLoading(true);
     try {
-      // Attempt backend AI generation
-      const { data } = await api.post('/ai/assess-skill', { topic: selectedTopic, level: difficulty });
+      // Attempt backend AI generation with real branch context
+      const { data } = await api.post('/ai/assess-skill', {
+        topic: selectedTopic,
+        level: difficulty,
+        branch: activeBranch.name,
+      });
       if (data?.data?.questions && data.data.questions.length >= 3) {
         setQuestions(data.data.questions);
       } else {
         throw new Error('Fallback required');
       }
     } catch {
-      // High quality curated question bank fallback
-      const list = QUESTION_BANK[selectedTopic] || QUESTION_BANK.JavaScript;
+      // High quality curated branch-specific question bank fallback
+      const topicMatch = activeBranch.assessmentTopics.find((t) => t.id === selectedTopic);
+      const list = topicMatch?.questions?.length ? topicMatch.questions : (activeBranch.assessmentTopics[0]?.questions || []);
       setQuestions(list);
     } finally {
       setAnswers([]);
@@ -387,21 +218,26 @@ export default function AssessmentPage() {
   const finishAssessment = async () => {
     setLoading(true);
     const correctCount = answers.filter((a) => a.isCorrect).length;
-    const totalCount = questions.length;
+    const totalCount = questions.length || 1;
     const scorePct = Math.round((correctCount / totalCount) * 100);
+    const activeTopicConfig = activeBranch.assessmentTopics.find((t) => t.id === selectedTopic) || activeBranch.assessmentTopics[0];
 
     const calculatedResult: EvalResult = {
       score: scorePct,
       correct: correctCount,
       total: totalCount,
       level: scorePct >= 80 ? 'Advanced' : scorePct >= 60 ? 'Proficient' : 'Foundational',
-      nsqfTier: scorePct >= 80 ? 'NSQF Level 6 Certified' : scorePct >= 60 ? 'NSQF Level 5 Verified' : 'NSQF Level 4 Practitioner',
-      weakAreas: scorePct >= 80 ? ['Edge Case Boundary Testing'] : ['Asynchronous State Architecture', 'Query Plan Optimization'],
-      strengths: ['Core Syntax & Execution Flow', 'Algorithmic Problem Solving', 'Design Pattern Adherence'],
-      improvementPlan: `Candidate demonstrated solid grasp of ${selectedTopic} principles. Focus upskilling on distributed patterns and production fault-tolerance.`,
+      nsqfTier: scorePct >= 80
+        ? `NSQF Level ${activeTopicConfig?.nsqfLevel || 6} Certified`
+        : scorePct >= 60
+        ? `NSQF Level ${Math.max(4, (activeTopicConfig?.nsqfLevel || 5) - 1)} Verified`
+        : 'NSQF Level 4 Practitioner',
+      weakAreas: scorePct >= 80 ? ['Advanced Non-Linear Edge Cases'] : [`${selectedTopic} Core Specifications`, 'Applied System Verification'],
+      strengths: [`${selectedTopic} Principles`, 'Problem Solving Logic', 'Discipline Standards Compliance'],
+      improvementPlan: `Candidate demonstrated solid grasp of ${selectedTopic} in ${activeBranch.name}. Focus upskilling on advanced real-world implementations and industry simulations.`,
       nextSteps: [
         'Sync score with the SkillSense Passport after verification',
-        `Explore verified openings in ${selectedTopic} Engineering`,
+        `Explore verified openings in ${activeBranch.name} (${selectedTopic})`,
         'Complete targeted capstone practical project',
       ],
     };
@@ -417,7 +253,7 @@ export default function AssessmentPage() {
       // Save locally
       try {
         const history = JSON.parse(localStorage.getItem('skillsense_assessments') || '[]');
-        history.push({ ...calculatedResult, topic: selectedTopic, date: new Date().toISOString() });
+        history.push({ ...calculatedResult, topic: selectedTopic, branch: activeBranch.code, date: new Date().toISOString() });
         localStorage.setItem('skillsense_assessments', JSON.stringify(history));
       } catch {}
     }
@@ -438,7 +274,14 @@ export default function AssessmentPage() {
     toast.success(`Assessment Complete! Verified Score: ${scorePct}%`);
   };
 
-  const topicConfig = TOPICS.find((t) => t.id === selectedTopic) || TOPICS[0];
+  const topicConfig = activeBranch.assessmentTopics.find((t) => t.id === selectedTopic) || activeBranch.assessmentTopics[0] || {
+    id: 'general',
+    name: 'General Diagnostic',
+    desc: 'Foundational analytical evaluation',
+    nsqfLevel: 5,
+    badge: 'Core',
+    questions: [],
+  };
 
   return (
     <ErrorBoundary>
@@ -456,19 +299,81 @@ export default function AssessmentPage() {
                 AI Diagnostic <span style={{ color: 'var(--gold)' }}>Skill Assessment</span>
               </h1>
               <p style={{ color: 'var(--text-secondary)', fontSize: 14, marginTop: 4, maxWidth: 680 }}>
-                Take timed, proctored competency evaluations to verify technical mastery and earn cryptographically sealed credentials for your skill passport.
+                Take timed, proctored competency evaluations to verify technical mastery in your engineering discipline and earn cryptographically sealed credentials for your skill passport.
               </p>
+            </div>
+
+            {/* Academic Branch Selector Header */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: 12,
+              marginBottom: 16,
+              padding: '12px 16px',
+              borderRadius: 10,
+              background: 'rgba(255,255,255,0.02)',
+              border: '1px solid var(--border)',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: 8,
+                  background: 'rgba(245,158,11,0.12)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'var(--gold)',
+                }}>
+                  <GraduationCap size={18} />
+                </div>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: '#f8fafc' }}>
+                    {activeBranch.name} ({activeBranch.code})
+                  </div>
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+                    Sector: {activeBranch.domain} • Curated NSQF Assessment Modules
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ fontSize: 11.5, color: 'var(--text-secondary)', fontWeight: 600 }}>Switch Branch:</span>
+                <select
+                  value={activeBranch.id}
+                  onChange={(e) => handleBranchChange(e.target.value)}
+                  style={{
+                    padding: '6px 12px',
+                    borderRadius: 8,
+                    background: 'rgba(15,23,42,0.8)',
+                    border: '1px solid rgba(245,158,11,0.35)',
+                    color: '#f8fafc',
+                    fontSize: 12,
+                    fontWeight: 600,
+                    outline: 'none',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {allBranches.map((b) => (
+                    <option key={b.id} value={b.id} style={{ background: '#0f172a', color: '#f8fafc' }}>
+                      {b.name} ({b.code})
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
 
             {/* Topic Selection Grid */}
             <div style={{ marginBottom: 24 }}>
               <div style={{ fontSize: 13, fontWeight: 700, color: '#e2e8f0', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
-                <Code size={16} color="var(--gold)" /> Select Assessment Domain
+                <Code size={16} color="var(--gold)" /> Select Assessment Domain ({activeBranch.code})
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: 12 }}>
-                {TOPICS.map((t) => {
-                  const Icon = t.icon;
+                {activeBranch.assessmentTopics.map((t) => {
+                  const Icon = getTopicIcon(t.id, t.name);
                   const isSelected = selectedTopic === t.id;
                   return (
                     <div

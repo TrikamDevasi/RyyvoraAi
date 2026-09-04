@@ -88,12 +88,13 @@ export default function InterventionFeed({ items, maxVisible = 6 }: Props) {
     const displayItems = (items ?? SAMPLE_INTERVENTIONS).slice(0, maxVisible);
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <div className="stagger-children" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {displayItems.map((item) => {
                 const cfg = SEVERITY_CONFIG[item.severity];
                 return (
                     <div
                         key={item.id}
+                        className="data-row-hover"
                         style={{
                             background: cfg.bg,
                             border: `1px solid ${cfg.border}`,
@@ -102,13 +103,6 @@ export default function InterventionFeed({ items, maxVisible = 6 }: Props) {
                             display: 'flex',
                             gap: 12,
                             alignItems: 'flex-start',
-                            transition: 'transform 0.15s',
-                        }}
-                        onMouseEnter={(e) => {
-                            (e.currentTarget as HTMLDivElement).style.transform = 'translateX(3px)';
-                        }}
-                        onMouseLeave={(e) => {
-                            (e.currentTarget as HTMLDivElement).style.transform = 'translateX(0)';
                         }}
                     >
                         {/* Icon */}

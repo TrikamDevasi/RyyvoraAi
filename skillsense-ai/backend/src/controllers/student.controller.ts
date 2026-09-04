@@ -5,6 +5,7 @@ import Student, { IStudent } from '../models/Student.model';
 import Assessment from '../models/Assessment.model';
 import { aiService } from '../services/ai.service';
 import { buildApiResponse, parsePagination, buildPaginatedResponse } from '../utils/pagination.utils';
+import { resolveBranch, getAllBranchesSummary } from '../data/branches.data';
 
 export const listStudents = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -66,10 +67,11 @@ export const getMyStudentProfile = async (req: Request, res: Response, next: Nex
       .populate('skills.skillId', 'name domain nsqfLevel');
 
     if (!student) {
+      const requestedProgram = (req.query.program as string) || (user.program as string) || 'General Engineering & Applied Sciences';
       const created = await Student.create({
         userId: user._id,
         enrollmentNumber: `SKP-${user._id.toString().slice(-6).toUpperCase()}`,
-        program: 'Computer Science & Engineering',
+        program: requestedProgram,
         nsqfLevel: 4,
         state: 'Karnataka',
         gender: 'male',
@@ -204,7 +206,7 @@ export const getCareerPaths = async (req: Request, res: Response, next: NextFunc
 
     const prediction = await aiService.matchCareerPaths({
       skills,
-      program: student.program || 'Software Engineering',
+      program: student.program,
       nsqfLevel: student.nsqfLevel || 4,
       overallScore: student.overallScore ?? 75,
       state: student.state || 'Karnataka',
@@ -338,6 +340,26 @@ export const verifyPublicPassport = async (req: Request, res: Response, next: Ne
         'Cryptographic credential successfully verified'
       )
     );
+  } catch (err) {
+    next(err);
+  }
+};
+
+/**
+ * GET /api/v1/student/branch-catalog
+ * Returns official academic branches and detailed branch-specific datasets.
+ */
+export const getBranchCatalog = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const branchQuery = req.query.branch as string | undefined;
+    if (branchQuery) {
+      const branchData = resolveBranch(branchQuery);
+      res.status(200).json(buildApiResponse(branchData, 'Branch data retrieved'));
+      return;
+    }
+
+    const summary = getAllBranchesSummary();
+    res.status(200).json(buildApiResponse(summary, 'Branch catalog retrieved'));
   } catch (err) {
     next(err);
   }

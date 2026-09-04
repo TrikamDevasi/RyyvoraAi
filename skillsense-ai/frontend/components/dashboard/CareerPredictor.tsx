@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import api from '@/lib/api';
+import { studentApi } from '@/lib/api/student.api';
+import { resolveBranch, getAllBranchesSummary, BranchData, BranchPreset, BranchCareerPath, saveBranchId } from '@/lib/branches';
 import {
   Brain,
   Briefcase,
@@ -19,6 +21,7 @@ import {
   CheckCircle2,
   AlertTriangle,
   RotateCcw,
+  GraduationCap,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import CareerPathwayCard from './CareerPathwayCard';
@@ -28,133 +31,111 @@ import { AIBadge } from '@/components/ui/AIBadge';
 import Link from 'next/link';
 import confetti from 'canvas-confetti';
 
-interface Preset {
-  name: string;
-  skills: string;
-  interests: string;
-  education: string;
-  badge: string;
-}
-
-const PRESETS: Preset[] = [
-  {
-    name: 'Full-Stack & Next.js Systems',
-    skills: 'TypeScript, React 19, Next.js, Node.js, Express, PostgreSQL, Prisma, TailwindCSS, REST APIs',
-    interests: 'Full-Stack Web Development, SaaS Platforms, Cloud Architecture',
-    education: 'B.Tech / Diploma in Computer Science (NSQF Level 5)',
-    badge: 'High Demand',
-  },
-  {
-    name: 'AI & Machine Learning Specialist',
-    skills: 'Python, PyTorch, NumPy, Pandas, FastAPI, Vector Databases (Chroma/Pinecone), RAG Architecture, HuggingFace',
-    interests: 'Applied Generative AI, Large Language Models, Neural Analytics',
-    education: 'Applied Artificial Intelligence & Data Science (NSQF Level 6)',
-    badge: 'Top Salary',
-  },
-  {
-    name: 'Cloud & DevOps Infrastructure',
-    skills: 'Docker, Kubernetes, AWS ECS/S3, CI/CD GitHub Actions, Linux Administration, Prometheus, Grafana, Terraform',
-    interests: 'Cloud Platform Engineering, Site Reliability, Kubernetes Orchestration',
-    education: 'Cloud Computing & System Administration (NSQF Level 5)',
-    badge: 'Infrastructure',
-  },
-  {
-    name: 'Cybersecurity & AppSec Defense',
-    skills: 'OWASP Top 10, Network Penetration Testing, Wireshark, Cryptography, Identity & Access Management (IAM), Linux Security',
-    interests: 'Application Security, SOC Analysis, Ethical Hacking',
-    education: 'Information Security & Cyber Defense (NSQF Level 5)',
-    badge: 'Critical Need',
-  },
-];
-
-const CURATED_CAREERS: Record<string, any[]> = {
-  default: [
-    {
-      title: 'Senior Full-Stack Software Engineer',
-      organization: 'Swiggy / Razorpay / TCS Digital',
-      match: 94,
-      salaryRange: '₹8.50 LPA – ₹14.50 LPA',
-      growth: '+38% 3-Yr CAGR',
-      timeToReady: 'Immediate Match',
-      missingSkills: ['Redis Caching Patterns', 'Distributed System Sharding'],
-      roadmap: [
-        'Master React 19 Server Actions & Optimistic UI',
-        'Build and deploy production Microservices with PostgreSQL',
-        'Complete NSQF Level 5 Full-Stack Certification',
-        'Interview with Enterprise Tier-1 Technology Partners',
-      ],
-    },
-    {
-      title: 'Cloud Platform & Microservices Engineer',
-      organization: 'Infosys / Wipro Digital / PhonePe',
-      match: 87,
-      salaryRange: '₹9.00 LPA – ₹16.00 LPA',
-      growth: '+42% 3-Yr CAGR',
-      timeToReady: '2–3 Months Targeted Upskilling',
-      missingSkills: ['Kubernetes Helm Charts', 'Prometheus Alerting Pipelines'],
-      roadmap: [
-        'Containerize multi-tier Node.js services with Docker Compose',
-        'Configure Kubernetes Cluster Ingress and Load Balancing',
-        'Earn AWS / CKA Verified Cloud Credentials',
-        'Transition into Senior Platform Architecture Roles',
-      ],
-    },
-    {
-      title: 'Applied AI & Intelligent Systems Engineer',
-      organization: 'Jio Platforms / Persistent Systems / Fractal AI',
-      match: 81,
-      salaryRange: '₹10.50 LPA – ₹18.00 LPA',
-      growth: '+52% 3-Yr CAGR',
-      timeToReady: '3–4 Months Targeted Upskilling',
-      missingSkills: ['RAG Pipeline Fine-tuning', 'Vector Index Optimization'],
-      roadmap: [
-        'Implement LangChain / LlamaIndex Vector Retrieval Systems',
-        'Deploy low-latency FastAPI endpoints with Model Quantization',
-        'Benchmark accuracy on Indian multilingual datasets',
-        'Secure high-growth AI Engineering roles',
-      ],
-    },
-  ],
-};
-
 export default function CareerPredictor() {
+  const [profile, setProfile] = useState<any>(null);
+  const [activeBranch, setActiveBranch] = useState<BranchData>(() => resolveBranch(undefined));
+  const [allBranches] = useState(() => getAllBranchesSummary());
   const [loading, setLoading] = useState(false);
-  const [predictions, setPredictions] = useState<any[]>(CURATED_CAREERS.default);
-  const [skills, setSkills] = useState<string>(PRESETS[0].skills);
-  const [interests, setInterests] = useState<string>(PRESETS[0].interests);
-  const [education, setEducation] = useState<string>(PRESETS[0].education);
+  const [predictions, setPredictions] = useState<any[]>(() => resolveBranch(undefined).careerPaths);
+  const [skills, setSkills] = useState<string>(() => resolveBranch(undefined).presets[0]?.skills || '');
+  const [interests, setInterests] = useState<string>(() => resolveBranch(undefined).presets[0]?.interests || '');
+  const [education, setEducation] = useState<string>(() => resolveBranch(undefined).presets[0]?.education || '');
   const [step, setStep] = useState<'form' | 'results'>('results');
 
-  const handleApplyPreset = (preset: Preset) => {
+  useEffect(() => {
+    let isMounted = true;
+    studentApi.getMyProfile().then((data) => {
+      if (!isMounted) return;
+      setProfile(data);
+      if (data?.program) {
+        const b = resolveBranch(data.program);
+        setActiveBranch(b);
+        saveBranchId(b.id);
+        if (b.presets?.length > 0) {
+          setSkills(b.presets[0].skills);
+          setInterests(b.presets[0].interests);
+          setEducation(b.presets[0].education);
+        }
+        if (b.careerPaths?.length > 0) {
+          setPredictions(b.careerPaths);
+        }
+      }
+    }).catch(() => {});
+    return () => { isMounted = false; };
+  }, []);
+
+  const handleBranchChange = (branchId: string) => {
+    const b = resolveBranch(branchId);
+    saveBranchId(b.id);
+    setActiveBranch(b);
+
+    const defaultPreset = b.presets[0] || {
+      skills: b.coreSubjects?.join(', ') || '',
+      interests: b.domain,
+      education: b.name,
+    };
+
+    setSkills(defaultPreset.skills);
+    setInterests(defaultPreset.interests);
+    setEducation(defaultPreset.education);
+    
+    // Instantly set genuine branch-specific predictions
+    const newPaths = b.careerPaths && b.careerPaths.length > 0 ? b.careerPaths : resolveBranch('general').careerPaths;
+    setPredictions(newPaths);
+    setStep('results');
+
+    toast.success(`Discipline updated to ${b.name}`);
+
+    // Update backend profile asynchronously if user is logged in
+    if (profile?._id) {
+      studentApi.updateProfile(profile._id, { program: b.name }).then((updated) => {
+        if (updated) setProfile(updated);
+      }).catch(() => {});
+    }
+
+    // Optional silent background AI enhancement
+    api.post('/ai/predict-career', {
+      skills: defaultPreset.skills.split(',').map((s) => s.trim()),
+      interests: defaultPreset.interests.split(',').map((i) => i.trim()),
+      education: defaultPreset.education,
+      program: b.name,
+    }).then((res) => {
+      if (res?.data?.success && Array.isArray(res.data?.data?.careers) && res.data.data.careers.length > 0) {
+        setPredictions(res.data.data.careers);
+      }
+    }).catch(() => {
+      // Keep static authentic branch paths intact
+    });
+  };
+
+  const handleApplyPreset = (preset: BranchPreset) => {
     setSkills(preset.skills);
     setInterests(preset.interests);
     setEducation(preset.education);
     toast.success(`Loaded preset: ${preset.name}`);
   };
 
-  const handlePredict = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    if (!skills.trim()) {
+  // Predict using explicitly provided values (avoids stale-state race condition on preset click)
+  const predictWithValues = async (skillsVal: string, interestsVal: string, educationVal: string) => {
+    if (!skillsVal.trim()) {
       toast.error('Please enter at least some skills');
       return;
     }
-
     setLoading(true);
     try {
       const res = await api.post('/ai/predict-career', {
-        skills: skills.split(',').map((s) => s.trim()),
-        interests: interests.split(',').map((i) => i.trim()),
-        education,
+        skills: skillsVal.split(',').map((s) => s.trim()),
+        interests: interestsVal.split(',').map((i) => i.trim()),
+        education: educationVal,
+        program: activeBranch.name,
       });
-
       if (res?.data?.success && Array.isArray(res.data?.data?.careers) && res.data.data.careers.length > 0) {
         setPredictions(res.data.data.careers);
       } else {
         throw new Error('Using fallback predictions');
       }
     } catch {
-      // High quality curated career pathways fallback
-      setPredictions(CURATED_CAREERS.default);
+      setPredictions(activeBranch.careerPaths && activeBranch.careerPaths.length > 0 ? activeBranch.careerPaths : resolveBranch('general').careerPaths);
     } finally {
       setLoading(false);
       setStep('results');
@@ -166,6 +147,12 @@ export default function CareerPredictor() {
       });
       toast.success('AI career pathways calculated!');
     }
+  };
+
+  const handlePredict = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    // Always use current state values — guaranteed to be up-to-date when called from the form submit
+    await predictWithValues(skills, interests, education);
   };
 
   if (loading) {
@@ -181,25 +168,91 @@ export default function CareerPredictor() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+    <div className="page-enter" style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+      {/* ── Academic Discipline Selector Bar ── */}
+      <div className="branch-bar card-shine" style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        gap: 12,
+        padding: '12px 16px',
+        borderRadius: 10,
+        background: 'rgba(255,255,255,0.02)',
+        border: '1px solid var(--border)',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{
+            width: 32,
+            height: 32,
+            borderRadius: 8,
+            background: 'rgba(245,158,11,0.12)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: 'var(--gold)',
+          }}>
+            <GraduationCap size={18} />
+          </div>
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: '#f8fafc' }}>
+              {activeBranch.name} ({activeBranch.code})
+            </div>
+            <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+              Sector: {activeBranch.domain} • Curated NSQF Career Pathways
+            </div>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ fontSize: 11.5, color: 'var(--text-secondary)', fontWeight: 600 }}>Active Discipline:</span>
+          <select
+            value={activeBranch.id}
+            onChange={(e) => handleBranchChange(e.target.value)}
+            className="enhanced-select"
+            style={{
+              padding: '6px 12px',
+              borderRadius: 8,
+              background: 'rgba(15,23,42,0.8)',
+              border: '1px solid rgba(245,158,11,0.35)',
+              color: '#f8fafc',
+              fontSize: 12,
+              fontWeight: 600,
+              outline: 'none',
+              cursor: 'pointer',
+            }}
+          >
+            {allBranches.map((b) => (
+              <option key={b.id} value={b.id} style={{ background: '#0f172a', color: '#f8fafc' }}>
+                {b.name} ({b.code})
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
       {/* ── Preset Tracks Selector ── */}
       <div className="card-linear" style={{ padding: 20, borderRadius: 14 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, flexWrap: 'wrap', gap: 8 }}>
           <div style={{ fontSize: 13, fontWeight: 700, color: '#f8fafc', display: 'flex', alignItems: 'center', gap: 6 }}>
-            <Zap size={16} color="var(--gold)" /> Explore High-Growth Career Tracks:
+            <Zap size={16} color="var(--gold)" /> Explore High-Growth {activeBranch.code} Career Tracks:
           </div>
           <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>1-Click Career Preset Calibration</span>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 10 }}>
-          {PRESETS.map((preset, idx) => (
+        <div className="stagger-children" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 10 }}>
+          {activeBranch.presets.map((preset, idx) => (
             <button
               key={idx}
               type="button"
               onClick={() => {
-                handleApplyPreset(preset);
-                handlePredict();
+                // Update state for form display AND pass values directly to avoid stale closure
+                setSkills(preset.skills);
+                setInterests(preset.interests);
+                setEducation(preset.education);
+                predictWithValues(preset.skills, preset.interests, preset.education);
               }}
+              className="preset-btn ripple-container"
               style={{
                 padding: '12px 14px',
                 borderRadius: 10,
@@ -208,15 +261,6 @@ export default function CareerPredictor() {
                 color: '#e2e8f0',
                 textAlign: 'left',
                 cursor: 'pointer',
-                transition: 'all 0.15s ease',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = 'var(--gold)';
-                e.currentTarget.style.background = 'rgba(245,158,11,0.04)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = 'var(--border)';
-                e.currentTarget.style.background = 'rgba(255,255,255,0.02)';
               }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
@@ -365,7 +409,7 @@ export default function CareerPredictor() {
       )}
 
       {/* ── Predicted Career Pathways Grid ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 16 }}>
+      <div className="stagger-children" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 16 }}>
         {predictions.map((career, idx) => {
           const pathway: CareerPathway = {
             id: `P-${idx}`,
@@ -398,13 +442,32 @@ export default function CareerPredictor() {
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>
           {[
-            { phase: 'Year 1 · Junior Practitioner', salary: '₹7.80 LPA', monthly: '₹65,000/mo', skills: 'Core Stack (React / Node / SQL)', color: '#94a3b8' },
-            { phase: 'Year 2 · SDE-1 Confirmed', salary: '₹11.50 LPA', monthly: '₹95,800/mo', skills: 'Microservices & Redis Caching', color: 'var(--gold)' },
-            { phase: 'Year 3 · Senior SDE / Lead', salary: '₹18.00 LPA', monthly: '₹1,50,000/mo', skills: 'Distributed Systems & Cloud Ingress', color: '#10b981' },
+            {
+              phase: 'Year 1 · Junior Practitioner',
+              salary: '₹6.80 LPA – ₹8.50 LPA',
+              monthly: '₹65,000/mo',
+              skills: `Core ${activeBranch.code} (${activeBranch.coreSubjects?.[0] || 'Fundamentals'})`,
+              color: '#94a3b8',
+            },
+            {
+              phase: `Year 2 · ${activeBranch.code} Engineer`,
+              salary: '₹10.50 LPA – ₹13.00 LPA',
+              monthly: '₹95,000/mo',
+              skills: activeBranch.coreSubjects?.[1] || 'Domain Architecture & Design',
+              color: 'var(--gold)',
+            },
+            {
+              phase: `Year 3 · Senior ${activeBranch.code} Lead`,
+              salary: '₹16.00 LPA – ₹22.00 LPA',
+              monthly: '₹1,50,000/mo',
+              skills: activeBranch.trendingTopics?.[0] || 'Advanced System Integration',
+              color: '#10b981',
+            },
           ].map((tier, idx) => (
             <div
               key={idx}
-              style={{
+              className="comp-tier-card card-shine"
+            style={{
                 padding: '14px 16px',
                 borderRadius: 10,
                 background: 'rgba(255,255,255,0.02)',

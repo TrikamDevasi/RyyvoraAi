@@ -1422,3 +1422,713 @@ td {
   visibility: visible;
   transform: translateY(-50%) translateX(2px);
 }
+
+/* ==========================================================================
+   ── ENHANCED HOVER EFFECTS, MICRO-INTERACTIONS & PAGE ANIMATIONS ─────────
+   ========================================================================== */
+
+/* ── Page & Section Entrance Animations ── */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Page content wrapper — subtle fade+lift on mount */
+.page-enter {
+  animation: fadeInUp 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.page-enter-fast {
+  animation: fadeInUp 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.fade-in-scale {
+  animation: fadeInScale 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.fade-in {
+  animation: fadeIn 0.25s ease both;
+}
+
+.slide-in-left {
+  animation: slideInLeft 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.slide-in-right {
+  animation: slideInRight 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Staggered children — adds delay per nth child */
+.stagger-children > * {
+  animation: fadeInUp 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.stagger-children > *:nth-child(1) { animation-delay: 0.04s; }
+.stagger-children > *:nth-child(2) { animation-delay: 0.08s; }
+.stagger-children > *:nth-child(3) { animation-delay: 0.12s; }
+.stagger-children > *:nth-child(4) { animation-delay: 0.16s; }
+.stagger-children > *:nth-child(5) { animation-delay: 0.20s; }
+.stagger-children > *:nth-child(6) { animation-delay: 0.24s; }
+.stagger-children > *:nth-child(n+7) { animation-delay: 0.28s; }
+
+/* ── Shimmer Loading Skeleton ── */
+@keyframes shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--bg-surface-elevated) 0%,
+    rgba(255, 255, 255, 0.06) 40%,
+    var(--bg-surface-elevated) 80%
+  );
+  background-size: 800px 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+
+[data-theme="light"] .shimmer {
+  background: linear-gradient(
+    90deg,
+    #f1f5f9 0%,
+    #e2e8f0 40%,
+    #f1f5f9 80%
+  );
+  background-size: 800px 100%;
+}
+
+/* ── Ripple Press Effect (for buttons, cards) ── */
+.ripple-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple-container::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.15) 0%, transparent 70%);
+  opacity: 0;
+  transform: scale(0.6);
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s ease;
+  pointer-events: none;
+}
+
+.ripple-container:active::after {
+  opacity: 1;
+  transform: scale(1.6);
+  transition: transform 0s, opacity 0s;
+}
+
+/* ── Enhanced Card Hover — Card Glow on Hover ── */
+.card-glow-hover {
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (hover: hover) {
+  .card-glow-hover:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 28px -4px rgba(245, 158, 11, 0.18), 0 0 0 1px rgba(245, 158, 11, 0.12);
+    border-color: var(--gold-border) !important;
+  }
+}
+
+.card-glow-hover:active {
+  transform: translateY(0) scale(0.99);
+}
+
+/* ── Skill Tag / Badge Hover ── */
+.skill-tag {
+  display: inline-flex;
+  align-items: center;
+  transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.15s ease,
+              background-color 0.15s ease,
+              color 0.15s ease;
+  cursor: default;
+}
+
+@media (hover: hover) {
+  .skill-tag:hover {
+    border-color: var(--gold-border) !important;
+    color: var(--gold) !important;
+    transform: translateY(-1px) scale(1.04);
+  }
+}
+
+/* ── Preset Button Enhanced Hover (Career Predictor) ── */
+.preset-btn {
+  transition: transform 0.18s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.18s ease,
+              background-color 0.18s ease,
+              box-shadow 0.18s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+@media (hover: hover) {
+  .preset-btn:hover {
+    transform: translateY(-2px) scale(1.01);
+    border-color: var(--gold) !important;
+    background: rgba(245, 158, 11, 0.06) !important;
+    box-shadow: 0 4px 16px -4px rgba(245, 158, 11, 0.2);
+  }
+}
+
+.preset-btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* ── Compensation / Year Progression Card Hover ── */
+.comp-tier-card {
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.2s ease,
+              box-shadow 0.2s ease;
+}
+
+@media (hover: hover) {
+  .comp-tier-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--border-active) !important;
+    box-shadow: 0 6px 20px -4px rgba(0, 0, 0, 0.35);
+  }
+}
+
+.comp-tier-card:active {
+  transform: translateY(0);
+}
+
+/* ── Skill Passport: skill row hover ── */
+.skill-row {
+  transition: transform 0.16s cubic-bezier(0.4, 0, 0.2, 1),
+              background-color 0.16s ease,
+              border-color 0.16s ease;
+}
+
+@media (hover: hover) {
+  .skill-row:hover {
+    transform: translateX(3px);
+    background: rgba(245, 158, 11, 0.04) !important;
+    border-color: var(--gold-border) !important;
+  }
+}
+
+/* ── Roadmap Steps (expand section) ── */
+.roadmap-step {
+  transition: transform 0.16s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.16s ease;
+}
+
+@media (hover: hover) {
+  .roadmap-step:hover {
+    transform: translateX(4px);
+  }
+}
+
+/* ── KPI Card Gold Bar Animation ── */
+@keyframes kpiBarGrow {
+  from { width: 0%; opacity: 0; }
+  to   { width: 35%; opacity: 1; }
+}
+
+.kpi-gold-bar {
+  animation: kpiBarGrow 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
+}
+
+/* ── Match Ring SVG Animation ── */
+@keyframes ringFill {
+  from { stroke-dashoffset: 200; opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.match-ring-circle {
+  animation: ringFill 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+}
+
+/* ── Roadmap Expansion Entrance ── */
+@keyframes expandDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scaleY(0.92);
+    transform-origin: top;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scaleY(1);
+  }
+}
+
+.expand-enter {
+  animation: expandDown 0.26s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ── Notification dot pulse ── */
+@keyframes notifPing {
+  0% { transform: scale(1); opacity: 1; }
+  70% { transform: scale(1.8); opacity: 0; }
+  100% { transform: scale(1.8); opacity: 0; }
+}
+
+.notif-ping {
+  position: relative;
+}
+
+.notif-ping::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--gold);
+  animation: notifPing 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* ── Branch Selector Bar Hover ── */
+.branch-bar {
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+@media (hover: hover) {
+  .branch-bar:hover {
+    background: rgba(245, 158, 11, 0.03) !important;
+    border-color: var(--gold-border) !important;
+  }
+}
+
+/* ── Dropdown/Select Enhanced Hover ── */
+select.enhanced-select {
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  select.enhanced-select:hover {
+    border-color: var(--gold) !important;
+    box-shadow: 0 0 0 2px var(--gold-muted);
+    transform: translateY(-1px);
+  }
+}
+
+/* ── Icon Container Pulse on Card Hover ── */
+.icon-pulse-parent:hover .icon-pulse-target {
+  animation: iconPop 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes iconPop {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.14); }
+  100% { transform: scale(1.06); }
+}
+
+/* ── Navigation Active Indicator Slide ── */
+@keyframes navActiveSlide {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+.nav-active-indicator {
+  transform-origin: left;
+  animation: navActiveSlide 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ── Gold Accent Bottom Bar Grow ── */
+@keyframes growRight {
+  from { width: 0; opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.grow-right {
+  animation: growRight 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
+}
+
+/* ── Input Focus Ring Glow Pulse ── */
+@keyframes focusGlow {
+  0%   { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.3); }
+  70%  { box-shadow: 0 0 0 5px rgba(245, 158, 11, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  animation: focusGlow 0.5s ease forwards;
+}
+
+/* ── Card Hover: Inner Icon Scale ── */
+.card-hover-icon-parent {
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.2s ease,
+              box-shadow 0.2s ease;
+}
+
+@media (hover: hover) {
+  .card-hover-icon-parent:hover {
+    transform: translateY(-2px);
+    border-color: var(--border-active) !important;
+    box-shadow: var(--shadow-md);
+  }
+
+  .card-hover-icon-parent:hover .hover-scale-icon {
+    transform: scale(1.12) rotate(-4deg);
+  }
+}
+
+.hover-scale-icon {
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Upload Zone Enhanced Hover ── */
+.upload-zone {
+  transition: transform 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+}
+
+@media (hover: hover) {
+  .upload-zone:hover {
+    transform: translateY(-2px);
+    border-color: var(--gold) !important;
+    background: rgba(245, 158, 11, 0.04) !important;
+  }
+}
+
+/* ── Alert / Notification Card Slide-in ── */
+.alert-enter {
+  animation: slideInRight 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ── Tab Switching Slide ── */
+@keyframes tabSlide {
+  from { opacity: 0; transform: translateX(-8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.tab-content-enter {
+  animation: tabSlide 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ── Trending Badge Bounce ── */
+@keyframes badgeBounce {
+  0%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-3px); }
+  60% { transform: translateY(-1px); }
+}
+
+.badge-bounce {
+  animation: badgeBounce 2.4s ease-in-out 1s infinite;
+  will-change: transform;
+}
+
+/* ── Loading Pulse Bars ── */
+@keyframes barPulse {
+  0%, 100% { transform: scaleY(0.5); opacity: 0.5; }
+  50% { transform: scaleY(1); opacity: 1; }
+}
+
+.loading-bar {
+  display: inline-block;
+  width: 3px;
+  height: 14px;
+  border-radius: 2px;
+  background: var(--gold);
+  animation: barPulse 0.9s ease-in-out infinite;
+  transform-origin: bottom;
+}
+.loading-bar:nth-child(2) { animation-delay: 0.15s; }
+.loading-bar:nth-child(3) { animation-delay: 0.30s; }
+
+/* ── Section Header Fade Entrance ── */
+.section-header-enter {
+  animation: fadeInDown 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ── Market Intelligence / Assessment Row Hover ── */
+.data-row-hover {
+  transition: background-color 0.15s ease, transform 0.15s ease, border-color 0.15s ease;
+  border-radius: var(--radius-sm);
+}
+
+@media (hover: hover) {
+  .data-row-hover:hover {
+    background-color: var(--bg-surface-elevated) !important;
+    transform: translateX(3px);
+  }
+}
+
+/* ── Smooth Disclosure / Expand Arrow ── */
+.disclosure-arrow {
+  transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.disclosure-arrow.open {
+  transform: rotate(180deg);
+}
+
+/* ── Gold Shimmer Text ── */
+@keyframes goldShimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.text-shimmer-gold {
+  background: linear-gradient(
+    90deg,
+    var(--gold-dim) 0%,
+    var(--gold-light) 35%,
+    var(--gold) 50%,
+    var(--gold-light) 65%,
+    var(--gold-dim) 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: goldShimmer 3.5s linear infinite;
+}
+
+/* ── Hover Underline Link Effect ── */
+.underline-hover {
+  position: relative;
+  text-decoration: none;
+}
+
+.underline-hover::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 0;
+  height: 1.5px;
+  background: var(--gold);
+  border-radius: 1px;
+  transition: width 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (hover: hover) {
+  .underline-hover:hover::after {
+    width: 100%;
+  }
+}
+
+/* ── Card Subtle Shine on Hover ── */
+.card-shine {
+  position: relative;
+  overflow: hidden;
+}
+
+.card-shine::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -75%;
+  width: 50%;
+  height: 200%;
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.04) 50%,
+    transparent 60%
+  );
+  transform: skewX(-12deg);
+  transition: left 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+
+@media (hover: hover) {
+  .card-shine:hover::before {
+    left: 125%;
+  }
+}
+
+/* ── Progress Bar Fill Animation ── */
+@keyframes progressFill {
+  from { width: 0%; }
+}
+
+.progress-animated {
+  animation: progressFill 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
+}
+
+/* ── Score / Number Counter Appear ── */
+@keyframes numberPop {
+  0% { transform: scale(0.75); opacity: 0; }
+  70% { transform: scale(1.06); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* ── Preset Tracks Button Hover ── */
+.preset-btn {
+  transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.22s ease,
+              background-color 0.22s ease,
+              box-shadow 0.22s ease;
+}
+
+@media (hover: hover) {
+  .preset-btn:hover {
+    transform: translateY(-2px);
+    border-color: var(--gold-border) !important;
+    background-color: var(--bg-surface-elevated) !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25), 0 0 0 1px var(--gold-border);
+  }
+}
+
+.preset-btn:active {
+  transform: translateY(0);
+}
+
+/* ── Skill Passport Row Hover ── */
+.skill-row {
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.2s ease,
+              background-color 0.2s ease,
+              box-shadow 0.2s ease;
+}
+
+@media (hover: hover) {
+  .skill-row:hover {
+    transform: translateY(-2px);
+    border-color: var(--gold-border) !important;
+    background-color: var(--bg-surface-elevated) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+}
+
+/* ── Skill Tag Pill Hover ── */
+.skill-tag {
+  transition: transform 0.18s ease, border-color 0.18s ease, background-color 0.18s ease, color 0.18s ease;
+}
+
+@media (hover: hover) {
+  .skill-tag:hover {
+    transform: translateY(-1px);
+    border-color: var(--gold) !important;
+    color: var(--gold-light) !important;
+    background: rgba(245, 158, 11, 0.08) !important;
+  }
+}
+
+/* ── Global Interactive Button Enhancements ── */
+.btn-gold,
+.btn-primary,
+.btn-secondary {
+  transition: transform 0.18s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.18s ease,
+              filter 0.18s ease,
+              background-color 0.18s ease !important;
+}
+
+@media (hover: hover) {
+  .btn-gold:hover,
+  .btn-primary:hover {
+    transform: translateY(-1.5px);
+    box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
+    filter: brightness(1.06);
+  }
+
+  .btn-secondary:hover {
+    transform: translateY(-1.5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    border-color: var(--gold-border) !important;
+    color: #fff !important;
+  }
+}
+
+.btn-gold:active,
+.btn-primary:active,
+.btn-secondary:active {
+  transform: translateY(0);
+}
+
+/* ── Accessibility: Reduced Motion Overrides ── */
+@media (prefers-reduced-motion: reduce) {
+  .page-enter,
+  .page-enter-fast,
+  .fade-in-scale,
+  .fade-in,
+  .slide-in-left,
+  .slide-in-right,
+  .expand-enter,
+  .alert-enter,
+  .tab-content-enter,
+  .section-header-enter,
+  .stagger-children > *,
+  .kpi-gold-bar,
+  .grow-right,
+  .match-ring-circle,
+  .badge-bounce,
+  .number-pop {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .shimmer,
+  .text-shimmer-gold {
+    animation: none !important;
+  }
+
+  .card-shine::before {
+    display: none;
+  }
+
+  input:focus,
+  textarea:focus,
+  select:focus {
+    animation: none;
+  }
+}

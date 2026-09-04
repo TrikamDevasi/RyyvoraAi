@@ -4,62 +4,45 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { studentApi, StudentProfile } from '@/lib/api/student.api';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
+import { resolveBranch, getAllBranchesSummary, BranchData, BranchTestInfo, saveBranchId } from '@/lib/branches';
+import { GraduationCap } from 'lucide-react';
 
 const GOLD = '#D4A843';
 const AMBER = '#F59E0B';
 
-interface TestInfo {
-    id: string;
-    title: string;
-    subject: string;
-    duration: number;
-    questions: number;
-    difficulty: 'Easy' | 'Medium' | 'Hard';
-    description: string;
-    skills: string[];
-}
-
-const AVAILABLE_TESTS: TestInfo[] = [
-    {
-        id: 'TEST001', title: 'React.js & Modern Web Architecture', subject: 'Frontend Engineering',
-        duration: 30, questions: 20, difficulty: 'Medium',
-        description: 'Test your knowledge of React hooks, server components, JSX, and component lifecycle.',
-        skills: ['React.js', 'Next.js', 'State Management'],
-    },
-    {
-        id: 'TEST002', title: 'Data Structures & Algorithmic Thinking', subject: 'Computer Science',
-        duration: 45, questions: 25, difficulty: 'Hard',
-        description: 'Problem solving on trees, graphs, dynamic programming, and complexity optimization.',
-        skills: ['Algorithms', 'Data Structures', 'Problem Solving'],
-    },
-    {
-        id: 'TEST003', title: 'Node.js, Express & Microservices', subject: 'Backend Engineering',
-        duration: 35, questions: 20, difficulty: 'Medium',
-        description: 'REST API design, auth middleware, Redis caching, and error resilience in Express.',
-        skills: ['Node.js', 'Express', 'JWT', 'Redis'],
-    },
-    {
-        id: 'TEST004', title: 'SQL & Relational Database Design', subject: 'Data Architecture',
-        duration: 40, questions: 22, difficulty: 'Medium',
-        description: 'Schema indexing, ACID transactions, aggregation queries, and schema normalization.',
-        skills: ['SQL', 'MongoDB', 'Indexing'],
-    },
-];
-
 export default function TestsPage() {
     const [profile, setProfile] = useState<StudentProfile | null>(null);
+    const [activeBranch, setActiveBranch] = useState<BranchData>(() => resolveBranch(undefined));
+    const [allBranches] = useState(() => getAllBranchesSummary());
 
     useEffect(() => {
         studentApi.getMyProfile()
-            .then(data => setProfile(data))
+            .then(data => {
+                setProfile(data);
+                if (data?.program) {
+                    const b = resolveBranch(data.program);
+                    setActiveBranch(b);
+                    saveBranchId(b.id);
+                }
+            })
             .catch(() => {});
     }, []);
+
+    const handleBranchChange = (branchId: string) => {
+        const b = resolveBranch(branchId);
+        saveBranchId(b.id);
+        setActiveBranch(b);
+    };
+
+    const testsToDisplay: BranchTestInfo[] = activeBranch.tests && activeBranch.tests.length > 0
+        ? activeBranch.tests
+        : resolveBranch('general').tests;
 
     const assessedNames = (profile?.skills || [])
         .map((s: any) => (typeof s.skillId === 'object' && s.skillId?.name) ? s.skillId.name.toLowerCase() : String(s.skillId || '').toLowerCase())
         .filter(Boolean);
 
-    const completedScore = (test: TestInfo): number | null => {
+    const completedScore = (test: BranchTestInfo): number | null => {
         const skills = profile?.skills || [];
         const skill = skills.find((s: any) => {
             const name = (typeof s.skillId === 'object' && s.skillId?.name) ? s.skillId.name : String(s.skillId || '');
@@ -80,12 +63,74 @@ export default function TestsPage() {
                     </p>
                 </div>
 
+                {/* Academic Discipline Selector */}
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    flexWrap: 'wrap',
+                    gap: 12,
+                    marginBottom: 20,
+                    padding: '12px 16px',
+                    borderRadius: 10,
+                    background: 'rgba(255,255,255,0.02)',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <div style={{
+                            width: 32,
+                            height: 32,
+                            borderRadius: 8,
+                            background: 'rgba(212,168,67,0.12)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: GOLD,
+                        }}>
+                            <GraduationCap size={18} />
+                        </div>
+                        <div>
+                            <div style={{ fontSize: 13, fontWeight: 700, color: '#f8fafc' }}>
+                                {activeBranch.name} ({activeBranch.code})
+                            </div>
+                            <div style={{ fontSize: 11, color: '#64748b' }}>
+                                Domain: {activeBranch.domain} • Branch-Verified Certifications
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <span style={{ fontSize: 11.5, color: '#94a3b8', fontWeight: 600 }}>Discipline:</span>
+                        <select
+                            value={activeBranch.id}
+                            onChange={(e) => handleBranchChange(e.target.value)}
+                            style={{
+                                padding: '6px 12px',
+                                borderRadius: 8,
+                                background: '#0f172a',
+                                border: '1px solid rgba(212,168,67,0.3)',
+                                color: '#f8fafc',
+                                fontSize: 12,
+                                fontWeight: 600,
+                                outline: 'none',
+                                cursor: 'pointer',
+                            }}
+                        >
+                            {allBranches.map((b) => (
+                                <option key={b.id} value={b.id} style={{ background: '#0f172a', color: '#f8fafc' }}>
+                                    {b.name} ({b.code})
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
+
                 <div style={{ padding: 12, borderRadius: 10, background: 'rgba(212,168,67,0.06)', border: '1px solid rgba(212,168,67,0.25)', marginBottom: 20, fontSize: 12.5, color: '#94a3b8', lineHeight: 1.6 }}>
                     Scores are recorded on your passport only after you complete the full assessment flow — results below reflect your actual verified evaluations.
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16 }}>
-                    {AVAILABLE_TESTS.map(test => {
+                    {testsToDisplay.map(test => {
                         const score = completedScore(test);
                         const done = score != null;
                         return (

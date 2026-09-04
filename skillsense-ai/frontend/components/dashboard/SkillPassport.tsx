@@ -32,7 +32,7 @@ export default function SkillPassport({ student }: Props) {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+    <div className="page-enter" style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
       {/* ── Action Toolbar ── */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -81,7 +81,7 @@ export default function SkillPassport({ student }: Props) {
 
       {/* ── Verified Credential Card ── */}
       <div
-        className="card-accent"
+        className="card-accent card-shine"
         style={{
           padding: 28,
           background: 'linear-gradient(180deg, rgba(245,158,11,0.06) 0%, rgba(15,17,26,0.98) 100%)',
@@ -188,6 +188,7 @@ export default function SkillPassport({ student }: Props) {
               student.skills.map((s: any, idx: number) => (
                 <div
                   key={idx}
+                  className="skill-row"
                   style={{
                     padding: '12px 14px',
                     borderRadius: 8,

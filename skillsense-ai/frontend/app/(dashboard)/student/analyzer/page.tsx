@@ -38,36 +38,10 @@ import toast from 'react-hot-toast';
 import confetti from 'canvas-confetti';
 
 import { Radar, PolarGrid, PolarAngleAxis } from 'recharts';
+import { resolveBranch, getAllBranchesSummary, BranchData, saveBranchId } from '@/lib/branches';
+import { GraduationCap } from 'lucide-react';
 const RadarChart = dynamic(() => import('recharts').then((mod) => mod.RadarChart), { ssr: false });
 const ResponsiveContainer = dynamic(() => import('recharts').then((mod) => mod.ResponsiveContainer), { ssr: false });
-
-// ── Curated Demo Presets ──────────────────────────────────────────────────────
-const DEMO_PRESETS = [
-  {
-    title: '🚀 Full-Stack Web Engineer (MERN / Next.js)',
-    mode: 'text',
-    text: `Full-Stack Software Engineer with 2+ years of hands-on experience building scalable web applications. Proficient in React 19, Next.js App Router, TypeScript, Node.js, Express, and PostgreSQL. Experienced with Prisma ORM, Redis caching, Tailwind CSS, Docker containerization, and automated CI/CD pipelines via GitHub Actions. Designed RESTful and GraphQL APIs handling 5,000+ daily requests. Implemented OAuth2 / JWT authentication, role-based access control (RBAC), and unit testing with Jest and React Testing Library.`,
-    targetLevel: 5,
-  },
-  {
-    title: '🤖 AI & Machine Learning Specialist',
-    mode: 'text',
-    text: `Applied Machine Learning Engineer with strong foundations in Python, PyTorch, Scikit-Learn, and FastAPI. Experience fine-tuning open-source LLMs (Llama 3, Mistral) using LoRA/QLoRA and deploying Retrieval-Augmented Generation (RAG) pipelines with LangChain and Pinecone vector database. Designed NLP data pre-processing pipelines, evaluated model drift, and monitored production inference latency using Prometheus and Grafana. NSQF Level 6 aligned.`,
-    targetLevel: 6,
-  },
-  {
-    title: '☁️ Cloud & DevOps Architect',
-    mode: 'text',
-    text: `Cloud Infrastructure Engineer specializing in Kubernetes, AWS (EKS, S3, RDS, Lambda), Terraform infrastructure-as-code, and Docker container orchestration. Managed automated zero-downtime blue/green deployment workflows via ArgoCD and GitLab CI. Implemented security vulnerability scanning with Trivy and centralized log aggregation with ELK Stack. Strong Linux system administration, bash scripting, and networking fundamentals.`,
-    targetLevel: 6,
-  },
-  {
-    title: '🛡️ Cyber Security & Network Defense',
-    mode: 'text',
-    text: `Security Analyst certified in network penetration testing, OWASP Top 10 web application vulnerabilities, SIEM configuration with Splunk/Wazuh, and cryptographic key management. Conducted vulnerability assessments using Burp Suite, Nmap, and Wireshark. Configured firewall policies, zero-trust network access (ZTNA), and secure SSH bastion hosts. NSQF Level 5 vocational qualification.`,
-    targetLevel: 5,
-  },
-];
 
 const GITHUB_PRESETS = [
   { label: 'Next.js (Vercel)', url: 'https://github.com/vercel/next.js' },
@@ -78,6 +52,8 @@ const GITHUB_PRESETS = [
 
 export default function AIAnalyzerPage() {
   const [profile, setProfile] = useState<StudentProfile | null>(null);
+  const [activeBranch, setActiveBranch] = useState<BranchData>(() => resolveBranch(undefined));
+  const [allBranches] = useState(() => getAllBranchesSummary());
   const [mode, setMode] = useState<'text' | 'github' | 'projects' | 'upload'>('text');
   const [resumeText, setResumeText] = useState('');
   const [githubUrl, setGithubUrl] = useState('');
@@ -112,19 +88,30 @@ export default function AIAnalyzerPage() {
       .getMyProfile()
       .then((data) => {
         setProfile(data);
-        if (data.program && !resumeText) {
-          setResumeText(
-            `Candidate studying ${data.program}, NSQF Level ${data.nsqfLevel || 4}. Proficient in full-stack web development, RESTful APIs, database schema modeling, and modern software engineering practices.`
-          );
+        const b = resolveBranch(data.program);
+        setActiveBranch(b);
+        if (data.program && !resumeText && b.analyzerPresets?.length > 0) {
+          setResumeText(b.analyzerPresets[0].text);
         }
       })
       .catch(() => {
-        // Fallback placeholder profile
-        if (!resumeText) {
-          setResumeText(DEMO_PRESETS[0].text);
+        const b = resolveBranch(undefined);
+        setActiveBranch(b);
+        if (!resumeText && b.analyzerPresets?.length > 0) {
+          setResumeText(b.analyzerPresets[0].text);
         }
       });
   }, []);
+
+  const handleBranchChange = (branchId: string) => {
+    const b = resolveBranch(branchId);
+    saveBranchId(b.id);
+    setActiveBranch(b);
+    if (b.analyzerPresets?.length > 0) {
+      setResumeText(b.analyzerPresets[0].text);
+    }
+    toast.success(`Discipline updated: ${b.name}`);
+  };
 
   // ── Client-side Heuristic Analysis Engine (Resilient Fallback) ──────────────
   const runClientSideAnalysis = async (inputText: string, gitUrl?: string, projectInfo?: any) => {
@@ -173,14 +160,28 @@ export default function AIAnalyzerPage() {
       detectedSkills.reduce((acc, curr) => acc + curr.score, 0) / detectedSkills.length
     );
 
-    const radarData = [
-      { subject: 'Full-Stack Dev', score: Math.min(98, calculatedOverall + (textLower.includes('react') || textLower.includes('node') ? 8 : -4)) },
-      { subject: 'System Design', score: Math.min(95, calculatedOverall + (textLower.includes('architecture') || textLower.includes('docker') ? 6 : -6)) },
-      { subject: 'Cloud & DevOps', score: Math.min(96, calculatedOverall + (textLower.includes('aws') || textLower.includes('docker') ? 10 : -8)) },
-      { subject: 'Database & SQL', score: Math.min(95, calculatedOverall + (textLower.includes('postgres') || textLower.includes('sql') ? 7 : -5)) },
-      { subject: 'Security & QA', score: Math.min(92, calculatedOverall + (textLower.includes('security') || textLower.includes('test') ? 9 : -7)) },
-      { subject: 'Problem Solving', score: Math.min(96, calculatedOverall + 5) },
-    ];
+    const radarData = activeBranch.radarDimensions && activeBranch.radarDimensions.length > 0
+      ? activeBranch.radarDimensions.map((dim) => ({
+          subject: dim.subject,
+          score: Math.min(98, Math.max(68, calculatedOverall + dim.baseScoreOffset)),
+        }))
+      : [
+          { subject: 'Core Competency', score: calculatedOverall },
+          { subject: 'Applied Logic', score: Math.min(98, calculatedOverall + 5) },
+          { subject: 'Industry Standards', score: Math.min(95, calculatedOverall + 2) },
+          { subject: 'Problem Solving', score: Math.min(96, calculatedOverall + 4) },
+        ];
+
+    const competencies = activeBranch.competencyCategories && activeBranch.competencyCategories.length > 0
+      ? activeBranch.competencyCategories.map((cat, idx) => ({
+          category: cat.category,
+          score: radarData[idx % radarData.length]?.score || calculatedOverall,
+          description: cat.description,
+        }))
+      : [
+          { category: 'Technical Execution', score: calculatedOverall, description: 'Core discipline fundamentals and execution efficiency' },
+          { category: 'Domain Architecture', score: Math.min(95, calculatedOverall + 3), description: 'System design and standard specifications' },
+        ];
 
     const detectedLevel = calculatedOverall >= 85 ? 'NSQF Level 6 (Advanced Technologist)' : calculatedOverall >= 75 ? 'NSQF Level 5 (Lead Technician / Associate)' : 'NSQF Level 4 (Vocational Practitioner)';
 
@@ -189,23 +190,18 @@ export default function AIAnalyzerPage() {
       confidence: 0.94,
       experienceLevel: calculatedOverall >= 85 ? 'Advanced' : calculatedOverall >= 75 ? 'Intermediate' : 'Proficient',
       nsqfLevel: detectedLevel,
-      summary: `High-fidelity neural evaluation verified strong vocational competencies across software engineering, architecture, and deployment standards aligned with contemporary Indian industry hiring requisitions.`,
+      summary: `High-fidelity neural evaluation verified strong vocational competencies across ${activeBranch.name} (${activeBranch.domain}) standards aligned with contemporary Indian industry requisitions (${activeBranch.topEmployers.slice(0, 3).join(', ')} benchmarks).`,
       technicalSkills: detectedSkills,
       radarData,
-      competencies: [
-        { category: 'Frontend & User Experience', score: radarData[0].score, description: 'Component lifecycle, responsive state management, and modern UI tooling' },
-        { category: 'Backend Architecture & APIs', score: radarData[1].score, description: 'RESTful API protocols, schema validation, and database querying' },
-        { category: 'Cloud, Infrastructure & CI/CD', score: radarData[2].score, description: 'Automated build pipelines, containerized environments, and cloud deployment' },
-        { category: 'Code Quality & Security Hygiene', score: radarData[4].score, description: 'Defensive programming patterns, authorization standards, and unit test coverage' },
-      ],
+      competencies,
       strengths: [
-        'Demonstrates rigorous implementation of modern asynchronous architecture and state management.',
-        'Strong alignment with Indian IT service & product sector requirements (TCS, Swiggy, Zerodha benchmarks).',
-        'Demonstrated competence in version control, modular code reusability, and deployment workflows.',
+        `Demonstrates rigorous implementation of core ${activeBranch.name} principles.`,
+        `Strong alignment with Indian industry requirements (${activeBranch.topEmployers.slice(0, 3).join(', ')} benchmarks).`,
+        'Demonstrated competence in technical standards, safety, and operational workflows.',
       ],
       weaknesses: [
-        'Could expand automated end-to-end testing coverage (Playwright / Cypress) across core user journeys.',
-        'Opportunities to deepen distributed caching and message queue patterns (Redis / Kafka) for high-scale throughput.',
+        `Could expand advanced empirical testing and simulation coverage across complex ${activeBranch.code} systems.`,
+        `Opportunities to deepen specialized domain tooling (${activeBranch.trendingTopics.slice(0, 2).join(' / ')}) for enterprise scale.`,
       ],
       recommendations: [
         'Pursue NSQF Level 6 Advanced Cloud & Distributed Systems Micro-Credential',
@@ -267,7 +263,7 @@ export default function AIAnalyzerPage() {
     }
 
     if (!finalPayloadText) {
-      finalPayloadText = DEMO_PRESETS[0].text;
+      finalPayloadText = activeBranch.analyzerPresets[0]?.text || '';
     }
 
     try {
@@ -390,6 +386,68 @@ export default function AIAnalyzerPage() {
           </p>
         </div>
 
+        {/* Academic Discipline Selector */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: 12,
+          marginBottom: 16,
+          padding: '12px 16px',
+          borderRadius: 10,
+          background: 'rgba(255,255,255,0.02)',
+          border: '1px solid var(--border)',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{
+              width: 32,
+              height: 32,
+              borderRadius: 8,
+              background: 'rgba(245,158,11,0.12)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'var(--gold)',
+            }}>
+              <GraduationCap size={18} />
+            </div>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#f8fafc' }}>
+                {activeBranch.name} ({activeBranch.code})
+              </div>
+              <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+                Domain: {activeBranch.domain} • Verified NSQF Competency Benchmarks
+              </div>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ fontSize: 11.5, color: 'var(--text-secondary)', fontWeight: 600 }}>Active Discipline:</span>
+            <select
+              value={activeBranch.id}
+              onChange={(e) => handleBranchChange(e.target.value)}
+              style={{
+                padding: '6px 12px',
+                borderRadius: 8,
+                background: 'rgba(15,23,42,0.8)',
+                border: '1px solid rgba(245,158,11,0.35)',
+                color: '#f8fafc',
+                fontSize: 12,
+                fontWeight: 600,
+                outline: 'none',
+                cursor: 'pointer',
+              }}
+            >
+              {allBranches.map((b) => (
+                <option key={b.id} value={b.id} style={{ background: '#0f172a', color: '#f8fafc' }}>
+                  {b.name} ({b.code})
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
         {/* Quick Demo Presets Banner */}
         <div
           style={{
@@ -406,17 +464,17 @@ export default function AIAnalyzerPage() {
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 600, color: 'var(--gold)' }}>
-            <Zap size={16} /> <span>1-Click Evaluation Presets:</span>
+            <Zap size={16} /> <span>1-Click {activeBranch.code} Evaluation Presets:</span>
           </div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-            {DEMO_PRESETS.map((preset, idx) => (
+            {activeBranch.analyzerPresets.map((preset, idx) => (
               <button
                 key={idx}
                 type="button"
                 onClick={() => {
                   setResumeText(preset.text);
                   setMode('text');
-                  toast.success(`Loaded preset: ${preset.title.split('(')[0]}`);
+                  toast.success(`Loaded preset: ${preset.title}`);
                 }}
                 style={{
                   padding: '6px 12px',
@@ -438,7 +496,7 @@ export default function AIAnalyzerPage() {
                   e.currentTarget.style.color = '#e2e8f0';
                 }}
               >
-                {preset.title.split(' ')[0]} {preset.title.split(' ')[1]} {preset.title.split(' ')[2] || ''}
+                {preset.title}
               </button>
             ))}
           </div>

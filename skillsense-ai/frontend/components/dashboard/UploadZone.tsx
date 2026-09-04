@@ -118,13 +118,13 @@ export default function UploadZone() {
                 onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
                 onDragLeave={() => setDragging(false)}
                 onDrop={handleDrop}
+                className="upload-zone"
                 style={{
                     border: `2px dashed ${dragging ? GOLD : 'rgba(255,255,255,0.15)'}`,
                     borderRadius: 16,
                     padding: '40px 24px',
                     textAlign: 'center',
                     background: dragging ? 'rgba(212,168,67,0.05)' : 'rgba(255,255,255,0.01)',
-                    transition: 'all 0.2s ease',
                     cursor: 'pointer',
                 }}
             >
@@ -148,7 +148,7 @@ export default function UploadZone() {
                 <div style={{ marginTop: 24, display: 'flex', flexDirection: 'column', gap: 10 }}>
                     <h3 style={{ fontSize: 14, fontWeight: 700, margin: '0 0 8px', color: WHITE }}>Recent Uploads</h3>
                     {uploadJobs.map((job) => (
-                        <div key={job.id} style={{ padding: 14, background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div key={job.id} className="data-row-hover" style={{ padding: 14, background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <div>
                                 <div style={{ fontWeight: 600, fontSize: 13, color: WHITE }}>{job.fileName}</div>
                                 <div style={{ fontSize: 11, color: MUTED, marginTop: 2 }}>{formatSize(job.fileSize)} • {new Date(job.uploadedAt).toLocaleTimeString()}</div>

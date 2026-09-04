@@ -68,7 +68,7 @@ export default function MarketIntelligence() {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 24, maxWidth: 1040, margin: '0 auto' }}>
+    <div className="page-enter" style={{ display: 'flex', flexDirection: 'column', gap: 24, maxWidth: 1040, margin: '0 auto' }}>
       {/* ── Search & Header Banner ── */}
       <div
         className="card-accent"
@@ -148,6 +148,7 @@ export default function MarketIntelligence() {
                   setSkill(pop);
                   fetchTrends(pop);
                 }}
+                className="skill-tag ripple-container"
                 style={{
                   padding: '3px 9px',
                   borderRadius: 99,
@@ -156,7 +157,6 @@ export default function MarketIntelligence() {
                   color: '#cbd5e1',
                   fontSize: 11,
                   cursor: 'pointer',
-                  transition: 'all 0.15s ease',
                 }}
               >
                 {pop}
@@ -225,7 +225,7 @@ export default function MarketIntelligence() {
 
             {/* Metrics Triplets */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
-              <div style={{ padding: 14, borderRadius: 10, background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border)' }}>
+              <div className="card-interactive card-3d card-shine" style={{ padding: 14, borderRadius: 10, background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border)' }}>
                 <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
                   Growth Trajectory
                 </div>
@@ -234,7 +234,7 @@ export default function MarketIntelligence() {
                 </div>
               </div>
 
-              <div style={{ padding: 14, borderRadius: 10, background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border)' }}>
+              <div className="card-interactive card-3d card-shine" style={{ padding: 14, borderRadius: 10, background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border)' }}>
                 <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
                   Compensation Benchmark
                 </div>
@@ -243,7 +243,7 @@ export default function MarketIntelligence() {
                 </div>
               </div>
 
-              <div style={{ padding: 14, borderRadius: 10, background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border)' }}>
+              <div className="card-interactive card-3d card-shine" style={{ padding: 14, borderRadius: 10, background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border)' }}>
                 <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
                   Active National Requisitions
                 </div>
@@ -266,6 +266,7 @@ export default function MarketIntelligence() {
                 {(data.topCompanies || ['TCS', 'Infosys', 'Razorpay', 'Swiggy', 'Flipkart']).map((company: string, idx: number) => (
                   <div
                     key={idx}
+                    className="data-row-hover"
                     style={{
                       display: 'flex',
                       alignItems: 'center',
@@ -274,6 +275,7 @@ export default function MarketIntelligence() {
                       borderRadius: 8,
                       background: 'rgba(255,255,255,0.02)',
                       border: '1px solid var(--border)',
+                      cursor: 'pointer',
                     }}
                   >
                     <div
@@ -309,6 +311,7 @@ export default function MarketIntelligence() {
                   (topic: string, idx: number) => (
                     <div
                       key={idx}
+                      className="skill-tag"
                       style={{
                         padding: '6px 12px',
                         borderRadius: 99,
@@ -317,6 +320,7 @@ export default function MarketIntelligence() {
                         color: 'var(--gold)',
                         fontSize: 12,
                         fontWeight: 600,
+                        cursor: 'pointer',
                       }}
                     >
                       #{topic.replace(/\s+/g, '').toLowerCase()}

@@ -324,9 +324,21 @@ export const getAssessment = async (req: Request, res: Response): Promise<void> 
 
 // ── 5.  POST /api/v1/ai/predict-career ────────────────────────────────────────
 export const predictCareer = async (req: Request, res: Response): Promise<void> => {
-  const { skills = [], interests = [], education = '' } = req.body;
+  const { skills = [], interests = [], education = '', program = '' } = req.body;
   const user = req.user as any;
   const userId = user?._id || user?.id;
+
+  let effectiveProgram = program || education;
+  if (!effectiveProgram && userId) {
+    try {
+      const studentDoc = await Student.findOne({ userId }).select('program');
+      if (studentDoc?.program) {
+        effectiveProgram = studentDoc.program;
+      }
+    } catch {
+      // non-blocking
+    }
+  }
 
   const formattedSkills = Array.isArray(skills)
     ? skills.map((s) => (typeof s === 'string' ? { skill: s, score: 80 } : s))
@@ -336,7 +348,7 @@ export const predictCareer = async (req: Request, res: Response): Promise<void> 
     const prediction = await aiService.matchCareerPaths({
       skills: formattedSkills,
       interests: Array.isArray(interests) ? interests : [interests].filter(Boolean),
-      program: education || 'Computer Science & Engineering',
+      program: effectiveProgram,
     });
 
     // Save to CareerPrediction collection

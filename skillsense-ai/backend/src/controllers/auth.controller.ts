@@ -81,10 +81,11 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
     if (user.role === 'student') {
       try {
         const Student = (await import('../models/Student.model')).default;
+        const requestedProgram = (req.body.program as string)?.trim() || 'General Engineering & Applied Sciences';
         await Student.create({
           userId: user._id,
           enrollmentNumber: `SKP-${user._id.toString().slice(-6).toUpperCase()}`,
-          program: 'Full-Stack Software Engineering',
+          program: requestedProgram,
           nsqfLevel: 5,
           state: 'Maharashtra',
           gender: 'male',

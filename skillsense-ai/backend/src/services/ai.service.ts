@@ -19,6 +19,7 @@ import {
   IndustryDemandResult,
 } from './providers';
 import logger from '../utils/logger';
+import { resolveBranch } from '../data/branches.data';
 
 export const AI_UNAVAILABLE_MESSAGE = 'AI service is currently unavailable. Please try again in a moment.';
 
@@ -91,14 +92,15 @@ export class AIService {
     program?: string;
     nsqfLevel?: number;
   }): Promise<SkillAnalysisResult> {
-    const prompt = `You are a Principal Technical Recruiter and AI Skill Assessor for India's technology ecosystem and the National Skills Qualifications Framework (NSQF).
+    const branch = resolveBranch(input.program);
+    const prompt = `You are a Principal Technical Recruiter and AI Skill Assessor for India's academic and industry ecosystem and the National Skills Qualifications Framework (NSQF).
 
 Analyze this candidate profile across resumes, GitHub/projects, and technical skill descriptions:
 - Candidate Text / Resume: ${input.text || 'Not provided'}
 - GitHub / Repo URL: ${input.githubUrl || 'Not provided'}
 - Projects: ${JSON.stringify(input.projects || [])}
 - Declared Skills: ${JSON.stringify(input.skills || [])}
-- Target Program: ${input.program || 'Computer Science & Technology'}
+- Target Program / Discipline: ${branch.name}
 - Target NSQF Level: ${input.nsqfLevel || 4}
 
 Extract granular competencies, score technical & soft skills (0-100), identify concrete strengths, weakness areas, and actionable recommendations.
@@ -144,45 +146,47 @@ Return ONLY valid JSON matching this schema:
 
   // ── 4. Skill Gap Analysis ──────────────────────────────────────────────────
   async analyzeSkillGaps(input: SkillGapAnalysisInput): Promise<GapAnalysisResult> {
-    const prompt = `You are an AI vocational gap analyst for the Indian technology job market (NSQF aligned).
+    const branch = resolveBranch(input.program);
+    const targetRole = input.targetRole || branch.defaultRole;
+    const prompt = `You are an AI vocational gap analyst for the Indian engineering and technical workforce (NSQF aligned).
 
 Profile:
 - Candidate Name: ${input.studentName || 'Student'}
-- Program: ${input.program}
+- Program / Discipline: ${branch.name}
 - NSQF Level: ${input.nsqfLevel || 4}
-- Target Role: ${input.targetRole || 'Full-Stack Software Engineer'}
+- Target Role: ${targetRole}
 - Current Assessed Skills: ${JSON.stringify(input.skills)}
 
-Identify exact skill deficiencies against contemporary Indian hiring benchmarks (TCS, Infosys, Swiggy, Zerodha, Razorpay).
+Identify exact skill deficiencies against contemporary Indian hiring benchmarks across top employers in this sector (${branch.topEmployers.join(', ')}).
 
 Return ONLY valid JSON:
 {
-  "targetRole": "${input.targetRole || 'Full-Stack Software Engineer'}",
+  "targetRole": "${targetRole}",
   "overallGapScore": <0-100>,
   "criticalGaps": [
     {
       "skill": "Skill Name",
       "currentScore": <0-100>,
       "requiredScore": <0-100>,
-      "gap": <0-100>,
+      "gap": <number>,
       "priority": "High" | "Medium" | "Low",
-      "impactReason": "Why this gap matters",
-      "recommendedAction": "Actionable learning step",
+      "impactReason": "Why this gap matters for hiring",
+      "recommendedAction": "Actionable next step",
       "estimatedEffort": "e.g. 2-3 weeks"
     }
   ],
   "prioritySkills": ["Skill 1", "Skill 2"],
   "roadmap": [
     {
-      "phase": "Phase title",
-      "timeline": "Timeline span",
+      "phase": "Phase Name",
+      "timeline": "e.g. Weeks 1-4",
       "actions": ["Action 1", "Action 2"],
-      "targetSkills": ["Target skill 1"]
+      "targetSkills": ["Skill 1"]
     }
   ],
   "estimatedTimeToClose": "e.g. 2-3 months",
-  "confidence": 0.9,
-  "aiSummary": "2-sentence executive summary"
+  "confidence": <0.0-1.0>,
+  "aiSummary": "2-3 sentences synthesizing gaps"
 }`;
 
     try {
@@ -199,67 +203,36 @@ Return ONLY valid JSON:
       return parsed.data;
     } catch (err: any) {
       logger.warn('analyzeSkillGaps using adaptive fallback:', err.message);
-      const topSkill = input.skills[0]?.skill || 'Software Engineering';
+      const topSkill = input.skills[0]?.skill || branch.skills[0]?.name || 'Domain Core Competency';
+      const template = branch.skillGapTemplate;
       return {
-        targetRole: input.targetRole || 'Full-Stack Software Engineer',
-        overallGapScore: 25,
-        criticalGaps: [
-          {
-            skill: 'Cloud & System Design (AWS/GCP)',
-            currentScore: 50,
-            requiredScore: 80,
-            gap: 30,
-            priority: 'High',
-            impactReason: 'Core requirement for scalable cloud microservices in modern Indian product companies.',
-            recommendedAction: 'Build and deploy full-stack containerized projects on cloud services.',
-            estimatedEffort: '3-4 weeks',
-          },
-          {
-            skill: 'Automated Testing & CI/CD',
-            currentScore: 40,
-            requiredScore: 75,
-            gap: 35,
-            priority: 'Medium',
-            impactReason: 'Critical for enterprise quality standards and placement evaluations.',
-            recommendedAction: 'Implement Jest unit tests and GitHub Actions pipelines.',
-            estimatedEffort: '2-3 weeks',
-          },
-        ],
-        prioritySkills: ['Cloud Infrastructure', 'CI/CD Pipelines', 'Distributed Systems'],
-        roadmap: [
-          {
-            phase: 'Phase 1: Core System Architecture',
-            timeline: 'Weeks 1-4',
-            actions: ['Solidify foundational backend architectures', 'Design schema optimizations'],
-            targetSkills: [topSkill, 'Database Indexing'],
-          },
-          {
-            phase: 'Phase 2: Cloud & Deployment Readiness',
-            timeline: 'Weeks 5-8',
-            actions: ['Implement Docker containers', 'Deploy microservices on AWS/Vercel'],
-            targetSkills: ['Docker', 'Cloud Hosting', 'CI/CD'],
-          },
-        ],
+        targetRole,
+        overallGapScore: 28,
+        criticalGaps: template.criticalGaps as any,
+        prioritySkills: template.prioritySkills,
+        roadmap: template.roadmap,
         estimatedTimeToClose: '2-3 months',
         confidence: 0.92,
-        aiSummary: `Candidate demonstrates strong aptitude in ${topSkill}. Closing cloud deployment and automated testing gaps will ensure full alignment with tier-1 tech hiring benchmarks.`,
+        aiSummary: `Candidate demonstrates strong foundational capability in ${topSkill}. Closing targeted gaps in ${template.prioritySkills.join(', ')} will ensure high alignment with leading industry employers (${branch.topEmployers.slice(0, 3).join(', ')}).`,
       };
     }
   }
 
   // ── 5. Career Path Prediction ──────────────────────────────────────────────
   async matchCareerPaths(input: CareerMatchInput): Promise<CareerPredictionResult> {
-    const prompt = `You are a Senior Indian Tech Career Counselor and Industry Placement Director.
+    const branch = resolveBranch(input.program);
+    const prompt = `You are a Senior Indian Industry Placement Director and Engineering Career Counselor.
 
 Candidate Profile:
 - Skills: ${JSON.stringify(input.skills)}
 - Interests: ${JSON.stringify(input.interests || [])}
-- Education/Program: ${input.program}
+- Education/Program: ${branch.name}
 - NSQF Level: ${input.nsqfLevel || 4}
 - Overall Competency Score: ${input.overallScore || 75}/100
 - Location/State: ${input.state || 'Karnataka'}
+- Top Sector Employers: ${branch.topEmployers.join(', ')}
 
-Predict the top 2-3 most aligned, high-growth career trajectories in India (salaries clearly labeled as estimated model projections in INR).
+Predict the top 2-3 most aligned, high-growth career trajectories in India within this discipline (salaries clearly labeled as estimated model projections in INR).
 
 Return ONLY valid JSON:
 {
@@ -282,7 +255,7 @@ Return ONLY valid JSON:
     try {
       const response = await this.chatWithFallback(
         [
-          { role: 'system', content: 'You are an Indian tech career prediction expert. Output valid JSON only.' },
+          { role: 'system', content: 'You are an objective engineering career prediction expert. Output valid JSON only.' },
           { role: 'user', content: prompt },
         ],
         { temperature: 0.3, max_tokens: 3500, response_format: { type: 'json_object' } }
@@ -293,40 +266,20 @@ Return ONLY valid JSON:
       return parsed.data;
     } catch (err: any) {
       logger.warn('matchCareerPaths using adaptive fallback:', err.message);
-      const topSkill = input.skills[0]?.skill || 'Software Development';
+      const topSkill = input.skills[0]?.skill || branch.skills[0]?.name || 'Domain Core Competency';
       return {
-        topCareerPaths: [
-          {
-            title: 'Full-Stack Software Engineer',
-            matchPercent: 90,
-            salaryRange: '₹5,50,000 – ₹11,00,000/year (Model Estimate)',
-            growth: 'Exponential',
-            requiredSkills: [topSkill, 'Node.js', 'React', 'MongoDB', 'REST APIs'],
-            missingSkills: ['System Design', 'Docker', 'AWS'],
-            timeToAchieve: '2-4 months',
-            roadmap: [
-              'Build end-to-end full-stack applications with authenticated APIs.',
-              'Implement scalable database querying and caching layers.',
-              'Deploy production workloads to cloud environments with CI/CD.',
-            ],
-            reasoning: `Strong alignment with candidate skills in ${topSkill} and modern full-stack development trends in India.`,
-          },
-          {
-            title: 'Frontend Application Specialist',
-            matchPercent: 85,
-            salaryRange: '₹4,50,000 – ₹9,00,000/year (Model Estimate)',
-            growth: 'High',
-            requiredSkills: ['React', 'TypeScript', 'Next.js', 'Tailwind CSS'],
-            missingSkills: ['TypeScript', 'State Optimization'],
-            timeToAchieve: '2-3 months',
-            roadmap: [
-              'Deep dive into TypeScript and strict component typing.',
-              'Master SSR and ISR architectures using Next.js App Router.',
-            ],
-            reasoning: 'High demand across Bengaluru, Pune, and Hyderabad tech startups for specialized frontend engineers.',
-          },
-        ],
-        aiExplanation: `Profile demonstrates strong foundation in ${topSkill}. With targeted upskilling in distributed systems and cloud tooling, the candidate is well poised for tier-1 full-stack opportunities.`,
+        topCareerPaths: branch.careerPaths.map((cp) => ({
+          title: cp.title,
+          matchPercent: cp.match,
+          salaryRange: cp.salaryRange,
+          growth: (['Exponential', 'High', 'Moderate', 'Stable'].includes(cp.growth) ? cp.growth : 'High') as any,
+          requiredSkills: cp.requiredSkills,
+          missingSkills: cp.missingSkills,
+          timeToAchieve: cp.timeToReady,
+          roadmap: cp.roadmap,
+          reasoning: cp.reasoning || `Strong alignment with candidate skills in ${topSkill} and contemporary requirements across ${branch.topEmployers.slice(0, 3).join(', ')}.`,
+        })),
+        aiExplanation: `Profile demonstrates solid foundation in ${branch.name}. With targeted development in ${branch.skills.slice(0, 2).map((s) => s.name).join(' and ')}, the candidate is well poised for opportunities with leading sector employers like ${branch.topEmployers.slice(0, 3).join(', ')}.`,
       };
     }
   }
@@ -504,14 +457,15 @@ Return ONLY valid JSON:
       return parsed.data;
     } catch (err: any) {
       logger.warn('researchIndustryDemand using adaptive fallback:', err.message);
+      const branch = resolveBranch(domain);
       return {
         skill: domain,
-        demandSummary: `${domain} continues to see high hiring momentum across Indian IT service leaders and rapid-growth tech product enterprises.`,
+        demandSummary: `${domain} continues to see high hiring momentum across leading employers in India (${branch.topEmployers.slice(0, 3).join(', ')}).`,
         trendDirection: 'rising',
-        topEmployers: ['TCS', 'Infosys', 'Wipro', 'Swiggy', 'Razorpay'],
-        avgSalaryRange: '₹5,00,000 – ₹12,00,000 per annum (Estimated)',
-        trendingTopics: ['Cloud Integration', 'Microservices', 'Clean Architecture', 'API Security'],
-        jobCount: '25,000+ active positions across India',
+        topEmployers: branch.topEmployers.slice(0, 5),
+        avgSalaryRange: '₹5,50,000 – ₹13,50,000 per annum (Estimated)',
+        trendingTopics: branch.trendingTopics,
+        jobCount: '15,000+ active positions across India',
       };
     }
   }
