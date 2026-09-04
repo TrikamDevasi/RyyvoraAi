@@ -29,7 +29,7 @@ const updateStudentSchema = z.object({
   program: z.string().optional(),
   gender: z.enum(['male', 'female', 'other']).optional(),
   nsqfLevel: z.number().int().min(1).max(8).optional(),
-  placementStatus: z.enum(['seeking', 'placed', 'not_seeking']).optional(),
+  placementStatus: z.enum(['studying', 'placed', 'seeking', 'higher_education']).optional(),
   company: z.string().optional(),
   salary: z.number().optional(),
 }).strict().partial();
@@ -172,11 +172,7 @@ export const submitAssessment = async (req: Request, res: Response, next: NextFu
       });
     }
     
-    if (student.skills.length > 0) {
-      student.overallScore = Math.round(
-        student.skills.reduce((sum: number, s: any) => sum + (s.score || 0), 0) / student.skills.length
-      );
-    }
+    // overallScore is a virtual getter computed from skills — no manual assignment needed
 
     await student.save();
 
@@ -275,7 +271,7 @@ export const analyzeStudentSkills = async (req: Request, res: Response, next: Ne
         }
       }
 
-      student.overallScore = analysis.overallScore;
+      // overallScore is a virtual getter computed from skills — no manual assignment needed
       student.careerPathways = analysis.recommendations;
       await student.save();
     }
