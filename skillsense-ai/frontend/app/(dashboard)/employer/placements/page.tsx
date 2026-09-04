@@ -26,7 +26,6 @@ import { FadeIn } from '@/components/shared/FadeIn';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { AIBadge } from '@/components/ui/AIBadge';
 import toast from 'react-hot-toast';
-import confetti from 'canvas-confetti';
 
 interface PlacementRecord {
   id: string;
@@ -210,13 +209,7 @@ export default function EmployerPlacementsPage() {
     setDrives((prev) => [newDrive, ...prev]);
     setShowCreateModal(false);
     setNewDriveTitle('');
-    confetti({
-      particleCount: 50,
-      spread: 60,
-      origin: { y: 0.6 },
-      colors: ['#f59e0b', '#10b981'],
-    });
-    toast.success('New Placement Hiring Drive published across Maharashtra ITI network!');
+    toast.success('New placement hiring drive published across verified network.');
   };
 
   const handleExportCSV = () => {

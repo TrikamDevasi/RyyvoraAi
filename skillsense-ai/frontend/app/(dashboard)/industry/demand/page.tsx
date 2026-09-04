@@ -261,16 +261,17 @@ export default function DemandPage() {
             <div style={{ height: 240, width: '100%' }}>
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-                  <XAxis dataKey="name" stroke="#64748b" tick={{ fontSize: 10.5 }} />
-                  <YAxis stroke="#64748b" tick={{ fontSize: 10.5 }} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" strokeOpacity={0.6} />
+                  <XAxis dataKey="name" stroke="var(--text-muted)" tick={{ fontSize: 10.5 }} />
+                  <YAxis stroke="var(--text-muted)" tick={{ fontSize: 10.5 }} />
                   <Tooltip
                     contentStyle={{
-                      background: '#0f111a',
-                      border: '1px solid rgba(245,158,11,0.3)',
+                      background: 'var(--bg-surface)',
+                      border: '1px solid var(--border)',
                       borderRadius: 8,
                       fontSize: 12,
-                      color: '#fff',
+                      color: 'var(--text-primary)',
+                      boxShadow: 'var(--shadow-md)',
                     }}
                   />
                   <Bar dataKey="Demand" fill="var(--gold)" radius={[4, 4, 0, 0]} name="Demand Index" />
@@ -284,14 +285,14 @@ export default function DemandPage() {
           <div className="card-linear" style={{ padding: 22, borderRadius: 16 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
               <div>
-                <h3 className="font-display" style={{ fontSize: 15, fontWeight: 800, color: '#f8fafc', margin: 0 }}>
+                <h3 className="font-display" style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>
                   24-Month Median CTC Trajectory (₹ LPA)
                 </h3>
                 <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '2px 0 0' }}>
                   Macro salary acceleration for verified NSQF graduates.
                 </p>
               </div>
-              <span style={{ fontSize: 11, color: '#10b981', fontWeight: 700 }}>+41% Total Climb</span>
+              <span style={{ fontSize: 11, color: '#10b981', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>+41% Total Climb</span>
             </div>
 
             <div style={{ height: 240, width: '100%' }}>
@@ -303,16 +304,17 @@ export default function DemandPage() {
                       <stop offset="95%" stopColor="#10b981" stopOpacity={0.0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-                  <XAxis dataKey="quarter" stroke="#64748b" tick={{ fontSize: 10 }} />
-                  <YAxis stroke="#64748b" tick={{ fontSize: 10.5 }} domain={[5, 12]} unit="L" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" strokeOpacity={0.6} />
+                  <XAxis dataKey="quarter" stroke="var(--text-muted)" tick={{ fontSize: 10 }} />
+                  <YAxis stroke="var(--text-muted)" tick={{ fontSize: 10.5 }} domain={[5, 12]} unit="L" />
                   <Tooltip
                     contentStyle={{
-                      background: '#0f111a',
-                      border: '1px solid rgba(16,185,129,0.3)',
+                      background: 'var(--bg-surface)',
+                      border: '1px solid var(--border)',
                       borderRadius: 8,
                       fontSize: 12,
-                      color: '#fff',
+                      color: 'var(--text-primary)',
+                      boxShadow: 'var(--shadow-md)',
                     }}
                   />
                   <Area type="monotone" dataKey="medianSalary" stroke="#10b981" fill="url(#wageGrad)" strokeWidth={2.5} name="Median Package (LPA)" />

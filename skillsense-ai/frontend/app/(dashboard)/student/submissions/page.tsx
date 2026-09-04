@@ -4,10 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { studentApi, StudentProfile } from '@/lib/api/student.api';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Sparkles, CheckCircle2, Code2 } from 'lucide-react';
+import { CheckCircle2, Code2, Send } from 'lucide-react';
 import toast from 'react-hot-toast';
-
-const GOLD = '#D4A843';
 
 export default function StudentSubmissionsPage() {
     const [profile, setProfile] = useState<StudentProfile | null>(null);
@@ -48,15 +46,14 @@ export default function StudentSubmissionsPage() {
             setLastScore(score);
 
             // Record assessment submission
-            if (profile?._id) {
-                await studentApi.submitAssessment(profile._id, {
-                    category: title,
-                    responses: [{ title, repoUrl, description, submittedAt: new Date().toISOString() }],
-                    score,
-                });
-            }
+            await studentApi.submitAssessmentDirect({
+                category: title,
+                score,
+                totalQuestions: 10,
+                aiAnalysis: analysis,
+            });
 
-            toast.success(`Project evaluated! AI Competency Score: ${score}%`);
+            toast.success(`Assessment submitted! Score: ${score}% recorded to Skill Passport.`);
             setTitle('');
             setRepoUrl('');
             setDescription('');
@@ -65,72 +62,72 @@ export default function StudentSubmissionsPage() {
             const updated = await studentApi.getMyProfile();
             setProfile(updated);
         } catch (err: any) {
-            toast.error(err.response?.data?.message || 'Failed to submit and evaluate project');
+            toast.error(err?.response?.data?.message || err?.message || 'Failed to submit project for evaluation.');
         } finally {
             setSubmitting(false);
         }
     };
-
-    const assessments = profile?.skills || [];
+    const assessments = (profile?.skills as any[]) || [];
 
     return (
         <ErrorBoundary>
-            <div style={{ color: '#fff', maxWidth: 900 }}>
-                <div style={{ marginBottom: 24 }}>
-                    <h1 className="font-display" style={{ fontSize: 24, fontWeight: 800, margin: 0 }}>
-                        My Project <span style={{ color: GOLD }}>Submissions</span>
+            <div style={{ color: 'var(--text-primary)', maxWidth: 840, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 24 }}>
+                {/* Header */}
+                <div>
+                    <h1 className="font-display" style={{ fontSize: 24, fontWeight: 700, margin: 0, color: 'var(--text-primary)' }}>
+                        Project & Practical Submissions
                     </h1>
-                    <p style={{ color: '#64748b', fontSize: 14, marginTop: 4 }}>
-                        Submit real-world projects and code repositories for neural skill verification and portfolio grading.
+                    <p style={{ color: 'var(--text-secondary)', fontSize: 13.5, marginTop: 4 }}>
+                        Submit practical projects and code repositories for objective skill verification and credential assessment.
                     </p>
                 </div>
 
                 {loading ? (
                     <Skeleton height={150} width="100%" />
                 ) : (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
                         {/* Submission Form Card */}
-                        <div style={{ padding: 20, background: 'rgba(255,255,255,0.02)', borderRadius: 14, border: '1px solid rgba(245,158,11,0.2)' }}>
-                            <h3 style={{ fontSize: 16, fontWeight: 700, color: '#fff', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
-                                <Code2 size={18} color={GOLD} /> Submit Practical Project or GitHub Repository
+                        <div style={{ padding: 22, background: 'var(--bg-surface)', borderRadius: 10, border: '1px solid var(--border)' }}>
+                            <h3 style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 14, display: 'flex', alignItems: 'center', gap: 8 }}>
+                                <Code2 size={18} color="var(--gold)" /> Submit Practical Project or Repository
                             </h3>
 
                             {lastScore !== null && (
-                                <div style={{ padding: 12, background: 'rgba(34,197,94,0.12)', border: '1px solid #22c55e', borderRadius: 8, color: '#86efac', marginBottom: 16, fontSize: 13, display: 'flex', alignItems: 'center', gap: 8 }}>
-                                    <CheckCircle2 size={16} /> Latest submission evaluated! AI Score: <strong>{lastScore}%</strong> (Synced to digital passport)
+                                <div style={{ padding: 12, background: 'var(--success-bg)', border: '1px solid var(--success-border)', borderRadius: 8, color: 'var(--success)', marginBottom: 16, fontSize: 13, display: 'flex', alignItems: 'center', gap: 8 }}>
+                                    <CheckCircle2 size={16} /> Latest submission evaluated: Score <strong>{lastScore}%</strong> (Synced to digital passport)
                                 </div>
                             )}
 
-                            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                                 <div>
-                                    <label style={{ display: 'block', fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>Project Title / Key Competency</label>
+                                    <label style={{ display: 'block', fontSize: 12, fontWeight: 650, color: 'var(--text-secondary)', marginBottom: 4 }}>Project Title / Key Competency</label>
                                     <input
                                         type="text"
                                         value={title}
                                         onChange={e => setTitle(e.target.value)}
-                                        placeholder="e.g. Microservices Auth Service & Docker Pipeline"
+                                        placeholder="e.g. Solar PV Microgrid Synchronization Controller"
                                         required
-                                        style={{ width: '100%', padding: '10px 14px', borderRadius: 8, background: '#0d0a1a', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', fontSize: 13 }}
+                                        style={{ width: '100%', padding: '9px 12px', borderRadius: 6, background: 'var(--bg-surface-elevated)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 13 }}
                                     />
                                 </div>
                                 <div>
-                                    <label style={{ display: 'block', fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>GitHub / Project URL (Optional)</label>
+                                    <label style={{ display: 'block', fontSize: 12, fontWeight: 650, color: 'var(--text-secondary)', marginBottom: 4 }}>Repository / Project URL (Optional)</label>
                                     <input
                                         type="url"
                                         value={repoUrl}
                                         onChange={e => setRepoUrl(e.target.value)}
                                         placeholder="https://github.com/your-username/project-name"
-                                        style={{ width: '100%', padding: '10px 14px', borderRadius: 8, background: '#0d0a1a', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', fontSize: 13 }}
+                                        style={{ width: '100%', padding: '9px 12px', borderRadius: 6, background: 'var(--bg-surface-elevated)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 13 }}
                                     />
                                 </div>
                                 <div>
-                                    <label style={{ display: 'block', fontSize: 12, color: '#94a3b8', marginBottom: 4 }}>Description & Architecture Notes</label>
+                                    <label style={{ display: 'block', fontSize: 12, fontWeight: 650, color: 'var(--text-secondary)', marginBottom: 4 }}>Description & Implementation Notes</label>
                                     <textarea
                                         value={description}
                                         onChange={e => setDescription(e.target.value)}
-                                        placeholder="Briefly explain the libraries, database schema, APIs, and tests implemented in this project..."
+                                        placeholder="Explain the technical specifications, standards, and tests implemented..."
                                         rows={3}
-                                        style={{ width: '100%', padding: '10px 14px', borderRadius: 8, background: '#0d0a1a', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', fontSize: 13, resize: 'vertical' }}
+                                        style={{ width: '100%', padding: '9px 12px', borderRadius: 6, background: 'var(--bg-surface-elevated)', border: '1px solid var(--border)', color: 'var(--text-primary)', fontSize: 13, resize: 'vertical' }}
                                     />
                                 </div>
                                 <button
@@ -138,40 +135,65 @@ export default function StudentSubmissionsPage() {
                                     disabled={submitting || !title.trim()}
                                     className="btn-gold"
                                     style={{
-                                        alignSelf: 'flex-start', padding: '10px 24px', fontSize: 13, fontWeight: 700,
+                                        alignSelf: 'flex-start', padding: '8px 20px', fontSize: 12.5, fontWeight: 650,
                                         display: 'flex', alignItems: 'center', gap: 6, cursor: submitting ? 'not-allowed' : 'pointer',
-                                        opacity: submitting ? 0.7 : 1, marginTop: 4,
+                                        opacity: submitting ? 0.7 : 1, marginTop: 4, borderRadius: 6,
                                     }}
                                 >
-                                    {submitting ? 'Analyzing & Scoring...' : <><Sparkles size={14} /> Submit for AI Neural Evaluation</>}
+                                    {submitting ? 'Evaluating Submission...' : <><Send size={14} /> Submit Assessment for Automated Grading</>}
                                 </button>
                             </form>
                         </div>
 
                         {/* Submissions List */}
-                        <div style={{ padding: 20, background: 'rgba(255,255,255,0.02)', borderRadius: 14, border: '1px solid rgba(255,255,255,0.08)' }}>
-                            <h3 style={{ fontSize: 16, fontWeight: 700, color: '#fff', marginBottom: 16 }}>
+                        <div style={{ padding: 22, background: 'var(--bg-surface)', borderRadius: 10, border: '1px solid var(--border)' }}>
+                            <h3 style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', marginBottom: 14 }}>
                                 Evaluated Skills & Verified Ledgers ({assessments.length})
                             </h3>
                             {assessments.length === 0 ? (
-                                <p style={{ color: '#64748b', fontSize: 13 }}>No submissions evaluated yet. Complete an assessment or submit a project above.</p>
+                                <p style={{ color: 'var(--text-muted)', fontSize: 13 }}>No submissions evaluated yet. Complete an assessment or submit a project above.</p>
                             ) : (
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                                     {assessments.map((a: any, idx: number) => (
-                                        <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: 14, background: 'rgba(255,255,255,0.02)', borderRadius: 8, border: '1px solid rgba(255,255,255,0.05)' }}>
+                                        <div
+                                            key={a._id || idx}
+                                            style={{
+                                                padding: '12px 16px',
+                                                borderRadius: 6,
+                                                background: 'var(--bg-surface-elevated)',
+                                                border: '1px solid var(--border)',
+                                                display: 'flex',
+                                                justifyContent: 'space-between',
+                                                alignItems: 'center',
+                                                gap: 12,
+                                                flexWrap: 'wrap',
+                                            }}
+                                        >
                                             <div>
-                                                <div style={{ fontWeight: 700, fontSize: 14, color: '#fff' }}>
-                                                    {typeof a.skillId === 'object' && a.skillId?.name ? a.skillId.name : `Technical Module ${idx + 1}`}
+                                                <div style={{ fontWeight: 650, fontSize: 13, color: 'var(--text-primary)' }}>
+                                                    {a.title || (typeof a.skillId === 'object' && a.skillId?.name ? a.skillId.name : `Technical Module ${idx + 1}`)}
                                                 </div>
-                                                <div style={{ fontSize: 11, color: '#64748b', marginTop: 2 }}>
-                                                    Assessed: {new Date(a.lastAssessed || Date.now()).toLocaleDateString()}
+                                                <div style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 2 }}>
+                                                    {a.date || a.lastAssessed ? new Date(a.date || a.lastAssessed).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Verified Credential'}
                                                 </div>
                                             </div>
-                                            <div style={{ textAlign: 'right' }}>
-                                                <span style={{ fontSize: 13, fontWeight: 800, color: GOLD, background: 'rgba(245,158,11,0.15)', padding: '4px 10px', borderRadius: 99 }}>
-                                                    Score: {a.score}%
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                                                <span
+                                                    style={{
+                                                        fontSize: 11,
+                                                        fontWeight: 700,
+                                                        padding: '2px 8px',
+                                                        borderRadius: 4,
+                                                        background: a.status === 'PASSED' ? 'var(--success-bg)' : 'var(--error-bg)',
+                                                        color: a.status === 'PASSED' ? 'var(--success)' : 'var(--error)',
+                                                        border: `1px solid ${a.status === 'PASSED' ? 'var(--success-border)' : 'var(--error-border)'}`,
+                                                    }}
+                                                >
+                                                    {a.status}
                                                 </span>
-                                                <div style={{ fontSize: 11, color: '#22c55e', marginTop: 4 }}>✓ Verified</div>
+                                                <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--gold)', fontVariantNumeric: 'tabular-nums' }}>
+                                                    {a.score}%
+                                                </span>
                                             </div>
                                         </div>
                                     ))}

@@ -106,7 +106,7 @@ export function QuickTipsSegment() {
                 gap: 5,
               }}
             >
-              <Sparkles size={12} /> Explore All Features
+              <Compass size={12} /> Explore Platform Features
             </button>
 
             <button

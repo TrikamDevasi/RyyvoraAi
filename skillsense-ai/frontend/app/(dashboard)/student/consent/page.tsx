@@ -29,7 +29,6 @@ import { FadeIn } from '@/components/shared/FadeIn';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { AIBadge } from '@/components/ui/AIBadge';
 import toast from 'react-hot-toast';
-import confetti from 'canvas-confetti';
 
 interface ConsentHistoryItem {
   action: string;
@@ -165,13 +164,7 @@ export default function TraineeConsentPage() {
       }));
 
       if (newStatus === 'GRANTED') {
-        confetti({
-          particleCount: 50,
-          spread: 60,
-          origin: { y: 0.6 },
-          colors: ['#f59e0b', '#10b981'],
-        });
-        toast.success('DPDP Act 2023 Consent Preferences Saved!');
+        toast.success('DPDP Act 2023 consent preferences updated.');
       } else {
         toast.success('All optional data processing consents withdrawn.');
       }

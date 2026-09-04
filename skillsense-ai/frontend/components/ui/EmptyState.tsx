@@ -26,43 +26,43 @@ export function EmptyState({
       style={{
         padding: '48px 24px',
         textAlign: 'center',
-        background: 'rgba(15,17,26,0.6)',
-        border: '1px dashed rgba(255,255,255,0.1)',
-        borderRadius: 14,
+        background: 'var(--bg-surface)',
+        border: '1px dashed var(--border)',
+        borderRadius: 10,
       }}
     >
       <div
         style={{
-          width: 48,
-          height: 48,
-          borderRadius: 12,
-          background: 'rgba(255,255,255,0.03)',
-          border: '1px solid rgba(255,255,255,0.08)',
+          width: 46,
+          height: 46,
+          borderRadius: 8,
+          background: 'var(--bg-surface-elevated)',
+          border: '1px solid var(--border)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           margin: '0 auto 16px',
-          color: '#94a3b8',
+          color: 'var(--text-muted)',
         }}
       >
         {icon || <Inbox size={22} />}
       </div>
 
-      <h4 style={{ fontSize: 16, fontWeight: 700, color: '#f8fafc', margin: 0 }}>
+      <h4 style={{ fontSize: 15, fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>
         {title}
       </h4>
-      <p style={{ color: '#64748b', fontSize: 13, marginTop: 6, maxWidth: 440, marginInline: 'auto', lineHeight: 1.5 }}>
+      <p style={{ color: 'var(--text-secondary)', fontSize: 13, marginTop: 6, maxWidth: 440, marginInline: 'auto', lineHeight: 1.5 }}>
         {description}
       </p>
 
       {(actionText && (actionHref || onAction)) && (
-        <div style={{ marginTop: 20 }}>
+        <div style={{ marginTop: 18 }}>
           {actionHref ? (
-            <Link href={actionHref} className="btn-gold" style={{ fontSize: 12.5, padding: '7px 18px' }}>
+            <Link href={actionHref} className="btn-gold" style={{ fontSize: 12.5, padding: '7px 18px', borderRadius: 6 }}>
               {actionText} <ArrowRight size={13} />
             </Link>
           ) : (
-            <button type="button" onClick={onAction} className="btn-gold" style={{ fontSize: 12.5, padding: '7px 18px' }}>
+            <button type="button" onClick={onAction} className="btn-gold" style={{ fontSize: 12.5, padding: '7px 18px', borderRadius: 6 }}>
               {actionText} <ArrowRight size={13} />
             </button>
           )}

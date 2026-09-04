@@ -29,7 +29,6 @@ import { FadeIn } from '@/components/shared/FadeIn';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { AIBadge } from '@/components/ui/AIBadge';
 import toast from 'react-hot-toast';
-import confetti from 'canvas-confetti';
 
 interface AccreditedInstitute {
   id: string;
@@ -167,13 +166,7 @@ export default function InstitutesPage() {
     setInstitutes((prev) =>
       prev.map((inst) => (inst.id === id ? { ...inst, isVerified: true } : inst))
     );
-    confetti({
-      particleCount: 50,
-      spread: 60,
-      origin: { y: 0.6 },
-      colors: ['#f59e0b', '#10b981'],
-    });
-    toast.success(`Accreditation sealed for ${instName}! State ledger key activated.`);
+    toast.success(`Accreditation verified for ${instName}. State ledger key activated.`);
   };
 
   const handleCreateInstitute = (e: React.FormEvent) => {
@@ -202,13 +195,7 @@ export default function InstitutesPage() {
       setShowModal(false);
       setName('');
       setLocation('');
-      confetti({
-        particleCount: 50,
-        spread: 60,
-        origin: { y: 0.6 },
-        colors: ['#f59e0b', '#10b981'],
-      });
-      toast.success(`Institution ${newInst.name} onboarded and accredited!`);
+      toast.success(`Institution ${newInst.name} onboarded and accredited.`);
     }, 800);
   };
 

@@ -5,11 +5,20 @@ export type { PlacementData } from '../data/samplePlacements';
 export type { SampleInstitution, ProgramROI } from '../data/sampleInstitutions';
 export type { FairnessMetrics, FairnessFlag } from '../data/sampleFairnessMetrics';
 
-// Chart-specific types
 export interface SkillGapEntry {
     skill: string;
     myLevel: number;
     industryReq: number;
+}
+
+export interface SkillGapAnalysis {
+    skill: string;
+    studentScore?: number;
+    marketBenchmark?: number;
+    myLevel?: number;
+    industryReq?: number;
+    gap?: number;
+    shortSkill?: string;
 }
 
 export interface ForecastEntry {

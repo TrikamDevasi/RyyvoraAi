@@ -31,7 +31,6 @@ import { FadeIn } from '@/components/shared/FadeIn';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { AIBadge } from '@/components/ui/AIBadge';
 import toast from 'react-hot-toast';
-import confetti from 'canvas-confetti';
 
 interface SystemUser {
   id: string;
@@ -183,13 +182,7 @@ export default function UsersPage() {
       setName('');
       setEmail('');
       setEntity('');
-      confetti({
-        particleCount: 50,
-        spread: 60,
-        origin: { y: 0.6 },
-        colors: ['#f59e0b', '#10b981'],
-      });
-      toast.success(`User ${newUser.name} provisioned with ${newUser.role} authorization!`);
+      toast.success(`User ${newUser.name} provisioned with ${newUser.role} authorization.`);
     }, 800);
   };
 

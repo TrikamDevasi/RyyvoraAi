@@ -31,7 +31,6 @@ import { FadeIn } from '@/components/shared/FadeIn';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { AIBadge } from '@/components/ui/AIBadge';
 import toast from 'react-hot-toast';
-import confetti from 'canvas-confetti';
 
 interface CandidateProfile {
   id: string;
@@ -184,13 +183,7 @@ export default function TalentPage() {
   };
 
   const handleConnectCandidate = (name: string) => {
-    confetti({
-      particleCount: 50,
-      spread: 60,
-      origin: { y: 0.6 },
-      colors: ['#f59e0b', '#10b981'],
-    });
-    toast.success(`Direct interview connection request dispatched to ${name}!`);
+    toast.success(`Interview connection request dispatched to ${name}.`);
     if (selectedCandidate) setSelectedCandidate(null);
   };
 

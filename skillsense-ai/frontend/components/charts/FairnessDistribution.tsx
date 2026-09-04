@@ -9,7 +9,6 @@ import {
     CartesianGrid,
     Tooltip,
     ResponsiveContainer,
-    Legend,
     ReferenceLine,
 } from 'recharts';
 import type { FairnessMetrics } from '../../types/charts';
@@ -19,9 +18,6 @@ interface Props {
 }
 
 const GOLD = '#F59E0B';
-const MUTED = '#94a3b8';
-const WHITE = '#FFFFFF';
-const AMBER = '#FBBF24';
 const WARN = '#ef4444';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -30,39 +26,39 @@ const CustomTooltip = ({ active, payload, label }: any) => {
         const gap = payload.length === 2 ? Math.abs((payload[0]?.value ?? 0) - (payload[1]?.value ?? 0)) : 0;
         return (
             <div style={{
-                background: 'rgba(10, 10, 20, 0.95)',
-                border: '1px solid rgba(212, 168, 67, 0.4)',
-                borderRadius: '10px',
-                padding: '12px 16px',
-                backdropFilter: 'blur(12px)',
-                boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+                background: 'var(--bg-surface)',
+                border: '1px solid var(--border)',
+                borderRadius: '8px',
+                padding: '10px 14px',
+                boxShadow: 'var(--shadow-md)',
                 minWidth: '180px'
             }}>
                 <p style={{
-                    color: '#F59E0B',
+                    color: 'var(--gold)',
                     fontWeight: 700,
-                    fontSize: '13px',
+                    fontSize: '12.5px',
                     marginBottom: '6px'
                 }}>{label}</p>
                 {payload.map((p: any, i: number) => (
                     <p key={i} style={{
-                        color: '#ffffff',
-                        fontSize: '13px',
+                        color: 'var(--text-primary)',
+                        fontSize: '12px',
                         margin: '2px 0'
                     }}>
-                        {p.name}: <span style={{ color: p.fill, fontWeight: 600 }}>{p.value?.toFixed(1)}</span>
+                        {p.name}: <span style={{ color: p.fill, fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>{p.value?.toFixed(1)}</span>
                     </p>
                 ))}
                 {payload.length === 2 && (
                     <p style={{
-                        color: gap > 10 ? WARN : gap > 5 ? '#f59e0b' : '#22c55e',
-                        fontSize: 12,
+                        color: gap > 10 ? WARN : gap > 5 ? '#f59e0b' : 'var(--success)',
+                        fontSize: 11.5,
                         marginTop: 8,
-                        borderTop: '1px solid rgba(255,255,255,0.1)',
-                        paddingTop: 8,
-                        fontWeight: 600
+                        borderTop: '1px solid var(--border)',
+                        paddingTop: 6,
+                        fontWeight: 600,
+                        fontVariantNumeric: 'tabular-nums'
                     }}>
-                        Gap: {gap.toFixed(1)}% {gap > 10 ? '(High Disparity)' : gap > 5 ? '(Medium)' : '(Healthy)'}
+                        Disparity Gap: {gap.toFixed(1)}% {gap > 10 ? '(High Disparity)' : gap > 5 ? '(Moderate)' : '(Compliant)'}
                     </p>
                 )}
             </div>
@@ -93,29 +89,29 @@ export default function FairnessDistribution({ data }: Props) {
                     margin={{ top: 20, right: 20, left: 10, bottom: 5 }}
                     barSize={28}
                 >
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.07)" vertical={false} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" strokeOpacity={0.6} vertical={false} />
                     <XAxis
                         dataKey="category"
-                        tick={{ fill: MUTED, fontSize: 12 }}
-                        axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
+                        tick={{ fill: 'var(--text-secondary)', fontSize: 11.5 }}
+                        axisLine={{ stroke: 'var(--border)' }}
                         tickLine={false}
                     />
                     <YAxis
                         domain={[50, 100]}
-                        tick={{ fill: MUTED, fontSize: 11 }}
+                        tick={{ fill: 'var(--text-muted)', fontSize: 11 }}
                         axisLine={false}
                         tickLine={false}
                     />
                     <Tooltip content={<CustomTooltip />} />
                     <ReferenceLine
                         y={avgScore}
-                        stroke={WHITE}
+                        stroke="var(--text-muted)"
                         strokeDasharray="4 2"
-                        strokeOpacity={0.3}
+                        strokeOpacity={0.5}
                         label={{
                             value: `Avg ${avgScore.toFixed(1)}`,
-                            fill: MUTED,
-                            fontSize: 10,
+                            fill: 'var(--text-secondary)',
+                            fontSize: 10.5,
                             position: 'insideTopRight',
                         }}
                     />

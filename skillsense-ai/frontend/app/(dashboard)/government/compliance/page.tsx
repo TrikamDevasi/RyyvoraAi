@@ -27,7 +27,6 @@ import { FadeIn } from '@/components/shared/FadeIn';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { AIBadge } from '@/components/ui/AIBadge';
 import toast from 'react-hot-toast';
-import confetti from 'canvas-confetti';
 
 interface ComplianceFramework {
   id: string;
@@ -121,13 +120,7 @@ export default function CompliancePage() {
     setScanning(true);
     setTimeout(() => {
       setScanning(false);
-      confetti({
-        particleCount: 60,
-        spread: 60,
-        origin: { y: 0.6 },
-        colors: ['#f59e0b', '#10b981'],
-      });
-      toast.success('Full Regulatory Compliance Audit Completed! Overall Index: 95.2%');
+      toast.success('Full Regulatory Compliance Audit Completed. Overall Index: 95.2%');
     }, 1200);
   };
 

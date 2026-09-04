@@ -28,7 +28,6 @@ import { FadeIn } from '@/components/shared/FadeIn';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { AIBadge } from '@/components/ui/AIBadge';
 import toast from 'react-hot-toast';
-import confetti from 'canvas-confetti';
 
 interface RegionalParityItem {
   division: string;
@@ -67,13 +66,7 @@ export default function FairnessPage() {
     setTimeout(() => {
       setScanningAudit(false);
       setAuditComplete(true);
-      confetti({
-        particleCount: 50,
-        spread: 60,
-        origin: { y: 0.6 },
-        colors: ['#f59e0b', '#10b981'],
-      });
-      toast.success('Algorithmic Disparate Impact Audit verified! All divisions meet the IEEE 7000 80% Parity Standard.');
+      toast.success('Algorithmic Disparate Impact Audit verified. All divisions meet the IEEE 7000 80% Parity Standard.');
     }, 1200);
   };
 

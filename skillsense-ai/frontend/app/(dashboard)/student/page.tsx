@@ -67,19 +67,19 @@ const DarkTooltip = ({ active, payload, label }: any) => {
     return (
       <div
         style={{
-          background: '#0f111a',
-          border: '1px solid rgba(245,158,11,0.3)',
+          background: 'var(--bg-surface)',
+          border: '1px solid var(--border)',
           borderRadius: 8,
           padding: '8px 12px',
-          boxShadow: '0 8px 24px rgba(0,0,0,0.6)',
+          boxShadow: 'var(--shadow-md)',
           fontSize: 12,
         }}
       >
-        <div style={{ color: '#f59e0b', fontWeight: 700, marginBottom: 4 }}>{label}</div>
+        <div style={{ color: 'var(--gold)', fontWeight: 700, marginBottom: 4 }}>{label}</div>
         {payload.map((item: any, i: number) => (
-          <div key={i} style={{ color: '#f8fafc', display: 'flex', justifyContent: 'space-between', gap: 12 }}>
-            <span style={{ color: '#94a3b8' }}>{item.name}:</span>
-            <span style={{ fontWeight: 700 }}>{item.value}%</span>
+          <div key={i} style={{ color: 'var(--text-primary)', display: 'flex', justifyContent: 'space-between', gap: 12 }}>
+            <span style={{ color: 'var(--text-muted)' }}>{item.name}:</span>
+            <span style={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{item.value}%</span>
           </div>
         ))}
       </div>

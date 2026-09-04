@@ -99,7 +99,7 @@ export const NAVIGATION_CONFIG: Record<string, NavGroup[]> = {
       routes: [
         { label: 'Student Roster', shortLabel: 'Students', mobileLabel: 'Trainees', href: '/institute/students', icon: Users },
         { label: 'Upload Batch Cohort', href: '/institute/upload', icon: FileCode, badge: 'BATCH' },
-        { label: 'AI Evaluations', shortLabel: 'Evaluations', mobileLabel: 'Assess', href: '/institute/evaluations', icon: Brain },
+        { label: 'Competency Evaluations', shortLabel: 'Evaluations', mobileLabel: 'Assess', href: '/institute/evaluations', icon: Brain },
       ],
     },
     {
@@ -110,9 +110,9 @@ export const NAVIGATION_CONFIG: Record<string, NavGroup[]> = {
       ],
     },
     {
-      group: 'Account & Billing',
+      group: 'Account & Quotas',
       routes: [
-        { label: 'Institute Profile', href: '/student/profile', icon: User },
+        { label: 'Institute Profile', href: '/institute/profile', icon: User },
         { label: 'Billing & Quotas', href: '/settings/billing', icon: CreditCard },
       ],
     },
@@ -131,22 +131,20 @@ export const NAVIGATION_CONFIG: Record<string, NavGroup[]> = {
       routes: [
         { label: 'Candidate Validations', shortLabel: 'Validations', mobileLabel: 'Validations', href: '/employer/validations', icon: Award, badge: 'LEDGER' },
         { label: 'Hired Placements', shortLabel: 'Placements', mobileLabel: 'Placements', href: '/employer/placements', icon: Briefcase },
-        { label: 'Feedback & Claims', href: '/employer/feedback', icon: FileCheck2 },
+        { label: 'Performance Feedback', href: '/employer/feedback', icon: FileCheck2 },
       ],
     },
     {
-      group: 'Talent & Campus',
+      group: 'Talent Acquisition',
       routes: [
         { label: 'Verified Talent Pool', shortLabel: 'Talent', mobileLabel: 'Talent', href: '/industry/talent', icon: Users, badge: 'VERIFIED' },
         { label: 'Campus Connect', href: '/industry/campus', icon: Building },
-        { label: 'Market Demand', href: '/industry/demand', icon: TrendingUp },
-        { label: 'Hiring News', href: '/industry/news', icon: Newspaper },
       ],
     },
     {
-      group: 'Account & Billing',
+      group: 'Account & Plan',
       routes: [
-        { label: 'Company Profile', href: '/student/profile', icon: User },
+        { label: 'Company Profile', href: '/employer/profile', icon: User },
         { label: 'Subscription & Tier', href: '/settings/billing', icon: CreditCard },
       ],
     },
@@ -156,30 +154,28 @@ export const NAVIGATION_CONFIG: Record<string, NavGroup[]> = {
     {
       group: 'Overview',
       routes: [
-        { label: 'Industry Cockpit', shortLabel: 'Cockpit', mobileLabel: 'Home', href: '/industry', icon: LayoutDashboard },
+        { label: 'Sector Intelligence Cockpit', shortLabel: 'Cockpit', mobileLabel: 'Home', href: '/industry', icon: LayoutDashboard },
       ],
     },
     {
-      group: 'Talent & Campus',
+      group: 'Workforce & Standards',
       routes: [
-        { label: 'Verified Candidates', shortLabel: 'Candidates', mobileLabel: 'Candidates', href: '/industry/talent', icon: Users, badge: 'VERIFIED' },
-        { label: 'Campus Drives', shortLabel: 'Campus', mobileLabel: 'Campus', href: '/industry/campus', icon: Building },
-        { label: 'Market Demand', shortLabel: 'Market', mobileLabel: 'Demand', href: '/industry/demand', icon: TrendingUp },
-        { label: 'Industry News', href: '/industry/news', icon: Newspaper },
+        { label: 'Market Demand & NOS', shortLabel: 'Demand', mobileLabel: 'Demand', href: '/industry/demand', icon: TrendingUp },
+        { label: 'Industry & Sector News', href: '/industry/news', icon: Newspaper },
       ],
     },
     {
-      group: 'Verification & Placements',
+      group: 'Talent & Institution Network',
       routes: [
-        { label: 'Candidate Validations', href: '/employer/validations', icon: Award },
-        { label: 'Placements Tracker', href: '/employer/placements', icon: Briefcase },
+        { label: 'Verified Candidate Pool', shortLabel: 'Candidates', mobileLabel: 'Candidates', href: '/industry/talent', icon: Users, badge: 'VERIFIED' },
+        { label: 'Campus Drives Network', shortLabel: 'Campus', mobileLabel: 'Campus', href: '/industry/campus', icon: Building },
       ],
     },
     {
-      group: 'Account & Billing',
+      group: 'Council Governance',
       routes: [
-        { label: 'Organization Profile', href: '/student/profile', icon: User },
-        { label: 'Enterprise Billing', href: '/settings/billing', icon: CreditCard },
+        { label: 'Sector Council Profile', href: '/industry/profile', icon: User },
+        { label: 'Enterprise Access', href: '/settings/billing', icon: CreditCard },
       ],
     },
   ],
@@ -216,7 +212,7 @@ export const NAVIGATION_CONFIG: Record<string, NavGroup[]> = {
     {
       group: 'Account & Security',
       routes: [
-        { label: 'Official Profile', href: '/student/profile', icon: User },
+        { label: 'Directorate Profile', href: '/government/profile', icon: User },
         { label: 'DPDP Security & Trust', href: '/student/consent', icon: Lock },
       ],
     },
@@ -248,7 +244,7 @@ export const NAVIGATION_CONFIG: Record<string, NavGroup[]> = {
     {
       group: 'Account & Billing',
       routes: [
-        { label: 'Administrator Profile', href: '/student/profile', icon: User },
+        { label: 'Administrator Profile', href: '/admin/profile', icon: User },
         { label: 'Platform Billing Engine', href: '/settings/billing', icon: CreditCard },
       ],
     },
