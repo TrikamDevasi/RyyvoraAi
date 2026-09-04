@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Cpu, RefreshCw, CheckCircle2, Circle } from 'lucide-react';
+import { CheckCircle2, Circle, Loader2, ShieldCheck } from 'lucide-react';
 
 interface ScanningStateProps {
   title?: string;
@@ -12,15 +12,14 @@ interface ScanningStateProps {
 }
 
 export function ScanningState({
-  title = 'Analyzing Skill Profile',
-  subtitle = 'Neural model extracting competencies against NSQF vocational taxonomy...',
+  title = 'Processing Competency Assessment',
+  subtitle = 'Benchmarking submitted competencies against NSQF vocational standards.',
   stage,
   stages = [
-    'Preparing Profile Input & Syntax Tokens',
-    'Extracting Technical & Soft Competencies',
-    'Aligning with NSQF National Framework',
-    'Benchmarking Active Industry Requisitions',
-    'Generating Cryptographic Verification Proof',
+    'Reading submission data',
+    'Identifying verified skill evidence',
+    'Mapping against NSQF Level benchmarks',
+    'Generating credential assessment summary',
   ],
   currentStageIndex = 1,
 }: ScanningStateProps) {
@@ -29,46 +28,40 @@ export function ScanningState({
       role="status"
       aria-live="polite"
       style={{
-        padding: '36px 24px',
-        borderRadius: 14,
-        background: 'rgba(15,17,26,0.95)',
-        border: '1px solid rgba(245,158,11,0.25)',
+        padding: '32px 24px',
+        borderRadius: 12,
+        background: 'var(--bg-surface)',
+        border: '1px solid var(--border)',
         textAlign: 'center',
         position: 'relative',
-        overflow: 'hidden',
+        boxShadow: 'var(--shadow-sm)',
       }}
     >
-      {/* Laser Scanning Indicator */}
-      <div
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: '2px',
-          background: 'linear-gradient(90deg, transparent, #f59e0b, transparent)',
-          animation: 'scan-line 2.5s ease-in-out infinite',
-        }}
-      />
-
       <div
         style={{
           width: 44,
           height: 44,
-          borderRadius: 12,
-          background: 'rgba(245,158,11,0.12)',
-          border: '1px solid rgba(245,158,11,0.25)',
+          borderRadius: 10,
+          background: 'var(--accent-glow)',
+          border: '1px solid var(--border-gold)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           margin: '0 auto 16px',
-          color: '#f59e0b',
+          color: 'var(--gold)',
         }}
       >
-        <RefreshCw size={22} className="animate-spin" />
+        <Loader2 size={22} className="animate-spin" aria-hidden="true" />
       </div>
 
-      <h4 style={{ fontSize: 16, fontWeight: 800, color: '#f8fafc', margin: 0 }}>
+      <h4
+        style={{
+          fontSize: 16,
+          fontWeight: 700,
+          color: 'var(--text-primary)',
+          margin: 0,
+        }}
+      >
         {title}
       </h4>
 
@@ -76,7 +69,7 @@ export function ScanningState({
         style={{
           color: 'var(--text-secondary)',
           fontSize: 13,
-          maxWidth: 520,
+          maxWidth: 480,
           margin: '8px auto 20px',
           lineHeight: 1.5,
         }}
@@ -84,17 +77,17 @@ export function ScanningState({
         {subtitle}
       </p>
 
-      {/* Progress Stages Ledger */}
+      {/* Structured Stepper */}
       <div
         style={{
-          maxWidth: 480,
+          maxWidth: 440,
           margin: '0 auto 16px',
           display: 'flex',
           flexDirection: 'column',
-          gap: 6,
+          gap: 8,
           textAlign: 'left',
-          background: 'rgba(255,255,255,0.02)',
-          padding: '12px 16px',
+          background: 'var(--bg-surface-elevated)',
+          padding: '14px 18px',
           borderRadius: 8,
           border: '1px solid var(--border)',
         }}
@@ -110,17 +103,31 @@ export function ScanningState({
                 display: 'flex',
                 alignItems: 'center',
                 gap: 10,
-                fontSize: 12,
-                color: isDone ? '#10b981' : isCurrent ? 'var(--gold)' : 'var(--text-muted)',
-                fontWeight: isCurrent ? 700 : 500,
+                fontSize: 12.5,
+                color: isDone
+                  ? 'var(--success)'
+                  : isCurrent
+                  ? 'var(--gold)'
+                  : 'var(--text-muted)',
+                fontWeight: isCurrent ? 600 : 450,
               }}
             >
               {isDone ? (
-                <CheckCircle2 size={13} color="#10b981" />
+                <CheckCircle2 size={14} color="var(--success)" aria-hidden="true" />
               ) : isCurrent ? (
-                <RefreshCw size={12} className="animate-spin" color="var(--gold)" />
+                <div
+                  style={{
+                    width: 14,
+                    height: 14,
+                    borderRadius: '50%',
+                    border: '2px solid var(--gold)',
+                    borderTopColor: 'transparent',
+                    animation: 'spin 1s linear infinite',
+                  }}
+                  aria-hidden="true"
+                />
               ) : (
-                <Circle size={10} color="#64748b" />
+                <Circle size={12} color="var(--text-muted)" aria-hidden="true" />
               )}
               <span>{stg}</span>
             </div>
@@ -134,16 +141,17 @@ export function ScanningState({
             display: 'inline-flex',
             alignItems: 'center',
             gap: 6,
-            padding: '4px 10px',
-            borderRadius: 99,
-            background: 'rgba(245,158,11,0.08)',
-            border: '1px solid rgba(245,158,11,0.2)',
-            fontSize: 11,
-            color: 'var(--gold)',
+            padding: '4px 12px',
+            borderRadius: 6,
+            background: 'var(--bg-surface-elevated)',
+            border: '1px solid var(--border)',
+            fontSize: 11.5,
+            color: 'var(--text-secondary)',
             fontFamily: 'monospace',
           }}
         >
-          <Cpu size={12} /> {stage}
+          <ShieldCheck size={13} color="var(--gold)" />
+          <span>{stage}</span>
         </div>
       )}
     </div>

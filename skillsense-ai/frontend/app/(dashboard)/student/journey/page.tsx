@@ -34,7 +34,6 @@ import { FadeIn } from '@/components/shared/FadeIn';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { AIBadge } from '@/components/ui/AIBadge';
 import toast from 'react-hot-toast';
-import confetti from 'canvas-confetti';
 
 export default function TraineeJourneyPage() {
   const { user } = useAuth();
@@ -103,13 +102,7 @@ export default function TraineeJourneyPage() {
         trainingRelevance,
       });
 
-      confetti({
-        particleCount: 60,
-        spread: 60,
-        origin: { y: 0.6 },
-        colors: ['#f59e0b', '#10b981'],
-      });
-      toast.success('Career milestone recorded on your longitudinal ledger!');
+      toast.success('Career milestone recorded on your longitudinal ledger.');
 
       setShowSelfReportModal(false);
       setEmployerName('');
@@ -139,13 +132,7 @@ export default function TraineeJourneyPage() {
         feedback: fuFeedback || undefined,
       });
 
-      confetti({
-        particleCount: 50,
-        spread: 60,
-        origin: { y: 0.6 },
-        colors: ['#f59e0b', '#10b981'],
-      });
-      toast.success('Longitudinal check-in submitted successfully!');
+      toast.success('Longitudinal check-in recorded successfully.');
 
       setShowFollowUpModal(null);
       setFuEmployed(true);
@@ -344,7 +331,7 @@ export default function TraineeJourneyPage() {
                       width: 40,
                       height: 40,
                       borderRadius: '50%',
-                      background: '#0f111a',
+                      background: 'var(--bg-surface)',
                       border: `2px solid ${isVerified ? '#10b981' : 'var(--gold)'}`,
                       display: 'flex',
                       alignItems: 'center',

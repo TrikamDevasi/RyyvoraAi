@@ -36,7 +36,6 @@ import { FadeIn } from '@/components/shared/FadeIn';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { AIBadge } from '@/components/ui/AIBadge';
 import toast from 'react-hot-toast';
-import confetti from 'canvas-confetti';
 
 const ResponsiveContainer = dynamic(
   () => import('recharts').then((m) => m.ResponsiveContainer),
@@ -161,15 +160,9 @@ export default function EmployerPage() {
         const data = res.data.data;
         setVerifyResult({
           status: 'SUCCESS',
-          message: `Passport Verified! Candidate: ${data.trainee?.name || 'Unknown'} | Program: ${data.trainee?.program || 'N/A'} | NSQF: ${data.trainee?.nsqfLevel || 'N/A'} | Integrity: Cryptographically Confirmed.`,
+          message: `Passport Verified: Candidate ${data.trainee?.name || 'Unknown'} | Program: ${data.trainee?.program || 'N/A'} | NSQF: ${data.trainee?.nsqfLevel || 'N/A'} | Integrity: Confirmed.`,
         });
-        confetti({
-          particleCount: 50,
-          spread: 50,
-          origin: { y: 0.6 },
-          colors: ['#10b981', '#f59e0b'],
-        });
-        toast.success('Candidate Skill Passport cryptographically verified!');
+        toast.success('Candidate Skill Passport cryptographically verified.');
       } else {
         setVerifyResult({
           status: 'ERROR',

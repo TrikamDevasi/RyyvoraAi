@@ -240,7 +240,7 @@ export default function LandingPage() {
               className="btn-gold"
               style={{ fontSize: 12.5, padding: '7px 16px' }}
             >
-              <Sparkles size={13} /> Analyze Skills
+              <BarChart3 size={13} /> Analyze Skills
             </Link>
           </div>
         </div>
@@ -2025,15 +2025,15 @@ export default function LandingPage() {
           <Link
             href="/student/analyzer"
             className="btn-gold"
-            style={{ fontSize: 14.5, padding: '13px 36px', boxShadow: '0 6px 28px rgba(245,158,11,0.35)' }}
+            style={{ fontSize: 14.5, padding: '13px 36px', boxShadow: 'var(--shadow-sm)' }}
           >
-            <Sparkles size={16} /> Start Your Free Skill Analysis <ArrowRight size={15} />
+            <BarChart3 size={16} /> Start Free Skill Analysis <ArrowRight size={15} />
           </Link>
         </div>
       </section>
 
       {/* ── 12. Enterprise Footer ── */}
-      <footer style={{ padding: '50px 24px 30px', borderTop: '1px solid var(--border)', background: '#07080c' }}>
+      <footer style={{ padding: '50px 24px 30px', borderTop: '1px solid var(--border)', background: 'var(--bg-surface)' }}>
         <div style={{ maxWidth: 1240, margin: '0 auto' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 30, marginBottom: 40 }}>
             <div>

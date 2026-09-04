@@ -1,5 +1,8 @@
-import { redirect } from 'next/navigation';
+'use client';
 
-export default function SettingsProfileRedirect() {
-  redirect('/student/profile');
+import React from 'react';
+import { ProfileShell } from '@/components/profile/ProfileShell';
+
+export default function SettingsProfilePage() {
+  return <ProfileShell />;
 }

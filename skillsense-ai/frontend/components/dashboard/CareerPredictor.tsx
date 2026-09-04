@@ -29,7 +29,6 @@ import type { CareerPathway } from '@/types/charts';
 import { ScanningState } from '@/components/ui/ScanningState';
 import { AIBadge } from '@/components/ui/AIBadge';
 import Link from 'next/link';
-import confetti from 'canvas-confetti';
 
 export default function CareerPredictor() {
   const [profile, setProfile] = useState<any>(null);
@@ -139,13 +138,7 @@ export default function CareerPredictor() {
     } finally {
       setLoading(false);
       setStep('results');
-      confetti({
-        particleCount: 70,
-        spread: 70,
-        origin: { y: 0.6 },
-        colors: ['#f59e0b', '#10b981', '#60a5fa'],
-      });
-      toast.success('AI career pathways calculated!');
+      toast.success('Career pathways and NSQF milestones calculated.');
     }
   };
 

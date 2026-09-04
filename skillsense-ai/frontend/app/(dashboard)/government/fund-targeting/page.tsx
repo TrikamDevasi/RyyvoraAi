@@ -27,7 +27,6 @@ import { FadeIn } from '@/components/shared/FadeIn';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { AIBadge } from '@/components/ui/AIBadge';
 import toast from 'react-hot-toast';
-import confetti from 'canvas-confetti';
 
 interface AllocationItem {
   id: string;
@@ -187,13 +186,7 @@ export default function FundTargetingPage() {
       });
       setAllocations(updated);
       setSimulating(false);
-      confetti({
-        particleCount: 60,
-        spread: 60,
-        origin: { y: 0.6 },
-        colors: ['#f59e0b', '#10b981'],
-      });
-      toast.success(`Neural Budget Optimization Calibrated for ₹${budgetCapCr.toLocaleString('en-IN')} Cr!`);
+      toast.success(`Budget optimization calibrated for ₹${budgetCapCr.toLocaleString('en-IN')} Cr.`);
     }, 900);
   };
 
@@ -324,15 +317,15 @@ export default function FundTargetingPage() {
                 cursor: simulating ? 'not-allowed' : 'pointer',
               }}
             >
-              {simulating ? <RefreshCw size={14} className="animate-spin" /> : <Sparkles size={14} />}
+              {simulating ? <RefreshCw size={14} className="animate-spin" /> : <TrendingUp size={14} />}
               <span>{simulating ? 'Optimizing Allocations...' : 'Re-calculate Optimal Grants'}</span>
             </button>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: 13, fontWeight: 700, color: '#cbd5e1' }}>
-                State Budget Cap: <strong style={{ color: 'var(--gold)', fontSize: 16 }}>₹{budgetCapCr.toLocaleString('en-IN')} Cr</strong>
+              <span style={{ fontSize: 13, fontWeight: 650, color: 'var(--text-primary)' }}>
+                State Budget Cap: <strong style={{ color: 'var(--gold)', fontSize: 16, fontVariantNumeric: 'tabular-nums' }}>₹{budgetCapCr.toLocaleString('en-IN')} Cr</strong>
               </span>
               <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Range: ₹500 Cr – ₹3,500 Cr</span>
             </div>

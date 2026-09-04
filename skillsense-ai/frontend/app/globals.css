@@ -501,29 +501,40 @@ tbody tr {
   will-change: transform;
 }
 
-/* ── AI Intelligence Halo Animation ── */
-@keyframes intelligence-halo-spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+/* ── Data-First & Institutional Layout Utilities ── */
+.tabular-numbers {
+  font-variant-numeric: tabular-nums;
+}
+
+.data-list-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  transition: background-color 0.15s ease;
+}
+
+.data-list-row:last-child {
+  border-bottom: none;
+}
+
+.data-band {
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px 20px;
+}
+
+.section-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 24px 0;
 }
 
 .ai-intelligence-halo {
   position: relative;
-}
-
-.ai-intelligence-halo::before {
-  content: '';
-  position: absolute;
-  inset: -2px;
-  border-radius: inherit;
-  background: conic-gradient(from 0deg, var(--gold), #d97706, #10b981, var(--gold));
-  opacity: 0.35;
-  animation: intelligence-halo-spin 8s linear infinite;
-  z-index: -1;
+  border: 1px solid var(--border-gold);
 }
 
 /* ── Spatial Popover & Dropdown Entrance ── */
@@ -975,14 +986,6 @@ tbody tr {
   animation: pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-@keyframes scan-line {
-  0% { transform: translateY(-100%); }
-  100% { transform: translateY(1000%); }
-}
-
-.animate-scan-line {
-  animation: scan-line 3s linear infinite;
-}
 
 /* ── Mobile Utilities ── */
 .no-scrollbar::-webkit-scrollbar {

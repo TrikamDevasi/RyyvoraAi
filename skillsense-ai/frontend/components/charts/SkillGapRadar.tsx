@@ -2,24 +2,23 @@
 
 import React from 'react';
 import {
-  RadarChart,
   Radar,
+  RadarChart,
   PolarGrid,
   PolarAngleAxis,
   PolarRadiusAxis,
-  Legend,
   ResponsiveContainer,
   Tooltip,
+  Legend,
 } from 'recharts';
-import type { SkillGapEntry } from '../../types/charts';
+import type { SkillGapAnalysis } from '../../types/charts';
 
 interface Props {
-  data: SkillGapEntry[];
+  data: SkillGapAnalysis[];
 }
 
 const GOLD = '#F59E0B';
-const WHITE = '#FFFFFF';
-const MUTED = '#94a3b8';
+const MUTED = 'var(--text-muted)';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const CustomTooltip = ({ active, payload, label }: any) => {
@@ -27,21 +26,20 @@ const CustomTooltip = ({ active, payload, label }: any) => {
     return (
       <div
         style={{
-          background: 'rgba(15, 17, 26, 0.95)',
-          border: '1px solid rgba(245, 158, 11, 0.4)',
-          borderRadius: '8px',
+          background: 'var(--bg-surface)',
+          border: '1px solid var(--border)',
+          borderRadius: 8,
           padding: '10px 14px',
-          backdropFilter: 'blur(12px)',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.6)',
-          minWidth: '150px',
+          boxShadow: 'var(--shadow-md)',
+          minWidth: '160px',
         }}
       >
         <p
           style={{
-            color: '#F59E0B',
+            color: 'var(--gold)',
             fontWeight: 700,
-            fontSize: '12px',
-            marginBottom: '6px',
+            fontSize: 12.5,
+            marginBottom: 6,
           }}
         >
           {label}
@@ -50,13 +48,13 @@ const CustomTooltip = ({ active, payload, label }: any) => {
           <p
             key={i}
             style={{
-              color: entry.name === 'My Level' ? '#F59E0B' : '#ffffff',
+              color: entry.name === 'My Level' ? 'var(--gold)' : 'var(--text-primary)',
               margin: '2px 0',
-              fontSize: '12px',
+              fontSize: 12,
               fontWeight: 500,
             }}
           >
-            {entry.name}: <span style={{ fontWeight: 700 }}>{entry.value}%</span>
+            {entry.name}: <span style={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{entry.value}%</span>
           </p>
         ))}
       </div>
@@ -75,8 +73,8 @@ export default function SkillGapRadar({ data }: Props) {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: 'rgba(255,255,255,0.02)',
-          borderRadius: 12,
+          background: 'var(--bg-surface)',
+          borderRadius: 10,
           border: '1px dashed var(--border)',
           color: 'var(--text-muted)',
           fontSize: 13,
@@ -87,53 +85,55 @@ export default function SkillGapRadar({ data }: Props) {
     );
   }
 
+  const hasStudentScore = data.some((d) => d.studentScore !== undefined);
+  const myLevelKey = hasStudentScore ? 'studentScore' : 'myLevel';
+  const hasMarketBenchmark = data.some((d) => d.marketBenchmark !== undefined);
+  const targetBenchmarkKey = hasMarketBenchmark ? 'marketBenchmark' : 'industryReq';
+
   // Sanitize labels to avoid clipping
   const formattedData = data.map((d) => ({
     ...d,
-    shortSkill: d.skill.length > 14 ? `${d.skill.slice(0, 13)}…` : d.skill,
+    shortSkill: (d.skill || '').length > 16 ? `${(d.skill || '').slice(0, 15)}…` : (d.skill || ''),
+    [myLevelKey]: d.studentScore ?? d.myLevel ?? 0,
+    [targetBenchmarkKey]: d.marketBenchmark ?? d.industryReq ?? 0,
   }));
 
   return (
     <div style={{ width: '100%', height: 320, minHeight: 280, position: 'relative' }}>
       <ResponsiveContainer width="100%" height="100%">
         <RadarChart data={formattedData} margin={{ top: 10, right: 20, bottom: 10, left: 20 }}>
-          <PolarGrid stroke="rgba(255,255,255,0.08)" />
+          <PolarGrid stroke="var(--border)" strokeOpacity={0.6} />
           <PolarAngleAxis
             dataKey="shortSkill"
-            tick={{ fill: MUTED, fontSize: 10.5, fontWeight: 600 }}
+            tick={{ fill: 'var(--text-secondary)', fontSize: 11, fontWeight: 600 }}
           />
           <PolarRadiusAxis
             angle={90}
             domain={[0, 100]}
-            tick={{ fill: MUTED, fontSize: 9 }}
+            tick={{ fill: 'var(--text-muted)', fontSize: 9.5 }}
             axisLine={false}
-          />
-          <Radar
-            name="My Level"
-            dataKey="myLevel"
-            stroke={GOLD}
-            fill={GOLD}
-            fillOpacity={0.25}
-            strokeWidth={2}
-            dot={{ fill: GOLD, r: 3 }}
-          />
-          <Radar
-            name="Industry Req"
-            dataKey="industryReq"
-            stroke="#60a5fa"
-            fill="transparent"
-            strokeWidth={1.5}
-            strokeDasharray="4 3"
-            dot={{ fill: '#60a5fa', r: 2 }}
           />
           <Tooltip content={<CustomTooltip />} />
           <Legend
+            wrapperStyle={{ fontSize: 12, paddingTop: 8, color: 'var(--text-secondary)' }}
             iconType="circle"
-            iconSize={8}
-            wrapperStyle={{ color: MUTED, fontSize: 11, paddingTop: 4 }}
-            formatter={(value) => (
-              <span style={{ color: value === 'My Level' ? GOLD : '#60a5fa', fontWeight: 600 }}>{value}</span>
-            )}
+          />
+          <Radar
+            name="My Level"
+            dataKey={myLevelKey}
+            stroke={GOLD}
+            fill={GOLD}
+            fillOpacity={0.35}
+            strokeWidth={2}
+          />
+          <Radar
+            name="Target Role Benchmark"
+            dataKey={targetBenchmarkKey}
+            stroke="#94a3b8"
+            fill="#94a3b8"
+            fillOpacity={0.15}
+            strokeWidth={1.5}
+            strokeDasharray="4 4"
           />
         </RadarChart>
       </ResponsiveContainer>

@@ -30,7 +30,6 @@ import { FadeIn } from '@/components/shared/FadeIn';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { AIBadge } from '@/components/ui/AIBadge';
 import toast from 'react-hot-toast';
-import confetti from 'canvas-confetti';
 
 interface FeedbackReview {
   id: string;
@@ -177,13 +176,7 @@ export default function EmployerFeedbackPage() {
     setShowForm(false);
     setCandidateName('');
     setComments('');
-    confetti({
-      particleCount: 50,
-      spread: 60,
-      origin: { y: 0.6 },
-      colors: ['#10b981', '#f59e0b'],
-    });
-    toast.success('Candidate Performance Review cryptographically logged onto state ledger!');
+    toast.success('Candidate performance review logged onto state ledger.');
   };
 
   const filteredReviews = reviews.filter((r) => {

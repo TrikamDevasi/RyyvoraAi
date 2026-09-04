@@ -46,7 +46,7 @@ function renderInlineText(text: string) {
     const token = match[0];
     if (token.startsWith('**') && token.endsWith('**')) {
       parts.push(
-        <strong key={match.index} style={{ color: '#fde68a', fontWeight: 650 }}>
+        <strong key={match.index} style={{ color: 'var(--gold)', fontWeight: 650 }}>
           {token.slice(2, -2)}
         </strong>
       );
@@ -55,12 +55,13 @@ function renderInlineText(text: string) {
         <code
           key={match.index}
           style={{
-            background: 'rgba(255, 255, 255, 0.08)',
+            background: 'var(--bg-surface-elevated)',
+            border: '1px solid var(--border)',
             padding: '2px 5px',
             borderRadius: 4,
             fontSize: '0.9em',
             fontFamily: 'monospace',
-            color: '#38bdf8',
+            color: 'var(--gold)',
           }}
         >
           {token.slice(1, -1)}
@@ -68,7 +69,7 @@ function renderInlineText(text: string) {
       );
     } else if (token.startsWith('*') && token.endsWith('*')) {
       parts.push(
-        <em key={match.index} style={{ color: '#e2e8f0' }}>
+        <em key={match.index} style={{ color: 'var(--text-secondary)' }}>
           {token.slice(1, -1)}
         </em>
       );
@@ -84,12 +85,10 @@ function renderInlineText(text: string) {
 }
 
 function FormattedMessageContent({ text }: { text: string }) {
-  // Pre-process text to separate numbered items if joined in one line (e.g. "... 1. **Title:** ... 2. **Title:** ...")
   let normalized = text;
   normalized = normalized.replace(/\s+(?=\d+\.\s+\*\*|\d+\.\s+[A-Z])/g, '\n\n');
   normalized = normalized.replace(/\s+(?=-\s+\*\*|-\s+[A-Z])/g, '\n');
 
-  // Split into paragraphs / lines
   const rawParagraphs = normalized.split(/\n\n+/).filter(Boolean);
 
   return (
@@ -97,7 +96,6 @@ function FormattedMessageContent({ text }: { text: string }) {
       {rawParagraphs.map((para, pIdx) => {
         const trimmed = para.trim();
 
-        // Check if paragraph is a numbered item (e.g. "1. **Title:** Description" or "1. Description")
         const numberedMatch = trimmed.match(/^(\d+)\.\s+([\s\S]*)$/);
         if (numberedMatch) {
           const num = numberedMatch[1];
@@ -109,8 +107,8 @@ function FormattedMessageContent({ text }: { text: string }) {
               style={{
                 display: 'flex',
                 gap: 9,
-                background: 'rgba(255, 255, 255, 0.025)',
-                border: '1px solid rgba(255, 255, 255, 0.05)',
+                background: 'var(--bg-surface-elevated)',
+                border: '1px solid var(--border)',
                 borderRadius: 8,
                 padding: '8px 10px',
                 marginTop: 2,
@@ -121,9 +119,9 @@ function FormattedMessageContent({ text }: { text: string }) {
                   minWidth: 20,
                   height: 20,
                   borderRadius: 6,
-                  background: 'rgba(245, 158, 11, 0.15)',
-                  border: '1px solid rgba(245, 158, 11, 0.3)',
-                  color: '#f59e0b',
+                  background: 'var(--gold-muted)',
+                  border: '1px solid var(--gold-border)',
+                  color: 'var(--gold)',
                   fontSize: 11,
                   fontWeight: 700,
                   display: 'flex',
@@ -134,14 +132,13 @@ function FormattedMessageContent({ text }: { text: string }) {
               >
                 {num}
               </div>
-              <div style={{ flex: 1, color: '#f1f5f9' }}>
+              <div style={{ flex: 1, color: 'var(--text-primary)' }}>
                 {renderInlineText(rest)}
               </div>
             </div>
           );
         }
 
-        // Check if paragraph is a bullet list (lines starting with '-' or '*')
         if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
           const bulletLines = trimmed.split(/\n/).filter(Boolean);
           return (
@@ -150,8 +147,8 @@ function FormattedMessageContent({ text }: { text: string }) {
                 const cleanLine = line.replace(/^[-*]\s+/, '');
                 return (
                   <div key={bIdx} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
-                    <span style={{ color: '#f59e0b', fontSize: 13, lineHeight: '18px' }}>•</span>
-                    <div style={{ flex: 1, color: '#f1f5f9' }}>{renderInlineText(cleanLine)}</div>
+                    <span style={{ color: 'var(--gold)', fontSize: 13, lineHeight: '18px' }}>•</span>
+                    <div style={{ flex: 1, color: 'var(--text-primary)' }}>{renderInlineText(cleanLine)}</div>
                   </div>
                 );
               })}
@@ -159,9 +156,8 @@ function FormattedMessageContent({ text }: { text: string }) {
           );
         }
 
-        // Regular paragraph
         return (
-          <p key={pIdx} style={{ margin: 0, color: '#f1f5f9' }}>
+          <p key={pIdx} style={{ margin: 0, color: 'var(--text-primary)' }}>
             {renderInlineText(trimmed)}
           </p>
         );
@@ -170,23 +166,59 @@ function FormattedMessageContent({ text }: { text: string }) {
   );
 }
 
+const ROLE_SUGGESTIONS: Record<string, string[]> = {
+  government: [
+    'Explain district retention disparities across Maharashtra',
+    'Summarize NSQF compliance across state ITIs',
+    'Project fund allocation ROI for underperforming districts',
+  ],
+  employer: [
+    'Summarize pending candidate verification claims',
+    'Benchmark required skills against active hiring drives',
+    'Find candidates verified at NSQF Level 5 or higher',
+  ],
+  institute: [
+    'Identify training batches with low 90-day retention',
+    'Recommend curriculum updates for regional industry demand',
+    'Compare placement outcomes across technical domains',
+  ],
+  industry: [
+    'Analyze emerging vocational skill shortages in Maharashtra',
+    'Map National Occupational Standards to active requisitions',
+    'Review industry apprenticeship demand signals',
+  ],
+  admin: [
+    'Explain algorithmic fairness disparity ratios',
+    'Review system security audit logs & DPDP consent health',
+    'Check data integrity across verification ledger nodes',
+  ],
+  student: [
+    'Explain my biggest skill gap and next learning step',
+    'Build an upskilling roadmap for NSQF Level 5 certification',
+    'Which employers are actively hiring for my verified skills?',
+  ],
+};
+
 const DEFAULT_SUGGESTIONS = [
-  'Explain my skill gaps & priority actions',
-  'Build an upskilling roadmap for NSQF Level 5',
-  'Which tech companies in India are hiring for my profile?',
-  'How do I prepare for full-stack system design interviews?',
+  'Explain skill gap priorities against NSQF frameworks',
+  'Summarize recent employment and retention outcomes',
+  'Review verified credentials and verification ledger status',
 ];
 
 export default function AIChatWidget() {
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
+
+  const roleKey = (user?.role || 'student').toLowerCase();
+  const currentRoleSuggestions = ROLE_SUGGESTIONS[roleKey] || DEFAULT_SUGGESTIONS;
+
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '0',
       role: 'assistant',
-      content: "Hello! I am your SkillSense AI Career Copilot. Ask me anything about your verified skills, gap closures, career matching, or tech interviews in India.",
-      suggestions: DEFAULT_SUGGESTIONS,
+      content: "Hello! I am your SkillSense Workforce & Policy Copilot. Ask me about state retention outcomes, NSQF competency benchmarks, candidate verification, or district skill analytics.",
+      suggestions: currentRoleSuggestions,
     },
   ]);
   const [input, setInput] = useState('');
@@ -196,6 +228,18 @@ export default function AIChatWidget() {
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
+
+  // Global Ctrl+K / Cmd+K listener
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // Fetch session history
   useEffect(() => {
@@ -415,42 +459,48 @@ export default function AIChatWidget() {
 
   return (
     <>
-      {/* ── Floating Launcher Button ── */}
+      {/* ── Copilot Launcher Button ── */}
       {!open && (
         <button
           type="button"
           onClick={() => setOpen(true)}
-          aria-label="Open SkillSense AI Copilot assistant"
+          aria-label="Open SkillSense Policy & Skill Copilot (Press Ctrl+K)"
           style={{
             position: 'fixed',
-            right: 16,
-            padding: '9px 15px',
-            borderRadius: 99,
-            background: 'linear-gradient(135deg, #f59e0b, #d97706)',
-            color: '#090a0f',
-            border: '1px solid #f59e0b',
-            fontWeight: 800,
+            bottom: 20,
+            right: 20,
+            padding: '8px 14px',
+            borderRadius: 8,
+            background: 'var(--bg-surface)',
+            color: 'var(--text-primary)',
+            border: '1px solid var(--border)',
+            fontWeight: 650,
             fontSize: 12.5,
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
-            gap: 7,
-            boxShadow: '0 8px 32px rgba(245,158,11,0.35)',
-            transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+            gap: 8,
+            boxShadow: 'var(--shadow-md)',
+            zIndex: 40,
+            transition: 'all 0.15s ease',
           }}
-          className="ai-copilot-launcher hover:scale-105 active:scale-95"
+          className="ai-copilot-launcher hover:border-amber-500"
         >
-          <Sparkles size={15} />
-          <span>AI Copilot</span>
-          <span
+          <Bot size={15} color="var(--gold)" />
+          <span>Workforce Copilot</span>
+          <kbd
             style={{
-              width: 7,
-              height: 7,
-              borderRadius: '50%',
-              background: '#10b981',
-              boxShadow: '0 0 6px #10b981',
+              fontSize: 10,
+              padding: '1px 5px',
+              borderRadius: 4,
+              background: 'var(--bg-surface-elevated)',
+              border: '1px solid var(--border)',
+              color: 'var(--text-muted)',
+              fontFamily: 'monospace',
             }}
-          />
+          >
+            ⌘K
+          </kbd>
         </button>
       )}
 
@@ -712,7 +762,7 @@ export default function AIChatWidget() {
                               gap: 4,
                             }}
                           >
-                            <Sparkles size={10} /> {s}
+                            <ChevronRight size={10} /> {s}
                           </button>
                         ))}
                       </div>

@@ -298,16 +298,17 @@ export default function ROIPage() {
                 <div style={{ height: 260, width: '100%' }}>
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={chartData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-                      <XAxis dataKey="name" stroke="#64748b" tick={{ fontSize: 10.5 }} />
-                      <YAxis stroke="#64748b" tick={{ fontSize: 10.5 }} unit="x" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" strokeOpacity={0.6} />
+                      <XAxis dataKey="name" stroke="var(--text-muted)" tick={{ fontSize: 10.5 }} />
+                      <YAxis stroke="var(--text-muted)" tick={{ fontSize: 10.5 }} unit="x" />
                       <Tooltip
                         contentStyle={{
-                          background: '#0f111a',
-                          border: '1px solid rgba(245,158,11,0.3)',
+                          background: 'var(--bg-surface)',
+                          border: '1px solid var(--border)',
                           borderRadius: 8,
                           fontSize: 12,
-                          color: '#fff',
+                          color: 'var(--text-primary)',
+                          boxShadow: 'var(--shadow-md)',
                         }}
                       />
                       <Bar dataKey="roi" fill="var(--gold)" radius={[4, 4, 0, 0]} name="ROI Multiplier (x)" />

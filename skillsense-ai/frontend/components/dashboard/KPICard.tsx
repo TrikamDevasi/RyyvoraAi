@@ -6,6 +6,7 @@ import type { KPIData } from '../../types/charts';
 
 interface KPICardProps extends KPIData {
     compact?: boolean;
+    subtitle?: string;
 }
 
 export default function KPICard({
@@ -16,6 +17,7 @@ export default function KPICard({
     trendDirection = 'neutral',
     icon,
     compact = false,
+    subtitle,
 }: KPICardProps) {
     const numericValue = typeof value === 'number' ? value : parseFloat(String(value)) || 0;
     const isNumeric = typeof value === 'number';
@@ -27,121 +29,115 @@ export default function KPICard({
 
     return (
         <div
-            className="card-kpi card-interactive card-3d card-hover-icon-parent"
+            className="card-kpi card-interactive"
             style={{
-                borderRadius: compact ? 'var(--radius-md)' : 'var(--radius-lg)',
-                padding: compact ? '14px 16px' : '18px 22px',
+                borderRadius: compact ? 8 : 10,
+                padding: compact ? '14px 16px' : '18px 20px',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: 8,
+                gap: 6,
                 position: 'relative',
                 overflow: 'hidden',
                 cursor: 'default',
+                background: 'var(--bg-surface)',
+                border: '1px solid var(--border)',
+                boxShadow: 'var(--shadow-sm)',
             }}
         >
-            {/* Background subtle radial glow */}
-            <div
-                style={{
-                    position: 'absolute',
-                    top: -20,
-                    right: -20,
-                    width: 70,
-                    height: 70,
-                    borderRadius: '50%',
-                    background: 'radial-gradient(circle, var(--gold-muted) 0%, transparent 70%)',
-                    pointerEvents: 'none',
-                }}
-            />
-
-            {/* Header row */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            {/* Header row: Label + subtle icon */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
                 <p
                     style={{
-                        color: 'var(--text-muted)',
-                        fontSize: compact ? 11 : 11.5,
-                        fontWeight: 700,
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.06em',
+                        color: 'var(--text-secondary)',
+                        fontSize: compact ? 12 : 12.5,
+                        fontWeight: 600,
                         margin: 0,
+                        lineHeight: 1.3,
                     }}
                 >
                     {label}
                 </p>
                 {icon && (
-                    <div
-                        className="card-icon-container interactive-icon hover-scale-icon"
+                    <span
                         style={{
-                            width: compact ? 28 : 34,
-                            height: compact ? 28 : 34,
-                            borderRadius: compact ? 'var(--radius-sm)' : 'var(--radius-md)',
+                            fontSize: compact ? 14 : 16,
+                            color: 'var(--text-muted)',
+                            opacity: 0.85,
+                            flexShrink: 0,
                         }}
+                        aria-hidden="true"
                     >
-                        <span style={{ fontSize: compact ? 13 : 15, fontWeight: 700 }}>{icon}</span>
-                    </div>
+                        {icon}
+                    </span>
                 )}
             </div>
 
-            {/* Value */}
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 5 }}>
+            {/* Metric Value with Tabular Numerals */}
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 5, marginTop: 2 }}>
                 <span
-                    className="font-display"
+                    className="font-display tabular-numbers"
                     style={{
                         color: 'var(--text-primary)',
                         fontSize: compact ? 22 : 28,
-                        fontWeight: 800,
+                        fontWeight: 700,
                         lineHeight: 1.1,
                         letterSpacing: '-0.02em',
+                        fontVariantNumeric: 'tabular-nums',
                     }}
                 >
                     {displayValue}
                 </span>
                 {unit && (
-                    <span style={{ color: 'var(--gold)', fontSize: compact ? 12 : 14, fontWeight: 700 }}>
+                    <span style={{ color: 'var(--gold)', fontSize: compact ? 12 : 13.5, fontWeight: 650 }}>
                         {unit}
                     </span>
                 )}
             </div>
 
-            {/* Trend indicator */}
-            {trend !== undefined && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
-                    <span
-                        style={{
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: 4,
-                            padding: '2px 7px',
-                            borderRadius: 'var(--radius-pill)',
-                            fontSize: 11,
-                            fontWeight: 700,
-                            background:
-                                trendDirection === 'up'
-                                    ? 'var(--success-bg)'
-                                    : trendDirection === 'down'
-                                    ? 'var(--error-bg)'
-                                    : 'var(--bg-surface-elevated)',
-                            color:
-                                trendDirection === 'up'
-                                    ? 'var(--success)'
-                                    : trendDirection === 'down'
-                                    ? 'var(--error)'
-                                    : 'var(--text-muted)',
-                            border: `1px solid ${
-                                trendDirection === 'up'
-                                    ? 'var(--success-border)'
-                                    : trendDirection === 'down'
-                                    ? 'var(--error-border)'
-                                    : 'var(--border)'
-                            }`,
-                        }}
-                    >
-                        <span className="interactive-arrow">{trendDirection === 'up' ? '↑' : trendDirection === 'down' ? '↓' : '→'}</span>
-                        {' '}{Math.abs(trend)}%
+            {/* Trend & Context row */}
+            {(trend !== undefined || subtitle) && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4, flexWrap: 'wrap' }}>
+                    {trend !== undefined && (
+                        <span
+                            style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: 3,
+                                padding: '1px 6px',
+                                borderRadius: 4,
+                                fontSize: 11,
+                                fontWeight: 650,
+                                fontVariantNumeric: 'tabular-nums',
+                                background:
+                                    trendDirection === 'up'
+                                        ? 'var(--success-bg)'
+                                        : trendDirection === 'down'
+                                        ? 'var(--error-bg)'
+                                        : 'var(--bg-surface-elevated)',
+                                color:
+                                    trendDirection === 'up'
+                                        ? 'var(--success)'
+                                        : trendDirection === 'down'
+                                        ? 'var(--error)'
+                                        : 'var(--text-muted)',
+                                border: `1px solid ${
+                                    trendDirection === 'up'
+                                        ? 'var(--success-border)'
+                                        : trendDirection === 'down'
+                                        ? 'var(--error-border)'
+                                        : 'var(--border)'
+                                }`,
+                            }}
+                        >
+                            <span>{trendDirection === 'up' ? '↑' : trendDirection === 'down' ? '↓' : '→'}</span>
+                            <span>{Math.abs(trend)}%</span>
+                        </span>
+                    )}
+                    <span style={{ color: 'var(--text-muted)', fontSize: 11.5 }}>
+                        {subtitle || 'vs baseline'}
                     </span>
-                    <span style={{ color: 'var(--text-muted)', fontSize: 11 }}>vs previous</span>
                 </div>
             )}
-
             {/* Gold bottom accent indicator */}
             <div
                 className="kpi-gold-bar"

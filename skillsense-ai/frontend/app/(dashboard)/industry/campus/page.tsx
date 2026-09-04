@@ -31,7 +31,6 @@ import { FadeIn } from '@/components/shared/FadeIn';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { AIBadge } from '@/components/ui/AIBadge';
 import toast from 'react-hot-toast';
-import confetti from 'canvas-confetti';
 
 interface CampusInstitution {
   id: string;
@@ -187,13 +186,7 @@ export default function CampusPage() {
       setScheduledDrives((prev) => [newSchedule, ...prev]);
       setSubmitting(false);
       setSelectedInst(null);
-      confetti({
-        particleCount: 60,
-        spread: 60,
-        origin: { y: 0.6 },
-        colors: ['#f59e0b', '#10b981'],
-      });
-      toast.success(`Campus Drive scheduled with ${newSchedule.institutionName}! Institutional TPO notified.`);
+      toast.success(`Campus drive scheduled with ${newSchedule.institutionName}. Institutional TPO notified.`);
     }, 800);
   };
 

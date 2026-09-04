@@ -29,7 +29,6 @@ import { FadeIn } from '@/components/shared/FadeIn';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { AIBadge } from '@/components/ui/AIBadge';
 import toast from 'react-hot-toast';
-import confetti from 'canvas-confetti';
 
 interface ReportTemplate {
   id: string;
@@ -154,26 +153,13 @@ export default function ReportsPage() {
       downloadAnchor.href = url;
       downloadAnchor.download = `${rep.id}_${Date.now()}.json`;
       downloadAnchor.click();
-
-      confetti({
-        particleCount: 50,
-        spread: 60,
-        origin: { y: 0.6 },
-        colors: ['#f59e0b', '#10b981'],
-      });
-      toast.success(`${rep.title} compiled & downloaded!`);
+      toast.success(`${rep.title} compiled and downloaded.`);
     }, 800);
   };
 
   const handleGenerateCustomDossier = (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success(`Custom Executive Dossier for ${reportScope} compiled successfully!`);
-    confetti({
-      particleCount: 60,
-      spread: 60,
-      origin: { y: 0.6 },
-      colors: ['#f59e0b', '#10b981'],
-    });
+    toast.success(`Executive report for ${reportScope} compiled successfully.`);
   };
 
   const filteredReports = reports.filter((r) => {
@@ -263,8 +249,8 @@ export default function ReportsPage() {
         <div className="card-linear" style={{ padding: 22, borderRadius: 16, marginBottom: 24 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
             <div>
-              <h3 className="font-display" style={{ fontSize: 16, fontWeight: 800, color: '#f8fafc', margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
-                <Sparkles size={17} color="var(--gold)" /> Instant Executive Dossier Builder
+              <h3 className="font-display" style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-primary)', margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
+                <FileText size={17} color="var(--gold)" /> State Workforce Outcome Summary
               </h3>
               <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '2px 0 0' }}>
                 Generate customized compliance and skilling reports tailored for ministerial review.
@@ -274,7 +260,7 @@ export default function ReportsPage() {
 
           <form onSubmit={handleGenerateCustomDossier} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12, alignItems: 'end' }}>
             <div>
-              <label style={{ fontSize: 11.5, fontWeight: 700, color: '#cbd5e1', display: 'block', marginBottom: 4 }}>
+              <label style={{ fontSize: 11.5, fontWeight: 650, color: 'var(--text-secondary)', display: 'block', marginBottom: 4 }}>
                 Report Geographic Scope
               </label>
               <select
@@ -284,9 +270,9 @@ export default function ReportsPage() {
                   width: '100%',
                   padding: '8px 10px',
                   borderRadius: 6,
-                  background: 'var(--bg-input, #0f111a)',
+                  background: 'var(--bg-surface-elevated)',
                   border: '1px solid var(--border)',
-                  color: '#fff',
+                  color: 'var(--text-primary)',
                   fontSize: 12,
                 }}
               >
@@ -299,7 +285,7 @@ export default function ReportsPage() {
             </div>
 
             <div>
-              <label style={{ fontSize: 11.5, fontWeight: 700, color: '#cbd5e1', display: 'block', marginBottom: 4 }}>
+              <label style={{ fontSize: 11.5, fontWeight: 650, color: 'var(--text-secondary)', display: 'block', marginBottom: 4 }}>
                 Compilation Format
               </label>
               <select
@@ -309,9 +295,9 @@ export default function ReportsPage() {
                   width: '100%',
                   padding: '8px 10px',
                   borderRadius: 6,
-                  background: 'var(--bg-input, #0f111a)',
+                  background: 'var(--bg-surface-elevated)',
                   border: '1px solid var(--border)',
-                  color: '#fff',
+                  color: 'var(--text-primary)',
                   fontSize: 12,
                 }}
               >
@@ -329,7 +315,7 @@ export default function ReportsPage() {
                 onChange={(e) => setIncludeLedgerHash(e.target.checked)}
                 style={{ accentColor: 'var(--gold)', cursor: 'pointer' }}
               />
-              <label htmlFor="ledgerCheck" style={{ fontSize: 12, color: '#cbd5e1', cursor: 'pointer' }}>
+              <label htmlFor="ledgerCheck" style={{ fontSize: 12, color: 'var(--text-secondary)', cursor: 'pointer' }}>
                 Attach Merkle Root Proof
               </label>
             </div>

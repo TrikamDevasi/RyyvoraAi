@@ -27,7 +27,6 @@ import { FadeIn } from '@/components/shared/FadeIn';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { AIBadge } from '@/components/ui/AIBadge';
 import toast from 'react-hot-toast';
-import confetti from 'canvas-confetti';
 
 interface ValidationClaim {
   _id: string;
@@ -118,13 +117,7 @@ export default function EmployerValidationsPage() {
         );
 
         if (action === 'VERIFY') {
-          confetti({
-            particleCount: 50,
-            spread: 60,
-            origin: { y: 0.6 },
-            colors: ['#10b981', '#f59e0b'],
-          });
-          toast.success('Placement verified successfully!');
+          toast.success('Placement verified successfully.');
         } else if (action === 'REJECT') {
           toast.error('Claim rejected. Candidate has been notified.');
         } else {

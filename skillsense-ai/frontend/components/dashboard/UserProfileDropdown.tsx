@@ -45,7 +45,7 @@ export default function UserProfileDropdown() {
     : 'U';
 
   const profileLabel = ROLE_PROFILE_LABELS[role] || 'Profile & Preferences';
-  const canonicalProfileHref = '/student/profile';
+  const canonicalProfileHref = `/${role}/profile`;
 
   // Outside click & ESC dismissal
   useEffect(() => {

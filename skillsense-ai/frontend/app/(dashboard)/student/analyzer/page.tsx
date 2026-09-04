@@ -33,9 +33,9 @@ import {
   Cpu,
   BookOpen,
   Check,
+  Briefcase,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import confetti from 'canvas-confetti';
 
 import { Radar, PolarGrid, PolarAngleAxis } from 'recharts';
 import { resolveBranch, getAllBranchesSummary, BranchData, saveBranchId } from '@/lib/branches';
@@ -306,17 +306,7 @@ export default function AIAnalyzerPage() {
       setResult(analysisData);
       localStorage.setItem('skillsense_analyzer_last_result', JSON.stringify(analysisData));
 
-      // Trigger celebration confetti on great scores
-      if (analysisData.overallScore >= 75) {
-        confetti({
-          particleCount: 75,
-          spread: 70,
-          origin: { y: 0.6 },
-          colors: ['#f59e0b', '#10b981', '#60a5fa', '#e2e8f0'],
-        });
-      }
-
-      toast.success('Skill analysis complete! Verified competencies synced.');
+      toast.success('Skill analysis complete. Verified competencies synced.');
     } catch (err: any) {
       toast.error(err?.message || 'Skill evaluation failed. Please try again.');
     } finally {
@@ -791,7 +781,7 @@ export default function AIAnalyzerPage() {
                   }}
                 >
                   {analyzing ? <RefreshCw size={15} className="animate-spin" /> : <Sparkles size={15} />}
-                  <span>{analyzing ? 'Evaluating...' : 'Run Neural Evaluation'}</span>
+                  <span>{analyzing ? 'Evaluating Competencies...' : 'Evaluate Competency Profile'}</span>
                 </button>
               </div>
             </div>
@@ -1132,7 +1122,7 @@ export default function AIAnalyzerPage() {
             >
               {[
                 { title: 'Take Adaptive Test', href: '/student/assessments', desc: 'Verify skills via live code & MCQ quiz', icon: <Target size={16} color="var(--gold)" /> },
-                { title: 'Explore Matching Jobs', href: '/student/jobs', desc: 'Browse live openings matching your score', icon: <Sparkles size={16} color="#10b981" /> },
+                { title: 'Explore Matching Jobs', href: '/student/jobs', desc: 'Browse live openings matching your score', icon: <Briefcase size={16} color="#10b981" /> },
                 { title: 'Career Trajectories', href: '/student/career', desc: 'Simulate 3-5 year salary & promotion path', icon: <ArrowRight size={16} color="#60a5fa" /> },
                 { title: 'Digital Skill Passport', href: '/student/passport', desc: 'View tamper-proof cryptographic credential', icon: <Award size={16} color="#a855f7" /> },
               ].map((link, idx) => (
