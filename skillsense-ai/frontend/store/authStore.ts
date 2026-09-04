@@ -14,12 +14,22 @@ export interface AuthUser {
   email: string;
   role: UserRole;
   phone?: string;
+  phoneVerified?: boolean;
+  profileCompleted?: boolean;
   avatar?: string;
   institutionId?: string;
-  authProvider?: 'local' | 'google' | 'github';
+  authProvider?: 'local' | 'google' | 'github' | 'mobile';
   isVerified: boolean;
   isActive?: boolean;
   createdAt?: string;
+}
+
+export interface MobileAuthState {
+  phone: string;
+  maskedPhone: string;
+  cooldownRemaining: number;
+  registrationToken?: string;
+  devOtp?: string;
 }
 
 interface AuthState {
@@ -28,9 +38,14 @@ interface AuthState {
   isAuthenticated: boolean;
   loading: boolean;
   error: string | null;
+  mobileState: MobileAuthState | null;
 
   login: (email: string, password: string) => Promise<void>;
   register: (name: string, email: string, password: string, role: UserRole) => Promise<void>;
+  sendMobileOtp: (phone: string) => Promise<{ phone: string; maskedPhone: string; cooldownRemaining: number; devOtp?: string }>;
+  verifyMobileOtp: (phone: string, otp: string) => Promise<{ isNewUser: boolean; registrationToken?: string; user?: AuthUser; token?: string }>;
+  completeMobileRegistration: (registrationToken: string, name: string, role: UserRole) => Promise<{ user: AuthUser; token: string }>;
+  setMobileState: (data: Partial<MobileAuthState> | null) => void;
   demoLogin: (role: UserRole) => Promise<AuthUser>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
@@ -56,6 +71,25 @@ function getStoredUser(): AuthUser | null {
   }
 }
 
+function getStoredMobileState(): MobileAuthState | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = sessionStorage.getItem('ss_mobile_auth');
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+function persistMobileState(data: MobileAuthState | null) {
+  if (typeof window === 'undefined') return;
+  if (!data) {
+    sessionStorage.removeItem('ss_mobile_auth');
+  } else {
+    sessionStorage.setItem('ss_mobile_auth', JSON.stringify(data));
+  }
+}
+
 export const useAuthStore = create<AuthState>((set, get) => ({
   user: getStoredUser(),
   accessToken:
@@ -64,6 +98,93 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     typeof window !== 'undefined' ? !!localStorage.getItem('skillsense_token') : false,
   loading: false,
   error: null,
+  mobileState: getStoredMobileState(),
+
+  setMobileState: (data: Partial<MobileAuthState> | null) => {
+    if (!data) {
+      persistMobileState(null);
+      set({ mobileState: null });
+      return;
+    }
+    const current = get().mobileState || { phone: '', maskedPhone: '', cooldownRemaining: 0 };
+    const updated = { ...current, ...data };
+    persistMobileState(updated);
+    set({ mobileState: updated });
+  },
+
+  sendMobileOtp: async (phone: string) => {
+    set({ loading: true, error: null });
+    try {
+      const response = await api.post('/auth/mobile/send-otp', { phone });
+      const { phone: normalizedPhone, maskedPhone, cooldownRemaining, _devOtp } = response.data.data;
+      const stateObj: MobileAuthState = {
+        phone: normalizedPhone,
+        maskedPhone,
+        cooldownRemaining: cooldownRemaining || 60,
+        devOtp: _devOtp,
+        registrationToken: get().mobileState?.registrationToken,
+      };
+      persistMobileState(stateObj);
+      set({ loading: false, mobileState: stateObj });
+      return { phone: normalizedPhone, maskedPhone, cooldownRemaining, devOtp: _devOtp };
+    } catch (err: any) {
+      const message = err.response?.data?.message || 'Failed to send OTP code.';
+      set({ loading: false, error: message });
+      throw err;
+    }
+  },
+
+  verifyMobileOtp: async (phone: string, otp: string) => {
+    set({ loading: true, error: null });
+    try {
+      const response = await api.post('/auth/mobile/verify-otp', { phone, otp });
+      const data = response.data.data;
+
+      if (data.isNewUser) {
+        const updatedMobile: MobileAuthState = {
+          phone: data.phone,
+          maskedPhone: data.maskedPhone,
+          cooldownRemaining: 0,
+          registrationToken: data.registrationToken,
+        };
+        persistMobileState(updatedMobile);
+        set({ loading: false, mobileState: updatedMobile });
+        return { isNewUser: true, registrationToken: data.registrationToken };
+      } else {
+        const { user, token } = data;
+        setTokens(token, user.role);
+        persistUser(user);
+        persistMobileState(null);
+        set({ user, accessToken: token, loading: false, isAuthenticated: true, mobileState: null });
+        return { isNewUser: false, user, token };
+      }
+    } catch (err: any) {
+      const message = err.response?.data?.message || 'Verification failed.';
+      set({ loading: false, error: message });
+      throw err;
+    }
+  },
+
+  completeMobileRegistration: async (registrationToken: string, name: string, role: UserRole) => {
+    set({ loading: true, error: null });
+    try {
+      const response = await api.post('/auth/mobile/complete-profile', {
+        registrationToken,
+        name,
+        role,
+      });
+      const { user, token } = response.data.data;
+      setTokens(token, user.role);
+      persistUser(user);
+      persistMobileState(null);
+      set({ user, accessToken: token, loading: false, isAuthenticated: true, mobileState: null });
+      return { user, token };
+    } catch (err: any) {
+      const message = err.response?.data?.message || 'Profile completion failed.';
+      set({ loading: false, error: message });
+      throw err;
+    }
+  },
 
   login: async (email: string, password: string) => {
     set({ loading: true, error: null });

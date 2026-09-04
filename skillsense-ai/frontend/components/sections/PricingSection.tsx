@@ -280,7 +280,7 @@ export default function PricingSection() {
             style={{ fontSize: 'clamp(30px, 4vw, 50px)', fontWeight: 900, color: 'var(--text-primary)', margin: '0 0 14px', lineHeight: 1.1 }}
           >
             Start Small.{' '}
-            <span style={{ background: 'linear-gradient(135deg, #f59e0b, #fbbf24)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+            <span style={{ color: 'var(--brand-gold)' }}>
               Scale Your Impact.
             </span>
           </h2>
@@ -371,12 +371,12 @@ export default function PricingSection() {
                 {plan.isPopular && (
                   <div style={{
                     position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)',
-                    background: 'linear-gradient(135deg, #f59e0b, #fbbf24)',
-                    color: '#090a0f', fontSize: 10.5, fontWeight: 900,
-                    padding: '4px 14px', borderRadius: 99, letterSpacing: '0.04em',
+                    background: 'var(--brand-gold)',
+                    color: 'var(--text-inverse, #ffffff)', fontSize: 10.5, fontWeight: 800,
+                    padding: '3px 12px', borderRadius: 'var(--radius-pill, 9999px)', letterSpacing: '0.04em',
                     whiteSpace: 'nowrap',
                   }}>
-                    ✦ Most Popular
+                    ★ MOST POPULAR
                   </div>
                 )}
 
@@ -453,32 +453,30 @@ export default function PricingSection() {
                   type="button"
                   onClick={() => handleCta(plan)}
                   style={{
-                    width: '100%', padding: '12px 0', borderRadius: 12,
-                    fontSize: 14, fontWeight: 700, cursor: 'pointer',
-                    fontFamily: "'Space Grotesk', sans-serif",
-                    transition: 'all 0.25s ease',
+                    width: '100%', padding: '11px 0', borderRadius: 'var(--radius-md, 8px)',
+                    fontSize: 13.5, fontWeight: 700, cursor: 'pointer',
+                    transition: 'all 0.15s ease',
                     background: isHighlighted
-                      ? 'linear-gradient(135deg, #f59e0b, #fbbf24)'
-                      : 'transparent',
-                    border: isHighlighted ? 'none' : `1px solid rgba(255,255,255,0.12)`,
-                    color: isHighlighted ? '#090a0f' : '#f8fafc',
-                    boxShadow: isHighlighted ? '0 4px 20px rgba(245, 158, 11, 0.35)' : 'none',
+                      ? 'var(--brand-gold)'
+                      : 'var(--bg-surface-elevated)',
+                    border: isHighlighted ? '1px solid var(--brand-gold-border)' : '1px solid var(--border-default)',
+                    color: isHighlighted ? 'var(--text-inverse, #ffffff)' : 'var(--text-primary)',
+                    boxShadow: 'var(--shadow-sm)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
                   }}
                   onMouseEnter={e => {
                     if (!isHighlighted) {
-                      (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)';
-                      (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.2)';
+                      (e.currentTarget as HTMLElement).style.background = 'var(--bg-surface-hover)';
+                      (e.currentTarget as HTMLElement).style.borderColor = 'var(--border-strong)';
                     } else {
-                      (e.currentTarget as HTMLElement).style.opacity = '0.9';
+                      (e.currentTarget as HTMLElement).style.background = 'var(--brand-gold-hover)';
                     }
                   }}
                   onMouseLeave={e => {
                     if (!isHighlighted) {
-                      (e.currentTarget as HTMLElement).style.background = 'transparent';
-                      (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.12)';
+                      (e.currentTarget as HTMLElement).style.background = 'var(--bg-surface-elevated)';
+                      (e.currentTarget as HTMLElement).style.borderColor = 'var(--border-default)';
                     } else {
-                      (e.currentTarget as HTMLElement).style.opacity = '1';
                     }
                   }}
                 >

@@ -494,7 +494,7 @@ export default function AIChatWidget() {
           }}
           className="ai-copilot-launcher hover:border-amber-500"
         >
-          <Bot size={15} color="var(--gold)" />
+          <Bot size={15} color="var(--info, #06b6d4)" />
           <span>Workforce Copilot</span>
           <kbd
             style={{
@@ -553,11 +553,11 @@ export default function AIChatWidget() {
                   width: 30,
                   height: 30,
                   borderRadius: 8,
-                  background: 'rgba(245,158,11,0.15)',
+                  background: 'var(--info-surface, rgba(6,182,212,0.12))',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: 'var(--gold)',
+                  color: 'var(--info, #06b6d4)',
                 }}
               >
                 <Bot size={18} />

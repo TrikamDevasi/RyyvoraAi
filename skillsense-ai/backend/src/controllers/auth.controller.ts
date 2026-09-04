@@ -112,8 +112,10 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
       }
     }
 
-    // Send verification email in the background without blocking the registration response
-    sendVerificationEmail(user.email, verificationToken, user.name).catch(() => {});
+    // Send verification email in the background if email is provided
+    if (user.email) {
+      sendVerificationEmail(user.email, verificationToken, user.name).catch(() => {});
+    }
 
     const token = signToken({ id: user._id.toString(), role: user.role, email: user.email });
     setAuthCookie(res, token, user.role);
@@ -348,10 +350,12 @@ export const forgotPassword = async (req: Request, res: Response) => {
     user.resetPasswordExpires = new Date(Date.now() + 60 * 60 * 1000);
     await user.save();
 
-    try {
-      await sendPasswordResetEmail(user.email, resetToken, user.name);
-    } catch (err) {
-      // Continue gracefully even if SMTP is offline
+    if (user.email) {
+      try {
+        await sendPasswordResetEmail(user.email, resetToken, user.name);
+      } catch (err) {
+        // Continue gracefully even if SMTP is offline
+      }
     }
 
     res.json({ success: true, message: 'Password reset link sent to your email' });
@@ -475,7 +479,9 @@ export const resendVerification = async (req: Request, res: Response) => {
     user.verificationTokenExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
     await user.save();
 
-    await sendVerificationEmail(user.email, verificationToken, user.name);
+    if (user.email) {
+      await sendVerificationEmail(user.email, verificationToken, user.name);
+    }
 
     res.status(200).json({ success: true, message: 'Verification email resent' });
   } catch (err) {

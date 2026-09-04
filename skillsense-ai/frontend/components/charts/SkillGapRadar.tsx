@@ -12,13 +12,13 @@ import {
   Legend,
 } from 'recharts';
 import type { SkillGapAnalysis } from '../../types/charts';
+import { CHART_THEMES } from '../../lib/chartColors';
 
 interface Props {
   data: SkillGapAnalysis[];
 }
 
-const GOLD = '#F59E0B';
-const MUTED = 'var(--text-muted)';
+const theme = CHART_THEMES.dark;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const CustomTooltip = ({ active, payload, label }: any) => {
@@ -26,8 +26,8 @@ const CustomTooltip = ({ active, payload, label }: any) => {
     return (
       <div
         style={{
-          background: 'var(--bg-surface)',
-          border: '1px solid var(--border)',
+          background: 'var(--bg-surface, #111827)',
+          border: '1px solid var(--border-default, rgba(255,255,255,0.10))',
           borderRadius: 8,
           padding: '10px 14px',
           boxShadow: 'var(--shadow-md)',
@@ -36,7 +36,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
       >
         <p
           style={{
-            color: 'var(--gold)',
+            color: 'var(--brand-gold, #F59E0B)',
             fontWeight: 700,
             fontSize: 12.5,
             marginBottom: 6,
@@ -48,7 +48,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
           <p
             key={i}
             style={{
-              color: entry.name === 'My Level' ? 'var(--gold)' : 'var(--text-primary)',
+              color: entry.name === 'My Level' ? 'var(--brand-gold, #F59E0B)' : 'var(--brand-navy-light, #3B82F6)',
               margin: '2px 0',
               fontSize: 12,
               fontWeight: 500,
@@ -74,8 +74,8 @@ export default function SkillGapRadar({ data }: Props) {
           alignItems: 'center',
           justifyContent: 'center',
           background: 'var(--bg-surface)',
-          borderRadius: 10,
-          border: '1px dashed var(--border)',
+          borderRadius: 8,
+          border: '1px dashed var(--border-default)',
           color: 'var(--text-muted)',
           fontSize: 13,
         }}
@@ -102,35 +102,35 @@ export default function SkillGapRadar({ data }: Props) {
     <div style={{ width: '100%', height: 320, minHeight: 280, position: 'relative' }}>
       <ResponsiveContainer width="100%" height="100%">
         <RadarChart data={formattedData} margin={{ top: 10, right: 20, bottom: 10, left: 20 }}>
-          <PolarGrid stroke="var(--border)" strokeOpacity={0.6} />
+          <PolarGrid stroke="var(--border-subtle, rgba(255,255,255,0.06))" />
           <PolarAngleAxis
             dataKey="shortSkill"
-            tick={{ fill: 'var(--text-secondary)', fontSize: 11, fontWeight: 600 }}
+            tick={{ fill: 'var(--text-secondary, #94A3B8)', fontSize: 11, fontWeight: 600 }}
           />
           <PolarRadiusAxis
             angle={90}
             domain={[0, 100]}
-            tick={{ fill: 'var(--text-muted)', fontSize: 9.5 }}
+            tick={{ fill: 'var(--text-muted, #64748B)', fontSize: 9.5 }}
             axisLine={false}
           />
           <Tooltip content={<CustomTooltip />} />
           <Legend
-            wrapperStyle={{ fontSize: 12, paddingTop: 8, color: 'var(--text-secondary)' }}
+            wrapperStyle={{ fontSize: 12, paddingTop: 8, color: 'var(--text-secondary, #94A3B8)' }}
             iconType="circle"
           />
           <Radar
             name="My Level"
             dataKey={myLevelKey}
-            stroke={GOLD}
-            fill={GOLD}
-            fillOpacity={0.35}
+            stroke={theme.series.primary}
+            fill={theme.series.primary}
+            fillOpacity={0.3}
             strokeWidth={2}
           />
           <Radar
-            name="Target Role Benchmark"
+            name="Institutional Benchmark"
             dataKey={targetBenchmarkKey}
-            stroke="#94a3b8"
-            fill="#94a3b8"
+            stroke={theme.series.benchmark}
+            fill={theme.series.benchmark}
             fillOpacity={0.15}
             strokeWidth={1.5}
             strokeDasharray="4 4"

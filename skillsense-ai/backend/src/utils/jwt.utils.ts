@@ -6,6 +6,7 @@ export interface TokenPayload {
   id: string;
   role: UserRole | string;
   email?: string;
+  phone?: string;
   purpose?: string;
 }
 

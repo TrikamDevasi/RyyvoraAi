@@ -12,15 +12,13 @@ import {
     Dot,
 } from 'recharts';
 import type { PlacementData } from '../../types/charts';
+import { CHART_THEMES } from '../../lib/chartColors';
 
 interface Props {
     data: PlacementData[];
 }
 
-const GOLD = '#F59E0B';
-const MUTED = '#94a3b8';
-const WHITE = '#FFFFFF';
-const AMBER = '#FBBF24';
+const theme = CHART_THEMES.dark;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const CustomTooltip = ({ active, payload, label }: any) => {
@@ -28,41 +26,40 @@ const CustomTooltip = ({ active, payload, label }: any) => {
         const d = payload[0].payload as PlacementData;
         return (
             <div style={{
-                background: 'rgba(10, 10, 20, 0.95)',
-                border: '1px solid rgba(212, 168, 67, 0.4)',
-                borderRadius: '10px',
-                padding: '12px 16px',
-                backdropFilter: 'blur(12px)',
-                boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
-                minWidth: '200px'
+                background: 'var(--bg-surface, #111827)',
+                border: '1px solid var(--border-default, rgba(255,255,255,0.10))',
+                borderRadius: '8px',
+                padding: '12px 14px',
+                boxShadow: 'var(--shadow-md)',
+                minWidth: '190px'
             }}>
                 <p style={{
-                    color: '#F59E0B',
+                    color: 'var(--brand-gold, #F59E0B)',
                     fontWeight: 700,
-                    fontSize: '14px',
+                    fontSize: '13px',
                     marginBottom: '8px'
                 }}>{label}</p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <p style={{ color: '#ffffff', fontSize: '13px', margin: 0 }}>
-                        Placed: <span style={{ color: '#F59E0B', fontWeight: 600 }}>{d.placedCount}</span>
+                    <p style={{ color: 'var(--text-primary, #F8FAFC)', fontSize: '12.5px', margin: 0 }}>
+                        Placed: <span style={{ color: 'var(--brand-gold, #F59E0B)', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{d.placedCount}</span>
                     </p>
-                    <p style={{ color: '#ffffff', fontSize: '13px', margin: 0 }}>
-                        Avg Salary: <span style={{ color: '#F59E0B', fontWeight: 600 }}>&#8377;{(d.avgSalary || 0).toLocaleString('en-IN')}</span>
+                    <p style={{ color: 'var(--text-primary, #F8FAFC)', fontSize: '12.5px', margin: 0 }}>
+                        Avg Package: <span style={{ color: 'var(--brand-gold, #F59E0B)', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>&#8377;{(d.avgSalary || 0).toLocaleString('en-IN')}</span>
                     </p>
                     {d.placementRate !== undefined && (
-                        <p style={{ color: '#ffffff', fontSize: '13px', margin: 0 }}>
-                            Rate: <span style={{ color: '#22c55e', fontWeight: 700 }}>{d.placementRate}%</span>
+                        <p style={{ color: 'var(--text-primary, #F8FAFC)', fontSize: '12.5px', margin: 0 }}>
+                            Rate: <span style={{ color: 'var(--success, #10B981)', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{d.placementRate}%</span>
                         </p>
                     )}
                     {d.topSector !== undefined && d.topSector !== null && (
                         <p style={{
-                            color: '#94a3b8',
+                            color: 'var(--text-muted, #94A3B8)',
                             fontSize: '11px',
-                            marginTop: '8px',
-                            paddingTop: '8px',
-                            borderTop: '1px solid rgba(255,255,255,0.1)'
+                            marginTop: '6px',
+                            paddingTop: '6px',
+                            borderTop: '1px solid var(--border-subtle, rgba(255,255,255,0.06))'
                         }}>
-                            Top: {d.topSector}{d.femalePercent !== undefined ? ` • Female ${d.femalePercent}%` : ''}
+                            Top Sector: {d.topSector}{d.femalePercent !== undefined ? ` • Female ${d.femalePercent}%` : ''}
                         </p>
                     )}
                 </div>
@@ -75,7 +72,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const GoldDot = (props: any) => {
     const { cx, cy } = props;
-    return <Dot cx={cx} cy={cy} r={4} fill={GOLD} stroke="rgba(212,168,67,0.4)" strokeWidth={3} />;
+    return <Dot cx={cx} cy={cy} r={3.5} fill={theme.series.primary} stroke={theme.tooltip.background} strokeWidth={2} />;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -83,9 +80,8 @@ const GoldActiveDot = (props: any) => {
     const { cx, cy } = props;
     return (
         <g>
-            <circle cx={cx} cy={cy} r={10} fill="rgba(212,168,67,0.2)" />
-            <circle cx={cx} cy={cy} r={6} fill={GOLD} />
-            <circle cx={cx} cy={cy} r={3} fill={WHITE} />
+            <circle cx={cx} cy={cy} r={6} fill={theme.series.primary} />
+            <circle cx={cx} cy={cy} r={2.5} fill="#FFFFFF" />
         </g>
     );
 };
@@ -97,19 +93,19 @@ export default function PlacementLineChart({ data }: Props) {
                 <AreaChart data={data} margin={{ top: 10, right: 20, left: 10, bottom: 5 }}>
                     <defs>
                         <linearGradient id="goldGradient" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor={GOLD} stopOpacity={0.35} />
-                            <stop offset="95%" stopColor={GOLD} stopOpacity={0.02} />
+                            <stop offset="5%" stopColor={theme.series.primary} stopOpacity={0.25} />
+                            <stop offset="95%" stopColor={theme.series.primary} stopOpacity={0.0} />
                         </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.07)" vertical={false} />
+                    <CartesianGrid strokeDasharray="3 3" stroke={theme.grid.stroke} vertical={false} />
                     <XAxis
                         dataKey="month"
-                        tick={{ fill: MUTED, fontSize: 11 }}
-                        axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
+                        tick={{ fill: theme.axis.tick, fontSize: 11 }}
+                        axisLine={{ stroke: theme.grid.stroke }}
                         tickLine={false}
                     />
                     <YAxis
-                        tick={{ fill: MUTED, fontSize: 11 }}
+                        tick={{ fill: theme.axis.tick, fontSize: 11 }}
                         axisLine={false}
                         tickLine={false}
                         tickFormatter={(v) => `${v}`}
@@ -118,8 +114,8 @@ export default function PlacementLineChart({ data }: Props) {
                     <Area
                         type="monotone"
                         dataKey="placedCount"
-                        stroke={GOLD}
-                        strokeWidth={2.5}
+                        stroke={theme.series.primary}
+                        strokeWidth={2}
                         fill="url(#goldGradient)"
                         dot={<GoldDot />}
                         activeDot={<GoldActiveDot />}

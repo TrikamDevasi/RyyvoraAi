@@ -12,45 +12,46 @@ import {
     ReferenceLine,
 } from 'recharts';
 import type { ForecastEntry } from '../../types/charts';
+import { CHART_THEMES } from '../../lib/chartColors';
 
 interface Props {
     data: ForecastEntry[];
     currentMonthIndex?: number; // index where forecast starts
 }
 
-const GOLD = '#F59E0B';
-const MUTED = '#94a3b8';
-const WHITE = '#FFFFFF';
-const AMBER = '#FBBF24';
+const theme = CHART_THEMES.dark;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload?.length) {
         return (
             <div style={{
-                background: 'rgba(10, 10, 20, 0.95)',
-                border: '1px solid rgba(212, 168, 67, 0.4)',
-                borderRadius: '10px',
-                padding: '12px 16px',
-                backdropFilter: 'blur(12px)',
-                boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+                background: 'var(--bg-surface, #111827)',
+                border: '1px solid var(--border-default, rgba(255,255,255,0.10))',
+                borderRadius: '8px',
+                padding: '10px 14px',
+                boxShadow: 'var(--shadow-md)',
                 minWidth: '160px'
             }}>
                 <p style={{
-                    color: '#F59E0B',
+                    color: 'var(--brand-gold, #F59E0B)',
                     fontWeight: 700,
                     fontSize: '13px',
                     marginBottom: '6px'
                 }}>{label}</p>
-                {payload.map((p: any, i: number) => (
-                    <p key={i} style={{
-                        color: '#ffffff',
-                        fontSize: '13px',
-                        margin: '2px 0'
-                    }}>
-                        {p.name === 'actual' ? 'Actual' : 'Forecast'}: <span style={{ color: '#F59E0B', fontWeight: 600 }}>{p.value?.toFixed(1)}%</span>
-                    </p>
-                ))}
+                {payload.map((p: any, i: number) => {
+                    const isActual = p.name === 'actual';
+                    const color = isActual ? 'var(--brand-gold, #F59E0B)' : 'var(--info, #06B6D4)';
+                    return (
+                        <p key={i} style={{
+                            color: 'var(--text-primary, #F8FAFC)',
+                            fontSize: '12.5px',
+                            margin: '3px 0'
+                        }}>
+                            {isActual ? 'Actual' : 'AI Forecast'}: <span style={{ color, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{p.value?.toFixed(1)}%</span>
+                        </p>
+                    );
+                })}
             </div>
         );
     }
@@ -71,23 +72,23 @@ export default function SkillForecastArea({ data, currentMonthIndex }: Props) {
                 <AreaChart data={data} margin={{ top: 10, right: 20, left: 10, bottom: 5 }}>
                     <defs>
                         <linearGradient id="actualGradient" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor={GOLD} stopOpacity={0.4} />
-                            <stop offset="95%" stopColor={GOLD} stopOpacity={0.03} />
+                            <stop offset="5%" stopColor={theme.series.primary} stopOpacity={0.25} />
+                            <stop offset="95%" stopColor={theme.series.primary} stopOpacity={0.0} />
                         </linearGradient>
                         <linearGradient id="forecastGradient" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor={GOLD} stopOpacity={0.15} />
-                            <stop offset="95%" stopColor={GOLD} stopOpacity={0.01} />
+                            <stop offset="5%" stopColor={theme.series.telemetry} stopOpacity={0.2} />
+                            <stop offset="95%" stopColor={theme.series.telemetry} stopOpacity={0.0} />
                         </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.07)" vertical={false} />
+                    <CartesianGrid strokeDasharray="3 3" stroke={theme.grid.stroke} vertical={false} />
                     <XAxis
                         dataKey="month"
-                        tick={{ fill: MUTED, fontSize: 11 }}
-                        axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
+                        tick={{ fill: theme.axis.tick, fontSize: 11 }}
+                        axisLine={{ stroke: theme.grid.stroke }}
                         tickLine={false}
                     />
                     <YAxis
-                        tick={{ fill: MUTED, fontSize: 11 }}
+                        tick={{ fill: theme.axis.tick, fontSize: 11 }}
                         axisLine={false}
                         tickLine={false}
                         tickFormatter={(v) => `${v}%`}
@@ -97,12 +98,13 @@ export default function SkillForecastArea({ data, currentMonthIndex }: Props) {
                     {splitLabel && (
                         <ReferenceLine
                             x={splitLabel}
-                            stroke="rgba(212,168,67,0.4)"
-                            strokeDasharray="6 3"
+                            stroke={theme.series.telemetry}
+                            strokeDasharray="4 3"
                             label={{
-                                value: 'Forecast →',
-                                fill: GOLD,
+                                value: 'AI Projection →',
+                                fill: theme.series.telemetry,
                                 fontSize: 11,
+                                fontWeight: 600,
                                 position: 'insideTopRight',
                             }}
                         />
@@ -111,8 +113,8 @@ export default function SkillForecastArea({ data, currentMonthIndex }: Props) {
                     <Area
                         type="monotone"
                         dataKey="actual"
-                        stroke={GOLD}
-                        strokeWidth={2.5}
+                        stroke={theme.series.primary}
+                        strokeWidth={2}
                         fill="url(#actualGradient)"
                         dot={false}
                         connectNulls={false}
@@ -120,9 +122,9 @@ export default function SkillForecastArea({ data, currentMonthIndex }: Props) {
                     <Area
                         type="monotone"
                         dataKey="forecast"
-                        stroke={GOLD}
-                        strokeWidth={1.5}
-                        strokeDasharray="6 3"
+                        stroke={theme.series.telemetry}
+                        strokeWidth={2}
+                        strokeDasharray="5 3"
                         fill="url(#forecastGradient)"
                         dot={false}
                         connectNulls={false}

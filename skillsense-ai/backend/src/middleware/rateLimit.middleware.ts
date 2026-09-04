@@ -24,6 +24,24 @@ export const authLimiter = rateLimit({
   message: rateLimitResponse('Too many authentication attempts. Please try again in 15 minutes.'),
 });
 
+export const otpSendLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10, // Max 10 OTP generation attempts per 15m per IP
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: (req) => req.method === 'OPTIONS',
+  message: rateLimitResponse('Too many verification codes requested. Please wait 15 minutes before trying again.'),
+});
+
+export const otpVerifyLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 25, // Max 25 verification attempts per 15m
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: (req) => req.method === 'OPTIONS',
+  message: rateLimitResponse('Too many verification attempts. Please wait 15 minutes before trying again.'),
+});
+
 export const aiLimiter = rateLimit({
   windowMs: 60 * 1000, // 1 minute
   max: 100, // Increased for interactive neural assessments & analysis

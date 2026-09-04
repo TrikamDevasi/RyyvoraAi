@@ -1,28 +1,13 @@
 'use client';
 
 import React, { useState } from 'react';
+import { getScoreTierColor } from '../../lib/chartColors';
 
 interface CohortHeatmapProps {
     data: {
         cohort: string;
         skills: { skill: string; score: number }[];
     }[];
-}
-
-const GOLD = '#D4A843';
-const MUTED = '#A0A0A0';
-const WHITE = '#FFFFFF';
-
-function getColor(score: number): string {
-    if (score >= 80) return 'rgba(212, 168, 67, 0.85)';
-    if (score >= 65) return 'rgba(212, 168, 67, 0.55)';
-    if (score >= 50) return 'rgba(212, 168, 67, 0.3)';
-    return 'rgba(239, 68, 68, 0.4)';
-}
-
-function getTextColor(score: number): string {
-    if (score >= 65) return '#1a1208';
-    return WHITE;
 }
 
 export default function CohortHeatmap({ data }: CohortHeatmapProps) {
@@ -38,22 +23,23 @@ export default function CohortHeatmap({ data }: CohortHeatmapProps) {
             {hoveredCell && (
                 <div
                     style={{
-                        background: 'rgba(10, 10, 20, 0.95)',
-                        border: '1px solid rgba(212, 168, 67, 0.4)',
-                        borderRadius: '10px',
-                        padding: '12px 16px',
-                        backdropFilter: 'blur(12px)',
-                        boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+                        background: 'var(--bg-surface, #111827)',
+                        border: '1px solid var(--border-default, rgba(255,255,255,0.10))',
+                        borderRadius: '8px',
+                        padding: '10px 14px',
+                        boxShadow: 'var(--shadow-md)',
                         marginBottom: 12,
                         display: 'inline-block',
                     }}
                 >
-                    <p style={{ color: '#F59E0B', fontWeight: 700, fontSize: '13px', margin: 0 }}>
+                    <p style={{ color: 'var(--brand-gold, #F59E0B)', fontWeight: 700, fontSize: '13px', margin: 0 }}>
                         {hoveredCell.cohort}
                     </p>
-                    <div style={{ marginTop: '4px', display: 'flex', gap: '8px' }}>
-                        <span style={{ color: '#ffffff', fontSize: '13px' }}>{hoveredCell.skill}:</span>
-                        <span style={{ color: '#F59E0B', fontWeight: 700, fontSize: '13px' }}>{hoveredCell.score}</span>
+                    <div style={{ marginTop: '4px', display: 'flex', gap: '8px', alignItems: 'center' }}>
+                        <span style={{ color: 'var(--text-secondary, #94A3B8)', fontSize: '12px' }}>{hoveredCell.skill}:</span>
+                        <span style={{ color: getScoreTierColor(hoveredCell.score, true), fontWeight: 700, fontSize: '13px', fontVariantNumeric: 'tabular-nums' }}>
+                            {hoveredCell.score}%
+                        </span>
                     </div>
                 </div>
             )}
@@ -65,9 +51,9 @@ export default function CohortHeatmap({ data }: CohortHeatmapProps) {
                             style={{
                                 padding: '8px 12px',
                                 textAlign: 'left',
-                                color: MUTED,
+                                color: 'var(--text-secondary, #94A3B8)',
                                 fontWeight: 600,
-                                borderBottom: '1px solid rgba(255,255,255,0.1)',
+                                borderBottom: '1px solid var(--border-default, rgba(255,255,255,0.10))',
                                 whiteSpace: 'nowrap',
                             }}
                         >
@@ -79,9 +65,9 @@ export default function CohortHeatmap({ data }: CohortHeatmapProps) {
                                 style={{
                                     padding: '8px 10px',
                                     textAlign: 'center',
-                                    color: MUTED,
+                                    color: 'var(--text-secondary, #94A3B8)',
                                     fontWeight: 600,
-                                    borderBottom: '1px solid rgba(255,255,255,0.1)',
+                                    borderBottom: '1px solid var(--border-default, rgba(255,255,255,0.10))',
                                     whiteSpace: 'nowrap',
                                     maxWidth: 90,
                                     overflow: 'hidden',
@@ -100,58 +86,62 @@ export default function CohortHeatmap({ data }: CohortHeatmapProps) {
                             <td
                                 style={{
                                     padding: '7px 12px',
-                                    color: WHITE,
+                                    color: 'var(--text-primary, #F8FAFC)',
                                     fontWeight: 500,
-                                    borderBottom: '1px solid rgba(255,255,255,0.05)',
+                                    borderBottom: '1px solid var(--border-subtle, rgba(255,255,255,0.06))',
                                     whiteSpace: 'nowrap',
                                 }}
                             >
                                 {row.cohort}
                             </td>
-                            {row.skills.map((cell) => (
-                                <td
-                                    key={cell.skill}
-                                    style={{
-                                        padding: '7px 10px',
-                                        textAlign: 'center',
-                                        background: getColor(cell.score),
-                                        color: getTextColor(cell.score),
-                                        fontWeight: 600,
-                                        borderBottom: '1px solid rgba(255,255,255,0.05)',
-                                        borderRadius: 4,
-                                        cursor: 'pointer',
-                                        transition: 'transform 0.15s',
-                                        transform: hoveredCell?.cohort === row.cohort && hoveredCell?.skill === cell.skill ? 'scale(1.1)' : 'scale(1)',
-                                    }}
-                                    onMouseEnter={() => setHoveredCell({ cohort: row.cohort, skill: cell.skill, score: cell.score })}
-                                    onMouseLeave={() => setHoveredCell(null)}
-                                >
-                                    {cell.score}
-                                </td>
-                            ))}
+                            {row.skills.map((cell) => {
+                                const tierColor = getScoreTierColor(cell.score, true);
+                                return (
+                                    <td
+                                        key={cell.skill}
+                                        style={{
+                                            padding: '7px 10px',
+                                            textAlign: 'center',
+                                            background: `${tierColor}22`,
+                                            color: tierColor,
+                                            fontWeight: 700,
+                                            borderBottom: '1px solid var(--border-subtle, rgba(255,255,255,0.06))',
+                                            borderRadius: 4,
+                                            cursor: 'pointer',
+                                            transition: 'background 0.15s ease',
+                                            fontVariantNumeric: 'tabular-nums',
+                                        }}
+                                        onMouseEnter={() => setHoveredCell({ cohort: row.cohort, skill: cell.skill, score: cell.score })}
+                                        onMouseLeave={() => setHoveredCell(null)}
+                                    >
+                                        {cell.score}
+                                    </td>
+                                );
+                            })}
                         </tr>
                     ))}
                 </tbody>
             </table>
 
-            {/* Legend */}
-            <div style={{ display: 'flex', gap: 16, marginTop: 12, flexWrap: 'wrap' }}>
+            {/* Strict 5-Tier Legend */}
+            <div style={{ display: 'flex', gap: 14, marginTop: 12, flexWrap: 'wrap', alignItems: 'center' }}>
                 {[
-                    { label: '≥ 80 (Excellent)', color: 'rgba(212, 168, 67, 0.85)' },
-                    { label: '65–79 (Good)', color: 'rgba(212, 168, 67, 0.55)' },
-                    { label: '50–64 (Fair)', color: 'rgba(212, 168, 67, 0.3)' },
-                    { label: '< 50 (At Risk)', color: 'rgba(239, 68, 68, 0.4)' },
+                    { label: '≥85% Surplus', color: '#10B981' },
+                    { label: '75–84% Strong', color: '#06B6D4' },
+                    { label: '65–74% Equilibrium', color: '#F59E0B' },
+                    { label: '50–64% Deficit', color: '#F97316' },
+                    { label: '<50% Critical', color: '#EF4444' },
                 ].map((item) => (
                     <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <div
+                        <span
                             style={{
-                                width: 14,
-                                height: 14,
+                                width: 8,
+                                height: 8,
+                                borderRadius: 2,
                                 background: item.color,
-                                borderRadius: 3,
                             }}
                         />
-                        <span style={{ color: MUTED, fontSize: 11 }}>{item.label}</span>
+                        <span style={{ color: 'var(--text-secondary, #94A3B8)', fontSize: 11 }}>{item.label}</span>
                     </div>
                 ))}
             </div>

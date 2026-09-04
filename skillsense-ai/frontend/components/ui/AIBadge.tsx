@@ -17,12 +17,12 @@ export function AIBadge({ type = 'ai', label }: AIBadgeProps) {
           alignItems: 'center',
           gap: 4,
           padding: '2px 8px',
-          background: 'var(--error-bg, rgba(239,68,68,0.1))',
-          border: '1px solid var(--error-border, rgba(239,68,68,0.3))',
+          background: 'var(--error-surface, rgba(239,68,68,0.1))',
+          border: '1px solid var(--error-border, rgba(239,68,68,0.25))',
           color: 'var(--error, #ef4444)',
           fontSize: 10.5,
           fontWeight: 700,
-          borderRadius: 99,
+          borderRadius: 'var(--radius-sm, 6px)',
           letterSpacing: '0.03em',
           textTransform: 'uppercase',
         }}
@@ -41,12 +41,12 @@ export function AIBadge({ type = 'ai', label }: AIBadgeProps) {
           alignItems: 'center',
           gap: 4,
           padding: '2px 8px',
-          background: 'var(--success-bg, rgba(16,185,129,0.08))',
+          background: 'var(--success-surface, rgba(16,185,129,0.1))',
           border: '1px solid var(--success-border, rgba(16,185,129,0.25))',
           color: 'var(--success, #10b981)',
           fontSize: 10.5,
           fontWeight: 700,
-          borderRadius: 99,
+          borderRadius: 'var(--radius-sm, 6px)',
           letterSpacing: '0.03em',
           textTransform: 'uppercase',
         }}
@@ -65,16 +65,16 @@ export function AIBadge({ type = 'ai', label }: AIBadgeProps) {
           alignItems: 'center',
           gap: 5,
           padding: '2px 8px',
-          background: 'var(--info-bg, rgba(59,130,246,0.08))',
-          border: '1px solid var(--info-border, rgba(59,130,246,0.22))',
-          color: 'var(--info, #3b82f6)',
+          background: 'var(--info-surface, rgba(6,182,212,0.1))',
+          border: '1px solid var(--info-border, rgba(6,182,212,0.25))',
+          color: 'var(--info, #06b6d4)',
           fontSize: 10.5,
           fontWeight: 700,
-          borderRadius: 99,
+          borderRadius: 'var(--radius-sm, 6px)',
           letterSpacing: '0.03em',
         }}
       >
-        <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--info, #3b82f6)', animation: 'pulse-slow 2s infinite' }} />
+        <span style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--info, #06b6d4)' }} />
         {label || 'LIVE TELEMETRY'}
       </span>
     );
@@ -88,12 +88,12 @@ export function AIBadge({ type = 'ai', label }: AIBadgeProps) {
           alignItems: 'center',
           gap: 4,
           padding: '2px 8px',
-          background: 'var(--gold-muted, rgba(245,158,11,0.08))',
-          border: '1px solid var(--gold-border, rgba(245,158,11,0.25))',
-          color: 'var(--gold, #f59e0b)',
+          background: 'var(--brand-gold-subtle, rgba(245,158,11,0.08))',
+          border: '1px solid var(--brand-gold-border, rgba(245,158,11,0.25))',
+          color: 'var(--brand-gold, #f59e0b)',
           fontSize: 10.5,
           fontWeight: 700,
-          borderRadius: 99,
+          borderRadius: 'var(--radius-sm, 6px)',
           letterSpacing: '0.03em',
           textTransform: 'uppercase',
         }}
@@ -104,6 +104,7 @@ export function AIBadge({ type = 'ai', label }: AIBadgeProps) {
     );
   }
 
+  // AI telemetry badge — Telemetry Cyan identity
   return (
     <span
       style={{
@@ -111,12 +112,12 @@ export function AIBadge({ type = 'ai', label }: AIBadgeProps) {
         alignItems: 'center',
         gap: 4,
         padding: '2px 8px',
-        background: 'var(--gold-muted, rgba(245,158,11,0.08))',
-        border: '1px solid var(--gold-border, rgba(245,158,11,0.25))',
-        color: 'var(--gold, #f59e0b)',
+        background: 'var(--info-surface, rgba(6,182,212,0.1))',
+        border: '1px solid var(--info-border, rgba(6,182,212,0.25))',
+        color: 'var(--info, #06b6d4)',
         fontSize: 10.5,
         fontWeight: 700,
-        borderRadius: 99,
+        borderRadius: 'var(--radius-sm, 6px)',
         letterSpacing: '0.03em',
         textTransform: 'uppercase',
       }}

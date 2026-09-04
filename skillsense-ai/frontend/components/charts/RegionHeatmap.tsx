@@ -2,14 +2,11 @@
 
 import React, { useState } from 'react';
 import type { RegionData } from '../../types/charts';
+import { getScoreTierColor } from '../../lib/chartColors';
 
 interface RegionHeatmapProps {
     data: RegionData[];
 }
-
-const GOLD = '#D4A843';
-const MUTED = '#A0A0A0';
-const WHITE = '#FFFFFF';
 
 const STATE_POSITIONS: Record<string, { x: number; y: number }> = {
     'Jammu & Kashmir': { x: 28, y: 6 },
@@ -44,13 +41,6 @@ const STATE_POSITIONS: Record<string, { x: number; y: number }> = {
     'Goa': { x: 24, y: 60 },
 };
 
-function getHeatColor(score: number): string {
-    if (score >= 80) return 'rgba(212, 168, 67, 0.9)';
-    if (score >= 70) return 'rgba(212, 168, 67, 0.65)';
-    if (score >= 60) return 'rgba(212, 168, 67, 0.38)';
-    return 'rgba(239, 68, 68, 0.55)';
-}
-
 export default function RegionHeatmap({ data }: RegionHeatmapProps) {
     const [tooltip, setTooltip] = useState<RegionData | null>(null);
 
@@ -62,9 +52,9 @@ export default function RegionHeatmap({ data }: RegionHeatmapProps) {
                     position: 'relative',
                     width: '100%',
                     paddingBottom: '90%',
-                    background: 'rgba(255,255,255,0.03)',
-                    borderRadius: 12,
-                    border: '1px solid rgba(255,255,255,0.08)',
+                    background: 'var(--bg-surface-elevated, #1A2234)',
+                    borderRadius: 10,
+                    border: '1px solid var(--border-default, rgba(255,255,255,0.10))',
                     overflow: 'hidden',
                 }}
             >
@@ -82,34 +72,36 @@ export default function RegionHeatmap({ data }: RegionHeatmapProps) {
                         <path
                             d="M30,10 Q45,5 65,10 Q85,20 88,35 Q82,55 70,70 Q55,85 40,80 Q25,78 20,65 Q12,50 18,35 Q22,20 30,10Z"
                             fill="none"
-                            stroke="rgba(255,255,255,0.06)"
-                            strokeWidth="0.5"
+                            stroke="var(--border-subtle, rgba(255,255,255,0.06))"
+                            strokeWidth="0.6"
                         />
 
                         {/* State dots */}
                         {data.map((region) => {
                             const pos = STATE_POSITIONS[region.state];
                             if (!pos) return null;
+                            const tierColor = getScoreTierColor(region.skillScore, true);
                             return (
                                 <g key={region.state}>
                                     <circle
                                         cx={pos.x}
                                         cy={pos.y}
-                                        r={3.5}
-                                        fill={getHeatColor(region.skillScore)}
-                                        stroke="rgba(255,255,255,0.2)"
-                                        strokeWidth={0.3}
-                                        style={{ cursor: 'pointer', transition: 'r 0.2s' }}
+                                        r={3.2}
+                                        fill={tierColor}
+                                        stroke="rgba(0,0,0,0.5)"
+                                        strokeWidth={0.5}
+                                        style={{ cursor: 'pointer', transition: 'transform 0.15s ease' }}
                                         onMouseEnter={() => setTooltip(region)}
                                         onMouseLeave={() => setTooltip(null)}
                                     />
                                     <text
                                         x={pos.x}
-                                        y={pos.y + 5.5}
+                                        y={pos.y + 5.2}
                                         textAnchor="middle"
-                                        fill={MUTED}
-                                        fontSize="2.2"
+                                        fill="var(--text-muted, #94A3B8)"
+                                        fontSize="2.1"
                                         pointerEvents="none"
+                                        style={{ fontFamily: 'inherit', fontWeight: 500 }}
                                     >
                                         {region.state.split(' ')[0].slice(0, 6)}
                                     </text>
@@ -125,40 +117,39 @@ export default function RegionHeatmap({ data }: RegionHeatmapProps) {
                                 position: 'absolute',
                                 bottom: 16,
                                 left: 16,
-                                background: 'rgba(10, 10, 20, 0.95)',
-                                border: '1px solid rgba(212, 168, 67, 0.4)',
-                                borderRadius: '10px',
-                                padding: '12px 16px',
-                                backdropFilter: 'blur(12px)',
-                                boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+                                background: 'var(--bg-surface, #111827)',
+                                border: '1px solid var(--border-default, rgba(255,255,255,0.10))',
+                                borderRadius: '8px',
+                                padding: '12px 14px',
+                                boxShadow: 'var(--shadow-md)',
                                 minWidth: 200,
                                 zIndex: 10,
                                 pointerEvents: 'none',
                             }}
                         >
-                            <p style={{ color: '#F59E0B', fontWeight: 700, fontSize: '14px', marginBottom: '8px' }}>
+                            <p style={{ color: 'var(--brand-gold, #F59E0B)', fontWeight: 700, fontSize: '13.5px', marginBottom: '8px' }}>
                                 {tooltip.state}
                             </p>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                <p style={{ color: '#ffffff', fontSize: '13px', margin: 0 }}>
-                                    Skill Score: <span style={{ color: '#F59E0B', fontWeight: 600 }}>{tooltip.skillScore}</span>
+                                <p style={{ color: 'var(--text-primary, #F8FAFC)', fontSize: '12.5px', margin: 0 }}>
+                                    Skill Score: <span style={{ color: getScoreTierColor(tooltip.skillScore, true), fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{tooltip.skillScore}%</span>
                                 </p>
-                                <p style={{ color: '#ffffff', fontSize: '13px', margin: 0 }}>
-                                    Placement Rate: <span style={{ color: '#F59E0B', fontWeight: 600 }}>{tooltip.placementRate}%</span>
+                                <p style={{ color: 'var(--text-primary, #F8FAFC)', fontSize: '12.5px', margin: 0 }}>
+                                    Placement Rate: <span style={{ color: 'var(--text-primary, #F8FAFC)', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>{tooltip.placementRate}%</span>
                                 </p>
-                                <p style={{ color: '#ffffff', fontSize: '13px', margin: 0 }}>
-                                    Students: <span style={{ color: '#F59E0B', fontWeight: 600 }}>{tooltip.studentCount.toLocaleString('en-IN')}</span>
+                                <p style={{ color: 'var(--text-primary, #F8FAFC)', fontSize: '12.5px', margin: 0 }}>
+                                    Candidates: <span style={{ color: 'var(--text-primary, #F8FAFC)', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>{tooltip.studentCount.toLocaleString('en-IN')}</span>
                                 </p>
                                 {tooltip.criticalGaps.length > 0 && (
                                     <p style={{ 
-                                        color: '#ef4444', 
-                                        fontSize: '12px', 
-                                        marginTop: '8px',
-                                        paddingTop: '8px',
-                                        borderTop: '1px solid rgba(255,255,255,0.1)',
+                                        color: 'var(--error, #EF4444)', 
+                                        fontSize: '11.5px', 
+                                        marginTop: '6px',
+                                        paddingTop: '6px',
+                                        borderTop: '1px solid var(--border-subtle, rgba(255,255,255,0.06))',
                                         fontWeight: 600 
                                     }}>
-                                        ⚑ {tooltip.criticalGaps.join(', ')}
+                                        Deficit: {tooltip.criticalGaps.join(', ')}
                                     </p>
                                 )}
                             </div>
@@ -167,24 +158,25 @@ export default function RegionHeatmap({ data }: RegionHeatmapProps) {
                 </div>
             </div>
 
-            {/* Color legend */}
-            <div style={{ display: 'flex', gap: 12, marginTop: 10, flexWrap: 'wrap' }}>
+            {/* Strict 5-Tier Color Legend */}
+            <div style={{ display: 'flex', gap: 14, marginTop: 12, flexWrap: 'wrap', alignItems: 'center' }}>
                 {[
-                    { label: '≥ 80', color: 'rgba(212,168,67,0.9)' },
-                    { label: '70–79', color: 'rgba(212,168,67,0.65)' },
-                    { label: '60–69', color: 'rgba(212,168,67,0.38)' },
-                    { label: '< 60 Critical', color: 'rgba(239,68,68,0.55)' },
+                    { label: '≥85% Surplus', color: '#10B981' },
+                    { label: '75–84% Strong', color: '#06B6D4' },
+                    { label: '65–74% Equilibrium', color: '#F59E0B' },
+                    { label: '50–64% Deficit', color: '#F97316' },
+                    { label: '<50% Critical', color: '#EF4444' },
                 ].map((item) => (
-                    <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                        <div
+                    <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <span
                             style={{
-                                width: 12,
-                                height: 12,
+                                width: 8,
+                                height: 8,
                                 borderRadius: '50%',
                                 background: item.color,
                             }}
                         />
-                        <span style={{ color: MUTED, fontSize: 11 }}>{item.label}</span>
+                        <span style={{ color: 'var(--text-secondary, #94A3B8)', fontSize: 11, fontWeight: 500 }}>{item.label}</span>
                     </div>
                 ))}
             </div>

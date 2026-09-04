@@ -301,24 +301,25 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                             display: 'flex',
                             alignItems: 'center',
                             gap: 10,
-                            minHeight: 40,
-                            padding: sidebarCollapsed ? '8px 0' : '8px 10px',
+                            minHeight: 38,
+                            padding: sidebarCollapsed ? '7px 0' : '7px 10px',
                             justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
-                            borderRadius: 8,
+                            borderRadius: 'var(--radius-md, 8px)',
                             fontSize: 13,
-                            fontWeight: active ? 700 : 500,
-                            color: active ? 'var(--gold)' : 'var(--text-secondary)',
-                            background: active ? 'var(--gold-muted)' : 'transparent',
-                            borderLeft: active ? '3px solid var(--gold)' : '3px solid transparent',
+                            fontWeight: active ? 650 : 500,
+                            color: active ? 'var(--text-primary)' : 'var(--text-secondary)',
+                            background: active ? 'var(--bg-surface-elevated)' : 'transparent',
+                            border: active ? '1px solid var(--border-default)' : '1px solid transparent',
                             textDecoration: 'none',
+                            transition: 'all 0.15s ease',
                           }}
                           aria-label={route.label}
                           aria-current={active ? 'page' : undefined}
                         >
                           <Icon
-                            size={17}
+                            size={16}
                             style={{
-                              color: active ? 'var(--gold)' : 'currentColor',
+                              color: active ? 'var(--brand-gold)' : 'var(--text-muted)',
                               flexShrink: 0,
                             }}
                           />
@@ -332,12 +333,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                                 <span
                                   style={{
                                     fontSize: 9,
-                                    fontWeight: 800,
+                                    fontWeight: 700,
                                     padding: '1px 5px',
-                                    borderRadius: 4,
-                                    background: route.badge === 'AI' ? 'rgba(245,158,11,0.2)' : 'var(--bg-surface-elevated)',
-                                    color: route.badge === 'AI' ? 'var(--gold)' : 'var(--text-muted)',
-                                    border: '1px solid var(--border)',
+                                    borderRadius: 'var(--radius-sm, 4px)',
+                                    background: route.badge === 'AI' ? 'var(--info-surface, rgba(6,182,212,0.1))' : 'var(--bg-surface-elevated)',
+                                    color: route.badge === 'AI' ? 'var(--info, #06b6d4)' : 'var(--text-muted)',
+                                    border: route.badge === 'AI' ? '1px solid var(--info-border, rgba(6,182,212,0.25))' : '1px solid var(--border)',
                                     flexShrink: 0,
                                   }}
                                 >
@@ -349,7 +350,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                             <span className="sidebar-tooltip">
                               {route.label}
                               {route.badge && (
-                                <span style={{ marginLeft: 6, fontSize: 9.5, color: 'var(--gold)', fontWeight: 800 }}>
+                                <span style={{ marginLeft: 6, fontSize: 9.5, color: route.badge === 'AI' ? 'var(--info)' : 'var(--brand-gold)', fontWeight: 700 }}>
                                   ({route.badge})
                                 </span>
                               )}
@@ -560,20 +561,21 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                       display: 'inline-flex',
                       alignItems: 'center',
                       gap: 7,
-                      padding: '7px 12px',
-                      height: 38,
-                      borderRadius: 8,
+                      padding: '6px 12px',
+                      height: 36,
+                      borderRadius: 'var(--radius-md, 8px)',
                       fontSize: 13,
-                      fontWeight: active ? 700 : 500,
-                      color: active ? 'var(--gold)' : 'var(--text-secondary)',
-                      background: active ? 'var(--gold-muted)' : 'transparent',
-                      border: active ? '1px solid var(--gold-border)' : '1px solid transparent',
+                      fontWeight: active ? 650 : 500,
+                      color: active ? 'var(--text-primary)' : 'var(--text-secondary)',
+                      background: active ? 'var(--bg-surface-elevated)' : 'transparent',
+                      border: active ? '1px solid var(--border-default)' : '1px solid transparent',
                       textDecoration: 'none',
                       whiteSpace: 'nowrap',
                       flexShrink: 0,
+                      transition: 'all 0.15s ease',
                     }}
                   >
-                    <Icon size={16} style={{ color: active ? 'var(--gold)' : 'currentColor', flexShrink: 0 }} />
+                    <Icon size={15} style={{ color: active ? 'var(--brand-gold)' : 'var(--text-muted)', flexShrink: 0 }} />
                     <span className="hidden xl:inline">{route.label}</span>
                     <span className="inline xl:hidden">{route.shortLabel || route.label}</span>
                   </Link>
@@ -892,18 +894,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                                 display: 'flex',
                                 alignItems: 'center',
                                 gap: 10,
-                                minHeight: 42,
+                                minHeight: 40,
                                 padding: '8px 10px',
-                                borderRadius: 8,
+                                borderRadius: 'var(--radius-md, 8px)',
                                 fontSize: 13,
-                                fontWeight: active ? 700 : 500,
-                                color: active ? 'var(--gold)' : 'var(--text-primary)',
-                                background: active ? 'var(--gold-muted)' : 'transparent',
-                                borderLeft: active ? '3px solid var(--gold)' : '3px solid transparent',
+                                fontWeight: active ? 650 : 500,
+                                color: active ? 'var(--text-primary)' : 'var(--text-secondary)',
+                                background: active ? 'var(--bg-surface-elevated)' : 'transparent',
+                                border: active ? '1px solid var(--border-default)' : '1px solid transparent',
                                 textDecoration: 'none',
+                                transition: 'all 0.15s ease',
                               }}
                             >
-                              <Icon size={16} style={{ color: active ? 'var(--gold)' : 'var(--text-secondary)' }} />
+                              <Icon size={16} style={{ color: active ? 'var(--brand-gold)' : 'var(--text-muted)' }} />
                               <span>{route.label}</span>
                             </Link>
                           );

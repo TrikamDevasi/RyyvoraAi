@@ -12,13 +12,13 @@ import {
     ReferenceLine,
 } from 'recharts';
 import type { FairnessMetrics } from '../../types/charts';
+import { CHART_THEMES } from '../../lib/chartColors';
 
 interface Props {
     data: FairnessMetrics;
 }
 
-const GOLD = '#F59E0B';
-const WARN = '#ef4444';
+const theme = CHART_THEMES.dark;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const CustomTooltip = ({ active, payload, label }: any) => {
@@ -26,22 +26,22 @@ const CustomTooltip = ({ active, payload, label }: any) => {
         const gap = payload.length === 2 ? Math.abs((payload[0]?.value ?? 0) - (payload[1]?.value ?? 0)) : 0;
         return (
             <div style={{
-                background: 'var(--bg-surface)',
-                border: '1px solid var(--border)',
+                background: 'var(--bg-surface, #111827)',
+                border: '1px solid var(--border-default, rgba(255,255,255,0.10))',
                 borderRadius: '8px',
                 padding: '10px 14px',
                 boxShadow: 'var(--shadow-md)',
                 minWidth: '180px'
             }}>
                 <p style={{
-                    color: 'var(--gold)',
+                    color: 'var(--brand-gold, #F59E0B)',
                     fontWeight: 700,
                     fontSize: '12.5px',
                     marginBottom: '6px'
                 }}>{label}</p>
                 {payload.map((p: any, i: number) => (
                     <p key={i} style={{
-                        color: 'var(--text-primary)',
+                        color: 'var(--text-primary, #F8FAFC)',
                         fontSize: '12px',
                         margin: '2px 0'
                     }}>
@@ -50,10 +50,10 @@ const CustomTooltip = ({ active, payload, label }: any) => {
                 ))}
                 {payload.length === 2 && (
                     <p style={{
-                        color: gap > 10 ? WARN : gap > 5 ? '#f59e0b' : 'var(--success)',
+                        color: gap > 10 ? 'var(--error, #EF4444)' : gap > 5 ? 'var(--warning, #EAB308)' : 'var(--success, #10B981)',
                         fontSize: 11.5,
                         marginTop: 8,
-                        borderTop: '1px solid var(--border)',
+                        borderTop: '1px solid var(--border-subtle, rgba(255,255,255,0.06))',
                         paddingTop: 6,
                         fontWeight: 600,
                         fontVariantNumeric: 'tabular-nums'
@@ -87,30 +87,29 @@ export default function FairnessDistribution({ data }: Props) {
                 <BarChart
                     data={chartData}
                     margin={{ top: 20, right: 20, left: 10, bottom: 5 }}
-                    barSize={28}
+                    barSize={26}
                 >
-                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" strokeOpacity={0.6} vertical={false} />
+                    <CartesianGrid strokeDasharray="3 3" stroke={theme.grid.stroke} vertical={false} />
                     <XAxis
                         dataKey="category"
-                        tick={{ fill: 'var(--text-secondary)', fontSize: 11.5 }}
-                        axisLine={{ stroke: 'var(--border)' }}
+                        tick={{ fill: theme.axis.tick, fontSize: 11.5 }}
+                        axisLine={{ stroke: theme.grid.stroke }}
                         tickLine={false}
                     />
                     <YAxis
                         domain={[50, 100]}
-                        tick={{ fill: 'var(--text-muted)', fontSize: 11 }}
+                        tick={{ fill: theme.axis.tick, fontSize: 11 }}
                         axisLine={false}
                         tickLine={false}
                     />
                     <Tooltip content={<CustomTooltip />} />
                     <ReferenceLine
                         y={avgScore}
-                        stroke="var(--text-muted)"
+                        stroke={theme.series.baseline}
                         strokeDasharray="4 2"
-                        strokeOpacity={0.5}
                         label={{
                             value: `Avg ${avgScore.toFixed(1)}`,
-                            fill: 'var(--text-secondary)',
+                            fill: theme.axis.label,
                             fontSize: 10.5,
                             position: 'insideTopRight',
                         }}
@@ -118,7 +117,7 @@ export default function FairnessDistribution({ data }: Props) {
                     <Bar
                         dataKey="score"
                         radius={[4, 4, 0, 0]}
-                        fill={GOLD}
+                        fill={theme.series.primary}
                         fillOpacity={0.85}
                     />
                 </BarChart>

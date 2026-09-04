@@ -6,8 +6,14 @@ import {
   resetPassword, verifyEmail, resendVerification,
   getPreferences, updatePreferences,
 } from '../controllers/auth.controller';
+import {
+  sendMobileOtp,
+  verifyMobileOtp,
+  completeMobileProfile,
+  linkMobilePhone,
+} from '../controllers/mobileAuth.controller';
 import { protect } from '../middleware/auth.middleware';
-import { authLimiter } from '../middleware/rateLimit.middleware';
+import { authLimiter, otpSendLimiter, otpVerifyLimiter } from '../middleware/rateLimit.middleware';
 import { IUser } from '../models/User.model';
 import { signToken } from '../utils/jwt.utils';
 import env from '../config/env';
@@ -27,6 +33,12 @@ const encodeUser = (user: IUser): string => {
   };
   return Buffer.from(JSON.stringify(payload)).toString('base64');
 };
+
+// ── Mobile OTP Authentication ──────────────────────────────────────────────────
+router.post('/mobile/send-otp', otpSendLimiter, sendMobileOtp);
+router.post('/mobile/verify-otp', otpVerifyLimiter, verifyMobileOtp);
+router.post('/mobile/complete-profile', authLimiter, completeMobileProfile);
+router.post('/mobile/link-phone', protect, linkMobilePhone);
 
 // ── Local Auth ─────────────────────────────────────────────────────────────────
 router.post('/register', authLimiter, register);

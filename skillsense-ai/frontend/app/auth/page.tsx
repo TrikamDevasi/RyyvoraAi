@@ -22,6 +22,7 @@ import {
   ShieldCheck,
   CheckCircle2,
   AlertCircle,
+  Smartphone,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import './auth.css';
@@ -56,9 +57,13 @@ const DEMO_ACCOUNTS: Record<UserRole, { name: string; email: string; role: UserR
 export default function AuthPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { login, register, setAuth } = useAuthStore();
+  const { login, register, setAuth, sendMobileOtp } = useAuthStore();
 
   const [activeTab, setActiveTab] = useState<'signin' | 'signup' | 'demo'>('signin');
+  const [authMethod, setAuthMethod] = useState<'email' | 'mobile'>('email');
+  const [mobilePhone, setMobilePhone] = useState('');
+  const [mobileLoading, setMobileLoading] = useState(false);
+
   const [selectedRole, setSelectedRole] = useState<UserRole>('student');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -68,6 +73,13 @@ export default function AuthPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const methodParam = searchParams.get('method');
+    if (methodParam === 'mobile') {
+      setAuthMethod('mobile');
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     const errParam = searchParams.get('error');
@@ -161,6 +173,34 @@ export default function AuthPage() {
     }
   };
 
+  // ── Mobile OTP Handler ─────────────────────────────────────────────
+  const handleSendMobileOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+
+    const cleanNumber = mobilePhone.replace(/\D/g, '');
+    if (cleanNumber.length < 10) {
+      setError('Please enter a valid 10-digit Indian mobile number.');
+      return;
+    }
+
+    setMobileLoading(true);
+    try {
+      const res = await sendMobileOtp(mobilePhone);
+      toast.success(`Verification code sent to ${res.maskedPhone}!`);
+      router.push('/auth/mobile/verify');
+    } catch (err: any) {
+      setMobileLoading(false);
+      const status = err.response?.status;
+      const msg = err.response?.data?.message || err.message || 'Failed to send verification code.';
+      if (status === 429) {
+        setError('Too many requests. Please wait 60 seconds before requesting another code.');
+      } else {
+        setError(msg);
+      }
+    }
+  };
+
   // ── Instant 1-Click Demo Login ──────────────────────────────────────────────
   const handleInstantDemoLogin = (role: UserRole) => {
     const demo = DEMO_ACCOUNTS[role];
@@ -210,7 +250,7 @@ export default function AuthPage() {
         </div>
 
         {/* ── TABS ── */}
-        <div className="auth-tabs" style={{ display: 'flex', gap: 4, background: 'rgba(0,0,0,0.4)', padding: 4, borderRadius: 10, marginBottom: 20, border: '1px solid rgba(255,255,255,0.06)' }}>
+        <div className="auth-tabs" style={{ display: 'flex', gap: 4, background: 'rgba(0,0,0,0.4)', padding: 4, borderRadius: 10, marginBottom: 16, border: '1px solid rgba(255,255,255,0.06)' }}>
           <button
             type="button"
             onClick={() => setActiveTab('signin')}
@@ -250,6 +290,136 @@ export default function AuthPage() {
             <Zap size={13} /> Demo
           </button>
         </div>
+
+        {/* ── METHOD TOGGLE (EMAIL vs MOBILE) ── */}
+        {activeTab !== 'demo' && (
+          <div style={{ display: 'flex', gap: 6, marginBottom: 16, background: 'rgba(255,255,255,0.03)', padding: 3, borderRadius: 8, border: '1px solid rgba(255,255,255,0.06)' }}>
+            <button
+              type="button"
+              onClick={() => { setAuthMethod('email'); setError(null); }}
+              style={{
+                flex: 1,
+                padding: '7px 10px',
+                fontSize: 12,
+                fontWeight: 600,
+                borderRadius: 6,
+                border: 'none',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 6,
+                background: authMethod === 'email' ? 'rgba(255,255,255,0.1)' : 'transparent',
+                color: authMethod === 'email' ? '#f8fafc' : '#94a3b8',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              <Mail size={13} /> Email & Password
+            </button>
+            <button
+              type="button"
+              onClick={() => { setAuthMethod('mobile'); setError(null); }}
+              style={{
+                flex: 1,
+                padding: '7px 10px',
+                fontSize: 12,
+                fontWeight: 600,
+                borderRadius: 6,
+                border: 'none',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 6,
+                background: authMethod === 'mobile' ? 'rgba(245,158,11,0.15)' : 'transparent',
+                color: authMethod === 'mobile' ? 'var(--gold, #f59e0b)' : '#94a3b8',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              <Smartphone size={13} /> Mobile Number (OTP)
+            </button>
+          </div>
+        )}
+
+        {/* ── MOBILE NUMBER AUTH FORM ── */}
+        {activeTab !== 'demo' && authMethod === 'mobile' && (
+          <form onSubmit={handleSendMobileOtp} className="auth-form" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <div className="auth-field">
+              <label className="auth-field-label">Mobile Number</label>
+              <div className="auth-input-wrap" style={{ display: 'flex', alignItems: 'center' }}>
+                <div style={{
+                  padding: '0 10px',
+                  height: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 4,
+                  background: 'rgba(255,255,255,0.05)',
+                  borderRight: '1px solid rgba(255,255,255,0.1)',
+                  fontSize: 13,
+                  fontWeight: 700,
+                  color: '#f8fafc',
+                }}>
+                  <span>🇮🇳</span>
+                  <span>+91</span>
+                </div>
+                <input
+                  type="tel"
+                  inputMode="numeric"
+                  value={mobilePhone}
+                  onChange={(e) => {
+                    setMobilePhone(e.target.value);
+                    if (error) setError(null);
+                  }}
+                  placeholder="98765 43210"
+                  className="auth-input"
+                  style={{ paddingLeft: 12 }}
+                  required
+                  autoFocus
+                />
+              </div>
+              <div style={{ fontSize: 11.5, color: '#64748b', marginTop: 4 }}>
+                We'll send a 6-digit verification code to this phone.
+              </div>
+            </div>
+
+            {error && (
+              <div style={{ color: '#f87171', fontSize: 12, display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(239,68,68,0.1)', padding: '8px 12px', borderRadius: 8, border: '1px solid rgba(239,68,68,0.2)' }}>
+                <AlertCircle size={14} />
+                <span>{error}</span>
+              </div>
+            )}
+
+            <button
+              type="submit"
+              className="auth-btn"
+              disabled={mobileLoading || !mobilePhone.trim()}
+              style={{
+                padding: '11px',
+                borderRadius: 8,
+                background: 'var(--gold, #f59e0b)',
+                color: '#000',
+                fontWeight: 800,
+                fontSize: 13.5,
+                border: 'none',
+                cursor: mobileLoading || !mobilePhone.trim() ? 'not-allowed' : 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 8,
+                marginTop: 4,
+              }}
+            >
+              {mobileLoading ? (
+                <span>Sending code...</span>
+              ) : (
+                <>
+                  <span>Get Verification Code</span>
+                  <ArrowRight size={16} />
+                </>
+              )}
+            </button>
+          </form>
+        )}
 
         {/* ── 1-CLICK DEMO ACCESS TAB ── */}
         {activeTab === 'demo' && (
@@ -307,8 +477,8 @@ export default function AuthPage() {
           </div>
         )}
 
-        {/* ── FORM (SIGN IN & SIGN UP) ── */}
-        {activeTab !== 'demo' && (
+        {/* ── FORM (SIGN IN & SIGN UP - EMAIL METHOD) ── */}
+        {activeTab !== 'demo' && authMethod === 'email' && (
           <form onSubmit={activeTab === 'signin' ? handleSignIn : handleSignUp} className="auth-form" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             {activeTab === 'signup' && (
               <>

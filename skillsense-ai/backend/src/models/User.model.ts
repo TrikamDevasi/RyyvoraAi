@@ -4,11 +4,13 @@ import { UserRole } from '../types';
 
 export interface IUser extends Document {
   name: string;
-  email: string;
+  email?: string;
   password?: string;
   role: UserRole;
   avatar?: string;
   phone?: string;
+  phoneVerified?: boolean;
+  profileCompleted?: boolean;
   isVerified: boolean;
   isActive: boolean;
   isDeleted: boolean;
@@ -20,7 +22,7 @@ export interface IUser extends Document {
   // OAuth fields
   googleId?: string;
   githubId?: string;
-  authProvider: 'local' | 'google' | 'github';
+  authProvider: 'local' | 'google' | 'github' | 'mobile';
   resetPasswordToken?: string | null;
   resetPasswordExpires?: Date | null;
   verificationToken?: string | null;
@@ -37,7 +39,7 @@ export interface IUser extends Document {
 const UserSchema = new Schema<IUser>(
   {
     name: { type: String, required: [true, 'Name is required'], trim: true },
-    email: { type: String, required: [true, 'Email is required'], unique: true, lowercase: true, trim: true },
+    email: { type: String, unique: true, sparse: true, lowercase: true, trim: true },
     password: { type: String, select: false, minlength: [8, 'Password must be at least 8 characters'] },
     role: { 
       type: String, 
@@ -45,7 +47,9 @@ const UserSchema = new Schema<IUser>(
       default: 'student' 
     },
     avatar: { type: String, default: '' },
-    phone: { type: String },
+    phone: { type: String, unique: true, sparse: true, trim: true },
+    phoneVerified: { type: Boolean, default: false },
+    profileCompleted: { type: Boolean, default: true },
     institutionId: { type: Schema.Types.ObjectId, ref: 'Institution' },
     isVerified: { type: Boolean, default: false },
     isActive: { type: Boolean, default: true },
@@ -56,10 +60,10 @@ const UserSchema = new Schema<IUser>(
       sidebarCollapsed: { type: Boolean, default: false },
     },
     refreshToken: { type: String, select: false },
-    // OAuth
+    // OAuth & Auth Provider
     googleId: { type: String, sparse: true, index: true },
     githubId: { type: String, sparse: true, index: true },
-    authProvider: { type: String, enum: ['local', 'google', 'github'], default: 'local' },
+    authProvider: { type: String, enum: ['local', 'google', 'github', 'mobile'], default: 'local' },
     lastLogin: { type: Date, default: null },
     bio: { type: String, default: '' },
     location: { type: String, default: '' },
