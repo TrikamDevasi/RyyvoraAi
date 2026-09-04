@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -46,11 +46,84 @@ import Tilt3D from '@/components/ui/Tilt3D';
 import PricingSection from '@/components/sections/PricingSection';
 import ThemeToggle from '@/components/shared/ThemeToggle';
 
+function DynamicBidirectionalCounter({
+  target,
+  decimals = 0,
+  prefix = '',
+  suffix = '',
+  duration = 1600,
+}: {
+  target: number;
+  decimals?: number;
+  prefix?: string;
+  suffix?: string;
+  duration?: number;
+}) {
+  const [count, setCount] = useState(0);
+  const ref = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    let animFrame: number;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            let startTime: number | null = null;
+            setCount(0);
+
+            const animate = (timestamp: number) => {
+              if (!startTime) startTime = timestamp;
+              const elapsed = timestamp - startTime;
+              const progress = Math.min(elapsed / duration, 1);
+              const easeOut = 1 - Math.pow(1 - progress, 3);
+              setCount(easeOut * target);
+
+              if (progress < 1) {
+                animFrame = requestAnimationFrame(animate);
+              } else {
+                setCount(target);
+              }
+            };
+
+            animFrame = requestAnimationFrame(animate);
+          } else {
+            setCount(0);
+          }
+        });
+      },
+      { threshold: 0.25 }
+    );
+
+    observer.observe(el);
+    return () => {
+      observer.disconnect();
+      if (animFrame) cancelAnimationFrame(animFrame);
+    };
+  }, [target, duration, decimals]);
+
+  const formatted =
+    decimals > 0
+      ? count.toFixed(decimals)
+      : Math.floor(count).toLocaleString('en-IN');
+
+  return (
+    <span ref={ref}>
+      {prefix}
+      {formatted}
+      {suffix}
+    </span>
+  );
+}
+
 export default function LandingPage() {
   const [scrolled, setScrolled] = useState(false);
   const [activeShowcaseTab, setActiveShowcaseTab] = useState<'dashboard' | 'analyzer' | 'gaps' | 'career' | 'copilot' | 'passport'>('dashboard');
   const [activeRoleTab, setActiveRoleTab] = useState<'student' | 'employer' | 'institute' | 'government' | 'industry' | 'admin'>('student');
-  const [openFaq, setOpenFaq] = useState<number | null>(0);
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [copiedHash, setCopiedHash] = useState(false);
 
   useEffect(() => {
@@ -574,110 +647,266 @@ export default function LandingPage() {
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: 20 }}>
             {/* Feature 1: AI Skill Analyzer */}
-            <div className="card-linear" style={{ padding: 24 }}>
-              <div style={{ width: 38, height: 38, borderRadius: 10, background: 'rgba(245,158,11,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--gold)', marginBottom: 16 }}>
-                <Brain size={20} />
+            <div
+              className="tech-feature-card card-shine"
+              style={
+                {
+                  padding: 24,
+                  '--card-accent': 'var(--gold)',
+                  '--card-accent-glow': 'rgba(245,158,11,0.25)',
+                  '--card-accent-border': 'rgba(245,158,11,0.5)',
+                } as React.CSSProperties
+              }
+            >
+              <div>
+                <div
+                  className="tech-feature-icon"
+                  style={{
+                    width: 42,
+                    height: 42,
+                    borderRadius: 10,
+                    background: 'rgba(245,158,11,0.12)',
+                    border: '1px solid rgba(245,158,11,0.25)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'var(--gold)',
+                    marginBottom: 16,
+                  }}
+                >
+                  <Brain size={20} />
+                </div>
+                <h3 className="font-display" style={{ fontSize: 17, fontWeight: 800, color: '#f8fafc', margin: '0 0 8px' }}>
+                  Multi-Modal AI Skill Analyzer
+                </h3>
+                <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 16 }}>
+                  <strong style={{ color: '#f8fafc' }}>WHAT:</strong> Ingests raw resume text, GitHub repositories, and submitted code snippets.<br />
+                  <strong style={{ color: '#f8fafc' }}>WHY:</strong> Eliminates keyword stuffing by verifying actual architectural and coding syntax.<br />
+                  <strong style={{ color: '#f8fafc' }}>HOW:</strong> Powered by Groq Llama-3.3-70b with safe JSON repair and NSQF taxonomy mapping.
+                </p>
               </div>
-              <h3 className="font-display" style={{ fontSize: 17, fontWeight: 800, color: '#f8fafc', margin: '0 0 8px' }}>
-                Multi-Modal AI Skill Analyzer
-              </h3>
-              <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 14 }}>
-                <strong>WHAT:</strong> Ingests raw resume text, GitHub repositories, and submitted code snippets.<br />
-                <strong>WHY:</strong> Eliminates keyword stuffing by verifying actual architectural and coding syntax.<br />
-                <strong>HOW:</strong> Powered by Groq Llama-3.3-70b with safe JSON repair and NSQF taxonomy mapping.
-              </p>
-              <Link href="/student/analyzer" style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--gold)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>
-                Test Skill Analyzer <ChevronRight size={14} />
+              <Link href="/student/analyzer" className="tech-feature-link" style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--gold)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>
+                Test Skill Analyzer <ChevronRight size={14} className="tech-feature-arrow" />
               </Link>
             </div>
 
             {/* Feature 2: Career Prediction */}
-            <div className="card-linear" style={{ padding: 24 }}>
-              <div style={{ width: 38, height: 38, borderRadius: 10, background: 'rgba(59,130,246,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#60a5fa', marginBottom: 16 }}>
-                <Compass size={20} />
+            <div
+              className="tech-feature-card card-shine"
+              style={
+                {
+                  padding: 24,
+                  '--card-accent': '#60a5fa',
+                  '--card-accent-glow': 'rgba(96,165,250,0.25)',
+                  '--card-accent-border': 'rgba(96,165,250,0.5)',
+                } as React.CSSProperties
+              }
+            >
+              <div>
+                <div
+                  className="tech-feature-icon"
+                  style={{
+                    width: 42,
+                    height: 42,
+                    borderRadius: 10,
+                    background: 'rgba(59,130,246,0.12)',
+                    border: '1px solid rgba(59,130,246,0.25)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#60a5fa',
+                    marginBottom: 16,
+                  }}
+                >
+                  <Compass size={20} />
+                </div>
+                <h3 className="font-display" style={{ fontSize: 17, fontWeight: 800, color: '#f8fafc', margin: '0 0 8px' }}>
+                  Predictive Career Pathways
+                </h3>
+                <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 16 }}>
+                  <strong style={{ color: '#f8fafc' }}>WHAT:</strong> Matches candidate competencies to high-growth Indian tech roles.<br />
+                  <strong style={{ color: '#f8fafc' }}>WHY:</strong> Prevents career misalignment by forecasting market demand and compensation.<br />
+                  <strong style={{ color: '#f8fafc' }}>HOW:</strong> Calculates mathematical compatibility scores and transparent INR model estimates.
+                </p>
               </div>
-              <h3 className="font-display" style={{ fontSize: 17, fontWeight: 800, color: '#f8fafc', margin: '0 0 8px' }}>
-                Predictive Career Pathways
-              </h3>
-              <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 14 }}>
-                <strong>WHAT:</strong> Matches candidate competencies to high-growth Indian tech roles.<br />
-                <strong>WHY:</strong> Prevents career misalignment by forecasting market demand and compensation.<br />
-                <strong>HOW:</strong> Calculates mathematical compatibility scores and transparent INR model estimates.
-              </p>
-              <Link href="/student/career" style={{ fontSize: 12.5, fontWeight: 700, color: '#60a5fa', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>
-                Explore Career Paths <ChevronRight size={14} />
+              <Link href="/student/career" className="tech-feature-link" style={{ fontSize: 12.5, fontWeight: 700, color: '#60a5fa', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>
+                Explore Career Paths <ChevronRight size={14} className="tech-feature-arrow" />
               </Link>
             </div>
 
             {/* Feature 3: Gap Analysis */}
-            <div className="card-linear" style={{ padding: 24 }}>
-              <div style={{ width: 38, height: 38, borderRadius: 10, background: 'rgba(239,68,68,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ef4444', marginBottom: 16 }}>
-                <AlertTriangle size={20} />
+            <div
+              className="tech-feature-card card-shine"
+              style={
+                {
+                  padding: 24,
+                  '--card-accent': '#ef4444',
+                  '--card-accent-glow': 'rgba(239,68,68,0.25)',
+                  '--card-accent-border': 'rgba(239,68,68,0.5)',
+                } as React.CSSProperties
+              }
+            >
+              <div>
+                <div
+                  className="tech-feature-icon"
+                  style={{
+                    width: 42,
+                    height: 42,
+                    borderRadius: 10,
+                    background: 'rgba(239,68,68,0.12)',
+                    border: '1px solid rgba(239,68,68,0.25)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#ef4444',
+                    marginBottom: 16,
+                  }}
+                >
+                  <AlertTriangle size={20} />
+                </div>
+                <h3 className="font-display" style={{ fontSize: 17, fontWeight: 800, color: '#f8fafc', margin: '0 0 8px' }}>
+                  Dynamic Skill Gap Analysis
+                </h3>
+                <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 16 }}>
+                  <strong style={{ color: '#f8fafc' }}>WHAT:</strong> Compares student skills against target enterprise benchmarks.<br />
+                  <strong style={{ color: '#f8fafc' }}>WHY:</strong> Gives learners concrete clarity on what to study rather than generic advice.<br />
+                  <strong style={{ color: '#f8fafc' }}>HOW:</strong> Generates priority-tagged deficiencies and phase-by-phase timeline roadmaps.
+                </p>
               </div>
-              <h3 className="font-display" style={{ fontSize: 17, fontWeight: 800, color: '#f8fafc', margin: '0 0 8px' }}>
-                Dynamic Skill Gap Analysis
-              </h3>
-              <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 14 }}>
-                <strong>WHAT:</strong> Compares student skills against target enterprise benchmarks.<br />
-                <strong>WHY:</strong> Gives learners concrete clarity on what to study rather than generic advice.<br />
-                <strong>HOW:</strong> Generates priority-tagged deficiencies and phase-by-phase timeline roadmaps.
-              </p>
-              <Link href="/student" style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--gold)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>
-                View Gap Roadmap <ChevronRight size={14} />
+              <Link href="/student" className="tech-feature-link" style={{ fontSize: 12.5, fontWeight: 700, color: '#ef4444', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>
+                View Gap Roadmap <ChevronRight size={14} className="tech-feature-arrow" />
               </Link>
             </div>
 
             {/* Feature 4: Cryptographic Passport */}
-            <div className="card-linear" style={{ padding: 24 }}>
-              <div style={{ width: 38, height: 38, borderRadius: 10, background: 'rgba(16,185,129,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#10b981', marginBottom: 16 }}>
-                <Award size={20} />
+            <div
+              className="tech-feature-card card-shine"
+              style={
+                {
+                  padding: 24,
+                  '--card-accent': '#10b981',
+                  '--card-accent-glow': 'rgba(16,185,129,0.25)',
+                  '--card-accent-border': 'rgba(16,185,129,0.5)',
+                } as React.CSSProperties
+              }
+            >
+              <div>
+                <div
+                  className="tech-feature-icon"
+                  style={{
+                    width: 42,
+                    height: 42,
+                    borderRadius: 10,
+                    background: 'rgba(16,185,129,0.12)',
+                    border: '1px solid rgba(16,185,129,0.25)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#10b981',
+                    marginBottom: 16,
+                  }}
+                >
+                  <Award size={20} />
+                </div>
+                <h3 className="font-display" style={{ fontSize: 17, fontWeight: 800, color: '#f8fafc', margin: '0 0 8px' }}>
+                  Verifiable Skill Passport
+                </h3>
+                <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 16 }}>
+                  <strong style={{ color: '#f8fafc' }}>WHAT:</strong> A tamper-proof digital credential issued with a cryptographic hash.<br />
+                  <strong style={{ color: '#f8fafc' }}>WHY:</strong> Employers can verify skills in seconds without relying on self-reported resumes.<br />
+                  <strong style={{ color: '#f8fafc' }}>HOW:</strong> SHA-256 HMAC digest computed over student scores and NSQF certification tier.
+                </p>
               </div>
-              <h3 className="font-display" style={{ fontSize: 17, fontWeight: 800, color: '#f8fafc', margin: '0 0 8px' }}>
-                Verifiable Skill Passport
-              </h3>
-              <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 14 }}>
-                <strong>WHAT:</strong> A tamper-proof digital credential issued with a cryptographic hash.<br />
-                <strong>WHY:</strong> Employers can verify skills in seconds without relying on self-reported resumes.<br />
-                <strong>HOW:</strong> SHA-256 HMAC digest computed over student scores and NSQF certification tier.
-              </p>
-              <Link href="/student/passport" style={{ fontSize: 12.5, fontWeight: 700, color: '#10b981', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>
-                Inspect Passport <ChevronRight size={14} />
+              <Link href="/student/passport" className="tech-feature-link" style={{ fontSize: 12.5, fontWeight: 700, color: '#10b981', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>
+                Inspect Passport <ChevronRight size={14} className="tech-feature-arrow" />
               </Link>
             </div>
 
             {/* Feature 5: Adaptive Assessments */}
-            <div className="card-linear" style={{ padding: 24 }}>
-              <div style={{ width: 38, height: 38, borderRadius: 10, background: 'rgba(245,158,11,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--gold)', marginBottom: 16 }}>
-                <CheckCircle2 size={20} />
+            <div
+              className="tech-feature-card card-shine"
+              style={
+                {
+                  padding: 24,
+                  '--card-accent': 'var(--gold)',
+                  '--card-accent-glow': 'rgba(245,158,11,0.25)',
+                  '--card-accent-border': 'rgba(245,158,11,0.5)',
+                } as React.CSSProperties
+              }
+            >
+              <div>
+                <div
+                  className="tech-feature-icon"
+                  style={{
+                    width: 42,
+                    height: 42,
+                    borderRadius: 10,
+                    background: 'rgba(245,158,11,0.12)',
+                    border: '1px solid rgba(245,158,11,0.25)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'var(--gold)',
+                    marginBottom: 16,
+                  }}
+                >
+                  <CheckCircle2 size={20} />
+                </div>
+                <h3 className="font-display" style={{ fontSize: 17, fontWeight: 800, color: '#f8fafc', margin: '0 0 8px' }}>
+                  Adaptive Assessment Engine
+                </h3>
+                <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 16 }}>
+                  <strong style={{ color: '#f8fafc' }}>WHAT:</strong> Distraction-free diagnostic quizzes with keyboard navigation (A, B, C, D).<br />
+                  <strong style={{ color: '#f8fafc' }}>WHY:</strong> Continuously validates real practical mastery across multiple difficulty tiers.<br />
+                  <strong style={{ color: '#f8fafc' }}>HOW:</strong> Dynamic question synthesis, automated grading, and instant passport ledger sync.
+                </p>
               </div>
-              <h3 className="font-display" style={{ fontSize: 17, fontWeight: 800, color: '#f8fafc', margin: '0 0 8px' }}>
-                Adaptive Assessment Engine
-              </h3>
-              <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 14 }}>
-                <strong>WHAT:</strong> Distraction-free diagnostic quizzes with keyboard navigation (A, B, C, D).<br />
-                <strong>WHY:</strong> Continuously validates real practical mastery across multiple difficulty tiers.<br />
-                <strong>HOW:</strong> Dynamic question synthesis, automated grading, and instant passport ledger sync.
-              </p>
-              <Link href="/student/assessment" style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--gold)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>
-                Take Diagnostic Quiz <ChevronRight size={14} />
+              <Link href="/student/assessment" className="tech-feature-link" style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--gold)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>
+                Take Diagnostic Quiz <ChevronRight size={14} className="tech-feature-arrow" />
               </Link>
             </div>
 
             {/* Feature 6: Real-Time Copilot */}
-            <div className="card-linear" style={{ padding: 24 }}>
-              <div style={{ width: 38, height: 38, borderRadius: 10, background: 'rgba(168,85,247,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#c084fc', marginBottom: 16 }}>
-                <Bot size={20} />
+            <div
+              className="tech-feature-card card-shine"
+              style={
+                {
+                  padding: 24,
+                  '--card-accent': '#c084fc',
+                  '--card-accent-glow': 'rgba(192,132,252,0.25)',
+                  '--card-accent-border': 'rgba(192,132,252,0.5)',
+                } as React.CSSProperties
+              }
+            >
+              <div>
+                <div
+                  className="tech-feature-icon"
+                  style={{
+                    width: 42,
+                    height: 42,
+                    borderRadius: 10,
+                    background: 'rgba(168,85,247,0.12)',
+                    border: '1px solid rgba(168,85,247,0.25)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#c084fc',
+                    marginBottom: 16,
+                  }}
+                >
+                  <Bot size={20} />
+                </div>
+                <h3 className="font-display" style={{ fontSize: 17, fontWeight: 800, color: '#f8fafc', margin: '0 0 8px' }}>
+                  Profile-Aware AI Copilot
+                </h3>
+                <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 16 }}>
+                  <strong style={{ color: '#f8fafc' }}>WHAT:</strong> Conversational mentor embedded natively into the student dashboard.<br />
+                  <strong style={{ color: '#f8fafc' }}>WHY:</strong> Answers personalized questions about interview prep, salary, and gap closure.<br />
+                  <strong style={{ color: '#f8fafc' }}>HOW:</strong> Injects live student NSQF competencies into prompts with SSE typewriter streaming.
+                </p>
               </div>
-              <h3 className="font-display" style={{ fontSize: 17, fontWeight: 800, color: '#f8fafc', margin: '0 0 8px' }}>
-                Profile-Aware AI Copilot
-              </h3>
-              <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 14 }}>
-                <strong>WHAT:</strong> Conversational mentor embedded natively into the student dashboard.<br />
-                <strong>WHY:</strong> Answers personalized questions about interview prep, salary, and gap closure.<br />
-                <strong>HOW:</strong> Injects live student NSQF competencies into prompts with SSE typewriter streaming.
-              </p>
-              <Link href="/student" style={{ fontSize: 12.5, fontWeight: 700, color: '#c084fc', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>
-                Chat with Copilot <ChevronRight size={14} />
+              <Link href="/student" className="tech-feature-link" style={{ fontSize: 12.5, fontWeight: 700, color: '#c084fc', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>
+                Chat with Copilot <ChevronRight size={14} className="tech-feature-arrow" />
               </Link>
             </div>
           </div>
@@ -853,25 +1082,149 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 16 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 16 }}>
             {[
-              { num: '01', title: 'Submit Profile & Code', desc: 'Paste your resume, link a public GitHub repository, or describe technical project architecture.' },
-              { num: '02', title: 'Multi-Vector AI Extraction', desc: 'Neural models extract competencies across 50+ technical, architectural, and soft skill vectors.' },
-              { num: '03', title: 'Identify Gaps & Milestones', desc: 'Instant gap analysis benchmarks your capabilities against top tech employers in India.' },
-              { num: '04', title: 'Issue Verifiable Passport', desc: 'Receive a cryptographically signed digital credential to share with employers and recruiters.' },
-            ].map((step, i) => (
-              <div key={i} className="card-linear" style={{ padding: 22 }}>
-                <span className="font-display text-gradient-gold" style={{ fontSize: 28, fontWeight: 900 }}>
-                  {step.num}
-                </span>
-                <h3 style={{ fontSize: 15, fontWeight: 700, color: '#f8fafc', margin: '10px 0 6px' }}>
-                  {step.title}
-                </h3>
-                <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.5, margin: 0 }}>
-                  {step.desc}
-                </p>
-              </div>
-            ))}
+              {
+                num: '01',
+                title: 'Submit Profile & Code',
+                desc: 'Paste your resume, link a public GitHub repository, or describe technical project architecture.',
+                icon: FileText,
+                accent: '#f59e0b',
+                phase: 'PHASE 01 · INGESTION',
+                specs: [
+                  'Multi-format PDF/Word OCR Parsing',
+                  'GitHub API AST Abstract Syntax Tree',
+                  'DPDP Sovereign Consent Encryption',
+                ],
+                metric: 'Latency: <800ms · 99.4% Parsing Accuracy',
+              },
+              {
+                num: '02',
+                title: 'Multi-Vector AI Extraction',
+                desc: 'Neural models extract competencies across 50+ technical, architectural, and soft skill vectors.',
+                icon: Brain,
+                accent: '#60a5fa',
+                phase: 'PHASE 02 · NEURAL EXTRACTION',
+                specs: [
+                  '50+ Dimension Competency Embeddings',
+                  'NSQF Level 4-7 Taxonomy Mapping',
+                  'Multi-Provider LLM Consensus Verification',
+                ],
+                metric: 'Zero-Hallucination Safe Zod Schemas',
+              },
+              {
+                num: '03',
+                title: 'Identify Gaps & Milestones',
+                desc: 'Instant gap analysis benchmarks your capabilities against top tech employers in India.',
+                icon: Layers,
+                accent: '#f59e0b',
+                phase: 'PHASE 03 · GAP BENCHMARK',
+                specs: [
+                  'Real-Time Enterprise Requisition Match',
+                  'Severity-Weighted Shortage Matrix',
+                  'Milestone-by-Milestone Timeline Roadmap',
+                ],
+                metric: 'Live Market Grounding via Perplexity Sonar',
+              },
+              {
+                num: '04',
+                title: 'Issue Verifiable Passport',
+                desc: 'Receive a cryptographically signed digital credential to share with employers and recruiters.',
+                icon: ShieldCheck,
+                accent: '#10b981',
+                phase: 'PHASE 04 · CREDENTIAL MINT',
+                specs: [
+                  'SHA-256 HMAC Immutable Ledger Signature',
+                  '1-Click Instant Recruiter Verification QR',
+                  'Sovereign Candidate Credential Revocation',
+                ],
+                metric: 'Govt & Enterprise Interoperable Record',
+              },
+            ].map((step, i) => {
+              const IconComp = step.icon;
+              return (
+                <div key={i} className="flip-card-container">
+                  <div className="flip-card-inner">
+                    {/* ── Front Side ── */}
+                    <div className="flip-card-front card-shine">
+                      <div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                          <span className="font-display text-gradient-gold" style={{ fontSize: 30, fontWeight: 900 }}>
+                            {step.num}
+                          </span>
+                          <div
+                            style={{
+                              width: 36,
+                              height: 36,
+                              borderRadius: 10,
+                              background: 'rgba(255,255,255,0.03)',
+                              border: `1px solid ${step.accent}40`,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              color: step.accent,
+                            }}
+                          >
+                            <IconComp size={18} />
+                          </div>
+                        </div>
+
+                        <h3 style={{ fontSize: 15, fontWeight: 700, color: '#f8fafc', margin: '0 0 8px' }}>
+                          {step.title}
+                        </h3>
+                        <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.5, margin: 0 }}>
+                          {step.desc}
+                        </p>
+                      </div>
+
+                      {/* Front footer hint */}
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 6,
+                          paddingTop: 12,
+                          borderTop: '1px solid rgba(255,255,255,0.06)',
+                          color: 'var(--gold)',
+                          fontSize: 11,
+                          fontWeight: 700,
+                        }}
+                      >
+                        <span style={{ fontSize: 13 }}>↻</span>
+                        <span>Hover to flip specifications</span>
+                      </div>
+                    </div>
+
+                    {/* ── Back Side (Revealed on 3D Flip) ── */}
+                    <div className="flip-card-back">
+                      <div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                          <span style={{ fontSize: 10, fontWeight: 800, color: step.accent, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                            {step.phase}
+                          </span>
+                          <span style={{ fontSize: 10, padding: '2px 6px', borderRadius: 4, background: 'rgba(16,185,129,0.15)', color: '#10b981', fontWeight: 800, border: '1px solid rgba(16,185,129,0.3)' }}>
+                            ACTIVE
+                          </span>
+                        </div>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, margin: '8px 0' }}>
+                          {step.specs.map((spec, sIdx) => (
+                            <div key={sIdx} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11.5, color: '#f1f5f9' }}>
+                              <span style={{ color: step.accent, fontSize: 12 }}>▹</span>
+                              <span>{spec}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div style={{ paddingTop: 10, borderTop: '1px solid rgba(255,255,255,0.08)', fontSize: 10.5, color: 'var(--text-muted)' }}>
+                        ✓ {step.metric}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -1400,16 +1753,22 @@ export default function LandingPage() {
         <div style={{ maxWidth: 1240, margin: '0 auto' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 20, textAlign: 'center' }}>
             {[
-              { label: 'Districts Monitored', value: '36 Districts', sub: 'Across Maharashtra State', color: 'var(--gold)' },
-              { label: 'Verified Skill Passports', value: '1,240,000+', sub: 'Cryptographically Minted', color: '#10B981' },
-              { label: 'Diagnostic Precision', value: '94.2%', sub: 'NSQF Calibrated Neural Engine', color: '#60A5FA' },
-              { label: 'Average Placed Salary', value: '₹7.80 LPA', sub: '+38% Longitudinal Wage Boost', color: '#C084FC' },
+              { label: 'Districts Monitored', target: 36, decimals: 0, prefix: '', suffix: ' Districts', sub: 'Across Maharashtra State', color: 'var(--gold)' },
+              { label: 'Verified Skill Passports', target: 1240000, decimals: 0, prefix: '', suffix: '+', sub: 'Cryptographically Minted', color: '#10B981' },
+              { label: 'Diagnostic Precision', target: 94.2, decimals: 1, prefix: '', suffix: '%', sub: 'NSQF Calibrated Neural Engine', color: '#60A5FA' },
+              { label: 'Average Placed Salary', target: 7.80, decimals: 2, prefix: '₹', suffix: ' LPA', sub: '+38% Longitudinal Wage Boost', color: '#C084FC' },
             ].map((stat, idx) => (
-              <div key={idx} style={{ padding: '14px 20px' }}>
-                <div className="font-display" style={{ fontSize: 32, fontWeight: 900, color: stat.color, letterSpacing: '-0.02em' }}>
-                  {stat.value}
+              <div key={idx} className="telemetry-stat-card">
+                <div className="font-display" style={{ fontSize: 34, fontWeight: 900, color: stat.color, letterSpacing: '-0.02em' }}>
+                  <DynamicBidirectionalCounter
+                    target={stat.target}
+                    decimals={stat.decimals}
+                    prefix={stat.prefix}
+                    suffix={stat.suffix}
+                    duration={1500}
+                  />
                 </div>
-                <div style={{ fontSize: 13, fontWeight: 800, color: '#f8fafc', marginTop: 4 }}>
+                <div style={{ fontSize: 13, fontWeight: 800, color: '#f8fafc', marginTop: 6 }}>
                   {stat.label}
                 </div>
                 <div style={{ fontSize: 11.5, color: 'var(--text-secondary)', marginTop: 2 }}>
@@ -1465,48 +1824,60 @@ export default function LandingPage() {
               return (
                 <div
                   key={idx}
-                  className="card-linear"
-                  style={{
-                    borderRadius: 12,
-                    overflow: 'hidden',
-                    border: `1px solid ${isOpen ? 'var(--gold)' : 'var(--border)'}`,
-                    transition: 'border-color 0.15s ease',
-                  }}
+                  className={`faq-hover-card ${isOpen ? 'is-open' : ''}`}
+                  onMouseEnter={() => setOpenFaq(idx)}
+                  onMouseLeave={() => setOpenFaq(null)}
+                  onClick={() => setOpenFaq(isOpen ? null : idx)}
                 >
-                  <button
-                    type="button"
-                    onClick={() => setOpenFaq(isOpen ? null : idx)}
+                  <div
                     style={{
                       width: '100%',
                       padding: '16px 20px',
-                      background: 'transparent',
-                      border: 'none',
-                      textAlign: 'left',
                       display: 'flex',
                       justifyContent: 'space-between',
                       alignItems: 'center',
                       gap: 12,
-                      cursor: 'pointer',
                       color: '#f8fafc',
                     }}
                   >
-                    <span style={{ fontSize: 14.5, fontWeight: 700 }}>{faq.q}</span>
+                    <span className="faq-question-text" style={{ fontSize: 14.5, fontWeight: 700 }}>
+                      {faq.q}
+                    </span>
                     <ChevronDown
                       size={16}
                       color="var(--gold)"
                       style={{
                         transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-                        transition: 'transform 0.2s ease',
+                        transition: 'transform 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
                         flexShrink: 0,
                       }}
                     />
-                  </button>
+                  </div>
 
-                  {isOpen && (
-                    <div style={{ padding: '0 20px 16px', fontSize: 13.5, color: '#cbd5e1', lineHeight: 1.6, borderTop: '1px solid rgba(255,255,255,0.04)', paddingTop: 12 }}>
-                      {faq.a}
-                    </div>
-                  )}
+                  <AnimatePresence initial={false}>
+                    {isOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0, y: -4 }}
+                        animate={{ opacity: 1, height: 'auto', y: 0 }}
+                        exit={{ opacity: 0, height: 0, y: -4 }}
+                        transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+                        style={{ overflow: 'hidden' }}
+                      >
+                        <div
+                          style={{
+                            padding: '0 20px 16px',
+                            fontSize: 13.5,
+                            color: '#cbd5e1',
+                            lineHeight: 1.6,
+                            borderTop: '1px solid rgba(255,255,255,0.05)',
+                            paddingTop: 12,
+                          }}
+                        >
+                          {faq.a}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               );
             })}
