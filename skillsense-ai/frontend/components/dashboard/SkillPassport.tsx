@@ -91,19 +91,25 @@ export default function SkillPassport({ student }: Props) {
           overflow: 'hidden',
         }}
       >
-        {/* Subtle Watermark Seal */}
+        {/* Institutional Security Guilloche Watermark Pattern */}
         <div
           style={{
             position: 'absolute',
-            right: -20,
-            bottom: -20,
-            opacity: 0.04,
+            right: -50,
+            bottom: -50,
+            width: 380,
+            height: 380,
+            opacity: 0.14,
             pointerEvents: 'none',
-            color: 'var(--gold)',
+            zIndex: 0,
           }}
           aria-hidden="true"
         >
-          <Award size={260} />
+          <img
+            src="/images/brand/credential-guilloche.svg"
+            alt=""
+            style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+          />
         </div>
 
         {/* Certificate Header */}
@@ -117,30 +123,27 @@ export default function SkillPassport({ student }: Props) {
             marginBottom: 20,
             flexWrap: 'wrap',
             gap: 16,
+            position: 'relative',
+            zIndex: 1,
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-            <div
-              style={{
-                width: 52,
-                height: 52,
-                borderRadius: 12,
-                background: 'linear-gradient(135deg, #f59e0b, #d97706)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontWeight: 900,
-                fontSize: 20,
-                color: '#090a0f',
-                boxShadow: '0 4px 16px rgba(245,158,11,0.3)',
-              }}
-            >
-              SK
+            <div style={{ position: 'relative' }}>
+              <img
+                src="/images/brand/maharashtra-seal-emblem.svg"
+                alt="Government of Maharashtra Official Skilling Seal"
+                style={{
+                  width: 52,
+                  height: 52,
+                  borderRadius: '50%',
+                  boxShadow: '0 4px 16px rgba(245,158,11,0.25)',
+                }}
+              />
             </div>
 
             <div>
               <div style={{ fontSize: 10.5, color: 'var(--gold)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                National Vocational Framework
+                Government of Maharashtra · NSQF Registry
               </div>
               <h2 className="font-display" style={{ fontSize: 22, fontWeight: 900, color: '#f8fafc', margin: '2px 0 0' }}>
                 {student.name}

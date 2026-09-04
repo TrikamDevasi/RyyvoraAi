@@ -33,6 +33,7 @@ import {
 import { FadeIn } from '@/components/shared/FadeIn';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { AIBadge } from '@/components/ui/AIBadge';
+import { EmptyState } from '@/components/ui/EmptyState';
 import toast from 'react-hot-toast';
 
 export default function TraineeJourneyPage() {
@@ -303,133 +304,143 @@ export default function TraineeJourneyPage() {
             </span>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', position: 'relative' }}>
-            {/* Timeline Vertical Line */}
-            <div
-              style={{
-                position: 'absolute',
-                left: 19,
-                top: 20,
-                bottom: 20,
-                width: 2,
-                background: 'linear-gradient(180deg, var(--gold) 0%, rgba(245,158,11,0.2) 100%)',
-                zIndex: 0,
-              }}
+          {timeline.length === 0 ? (
+            <EmptyState
+              illustration="outcomes"
+              title="No Milestone Events Recorded Yet"
+              description="Your verified journey milestones from enrollment to NSQF certification, campus placement, and wage progression will display chronologically along this timeline."
+              actionText="Log Placement / Milestone"
+              onAction={() => setShowSelfReportModal(true)}
             />
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', position: 'relative' }}>
+              {/* Timeline Vertical Line */}
+              <div
+                style={{
+                  position: 'absolute',
+                  left: 19,
+                  top: 20,
+                  bottom: 20,
+                  width: 2,
+                  background: 'linear-gradient(180deg, var(--gold) 0%, rgba(245,158,11,0.2) 100%)',
+                  zIndex: 0,
+                }}
+              />
 
-            {timeline.map((event, idx) => {
-              const isVerified = event.verificationStatus === 'VERIFIED';
-              return (
-                <div
-                  key={event._id || idx}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: 18,
-                    marginBottom: 26,
-                    position: 'relative',
-                    zIndex: 1,
-                  }}
-                >
-                  {/* Glowing Node Dot */}
+              {timeline.map((event, idx) => {
+                const isVerified = event.verificationStatus === 'VERIFIED';
+                return (
                   <div
+                    key={event._id || idx}
                     style={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: '50%',
-                      background: 'var(--bg-surface)',
-                      border: `2px solid ${isVerified ? '#10b981' : 'var(--gold)'}`,
                       display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: isVerified ? '#10b981' : 'var(--gold)',
-                      boxShadow: `0 0 12px ${isVerified ? 'rgba(16,185,129,0.3)' : 'rgba(245,158,11,0.3)'}`,
-                      flexShrink: 0,
+                      alignItems: 'flex-start',
+                      gap: 18,
+                      marginBottom: 26,
+                      position: 'relative',
+                      zIndex: 1,
                     }}
                   >
-                    {isVerified ? <Check size={16} /> : <Clock size={16} />}
-                  </div>
-
-                  {/* Event Content Card */}
-                  <div
-                    style={{
-                      flex: 1,
-                      padding: '16px 20px',
-                      background: 'rgba(255,255,255,0.02)',
-                      borderRadius: 12,
-                      border: '1px solid var(--border)',
-                      transition: 'all 0.15s ease',
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.borderColor = 'var(--gold)';
-                      e.currentTarget.style.background = 'rgba(245,158,11,0.03)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.borderColor = 'var(--border)';
-                      e.currentTarget.style.background = 'rgba(255,255,255,0.02)';
-                    }}
-                  >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 10, marginBottom: 6 }}>
-                      <div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
-                          <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--gold)', textTransform: 'uppercase' }}>
-                            {event.eventType}
-                          </span>
-                          <span style={{ color: 'var(--border)' }}>·</span>
-                          <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{event.date}</span>
-                        </div>
-                        <h3 className="font-display" style={{ fontSize: 15, fontWeight: 700, color: '#f8fafc', margin: 0 }}>
-                          {event.title}
-                        </h3>
-                      </div>
-
-                      <span
-                        style={{
-                          fontSize: 11,
-                          fontWeight: 700,
-                          padding: '3px 10px',
-                          borderRadius: 99,
-                          background: isVerified ? 'rgba(16,185,129,0.12)' : 'rgba(245,158,11,0.12)',
-                          color: isVerified ? '#10b981' : 'var(--gold)',
-                          border: `1px solid ${isVerified ? 'rgba(16,185,129,0.25)' : 'var(--gold-border)'}`,
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 4,
-                        }}
-                      >
-                        {isVerified ? <ShieldCheck size={13} /> : <Clock size={13} />}
-                        {isVerified ? `Verified (${Math.round(event.confidence * 100)}%)` : 'Self-Reported'}
-                      </span>
+                    {/* Glowing Node Dot */}
+                    <div
+                      style={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: '50%',
+                        background: 'var(--bg-surface)',
+                        border: `2px solid ${isVerified ? '#10b981' : 'var(--gold)'}`,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: isVerified ? '#10b981' : 'var(--gold)',
+                        boxShadow: `0 0 12px ${isVerified ? 'rgba(16,185,129,0.3)' : 'rgba(245,158,11,0.3)'}`,
+                        flexShrink: 0,
+                      }}
+                    >
+                      {isVerified ? <Check size={16} /> : <Clock size={16} />}
                     </div>
 
-                    <p style={{ fontSize: 13, color: '#cbd5e1', lineHeight: 1.5, margin: '6px 0 0' }}>
-                      {event.description}
-                    </p>
+                    {/* Event Content Card */}
+                    <div
+                      style={{
+                        flex: 1,
+                        padding: '16px 20px',
+                        background: 'rgba(255,255,255,0.02)',
+                        borderRadius: 12,
+                        border: '1px solid var(--border)',
+                        transition: 'all 0.15s ease',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.borderColor = 'var(--gold)';
+                        e.currentTarget.style.background = 'rgba(245,158,11,0.03)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.borderColor = 'var(--border)';
+                        e.currentTarget.style.background = 'rgba(255,255,255,0.02)';
+                      }}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 10, marginBottom: 6 }}>
+                        <div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
+                            <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--gold)', textTransform: 'uppercase' }}>
+                              {event.eventType}
+                            </span>
+                            <span style={{ color: 'var(--border)' }}>·</span>
+                            <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>{event.date}</span>
+                          </div>
+                          <h3 className="font-display" style={{ fontSize: 15, fontWeight: 700, color: '#f8fafc', margin: 0 }}>
+                            {event.title}
+                          </h3>
+                        </div>
 
-                    {event.metadata && Object.keys(event.metadata).length > 0 && (
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 10, paddingTop: 8, borderTop: '1px solid rgba(255,255,255,0.04)' }}>
-                        {Object.entries(event.metadata).map(([k, v], mIdx) => (
-                          <span
-                            key={mIdx}
-                            style={{
-                              fontSize: 11,
-                              padding: '2px 8px',
-                              borderRadius: 6,
-                              background: 'rgba(255,255,255,0.04)',
-                              color: '#94a3b8',
-                              border: '1px solid rgba(255,255,255,0.06)',
-                            }}
-                          >
-                            {k}: <strong style={{ color: '#e2e8f0' }}>{String(v)}</strong>
-                          </span>
-                        ))}
+                        <span
+                          style={{
+                            fontSize: 11,
+                            fontWeight: 700,
+                            padding: '3px 10px',
+                            borderRadius: 99,
+                            background: isVerified ? 'rgba(16,185,129,0.12)' : 'rgba(245,158,11,0.12)',
+                            color: isVerified ? '#10b981' : 'var(--gold)',
+                            border: `1px solid ${isVerified ? 'rgba(16,185,129,0.25)' : 'var(--gold-border)'}`,
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 4,
+                          }}
+                        >
+                          {isVerified ? <ShieldCheck size={13} /> : <Clock size={13} />}
+                          {isVerified ? `Verified (${Math.round(event.confidence * 100)}%)` : 'Self-Reported'}
+                        </span>
                       </div>
-                    )}
+
+                      <p style={{ fontSize: 13, color: '#cbd5e1', lineHeight: 1.5, margin: '6px 0 0' }}>
+                        {event.description}
+                      </p>
+
+                      {event.metadata && Object.keys(event.metadata).length > 0 && (
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 10, paddingTop: 8, borderTop: '1px solid rgba(255,255,255,0.04)' }}>
+                          {Object.entries(event.metadata).map(([k, v], mIdx) => (
+                            <span
+                              key={mIdx}
+                              style={{
+                                fontSize: 11,
+                                padding: '2px 8px',
+                                borderRadius: 6,
+                                background: 'rgba(255,255,255,0.04)',
+                                color: '#94a3b8',
+                                border: '1px solid rgba(255,255,255,0.06)',
+                              }}
+                            >
+                              {k}: <strong style={{ color: '#e2e8f0' }}>{String(v)}</strong>
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         {/* ── MODAL: Self-Report Milestone ── */}

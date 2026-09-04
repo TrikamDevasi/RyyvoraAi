@@ -26,6 +26,7 @@ import {
 import { FadeIn } from '@/components/shared/FadeIn';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { AIBadge } from '@/components/ui/AIBadge';
+import { EmptyState } from '@/components/ui/EmptyState';
 import toast from 'react-hot-toast';
 
 interface ValidationClaim {
@@ -353,17 +354,15 @@ export default function EmployerValidationsPage() {
         {!loading && !error && (
           <div className="card-linear" style={{ padding: 24, borderRadius: 16 }}>
             {displayedList.length === 0 ? (
-              <div style={{ padding: '48px 20px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
-                <CheckCircle2 size={44} style={{ color: activeTab === 'PENDING' ? '#10B981' : 'var(--text-muted)' }} />
-                <h3 className="font-display" style={{ fontSize: 18, fontWeight: 800, color: '#FFFFFF', margin: 0 }}>
-                  {activeTab === 'PENDING' ? 'No Pending Claims' : 'No Verified Records'}
-                </h3>
-                <p style={{ fontSize: 13, color: 'var(--text-secondary)', maxWidth: 460, margin: 0, lineHeight: 1.5 }}>
-                  {activeTab === 'PENDING'
-                    ? 'There are no pending employment claims from trainees at your organization awaiting verification.'
-                    : 'Confirmed placement records will appear here after you verify claims.'}
-                </p>
-              </div>
+              <EmptyState
+                illustration="validations"
+                title={activeTab === 'PENDING' ? 'No Pending Verification Claims' : 'No Verified Records Yet'}
+                description={
+                  activeTab === 'PENDING'
+                    ? 'There are no pending employment claims from trainees at your organization awaiting verification on the state ledger.'
+                    : 'Confirmed placement and 90-day retention records will appear here after you verify claims.'
+                }
+              />
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                 {displayedList.map((item) => {

@@ -25,6 +25,7 @@ import {
   Smartphone,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { ResponsiveImage } from '@/components/ui/ResponsiveImage';
 import './auth.css';
 
 const ROLES: { key: UserRole; label: string; desc: string; icon: any; href: string; badge: string }[] = [
@@ -228,7 +229,52 @@ export default function AuthPage() {
         <div className="auth-bg-grid" />
       </div>
 
-      <div className="auth-card" style={{ maxWidth: activeTab === 'demo' ? 520 : 440 }}>
+      <div className="auth-container">
+        {/* Contextual Institutional Workforce Visual (Desktop Only) */}
+        <div className="auth-visual-panel">
+          <div className="auth-visual-card">
+            <ResponsiveImage
+              src="/images/auth/auth-workforce-growth.jpg"
+              alt="Indian workforce professional in Maharashtra state research and innovation facility"
+              aspectRatio="3 / 4"
+              borderRadius={20}
+              overlayGradient="navy"
+              priority
+            />
+            <div className="auth-visual-overlay">
+              <div className="auth-visual-badge">
+                <img
+                  src="/images/brand/maharashtra-seal-emblem.svg"
+                  alt=""
+                  style={{ width: 18, height: 18 }}
+                />
+                <span>SkillSense AI · Maharashtra</span>
+              </div>
+
+              <div className="auth-visual-footer">
+                <p className="auth-visual-quote">
+                  "Advancing vocational candidates from NSQF certifications into verified corporate employment and long-term wage mobility."
+                </p>
+                <div className="auth-visual-stats">
+                  <div className="auth-visual-stat-item">
+                    <strong>36</strong>
+                    <span>Districts</span>
+                  </div>
+                  <div className="auth-visual-stat-item">
+                    <strong>98.4%</strong>
+                    <span>Verified</span>
+                  </div>
+                  <div className="auth-visual-stat-item">
+                    <strong>NSQF</strong>
+                    <span>Accredited</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="auth-card" style={{ maxWidth: activeTab === 'demo' ? 520 : 440 }}>
         {/* ── HEADER ── */}
         <div className="auth-header" style={{ textAlign: 'center', marginBottom: 20 }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(245,158,11,0.12)', border: '1px solid rgba(245,158,11,0.3)', padding: '4px 12px', borderRadius: 99, marginBottom: 12 }}>
@@ -748,5 +794,6 @@ export default function AuthPage() {
         </div>
       </div>
     </div>
+  </div>
   );
 }

@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none" width="100%" height="100%">
+  <defs>
+    <linearGradient id="sealGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F59E0B"/>
+      <stop offset="50%" stop-color="#D97706"/>
+      <stop offset="100%" stop-color="#B45309"/>
+    </linearGradient>
+    <linearGradient id="sealNavy" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E293B"/>
+      <stop offset="100%" stop-color="#0B0F17"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Outer Ring -->
+  <circle cx="100" cy="100" r="94" stroke="url(#sealGold)" stroke-width="2.5" fill="url(#sealNavy)" />
+  <circle cx="100" cy="100" r="88" stroke="#F59E0B" stroke-width="0.75" stroke-dasharray="3 3" fill="none" opacity="0.6"/>
+  <circle cx="100" cy="100" r="76" stroke="url(#sealGold)" stroke-width="1.5" fill="none"/>
+
+  <!-- Star Emblems along perimeter -->
+  <g fill="#F59E0B" transform="translate(100, 100)">
+    <circle cx="0" cy="-82" r="2"/>
+    <circle cx="0" cy="82" r="2"/>
+    <circle cx="-82" cy="0" r="2"/>
+    <circle cx="82" cy="0" r="2"/>
+  </g>
+
+  <!-- Circular Text Path: GOVERNMENT OF MAHARASHTRA -->
+  <path id="textPathTop" d="M 30,100 A 70,70 0 1,1 170,100" fill="none" />
+  <path id="textPathBottom" d="M 170,100 A 70,70 0 0,1 30,100" fill="none" />
+
+  <text fill="#F59E0B" font-family="system-ui, -apple-system, sans-serif" font-size="8.5" font-weight="800" letterSpacing="0.12em">
+    <textPath href="#textPathTop" startOffset="50%" text-anchor="middle">
+      GOVERNMENT OF MAHARASHTRA
+    </textPath>
+  </text>
+
+  <text fill="#94A3B8" font-family="system-ui, -apple-system, sans-serif" font-size="7.5" font-weight="700" letterSpacing="0.14em">
+    <textPath href="#textPathBottom" startOffset="50%" text-anchor="middle">
+      SKILLSENSE AI · NSQF VERIFIED
+    </textPath>
+  </text>
+
+  <!-- Central Emblem Geometry: Shield + Ashoka Wheel Motif -->
+  <g transform="translate(100, 100)">
+    <!-- Central Shield -->
+    <path d="M 0 -36 L 24 -24 L 24 10 C 24 26, 0 38, 0 38 C 0 38, -24 26, -24 10 L -24 -24 Z" 
+          fill="#0B0F17" stroke="url(#sealGold)" stroke-width="1.8" />
+    
+    <!-- Central Wheel (Chakra Spokes) -->
+    <circle cx="0" cy="2" r="14" stroke="#F59E0B" stroke-width="1.2" fill="none"/>
+    <circle cx="0" cy="2" r="3" fill="#F59E0B"/>
+    
+    <!-- Spokes -->
+    <g stroke="#F59E0B" stroke-width="0.75">
+      <line x1="0" y1="-12" x2="0" y2="16"/>
+      <line x1="-14" y1="2" x2="14" y2="2"/>
+      <line x1="-10" y1="-8" x2="10" y2="12"/>
+      <line x1="-10" y1="12" x2="10" y2="-8"/>
+    </g>
+
+    <!-- Small Crown/Torana on top of shield -->
+    <path d="M -12 -36 L 0 -44 L 12 -36 Z" fill="url(#sealGold)" />
+  </g>
+</svg>

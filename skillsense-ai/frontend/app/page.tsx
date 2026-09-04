@@ -45,6 +45,7 @@ import { AIBadge } from '@/components/ui/AIBadge';
 import Tilt3D from '@/components/ui/Tilt3D';
 import PricingSection from '@/components/sections/PricingSection';
 import ThemeToggle from '@/components/shared/ThemeToggle';
+import { ResponsiveImage } from '@/components/ui/ResponsiveImage';
 
 function DynamicBidirectionalCounter({
   target,
@@ -256,7 +257,33 @@ export default function LandingPage() {
           background: 'radial-gradient(ellipse at 50% 10%, rgba(245, 158, 11, 0.08) 0%, transparent 60%)',
         }}
       >
-        <div style={{ maxWidth: 1240, margin: '0 auto', padding: '0 24px', textAlign: 'center' }}>
+        {/* Subtle Maharashtra Workforce Intelligence Silhouette Background */}
+        <div
+          style={{
+            position: 'absolute',
+            top: 40,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: '100%',
+            maxWidth: 1040,
+            height: '80%',
+            opacity: 0.16,
+            pointerEvents: 'none',
+            zIndex: 0,
+            maskImage: 'radial-gradient(ellipse 70% 65% at 50% 45%, black 35%, transparent 85%)',
+            WebkitMaskImage: 'radial-gradient(ellipse 70% 65% at 50% 45%, black 35%, transparent 85%)',
+          }}
+          aria-hidden="true"
+        >
+          <img
+            src="/images/landing/maharashtra-telemetry-map.svg"
+            alt=""
+            style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+            loading="eager"
+          />
+        </div>
+
+        <div style={{ maxWidth: 1240, margin: '0 auto', padding: '0 24px', textAlign: 'center', position: 'relative', zIndex: 1 }}>
           {/* Top Badge */}
           <motion.div
             initial={{ opacity: 0, y: 15 }}
@@ -1336,7 +1363,7 @@ export default function LandingPage() {
           <div className="card-accent" style={{ padding: 32, borderRadius: 20 }}>
             {activeRoleTab === 'student' && (
               <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16, marginBottom: 24, borderBottom: '1px solid var(--border)', paddingBottom: 20 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 24, alignItems: 'center', marginBottom: 28, borderBottom: '1px solid var(--border)', paddingBottom: 24 }}>
                   <div>
                     <span style={{ fontSize: 11, fontWeight: 800, color: '#10b981', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                       Registered Candidate Workspace
@@ -1344,18 +1371,35 @@ export default function LandingPage() {
                     <h3 className="font-display" style={{ fontSize: 24, fontWeight: 900, color: '#f8fafc', margin: '4px 0 6px' }}>
                       Student & Vocational Trainee Cockpit
                     </h3>
-                    <p style={{ color: 'var(--text-secondary)', fontSize: 13.5, margin: 0, maxWidth: 640 }}>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: 13.5, margin: '0 0 18px', maxWidth: 560, lineHeight: 1.6 }}>
                       Empowering learners with AI skill auditing, timed NSQF diagnostic quizzes, tamper-proof passports, and personalized wage progression trajectories.
                     </p>
+                    <Link
+                      href="/student"
+                      className="btn-gold"
+                      style={{ fontSize: 13, padding: '10px 22px', display: 'inline-flex', alignItems: 'center', gap: 8 }}
+                    >
+                      <span>Launch Student Cockpit</span>
+                      <ArrowRight size={15} />
+                    </Link>
                   </div>
-                  <Link
-                    href="/student"
-                    className="btn-gold"
-                    style={{ fontSize: 13, padding: '10px 22px', display: 'flex', alignItems: 'center', gap: 8 }}
-                  >
-                    <span>Launch Student Cockpit</span>
-                    <ArrowRight size={15} />
-                  </Link>
+
+                  <div style={{ maxWidth: 420, justifySelf: 'end', width: '100%' }}>
+                    <div style={{ position: 'relative', borderRadius: 12, overflow: 'hidden', border: '1px solid rgba(16,185,129,0.3)', boxShadow: '0 12px 32px -8px rgba(0,0,0,0.6)' }}>
+                      <ResponsiveImage
+                        src="/images/stakeholders/student-career.jpg"
+                        alt="Young Indian students learning software engineering and cloud diagnostics in a Pune technical institute computer lab"
+                        aspectRatio="16 / 9"
+                        borderRadius={12}
+                        overlayGradient="subtle"
+                      />
+                      <div style={{ position: 'absolute', bottom: 8, left: 10, right: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center', pointerEvents: 'none' }}>
+                        <span style={{ fontSize: 10.5, fontWeight: 800, color: '#f8fafc', background: 'rgba(11,15,23,0.85)', padding: '3px 8px', borderRadius: 4, border: '1px solid rgba(255,255,255,0.1)' }}>
+                          Pune Tech Trainee Lab · NSQF Level 5/6
+                        </span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
@@ -1417,7 +1461,7 @@ export default function LandingPage() {
 
             {activeRoleTab === 'employer' && (
               <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16, marginBottom: 24, borderBottom: '1px solid var(--border)', paddingBottom: 20 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 24, alignItems: 'center', marginBottom: 28, borderBottom: '1px solid var(--border)', paddingBottom: 24 }}>
                   <div>
                     <span style={{ fontSize: 11, fontWeight: 800, color: '#C084FC', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                       Enterprise Recruiter Workspace
@@ -1425,18 +1469,35 @@ export default function LandingPage() {
                     <h3 className="font-display" style={{ fontSize: 24, fontWeight: 900, color: '#f8fafc', margin: '4px 0 6px' }}>
                       Hiring Employer & Talent Validation Suite
                     </h3>
-                    <p style={{ color: 'var(--text-secondary)', fontSize: 13.5, margin: 0, maxWidth: 640 }}>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: 13.5, margin: '0 0 18px', maxWidth: 560, lineHeight: 1.6 }}>
                       Streamline hiring with instant cryptographic credential verification, pre-assessed candidate talent pools, and automated 30d/90d retention telemetry.
                     </p>
+                    <Link
+                      href="/employer"
+                      className="btn-gold"
+                      style={{ fontSize: 13, padding: '10px 22px', display: 'inline-flex', alignItems: 'center', gap: 8 }}
+                    >
+                      <span>Launch Employer Suite</span>
+                      <ArrowRight size={15} />
+                    </Link>
                   </div>
-                  <Link
-                    href="/employer"
-                    className="btn-gold"
-                    style={{ fontSize: 13, padding: '10px 22px', display: 'flex', alignItems: 'center', gap: 8 }}
-                  >
-                    <span>Launch Employer Suite</span>
-                    <ArrowRight size={15} />
-                  </Link>
+
+                  <div style={{ maxWidth: 420, justifySelf: 'end', width: '100%' }}>
+                    <div style={{ position: 'relative', borderRadius: 12, overflow: 'hidden', border: '1px solid rgba(192,132,252,0.3)', boxShadow: '0 12px 32px -8px rgba(0,0,0,0.6)' }}>
+                      <ResponsiveImage
+                        src="/images/stakeholders/employer-workforce.jpg"
+                        alt="Indian engineering leads and recruiters reviewing talent metrics in an industrial tech facility"
+                        aspectRatio="16 / 9"
+                        borderRadius={12}
+                        overlayGradient="subtle"
+                      />
+                      <div style={{ position: 'absolute', bottom: 8, left: 10, right: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center', pointerEvents: 'none' }}>
+                        <span style={{ fontSize: 10.5, fontWeight: 800, color: '#f8fafc', background: 'rgba(11,15,23,0.85)', padding: '3px 8px', borderRadius: 4, border: '1px solid rgba(255,255,255,0.1)' }}>
+                          Udyog Enterprise Facility · Talent Telemetry
+                        </span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
@@ -1488,7 +1549,7 @@ export default function LandingPage() {
 
             {activeRoleTab === 'institute' && (
               <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16, marginBottom: 24, borderBottom: '1px solid var(--border)', paddingBottom: 20 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 24, alignItems: 'center', marginBottom: 28, borderBottom: '1px solid var(--border)', paddingBottom: 24 }}>
                   <div>
                     <span style={{ fontSize: 11, fontWeight: 800, color: '#60A5FA', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                       Vocational Training Partner Workspace
@@ -1496,18 +1557,35 @@ export default function LandingPage() {
                     <h3 className="font-display" style={{ fontSize: 24, fontWeight: 900, color: '#f8fafc', margin: '4px 0 6px' }}>
                       Training Institute & ITI Performance Portal
                     </h3>
-                    <p style={{ color: 'var(--text-secondary)', fontSize: 13.5, margin: 0, maxWidth: 640 }}>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: 13.5, margin: '0 0 18px', maxWidth: 560, lineHeight: 1.6 }}>
                       Monitor cohort skill mastery, pinpoint curriculum deficiencies vs industry demand, and track longitudinal graduate placement outcomes.
                     </p>
+                    <Link
+                      href="/institute"
+                      className="btn-gold"
+                      style={{ fontSize: 13, padding: '10px 22px', display: 'inline-flex', alignItems: 'center', gap: 8 }}
+                    >
+                      <span>Launch Institute Portal</span>
+                      <ArrowRight size={15} />
+                    </Link>
                   </div>
-                  <Link
-                    href="/institute"
-                    className="btn-gold"
-                    style={{ fontSize: 13, padding: '10px 22px', display: 'flex', alignItems: 'center', gap: 8 }}
-                  >
-                    <span>Launch Institute Portal</span>
-                    <ArrowRight size={15} />
-                  </Link>
+
+                  <div style={{ maxWidth: 420, justifySelf: 'end', width: '100%' }}>
+                    <div style={{ position: 'relative', borderRadius: 12, overflow: 'hidden', border: '1px solid rgba(96,165,250,0.3)', boxShadow: '0 12px 32px -8px rgba(0,0,0,0.6)' }}>
+                      <ResponsiveImage
+                        src="/images/stakeholders/vocational-training.jpg"
+                        alt="Indian technical instructor guiding students on precision electronics and robotics at ITI Maharashtra vocational center"
+                        aspectRatio="16 / 9"
+                        borderRadius={12}
+                        overlayGradient="subtle"
+                      />
+                      <div style={{ position: 'absolute', bottom: 8, left: 10, right: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center', pointerEvents: 'none' }}>
+                        <span style={{ fontSize: 10.5, fontWeight: 800, color: '#f8fafc', background: 'rgba(11,15,23,0.85)', padding: '3px 8px', borderRadius: 4, border: '1px solid rgba(255,255,255,0.1)' }}>
+                          ITI Maharashtra · Vocational Workshop
+                        </span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
@@ -1559,7 +1637,7 @@ export default function LandingPage() {
 
             {activeRoleTab === 'government' && (
               <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16, marginBottom: 24, borderBottom: '1px solid var(--border)', paddingBottom: 20 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 24, alignItems: 'center', marginBottom: 28, borderBottom: '1px solid var(--border)', paddingBottom: 24 }}>
                   <div>
                     <span style={{ fontSize: 11, fontWeight: 800, color: '#F59E0B', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                       State Policy & Governance Workspace
@@ -1567,18 +1645,35 @@ export default function LandingPage() {
                     <h3 className="font-display" style={{ fontSize: 24, fontWeight: 900, color: '#f8fafc', margin: '4px 0 6px' }}>
                       Government of Maharashtra · Skilling Intelligence Cockpit
                     </h3>
-                    <p style={{ color: 'var(--text-secondary)', fontSize: 13.5, margin: 0, maxWidth: 640 }}>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: 13.5, margin: '0 0 18px', maxWidth: 560, lineHeight: 1.6 }}>
                       Macro workforce analytics, 9-stage longitudinal outcome pipelines, grounded AI policy copilots, and district-level economic ROI monitoring.
                     </p>
+                    <Link
+                      href="/government"
+                      className="btn-gold"
+                      style={{ fontSize: 13, padding: '10px 22px', display: 'inline-flex', alignItems: 'center', gap: 8 }}
+                    >
+                      <span>Launch Government Cockpit</span>
+                      <ArrowRight size={15} />
+                    </Link>
                   </div>
-                  <Link
-                    href="/government"
-                    className="btn-gold"
-                    style={{ fontSize: 13, padding: '10px 22px', display: 'flex', alignItems: 'center', gap: 8 }}
-                  >
-                    <span>Launch Government Cockpit</span>
-                    <ArrowRight size={15} />
-                  </Link>
+
+                  <div style={{ maxWidth: 420, justifySelf: 'end', width: '100%' }}>
+                    <div style={{ position: 'relative', borderRadius: 12, overflow: 'hidden', border: '1px solid rgba(245,158,11,0.3)', boxShadow: '0 12px 32px -8px rgba(0,0,0,0.6)' }}>
+                      <ResponsiveImage
+                        src="/images/stakeholders/government-policy.jpg"
+                        alt="Government officials and policy analysts in a state conference room reviewing Maharashtra workforce intelligence"
+                        aspectRatio="16 / 9"
+                        borderRadius={12}
+                        overlayGradient="subtle"
+                      />
+                      <div style={{ position: 'absolute', bottom: 8, left: 10, right: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center', pointerEvents: 'none' }}>
+                        <span style={{ fontSize: 10.5, fontWeight: 800, color: '#f8fafc', background: 'rgba(11,15,23,0.85)', padding: '3px 8px', borderRadius: 4, border: '1px solid rgba(255,255,255,0.1)' }}>
+                          Maharashtra Skilling Directorate · Policy Analytics
+                        </span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>

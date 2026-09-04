@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" fill="none" width="100%" height="100%">
+  <defs>
+    <radialGradient id="radarSweep" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#06B6D4" stop-opacity="0.35"/>
+      <stop offset="60%" stop-color="#06B6D4" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#06B6D4" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="gridGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#64748B" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#1E293B" stop-opacity="0.05"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Ground Plane -->
+  <ellipse cx="160" cy="144" rx="120" ry="20" fill="#0B132B" fill-opacity="0.5"/>
+
+  <!-- Radar Rings -->
+  <g transform="translate(160, 85)">
+    <circle r="65" stroke="#334155" stroke-opacity="0.4" stroke-width="1" fill="none"/>
+    <circle r="46" stroke="#06B6D4" stroke-opacity="0.25" stroke-width="1" stroke-dasharray="4 3" fill="none"/>
+    <circle r="26" stroke="#06B6D4" stroke-opacity="0.5" stroke-width="1.2" fill="url(#radarSweep)"/>
+    
+    <!-- Crosshairs -->
+    <line x1="-75" y1="0" x2="75" y2="0" stroke="#334155" stroke-opacity="0.4" stroke-width="0.75"/>
+    <line x1="0" y1="-75" x2="0" y2="75" stroke="#334155" stroke-opacity="0.4" stroke-width="0.75"/>
+
+    <!-- Search Beam Cone -->
+    <path d="M 0 0 L 52 -38 A 65 65 0 0 0 -12 -64 Z" fill="#06B6D4" fill-opacity="0.12"/>
+
+    <!-- Center Hub Target -->
+    <circle r="6" fill="#0B0F17" stroke="#06B6D4" stroke-width="1.8"/>
+    <circle r="2.5" fill="#06B6D4"/>
+
+    <!-- Potential Candidate Node Blips (Searching) -->
+    <circle cx="34" cy="-22" r="3" fill="#F59E0B" opacity="0.6"/>
+    <circle cx="-28" cy="18" r="2.5" fill="#64748B" opacity="0.4"/>
+    <circle cx="18" cy="38" r="2.5" fill="#64748B" opacity="0.4"/>
+  </g>
+
+  <g transform="translate(160, 160)">
+    <text x="0" y="0" fill="#94A3B8" font-family="monospace" font-size="8.5" font-weight="600" text-anchor="middle">
+      RADAR ACTIVE · ZERO CANDIDATES FOUND FOR CRITERIA
+    </text>
+  </g>
+</svg>

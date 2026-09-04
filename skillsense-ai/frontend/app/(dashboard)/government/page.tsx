@@ -352,32 +352,41 @@ export default function GovernmentMacroDashboardPage() {
             gap: 16,
           }}
         >
-          <div style={{ flex: '1 1 500px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, flexWrap: 'wrap' }}>
-              <AIBadge type="nsqf" label="GOVERNMENT OF MAHARASHTRA" />
-              <AIBadge type="verified" label="LONGITUDINAL COCKPIT · SIH26135" />
-              {isFiltered && (
-                <span
-                  style={{
-                    fontSize: 11,
-                    fontWeight: 700,
-                    color: 'var(--gold)',
-                    background: 'rgba(245,158,11,0.12)',
-                    padding: '2px 8px',
-                    borderRadius: 4,
-                    border: '1px solid var(--gold-border)',
-                  }}
-                >
-                  FILTER ACTIVE
-                </span>
-              )}
+          <div style={{ flex: '1 1 500px', display: 'flex', alignItems: 'flex-start', gap: 16 }}>
+            <div style={{ flexShrink: 0, marginTop: 2 }} className="hidden sm:block">
+              <img
+                src="/images/brand/maharashtra-seal-emblem.svg"
+                alt="Government of Maharashtra Official Emblem"
+                style={{ width: 54, height: 54, borderRadius: '50%', boxShadow: '0 4px 16px rgba(245,158,11,0.25)' }}
+              />
             </div>
-            <h1 className="font-display" style={{ fontSize: 26, fontWeight: 800, color: '#f8fafc', margin: 0, letterSpacing: '-0.02em' }}>
-              State Longitudinal Skilling & <span style={{ color: 'var(--gold)' }}>Outcome Cockpit</span>
-            </h1>
-            <p style={{ color: 'var(--text-secondary)', fontSize: 13.5, marginTop: 6, lineHeight: 1.5, maxWidth: 720 }}>
-              Live, database-grounded outcome intelligence tracking candidate transition from enrollment to 365-day retention, verified wage progression, and district skill deficits.
-            </p>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, flexWrap: 'wrap' }}>
+                <AIBadge type="nsqf" label="GOVERNMENT OF MAHARASHTRA" />
+                <AIBadge type="verified" label="LONGITUDINAL COCKPIT · SIH26135" />
+                {isFiltered && (
+                  <span
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 700,
+                      color: 'var(--gold)',
+                      background: 'rgba(245,158,11,0.12)',
+                      padding: '2px 8px',
+                      borderRadius: 4,
+                      border: '1px solid var(--gold-border)',
+                    }}
+                  >
+                    FILTER ACTIVE
+                  </span>
+                )}
+              </div>
+              <h1 className="font-display" style={{ fontSize: 26, fontWeight: 800, color: '#f8fafc', margin: 0, letterSpacing: '-0.02em' }}>
+                State Longitudinal Skilling & <span style={{ color: 'var(--gold)' }}>Outcome Cockpit</span>
+              </h1>
+              <p style={{ color: 'var(--text-secondary)', fontSize: 13.5, marginTop: 6, lineHeight: 1.5, maxWidth: 720 }}>
+                Live, database-grounded outcome intelligence tracking candidate transition from enrollment to 365-day retention, verified wage progression, and district skill deficits.
+              </p>
+            </div>
           </div>
 
           <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>

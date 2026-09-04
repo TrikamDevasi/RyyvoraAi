@@ -187,33 +187,29 @@ export default function StudentDashboardPage() {
 
         {/* ── Error / Empty State ── */}
         {!loading && (error || !profile) && (
-          <div className="card-linear" style={{ padding: 40, borderRadius: 16, textAlign: 'center', marginTop: 20 }}>
-            <AlertTriangle size={36} style={{ color: 'var(--gold)', marginBottom: 12 }} />
-            <h2 className="font-display" style={{ fontSize: 20, fontWeight: 800, color: '#f8fafc', margin: '0 0 8px' }}>
-              {error ? 'Unable to Load Dashboard' : 'No Student Profile Found'}
-            </h2>
-            <p style={{ fontSize: 13.5, color: 'var(--text-secondary)', maxWidth: 520, margin: '0 auto 16px', lineHeight: 1.6 }}>
-              {error
-                ? 'We could not retrieve your dashboard data. Check your connection and try again.'
-                : 'No verified student profile is linked to your account yet. Enroll or complete an assessment to generate your personalized dashboard.'}
-            </p>
-            <div style={{ display: 'flex', justifyContent: 'center', gap: 10, flexWrap: 'wrap' }}>
-              {error ? (
-                <button onClick={fetchProfile} className="btn-gold" style={{ fontSize: 13, padding: '9px 20px', cursor: 'pointer' }}>
-                  <RefreshCw size={14} /> Retry
-                </button>
-              ) : (
-                <>
-                  <Link href="/student/assessments" className="btn-gold" style={{ fontSize: 13, padding: '9px 20px' }}>
-                    Take Assessment
-                  </Link>
-                  <Link href="/student/analyzer" className="btn-secondary" style={{ fontSize: 13, padding: '9px 20px' }}>
-                    Run AI Analyzer
-                  </Link>
-                </>
-              )}
+          error ? (
+            <div className="card-linear" style={{ padding: 40, borderRadius: 16, textAlign: 'center', marginTop: 20 }}>
+              <AlertTriangle size={36} style={{ color: 'var(--gold)', marginBottom: 12 }} />
+              <h2 className="font-display" style={{ fontSize: 20, fontWeight: 800, color: '#f8fafc', margin: '0 0 8px' }}>
+                Unable to Load Dashboard
+              </h2>
+              <p style={{ fontSize: 13.5, color: 'var(--text-secondary)', maxWidth: 520, margin: '0 auto 16px', lineHeight: 1.6 }}>
+                We could not retrieve your dashboard data. Check your connection and try again.
+              </p>
+              <button onClick={fetchProfile} className="btn-gold" style={{ fontSize: 13, padding: '9px 20px', cursor: 'pointer' }}>
+                <RefreshCw size={14} /> Retry
+              </button>
             </div>
-          </div>
+          ) : (
+            <EmptyState
+              illustration="outcomes"
+              title="No Verified Student Profile Found"
+              description="No verified student profile is linked to your account yet. Complete an NSQF diagnostic assessment or run an AI skill evaluation to initialize your personalized cockpit."
+              actionText="Take Diagnostic Assessment"
+              actionHref="/student/assessments"
+              style={{ marginTop: 20 }}
+            />
+          )
         )}
 
         {!loading && !error && profile && (
