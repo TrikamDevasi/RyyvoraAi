@@ -1,41 +1,52 @@
 import mongoose from 'mongoose';
 import logger from '../utils/logger';
 
-const MAX_RETRIES = 3;
-const RETRY_DELAY_MS = 5000;
+let retryTimer: NodeJS.Timeout | null = null;
+
+const attemptConnection = async (uri: string): Promise<boolean> => {
+  try {
+    await mongoose.connect(uri, {
+      serverSelectionTimeoutMS: 5000,
+      connectTimeoutMS: 10000,
+    });
+    logger.info(`MongoDB connected successfully to: ${uri.includes('127.0.0.1') ? 'LOCAL' : 'ATLAS'}`);
+    if (retryTimer) {
+      clearInterval(retryTimer);
+      retryTimer = null;
+    }
+    return true;
+  } catch (err: any) {
+    logger.warn(`MongoDB connection attempt failed: ${err.message}`);
+    return false;
+  }
+};
 
 const connectDB = async () => {
   const uri = process.env.MONGODB_URI || process.env.MONGO_URI_ATLAS || 'mongodb://127.0.0.1:27017/skillsense';
-  const maxRetries = 3;
 
-  for (let attempt = 1; attempt <= maxRetries; attempt++) {
-    try {
-      await mongoose.connect(uri, {
-        serverSelectionTimeoutMS: 5000,
-        connectTimeoutMS: 10000,
-      });
-      logger.info(`MongoDB connected successfully to: ${uri.includes('127.0.0.1') ? 'LOCAL' : 'ATLAS'}`);
-      return;
-    } catch (err: any) {
-      logger.error(`MongoDB connection attempt ${attempt} failed: ${err.message}`);
-      if (attempt < maxRetries) {
-        logger.info(`Retrying in 3s...`);
-        await new Promise(res => setTimeout(res, 3000));
-      } else {
-        // If Atlas fails, try local as last resort
-        if (!uri.includes('127.0.0.1')) {
-          logger.warn('Atlas failed. Attempting local MongoDB fallback...');
-          try {
-            await mongoose.connect('mongodb://127.0.0.1:27017/skillsense');
-            logger.info('MongoDB connected via LOCAL fallback');
-            return;
-          } catch (localErr: any) {
-            logger.error('Local MongoDB also failed: ' + localErr.message);
-          }
-        }
-        logger.warn('MongoDB connection unavailable. Server will continue running and reconnect when available.');
-      }
+  mongoose.connection.on('connected', () => {
+    logger.info('MongoDB connection established.');
+  });
+
+  mongoose.connection.on('error', (err) => {
+    logger.error('MongoDB connection error: ' + err.message);
+  });
+
+  mongoose.connection.on('disconnected', () => {
+    logger.warn('MongoDB disconnected. Retrying in background...');
+    if (!retryTimer) {
+      retryTimer = setInterval(() => {
+        attemptConnection(uri);
+      }, 5000);
     }
+  });
+
+  const connected = await attemptConnection(uri);
+  if (!connected) {
+    logger.warn('MongoDB initial connection unavailable. Starting background connection polling...');
+    retryTimer = setInterval(() => {
+      attemptConnection(uri);
+    }, 4000);
   }
 };
 

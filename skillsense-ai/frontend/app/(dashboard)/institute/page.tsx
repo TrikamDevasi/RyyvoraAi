@@ -148,15 +148,13 @@ export default function InstitutePage() {
           </div>
 
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-            <button
-              type="button"
-              disabled
-              title="Batch passport minting is handled by the SkillPass admin module"
-              className="btn-secondary"
-              style={{ fontSize: 12.5, padding: '9px 18px', display: 'flex', alignItems: 'center', gap: 6, opacity: 0.6, cursor: 'not-allowed' }}
+            <Link
+              href="/institute/upload"
+              className="btn-gold"
+              style={{ fontSize: 12.5, padding: '9px 18px', display: 'flex', alignItems: 'center', gap: 6 }}
             >
-              <Lock size={14} /> Batch Mint Passports
-            </button>
+              <Upload size={14} /> Bulk Upload Trainees
+            </Link>
             <button
               type="button"
               onClick={handleExportROIDossier}
@@ -340,9 +338,18 @@ export default function InstitutePage() {
               </p>
             </div>
           </div>
-          <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', padding: '24px 0', textAlign: 'center', margin: 0 }}>
-            Curriculum gap analysis will appear once the SkillGap analyzer is run across verified cohorts.
-          </p>
+          <div style={{ textAlign: 'center', padding: '20px 0' }}>
+            <p style={{ fontSize: 13, color: 'var(--text-secondary)', margin: '0 0 14px' }}>
+              Benchmark your institution's course curricula against current Maharashtra tech employment requisites and NCVET standards.
+            </p>
+            <Link
+              href="/institute/students"
+              className="btn-outline"
+              style={{ fontSize: 12.5, padding: '7px 18px', display: 'inline-flex', alignItems: 'center', gap: 6, textDecoration: 'none' }}
+            >
+              <Users size={14} /> Inspect Enrolled Cohort Skills <ArrowUpRight size={13} />
+            </Link>
+          </div>
         </div>
         </>
         )}

@@ -83,6 +83,12 @@ export default function TraineeJourneyPage() {
 
   useEffect(() => {
     loadData();
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('action') === 'report') {
+        setShowSelfReportModal(true);
+      }
+    }
   }, []);
 
   const handleSelfReportSubmit = async (e: React.FormEvent) => {

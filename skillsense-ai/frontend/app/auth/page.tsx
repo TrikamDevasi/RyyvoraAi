@@ -107,12 +107,14 @@ export default function AuthPage() {
     } catch (err: any) {
       setLoading(false);
       const status = err.response?.status;
-      const message = err.response?.data?.message || 'Authentication failed';
+      const message = err.response?.data?.message || err.message || 'Authentication failed';
 
-      if (status === 404 || message.toLowerCase().includes('not found')) {
+      if (status === 404 || message.toLowerCase().includes('not found') || message.toLowerCase().includes('no user')) {
         setError('No account found with this email. Please sign up or try 1-click demo access.');
-      } else if (status === 401 || message.toLowerCase().includes('incorrect')) {
-        setError('Incorrect credentials. Please verify your password.');
+      } else if (status === 401 || message.toLowerCase().includes('incorrect') || message.toLowerCase().includes('password')) {
+        setError('Incorrect email or password. Please verify your credentials.');
+      } else if (err.code === 'ECONNABORTED' || message.includes('timeout')) {
+        setError('Server connection timed out. Please try again.');
       } else {
         setError(message || 'Unable to sign in. Please check your credentials.');
       }
@@ -133,6 +135,11 @@ export default function AuthPage() {
       return;
     }
 
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters.');
+      return;
+    }
+
     setLoading(true);
     try {
       await register(name.trim(), email.trim(), password, selectedRole);
@@ -141,8 +148,16 @@ export default function AuthPage() {
       window.location.replace(destination);
     } catch (err: any) {
       setLoading(false);
-      const message = err.response?.data?.message || 'Registration failed';
-      setError(message);
+      const status = err.response?.status;
+      const message = err.response?.data?.message || err.message || 'Registration failed';
+      
+      if (status === 409 || message.toLowerCase().includes('already registered') || message.toLowerCase().includes('already exists')) {
+        setError('An account with this email already exists. Please switch to the Sign In tab to log in.');
+      } else if (err.code === 'ECONNABORTED' || message.includes('timeout')) {
+        setError('Server connection timed out. Please try again.');
+      } else {
+        setError(message);
+      }
     }
   };
 

@@ -31,7 +31,22 @@ export default function AssessmentsPage() {
     return (
         <ErrorBoundary>
             <div style={{ color: WHITE, maxWidth: 1000 }}>
-                <div style={{ marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                {/* ── Unified Assessment Hub Sub-nav ── */}
+                <div style={{ display: 'flex', gap: 10, marginBottom: 20 }}>
+                    <button
+                        type="button"
+                        onClick={() => router.push('/student/assessment')}
+                        className="btn-secondary"
+                        style={{ fontSize: 12.5, padding: '7px 16px', display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}
+                    >
+                        <span>← Launch Diagnostic Quiz Runner</span>
+                    </button>
+                    <span style={{ fontSize: 12, padding: '7px 14px', borderRadius: 8, background: 'rgba(245,158,11,0.12)', color: 'var(--gold)', border: '1px solid var(--gold-border)', fontWeight: 700 }}>
+                        Verified Competency Ledgers
+                    </span>
+                </div>
+
+                <div style={{ marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 14 }}>
                     <div>
                         <h1 style={{ margin: 0, fontSize: 24, fontWeight: 800, display: 'flex', alignItems: 'center' }}>
                             <FileCheck size={28} style={{ color: GOLD, marginRight: 10 }} /> Verified <span style={{ color: GOLD, marginLeft: 6 }}>Skill Assessments</span>

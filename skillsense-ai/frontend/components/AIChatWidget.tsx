@@ -257,6 +257,14 @@ export default function AIChatWidget() {
           }
         })
         .catch(() => {});
+
+      const suggestions = ROLE_SUGGESTIONS[user.role?.toLowerCase() || ''] || DEFAULT_SUGGESTIONS;
+      setMessages((prev) => {
+        if (prev.length === 1 && prev[0].id === '0') {
+          return [{ ...prev[0], suggestions }];
+        }
+        return prev;
+      });
     }
   }, [user]);
 

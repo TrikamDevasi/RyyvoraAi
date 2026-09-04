@@ -48,40 +48,29 @@ export const NAVIGATION_CONFIG: Record<string, NavGroup[]> = {
   // ── 1. STUDENT / TRAINEE ROLE ─────────────────────────────────────────────
   student: [
     {
-      group: 'Overview',
+      group: 'Core Workspace',
       routes: [
-        { label: 'Dashboard', shortLabel: 'Dashboard', mobileLabel: 'Home', href: '/student', icon: LayoutDashboard },
-        { label: 'Employment Journey', shortLabel: 'Employment', mobileLabel: 'Journey', href: '/student/journey', icon: Milestone, badge: 'TIMELINE' },
+        { label: 'Dashboard', shortLabel: 'Dashboard', mobileLabel: 'Home', href: '/student', icon: LayoutDashboard, description: 'Overview of your skill readiness and next actions' },
+        { label: 'Employment Journey', shortLabel: 'Journey', mobileLabel: 'Journey', href: '/student/journey', icon: Milestone, badge: 'CAREER', description: 'Track milestones from training to job retention' },
+        { label: 'Assessments & Tests', shortLabel: 'Tests', mobileLabel: 'Tests', href: '/student/assessment', icon: CheckSquare, badge: 'EVAL', description: 'NSQF competency evaluations & quizzes' },
+        { label: 'AI Skill Gap Analyzer', shortLabel: 'Skill Gap', mobileLabel: 'Skills', href: '/student/analyzer', icon: Brain, badge: 'AI', description: 'Personalized skill deficit roadmap' },
+        { label: 'Career Pathways', shortLabel: 'Careers', mobileLabel: 'Career', href: '/student/career', icon: Compass, description: 'Workforce alignment & salary projections' },
+        { label: 'Skill Passport', shortLabel: 'Passport', mobileLabel: 'Passport', href: '/student/passport', icon: Award, badge: 'VERIFIED', description: 'Tamper-proof digital credentials' },
       ],
     },
     {
-      group: 'Intelligence & Skills',
+      group: 'Opportunities & Market',
       routes: [
-        { label: 'AI Skill Analyzer', shortLabel: 'AI Tools', mobileLabel: 'AI', href: '/student/analyzer', icon: Brain, badge: 'AI' },
-        { label: 'Career Predictor', shortLabel: 'Career', mobileLabel: 'Career', href: '/student/career', icon: Compass },
-        { label: 'Market Demand', shortLabel: 'Market', mobileLabel: 'Market', href: '/student/market', icon: TrendingUp },
-      ],
-    },
-    {
-      group: 'Assessments & Credentials',
-      routes: [
-        { label: 'Evaluations & Tests', shortLabel: 'Evaluations', mobileLabel: 'Tests', href: '/student/assessment', icon: CheckSquare },
-        { label: 'Project Submissions', shortLabel: 'Submissions', mobileLabel: 'Projects', href: '/student/submissions', icon: FileSpreadsheet },
-        { label: 'Skill Passport', shortLabel: 'Passport', mobileLabel: 'Passport', href: '/student/passport', icon: Award, badge: 'VERIFIED' },
-      ],
-    },
-    {
-      group: 'Opportunities & Community',
-      routes: [
-        { label: 'Job Matches', href: '/student/jobs', icon: Briefcase, badge: 'NEW' },
-        { label: 'Leaderboard', href: '/student/leaderboard', icon: Trophy },
+        { label: 'Job Matches', shortLabel: 'Jobs', href: '/student/jobs', icon: Briefcase, badge: 'NEW', description: 'Open positions aligned to your skills' },
+        { label: 'Market Hiring Demand', shortLabel: 'Market', href: '/student/market', icon: TrendingUp, description: 'Live industry demand across Indian sectors' },
+        { label: 'Student Leaderboard', shortLabel: 'Ranks', href: '/student/leaderboard', icon: Trophy, description: 'Skill badges and cohort rankings' },
       ],
     },
     {
       group: 'Account & Trust',
       routes: [
-        { label: 'DPDP Consent & Privacy', href: '/student/consent', icon: Lock, badge: 'DPDP' },
-        { label: 'Profile & Settings', mobileLabel: 'Profile', href: '/student/profile', icon: User },
+        { label: 'Profile & Settings', mobileLabel: 'Profile', href: '/student/profile', icon: User, description: 'Personal details and vocational trade' },
+        { label: 'DPDP Privacy & Consent', href: '/student/consent', icon: Lock, badge: 'DPDP', description: 'Manage your data privacy rights' },
       ],
     },
   ],
@@ -91,26 +80,26 @@ export const NAVIGATION_CONFIG: Record<string, NavGroup[]> = {
     {
       group: 'Overview',
       routes: [
-        { label: 'Institutional Cockpit', shortLabel: 'Cockpit', mobileLabel: 'Home', href: '/institute', icon: LayoutDashboard },
+        { label: 'Institutional Cockpit', shortLabel: 'Cockpit', mobileLabel: 'Home', href: '/institute', icon: LayoutDashboard, description: 'Cohort training progress and placement ROI' },
       ],
     },
     {
       group: 'Students & Training',
       routes: [
-        { label: 'Student Roster', shortLabel: 'Students', mobileLabel: 'Trainees', href: '/institute/students', icon: Users },
-        { label: 'Upload Batch Cohort', href: '/institute/upload', icon: FileCode, badge: 'BATCH' },
-        { label: 'Competency Evaluations', shortLabel: 'Evaluations', mobileLabel: 'Assess', href: '/institute/evaluations', icon: Brain },
+        { label: 'Student Roster', shortLabel: 'Students', mobileLabel: 'Trainees', href: '/institute/students', icon: Users, description: 'Trainee records and academic milestones' },
+        { label: 'Upload Batch Cohort', href: '/institute/upload', icon: FileCode, badge: 'BATCH', description: 'Bulk CSV trainee enrollment' },
+        { label: 'Competency Evaluations', shortLabel: 'Evaluations', mobileLabel: 'Assess', href: '/institute/evaluations', icon: Brain, description: 'Diagnostic test completion & marks' },
       ],
     },
     {
       group: 'Outcomes & ROI',
       routes: [
-        { label: 'Placement Tracker', shortLabel: 'Placement', mobileLabel: 'Placements', href: '/institute/placement', icon: TrendingUp },
-        { label: 'Curriculum & ROI', href: '/institute/roi', icon: BarChart3, badge: 'FINANCIAL' },
+        { label: 'Placement Tracker', shortLabel: 'Placement', mobileLabel: 'Placements', href: '/institute/placement', icon: TrendingUp, description: 'Track verified job placements' },
+        { label: 'Curriculum & ROI', href: '/institute/roi', icon: BarChart3, badge: 'FINANCIAL', description: 'Department salary multiplier analysis' },
       ],
     },
     {
-      group: 'Account & Quotas',
+      group: 'Account & Plan',
       routes: [
         { label: 'Institute Profile', href: '/institute/profile', icon: User },
         { label: 'Billing & Quotas', href: '/settings/billing', icon: CreditCard },
@@ -123,22 +112,22 @@ export const NAVIGATION_CONFIG: Record<string, NavGroup[]> = {
     {
       group: 'Overview',
       routes: [
-        { label: 'Employer Dashboard', shortLabel: 'Dashboard', mobileLabel: 'Home', href: '/employer', icon: LayoutDashboard },
+        { label: 'Employer Dashboard', shortLabel: 'Dashboard', mobileLabel: 'Home', href: '/employer', icon: LayoutDashboard, description: 'Recruitment velocity and candidate validations' },
       ],
     },
     {
       group: 'Verification & Outcomes',
       routes: [
-        { label: 'Candidate Validations', shortLabel: 'Validations', mobileLabel: 'Validations', href: '/employer/validations', icon: Award, badge: 'LEDGER' },
-        { label: 'Hired Placements', shortLabel: 'Placements', mobileLabel: 'Placements', href: '/employer/placements', icon: Briefcase },
-        { label: 'Performance Feedback', href: '/employer/feedback', icon: FileCheck2 },
+        { label: 'Verify Credentials', shortLabel: 'Validations', mobileLabel: 'Validations', href: '/employer/validations', icon: Award, badge: 'VERIFIED', description: 'Instant Skill Passport ledger verification' },
+        { label: 'Hired Placements', shortLabel: 'Placements', mobileLabel: 'Placements', href: '/employer/placements', icon: Briefcase, description: 'Candidate offers and campus drives' },
+        { label: 'Performance Feedback', href: '/employer/feedback', icon: FileCheck2, description: 'Post-hire retention surveys' },
       ],
     },
     {
       group: 'Talent Acquisition',
       routes: [
-        { label: 'Verified Talent Pool', shortLabel: 'Talent', mobileLabel: 'Talent', href: '/industry/talent', icon: Users, badge: 'VERIFIED' },
-        { label: 'Campus Connect', href: '/industry/campus', icon: Building },
+        { label: 'Verified Talent Pool', shortLabel: 'Talent', mobileLabel: 'Talent', href: '/industry/talent', icon: Users, badge: 'ASSESSED', description: 'Pre-screened vocational candidates' },
+        { label: 'Campus Connect', href: '/industry/campus', icon: Building, description: 'Partner with technical institutes' },
       ],
     },
     {
@@ -154,21 +143,21 @@ export const NAVIGATION_CONFIG: Record<string, NavGroup[]> = {
     {
       group: 'Overview',
       routes: [
-        { label: 'Sector Intelligence Cockpit', shortLabel: 'Cockpit', mobileLabel: 'Home', href: '/industry', icon: LayoutDashboard },
+        { label: 'Sector Intelligence Cockpit', shortLabel: 'Cockpit', mobileLabel: 'Home', href: '/industry', icon: LayoutDashboard, description: 'Macro industry skill demand and talent shortages' },
       ],
     },
     {
       group: 'Workforce & Standards',
       routes: [
-        { label: 'Market Demand & NOS', shortLabel: 'Demand', mobileLabel: 'Demand', href: '/industry/demand', icon: TrendingUp },
-        { label: 'Industry & Sector News', href: '/industry/news', icon: Newspaper },
+        { label: 'Industry Demand & NOS', shortLabel: 'Demand', mobileLabel: 'Demand', href: '/industry/demand', icon: TrendingUp, description: 'National Occupational Standards talent deficits' },
+        { label: 'Sector News & Briefings', href: '/industry/news', icon: Newspaper, description: 'Vocational council intelligence' },
       ],
     },
     {
       group: 'Talent & Institution Network',
       routes: [
-        { label: 'Verified Candidate Pool', shortLabel: 'Candidates', mobileLabel: 'Candidates', href: '/industry/talent', icon: Users, badge: 'VERIFIED' },
-        { label: 'Campus Drives Network', shortLabel: 'Campus', mobileLabel: 'Campus', href: '/industry/campus', icon: Building },
+        { label: 'Verified Candidate Pool', shortLabel: 'Candidates', mobileLabel: 'Candidates', href: '/industry/talent', icon: Users, badge: 'VERIFIED', description: 'Pre-evaluated vocational graduates' },
+        { label: 'Campus Drives Network', shortLabel: 'Campus', mobileLabel: 'Campus', href: '/industry/campus', icon: Building, description: 'Institutional drive coordination' },
       ],
     },
     {
@@ -185,35 +174,35 @@ export const NAVIGATION_CONFIG: Record<string, NavGroup[]> = {
     {
       group: 'Overview',
       routes: [
-        { label: 'State Macro Dashboard', shortLabel: 'Dashboard', mobileLabel: 'Home', href: '/government', icon: Landmark, badge: 'LIVE' },
+        { label: 'State Outcome Cockpit', shortLabel: 'Dashboard', mobileLabel: 'Home', href: '/government', icon: Landmark, badge: 'LIVE', description: 'Macro view of state employment and retention' },
       ],
     },
     {
       group: 'Analytics & Regions',
       routes: [
-        { label: 'Regional Heatmap', shortLabel: 'Heatmap', mobileLabel: 'Heatmap', href: '/government/heatmap', icon: BarChart3 },
-        { label: 'Fund Targeting', shortLabel: 'Targeting', mobileLabel: 'Targeting', href: '/government/fund-targeting', icon: TrendingUp, badge: 'BUDGET' },
+        { label: 'Regional Outcome Heatmap', shortLabel: 'Heatmap', mobileLabel: 'Heatmap', href: '/government/heatmap', icon: BarChart3, description: 'District performance & cluster mapping' },
+        { label: 'Training Fund Allocation', shortLabel: 'Funding', mobileLabel: 'Funding', href: '/government/fund-targeting', icon: TrendingUp, badge: 'BUDGET', description: 'Target funds where outcomes are highest' },
       ],
     },
     {
       group: 'Compliance & Governance',
       routes: [
-        { label: 'NSQF Compliance', shortLabel: 'Compliance', mobileLabel: 'Compliance', href: '/government/compliance', icon: Shield },
-        { label: 'Policy Intelligence', href: '/government/news', icon: Newspaper },
+        { label: 'NSQF & State Compliance', shortLabel: 'Compliance', mobileLabel: 'Compliance', href: '/government/compliance', icon: Shield, description: 'Vocational standard compliance monitoring' },
+        { label: 'Policy Intelligence', href: '/government/news', icon: Newspaper, description: 'State labor and skill council briefings' },
       ],
     },
     {
       group: 'Auditing & System Reports',
       routes: [
-        { label: 'Algorithmic Fairness', href: '/admin/fairness', icon: Shield, badge: '4/5th' },
-        { label: 'System Reports', href: '/admin/reports', icon: BarChart3 },
+        { label: 'Fairness & Non-Bias Audit', href: '/admin/fairness', icon: Shield, badge: '4/5th', description: 'Algorithmic demographic parity verification' },
+        { label: 'State System Reports', href: '/admin/reports', icon: BarChart3, description: 'Downloadable outcome dossiers' },
       ],
     },
     {
-      group: 'Account & Security',
+      group: 'Account & Trust',
       routes: [
         { label: 'Directorate Profile', href: '/government/profile', icon: User },
-        { label: 'DPDP Security & Trust', href: '/student/consent', icon: Lock },
+        { label: 'DPDP Security & Trust', href: '/student/consent', icon: Lock, description: 'Data protection compliance status' },
       ],
     },
   ],
@@ -223,22 +212,22 @@ export const NAVIGATION_CONFIG: Record<string, NavGroup[]> = {
     {
       group: 'Overview',
       routes: [
-        { label: 'System Overview', shortLabel: 'Overview', mobileLabel: 'Home', href: '/admin', icon: LayoutDashboard },
+        { label: 'System Overview', shortLabel: 'Overview', mobileLabel: 'Home', href: '/admin', icon: LayoutDashboard, description: 'Platform health and operational telemetry' },
       ],
     },
     {
       group: 'Management & Directory',
       routes: [
-        { label: 'User Directory', shortLabel: 'Users', mobileLabel: 'Users', href: '/admin/users', icon: Users },
-        { label: 'Institute Registry', shortLabel: 'Institutes', mobileLabel: 'Institutes', href: '/admin/institutes', icon: Building },
+        { label: 'User Directory', shortLabel: 'Users', mobileLabel: 'Users', href: '/admin/users', icon: Users, description: 'Manage accounts and role permissions' },
+        { label: 'Institute Registry', shortLabel: 'Institutes', mobileLabel: 'Institutes', href: '/admin/institutes', icon: Building, description: 'Accredited institution credentials' },
       ],
     },
     {
       group: 'Auditing & Governance',
       routes: [
-        { label: 'Platform Reports', shortLabel: 'Reports', mobileLabel: 'Reports', href: '/admin/reports', icon: BarChart3 },
-        { label: 'Algorithmic Fairness', href: '/admin/fairness', icon: Shield, badge: '4/5th' },
-        { label: 'System Audit Logs', href: '/admin/audit-logs', icon: Activity },
+        { label: 'Platform Reports', shortLabel: 'Reports', mobileLabel: 'Reports', href: '/admin/reports', icon: BarChart3, description: 'Audit-ready system compliance exports' },
+        { label: 'Fairness & Non-Bias Audit', href: '/admin/fairness', icon: Shield, badge: '4/5th', description: 'Disparate impact & bias evaluation' },
+        { label: 'System Audit Logs', href: '/admin/audit-logs', icon: Activity, description: 'Immutable ledger access records' },
       ],
     },
     {
@@ -262,7 +251,7 @@ export function getMobileNavigationItems(role?: string): RouteItem[] {
 
   // Preferred primary mobile routes per role for optimal mobile workflows
   const preferredHrefs: Record<string, string[]> = {
-    student: ['/student', '/student/journey', '/student/analyzer', '/student/career'],
+    student: ['/student', '/student/journey', '/student/assessment', '/student/career'],
     employer: ['/employer', '/employer/validations', '/employer/placements', '/industry/talent'],
     institute: ['/institute', '/institute/students', '/institute/evaluations', '/institute/placement'],
     industry: ['/industry', '/industry/talent', '/industry/campus', '/industry/demand'],

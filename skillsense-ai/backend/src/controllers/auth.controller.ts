@@ -112,11 +112,8 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
       }
     }
 
-    try {
-      await sendVerificationEmail(user.email, verificationToken, user.name);
-    } catch (emailErr) {
-      // Non-blocking email failure
-    }
+    // Send verification email in the background without blocking the registration response
+    sendVerificationEmail(user.email, verificationToken, user.name).catch(() => {});
 
     const token = signToken({ id: user._id.toString(), role: user.role, email: user.email });
     setAuthCookie(res, token, user.role);

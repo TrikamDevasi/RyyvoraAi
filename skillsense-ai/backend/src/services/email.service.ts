@@ -4,7 +4,13 @@ import logger from '../utils/logger';
 
 let transporter: nodemailer.Transporter | null = null;
 
-if (env.GMAIL_USER && env.GMAIL_APP_PASSWORD) {
+const hasRealCredentials = 
+  Boolean(env.GMAIL_USER && 
+  env.GMAIL_APP_PASSWORD && 
+  !env.GMAIL_USER.includes('your.gmail') && 
+  !env.GMAIL_APP_PASSWORD.includes('xxxx'));
+
+if (hasRealCredentials) {
   transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {

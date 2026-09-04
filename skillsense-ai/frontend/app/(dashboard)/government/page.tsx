@@ -26,6 +26,7 @@ import {
   Lock,
   UserCheck,
   CheckCircle2,
+  ArrowRight,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -128,6 +129,7 @@ export default function GovernmentMacroDashboardPage() {
   const [wageSummary, setWageSummary] = useState<WageSummary | null>(null);
   const [barrierData, setBarrierData] = useState<ReasonItem[]>([]);
   const [interventions, setInterventions] = useState<PolicyDirective[]>([]);
+  const [activeTab, setActiveTab] = useState<'overview' | 'districts' | 'wages' | 'copilot'>('overview');
 
   // ── Filter State ────────────────────────────────────────────────────────
   const [selectedDistrict, setSelectedDistrict] = useState<string>('All');
@@ -550,613 +552,822 @@ export default function GovernmentMacroDashboardPage() {
           </div>
         )}
 
-        {/* ── Top 4 Live KPI Metric Cards (Database-Driven) ── */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14, marginBottom: 14 }}>
-          {/* Card 1: Total Enrolled */}
-          <div className="card-kpi card-interactive" style={{ padding: '18px 20px', borderRadius: 'var(--radius-lg)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-              <span style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                Total Tracked Trainees
-              </span>
-              <div className="card-icon-container" style={{ width: 32, height: 32, background: 'var(--gold-muted)', border: '1px solid var(--gold-border)', color: 'var(--gold)' }}>
-                <Users size={16} />
-              </div>
-            </div>
-            <div className="font-display" style={{ fontSize: 26, fontWeight: 800, color: 'var(--gold)', letterSpacing: '-0.02em' }}>
-              {totalTraineesDisplay}
-            </div>
-            <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 4 }}>
-              {funnelBreakdown
-                ? `${funnelBreakdown.certified.toLocaleString()} Certified (${funnelBreakdown.completed} Completed)`
-                : 'Real-time state enrollment ledger'}
-            </div>
-          </div>
-
-          {/* Card 2: Placement / Transition Rate */}
-          <div className="card-kpi card-interactive" style={{ padding: '18px 20px', borderRadius: 'var(--radius-lg)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-              <span style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                State Transition Rate
-              </span>
-              <div className="card-icon-container" style={{ width: 32, height: 32, background: 'var(--success-bg)', border: '1px solid var(--success-border)', color: 'var(--success)' }}>
-                <Briefcase size={16} />
-              </div>
-            </div>
-            <div className="font-display" style={{ fontSize: 26, fontWeight: 800, color: 'var(--success)', letterSpacing: '-0.02em' }}>
-              {placementRateDisplay}
-            </div>
-            <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 4 }}>
-              {funnelBreakdown
-                ? `${funnelBreakdown.placed.toLocaleString()} Placed / Transitioned`
-                : 'No placement records'}
-            </div>
-          </div>
-
-          {/* Card 3: 90-Day Retention */}
-          <div className="card-kpi card-interactive" style={{ padding: '18px 20px', borderRadius: 'var(--radius-lg)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-              <span style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                90-Day Retention
-              </span>
-              <div className="card-icon-container" style={{ width: 32, height: 32, background: 'var(--info-bg)', border: '1px solid var(--info-border)', color: 'var(--info)' }}>
-                <ShieldCheck size={16} />
-              </div>
-            </div>
-            <div className="font-display" style={{ fontSize: 26, fontWeight: 800, color: 'var(--info)', letterSpacing: '-0.02em' }}>
-              {retentionRateDisplay}
-            </div>
-            <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 4 }}>
-              {funnelBreakdown
-                ? `${funnelBreakdown.retained90d.toLocaleString()} Verified Retained at 90d`
-                : 'Surveys pending response'}
-            </div>
-          </div>
-
-          {/* Card 4: Wage Growth */}
-          <div className="card-kpi card-interactive" style={{ padding: '18px 20px', borderRadius: 'var(--radius-lg)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-              <span style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                Median Salary Growth
-              </span>
-              <div className="card-icon-container" style={{ width: 32, height: 32, background: 'rgba(168,85,247,0.1)', border: '1px solid rgba(168,85,247,0.25)', color: '#a855f7' }}>
-                <TrendingUp size={16} />
-              </div>
-            </div>
-            <div className="font-display" style={{ fontSize: 26, fontWeight: 800, color: '#a855f7', letterSpacing: '-0.02em' }}>
-              {wageGrowthDisplay}
-            </div>
-            <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 4 }}>
-              {wageSummary && wageSummary.avgInitialSalary > 0
-                ? `₹${wageSummary.avgInitialSalary.toLocaleString('en-IN')} → ₹${wageSummary.avgCurrentSalary.toLocaleString('en-IN')}/mo`
-                : 'No verified compensation data'}
-            </div>
-          </div>
+        {/* ── Cockpit Progressive Disclosure Navigation Tabs ── */}
+        <div
+          className="no-scrollbar touch-pan-x"
+          style={{
+            display: 'flex',
+            gap: 8,
+            borderBottom: '1px solid var(--border)',
+            paddingBottom: 2,
+            marginBottom: 24,
+            overflowX: 'auto',
+            WebkitOverflowScrolling: 'touch',
+          }}
+        >
+          {[
+            { key: 'overview', label: 'Executive Summary', icon: Layers },
+            { key: 'districts', label: 'District Intelligence & Pipeline', icon: Building, badge: districtData.length ? `${districtData.length} Districts` : undefined },
+            { key: 'wages', label: 'Wage Progression & Barriers', icon: TrendingUp },
+            { key: 'copilot', label: 'AI Policy Copilot & Directives', icon: Bot, badge: 'AI' },
+          ].map((t) => {
+            const Icon = t.icon;
+            const isActive = activeTab === t.key;
+            return (
+              <button
+                key={t.key}
+                type="button"
+                onClick={() => setActiveTab(t.key as any)}
+                style={{
+                  padding: '9px 18px',
+                  borderRadius: '8px 8px 0 0',
+                  border: 'none',
+                  borderBottom: `2px solid ${isActive ? 'var(--gold)' : 'transparent'}`,
+                  background: isActive ? 'rgba(245,158,11,0.08)' : 'transparent',
+                  color: isActive ? 'var(--gold)' : 'var(--text-secondary)',
+                  fontSize: 13,
+                  fontWeight: isActive ? 700 : 500,
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                  flexShrink: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 7,
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                <Icon size={15} />
+                <span>{t.label}</span>
+                {t.badge && (
+                  <span
+                    style={{
+                      fontSize: 10.5,
+                      fontWeight: 700,
+                      padding: '1px 6px',
+                      borderRadius: 4,
+                      background: isActive ? 'rgba(245,158,11,0.2)' : 'rgba(255,255,255,0.06)',
+                      color: isActive ? 'var(--gold)' : 'var(--text-muted)',
+                    }}
+                  >
+                    {t.badge}
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </div>
 
-        {/* ── Granular Outcome Breakdown Bar (Salaried vs Self-Employed vs Apprenticeship) ── */}
-        {funnelBreakdown && (
-          <div
-            className="card-linear"
-            style={{
-              padding: '12px 18px',
-              borderRadius: 10,
-              marginBottom: 24,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              flexWrap: 'wrap',
-              gap: 12,
-              background: 'rgba(255,255,255,0.02)',
-              fontSize: 12,
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
-              <span style={{ fontWeight: 700, color: '#94a3b8' }}>Employment Modalities:</span>
-              <span style={{ color: '#f8fafc' }}>
-                Salaried: <strong>{funnelBreakdown.salaried}</strong>
-              </span>
-              <span style={{ color: 'var(--gold)' }}>
-                Self-Employed: <strong>{funnelBreakdown.selfEmployed}</strong>
-              </span>
-              <span style={{ color: '#60a5fa' }}>
-                Apprenticeship: <strong>{funnelBreakdown.apprenticeship}</strong>
-              </span>
+        {/* ═══════════════════════════════════════════════════════════════════════ */}
+        {/* ── TAB 1: EXECUTIVE SUMMARY ────────────────────────────────────────── */}
+        {/* ═══════════════════════════════════════════════════════════════════════ */}
+        {activeTab === 'overview' && (
+          <div>
+            {/* Top 4 Live KPI Metric Cards */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14, marginBottom: 14 }}>
+              {/* Card 1: Total Enrolled */}
+              <div className="card-kpi card-interactive" style={{ padding: '18px 20px', borderRadius: 'var(--radius-lg)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                  <span style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    Total Tracked Trainees
+                  </span>
+                  <div className="card-icon-container" style={{ width: 32, height: 32, background: 'var(--gold-muted)', border: '1px solid var(--gold-border)', color: 'var(--gold)' }}>
+                    <Users size={16} />
+                  </div>
+                </div>
+                <div className="font-display" style={{ fontSize: 26, fontWeight: 800, color: 'var(--gold)', letterSpacing: '-0.02em' }}>
+                  {totalTraineesDisplay}
+                </div>
+                <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 4 }}>
+                  {funnelBreakdown
+                    ? `${funnelBreakdown.certified.toLocaleString()} Certified (${funnelBreakdown.completed} Completed)`
+                    : 'Real-time state enrollment ledger'}
+                </div>
+              </div>
+
+              {/* Card 2: Placement / Transition Rate */}
+              <div className="card-kpi card-interactive" style={{ padding: '18px 20px', borderRadius: 'var(--radius-lg)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                  <span style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    State Transition Rate
+                  </span>
+                  <div className="card-icon-container" style={{ width: 32, height: 32, background: 'var(--success-bg)', border: '1px solid var(--success-border)', color: 'var(--success)' }}>
+                    <Briefcase size={16} />
+                  </div>
+                </div>
+                <div className="font-display" style={{ fontSize: 26, fontWeight: 800, color: 'var(--success)', letterSpacing: '-0.02em' }}>
+                  {placementRateDisplay}
+                </div>
+                <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 4 }}>
+                  {funnelBreakdown
+                    ? `${funnelBreakdown.placed.toLocaleString()} Placed / Transitioned`
+                    : 'No placement records'}
+                </div>
+              </div>
+
+              {/* Card 3: 90-Day Retention */}
+              <div className="card-kpi card-interactive" style={{ padding: '18px 20px', borderRadius: 'var(--radius-lg)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                  <span style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    90-Day Retention
+                  </span>
+                  <div className="card-icon-container" style={{ width: 32, height: 32, background: 'var(--info-bg)', border: '1px solid var(--info-border)', color: 'var(--info)' }}>
+                    <ShieldCheck size={16} />
+                  </div>
+                </div>
+                <div className="font-display" style={{ fontSize: 26, fontWeight: 800, color: 'var(--info)', letterSpacing: '-0.02em' }}>
+                  {retentionRateDisplay}
+                </div>
+                <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 4 }}>
+                  {funnelBreakdown
+                    ? `${funnelBreakdown.retained90d.toLocaleString()} Verified Retained at 90d`
+                    : 'Surveys pending response'}
+                </div>
+              </div>
+
+              {/* Card 4: Wage Growth */}
+              <div className="card-kpi card-interactive" style={{ padding: '18px 20px', borderRadius: 'var(--radius-lg)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                  <span style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    Median Salary Growth
+                  </span>
+                  <div className="card-icon-container" style={{ width: 32, height: 32, background: 'rgba(168,85,247,0.1)', border: '1px solid rgba(168,85,247,0.25)', color: '#a855f7' }}>
+                    <TrendingUp size={16} />
+                  </div>
+                </div>
+                <div className="font-display" style={{ fontSize: 26, fontWeight: 800, color: '#a855f7', letterSpacing: '-0.02em' }}>
+                  {wageGrowthDisplay}
+                </div>
+                <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 4 }}>
+                  {wageSummary && wageSummary.avgInitialSalary > 0
+                    ? `₹${wageSummary.avgInitialSalary.toLocaleString('en-IN')} → ₹${wageSummary.avgCurrentSalary.toLocaleString('en-IN')}/mo`
+                    : 'No verified compensation data'}
+                </div>
+              </div>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
-              <span style={{ fontWeight: 700, color: '#94a3b8' }}>Retention Milestones:</span>
-              <span style={{ color: '#cbd5e1' }}>
-                30d: <strong>{funnelBreakdown.retained30d}</strong>
-              </span>
-              <span style={{ color: '#10b981' }}>
-                90d: <strong>{funnelBreakdown.retained90d}</strong>
-              </span>
-              <span style={{ color: '#60a5fa' }}>
-                180d: <strong>{funnelBreakdown.retained180d}</strong>
-              </span>
-              <span style={{ color: '#a855f7' }}>
-                365d: <strong>{funnelBreakdown.retained365d}</strong>
-              </span>
+            {/* Granular Outcome Breakdown Bar */}
+            {funnelBreakdown && (
+              <div
+                className="card-linear"
+                style={{
+                  padding: '12px 18px',
+                  borderRadius: 10,
+                  marginBottom: 24,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  flexWrap: 'wrap',
+                  gap: 12,
+                  background: 'rgba(255,255,255,0.02)',
+                  fontSize: 12,
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
+                  <span style={{ fontWeight: 700, color: '#94a3b8' }}>Employment Modalities:</span>
+                  <span style={{ color: '#f8fafc' }}>
+                    Salaried: <strong>{funnelBreakdown.salaried}</strong>
+                  </span>
+                  <span style={{ color: 'var(--gold)' }}>
+                    Self-Employed: <strong>{funnelBreakdown.selfEmployed}</strong>
+                  </span>
+                  <span style={{ color: '#60a5fa' }}>
+                    Apprenticeship: <strong>{funnelBreakdown.apprenticeship}</strong>
+                  </span>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
+                  <span style={{ fontWeight: 700, color: '#94a3b8' }}>Retention Milestones:</span>
+                  <span style={{ color: '#cbd5e1' }}>
+                    30d: <strong>{funnelBreakdown.retained30d}</strong>
+                  </span>
+                  <span style={{ color: '#10b981' }}>
+                    90d: <strong>{funnelBreakdown.retained90d}</strong>
+                  </span>
+                  <span style={{ color: '#60a5fa' }}>
+                    180d: <strong>{funnelBreakdown.retained180d}</strong>
+                  </span>
+                  <span style={{ color: '#a855f7' }}>
+                    365d: <strong>{funnelBreakdown.retained365d}</strong>
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* Priority Directives Summary Banner */}
+            <div
+              className="card-accent"
+              style={{
+                padding: '22px 24px',
+                borderRadius: 14,
+                marginBottom: 24,
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: 16,
+                borderLeft: '4px solid var(--gold)',
+              }}
+            >
+              <div style={{ maxWidth: 680 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                  <AIBadge type="ai" label="PRIORITY POLICY TAKEAWAY" />
+                  <span style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>
+                    State Workforce Telemetry
+                  </span>
+                </div>
+                <h3 className="font-display" style={{ fontSize: 16.5, fontWeight: 800, color: '#f8fafc', margin: '0 0 6px' }}>
+                  {interventions[0]?.title || 'Evidence-Based Vocational Directives Active'}
+                </h3>
+                <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', margin: 0, lineHeight: 1.5 }}>
+                  {interventions[0]?.observation || 'Longitudinal outcome tracking reveals rural clusters benefit most from apprenticeship subsidies. Review district breakdown or query AI Policy Copilot for targeted resource allocation.'}
+                </p>
+              </div>
+
+              <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('copilot')}
+                  className="btn-gold"
+                  style={{ fontSize: 12.5, padding: '9px 18px', display: 'flex', alignItems: 'center', gap: 6 }}
+                >
+                  <Bot size={15} /> Open Policy Copilot
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('districts')}
+                  className="btn-secondary"
+                  style={{ fontSize: 12.5, padding: '9px 18px', display: 'flex', alignItems: 'center', gap: 6 }}
+                >
+                  <Building size={15} /> District Drill-down
+                </button>
+              </div>
+            </div>
+
+            {/* Quick Action Navigation Cards */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 16 }}>
+              <div
+                onClick={() => setActiveTab('districts')}
+                className="card-linear hover:border-gold"
+                style={{ padding: 20, borderRadius: 12, cursor: 'pointer', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 12 }}
+              >
+                <div>
+                  <div style={{ width: 34, height: 34, borderRadius: 8, background: 'rgba(245,158,11,0.1)', color: 'var(--gold)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 10 }}>
+                    <Building size={17} />
+                  </div>
+                  <h4 style={{ fontSize: 14.5, fontWeight: 700, color: '#f8fafc', margin: '0 0 4px' }}>
+                    District Telemetry & Pipeline
+                  </h4>
+                  <p style={{ fontSize: 12, color: 'var(--text-secondary)', margin: 0, lineHeight: 1.4 }}>
+                    Inspect individual district performance, 9-stage conversion funnels, and DPDP-protected metrics.
+                  </p>
+                </div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--gold)', display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <span>Explore Districts</span>
+                  <ArrowRight size={13} />
+                </div>
+              </div>
+
+              <div
+                onClick={() => setActiveTab('wages')}
+                className="card-linear hover:border-gold"
+                style={{ padding: 20, borderRadius: 12, cursor: 'pointer', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 12 }}
+              >
+                <div>
+                  <div style={{ width: 34, height: 34, borderRadius: 8, background: 'rgba(168,85,247,0.1)', color: '#a855f7', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 10 }}>
+                    <TrendingUp size={17} />
+                  </div>
+                  <h4 style={{ fontSize: 14.5, fontWeight: 700, color: '#f8fafc', margin: '0 0 4px' }}>
+                    Longitudinal Wage Analytics
+                  </h4>
+                  <p style={{ fontSize: 12, color: 'var(--text-secondary)', margin: 0, lineHeight: 1.4 }}>
+                    Track verified candidate wage curves from 30 days to 365 days across vocational cohorts.
+                  </p>
+                </div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--gold)', display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <span>View Wage Curves</span>
+                  <ArrowRight size={13} />
+                </div>
+              </div>
+
+              <div
+                onClick={() => setActiveTab('copilot')}
+                className="card-linear hover:border-gold"
+                style={{ padding: 20, borderRadius: 12, cursor: 'pointer', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 12 }}
+              >
+                <div>
+                  <div style={{ width: 34, height: 34, borderRadius: 8, background: 'rgba(16,185,129,0.1)', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 10 }}>
+                    <Bot size={17} />
+                  </div>
+                  <h4 style={{ fontSize: 14.5, fontWeight: 700, color: '#f8fafc', margin: '0 0 4px' }}>
+                    AI Policy Directives
+                  </h4>
+                  <p style={{ fontSize: 12, color: 'var(--text-secondary)', margin: 0, lineHeight: 1.4 }}>
+                    Interact with grounded telemetry queries and evaluate {interventions.length} active policy interventions.
+                  </p>
+                </div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--gold)', display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <span>Ask Policy Copilot</span>
+                  <ArrowRight size={13} />
+                </div>
+              </div>
             </div>
           </div>
         )}
 
-        {/* ── Visual Section: Maharashtra 9-Stage Longitudinal Outcome Pipeline ── */}
-        <div className="card-linear" style={{ padding: 24, borderRadius: 14, marginBottom: 24 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18, borderBottom: '1px solid var(--border)', paddingBottom: 14, flexWrap: 'wrap', gap: 10 }}>
-            <div>
-              <h2 className="font-display" style={{ fontSize: 16, fontWeight: 700, color: '#f8fafc', margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
-                <Layers size={17} color="var(--gold)" /> Maharashtra Longitudinal Conversion Pipeline
-              </h2>
-              <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '4px 0 0' }}>
-                Live skilling conversion progression from candidate enrollment to 365-day employment retention.
-              </p>
-            </div>
-            <span style={{ fontSize: 11, fontWeight: 700, color: '#10b981', background: 'rgba(16,185,129,0.12)', padding: '3px 10px', borderRadius: 6, border: '1px solid rgba(16,185,129,0.25)' }}>
-              Live Telemetry Pipeline
-            </span>
-          </div>
-
-          {loading ? (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(105px, 1fr))', gap: 8 }}>
-              {Array.from({ length: 9 }).map((_, i) => (
-                <div key={i} style={{ height: 75, background: 'rgba(255,255,255,0.03)', borderRadius: 10 }} />
-              ))}
-            </div>
-          ) : funnelStages.length === 0 ? (
-            <div style={{ padding: '30px 0', textAlign: 'center', color: 'var(--text-muted)', fontSize: 13 }}>
-              No longitudinal stage progression data available for this filter.
-            </div>
-          ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(105px, 1fr))', gap: 8 }}>
-              {funnelStages.map((st) => (
-                <div
-                  key={st.id}
-                  style={{
-                    padding: 12,
-                    background: 'rgba(255,255,255,0.02)',
-                    borderRadius: 10,
-                    border: '1px solid var(--border)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    gap: 8,
-                  }}
-                >
-                  <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={st.label}>
-                    {st.label}
-                  </div>
-                  <div className="font-display" style={{ fontSize: 17, fontWeight: 800, color: '#f8fafc' }}>
-                    {typeof st.count === 'number' ? st.count.toLocaleString() : st.count}
-                  </div>
-                  <div style={{ height: 4, background: 'rgba(255,255,255,0.06)', borderRadius: 2, overflow: 'hidden' }}>
-                    <div
-                      style={{
-                        width: `${Math.min(100, Math.max(8, st.percent))}%`,
-                        height: '100%',
-                        background: 'var(--gold)',
-                        borderRadius: 2,
-                      }}
-                    />
-                  </div>
-                  <div style={{ fontSize: 10.5, fontWeight: 800, color: 'var(--gold)', textAlign: 'right' }}>
-                    {st.percent}%
-                  </div>
+        {/* ═══════════════════════════════════════════════════════════════════════ */}
+        {/* ── TAB 2: DISTRICT INTELLIGENCE & PIPELINE ─────────────────────────── */}
+        {/* ═══════════════════════════════════════════════════════════════════════ */}
+        {activeTab === 'districts' && (
+          <div>
+            {/* Visual Section: Maharashtra 9-Stage Longitudinal Outcome Pipeline */}
+            <div className="card-linear" style={{ padding: 24, borderRadius: 14, marginBottom: 24 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18, borderBottom: '1px solid var(--border)', paddingBottom: 14, flexWrap: 'wrap', gap: 10 }}>
+                <div>
+                  <h2 className="font-display" style={{ fontSize: 16, fontWeight: 700, color: '#f8fafc', margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <Layers size={17} color="var(--gold)" /> Maharashtra Longitudinal Conversion Pipeline
+                  </h2>
+                  <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '4px 0 0' }}>
+                    Live skilling conversion progression from candidate enrollment to 365-day employment retention.
+                  </p>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* ── AI Policy Copilot Interactive Query Panel ── */}
-        <div className="card-linear" style={{ padding: 24, borderRadius: 14, marginBottom: 24, border: '1px solid rgba(245,158,11,0.3)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, flexWrap: 'wrap', gap: 10 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <div style={{ padding: 8, borderRadius: 8, background: 'var(--gold)', color: '#000' }}>
-                <Bot size={18} />
-              </div>
-              <div>
-                <h2 className="font-display" style={{ fontSize: 16, fontWeight: 700, color: '#f8fafc', margin: 0 }}>
-                  AI Policy Copilot (Grounded in Verified Telemetry)
-                </h2>
-                <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '2px 0 0' }}>
-                  Real-time query engine grounded in the live Maharashtra skilling database.
-                </p>
-              </div>
-            </div>
-            <AIBadge type="ai" label="AI Recommendation · Grounded" />
-          </div>
-
-          <form onSubmit={handleCopilotSubmit} style={{ display: 'flex', gap: 10, marginBottom: 12 }}>
-            <input
-              type="text"
-              value={copilotQuery}
-              onChange={(e) => setCopilotQuery(e.target.value)}
-              placeholder="Ask policy questions e.g. 'Which districts have low employment outcomes and why?' or 'Compare wage growth across courses'"
-              aria-label="Policy query input"
-              style={{
-                flex: 1,
-                padding: '11px 16px',
-                borderRadius: 8,
-                background: 'var(--bg-input, #0f111a)',
-                border: '1px solid var(--border)',
-                color: '#fff',
-                fontSize: 13,
-              }}
-            />
-            <button
-              type="submit"
-              disabled={copilotLoading || !copilotQuery.trim()}
-              className="btn-gold"
-              aria-label="Submit policy query"
-              style={{
-                padding: '10px 20px',
-                fontSize: 13,
-                fontWeight: 700,
-                cursor: copilotLoading ? 'not-allowed' : 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 6,
-                flexShrink: 0,
-              }}
-            >
-              {copilotLoading ? <RefreshCw size={14} className="animate-spin" /> : <Send size={14} />}
-              <span>Analyze</span>
-            </button>
-          </form>
-
-          {/* Quick Query Pills */}
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 16 }}>
-            {SAMPLE_COPILOT_QUERIES.map((sq, idx) => (
-              <button
-                key={idx}
-                type="button"
-                onClick={() => {
-                  const text = sq.replace('⚡ ', '');
-                  setCopilotQuery(text);
-                }}
-                style={{
-                  fontSize: 11.5,
-                  padding: '4px 10px',
-                  borderRadius: 6,
-                  background: 'rgba(255,255,255,0.03)',
-                  border: '1px solid var(--border)',
-                  color: '#cbd5e1',
-                  cursor: 'pointer',
-                }}
-              >
-                {sq}
-              </button>
-            ))}
-          </div>
-
-          {copilotResponse && (
-            <div
-              style={{
-                padding: 16,
-                background: 'rgba(0,0,0,0.35)',
-                borderRadius: 10,
-                border: '1px solid rgba(245,158,11,0.2)',
-              }}
-            >
-              <div style={{ fontSize: 13, color: '#e2e8f0', lineHeight: 1.6, marginBottom: 12 }}>
-                {copilotResponse.answer}
+                <span style={{ fontSize: 11, fontWeight: 700, color: '#10b981', background: 'rgba(16,185,129,0.12)', padding: '3px 10px', borderRadius: 6, border: '1px solid rgba(16,185,129,0.25)' }}>
+                  Live Telemetry Pipeline
+                </span>
               </div>
 
-              {copilotResponse.citedMetrics && copilotResponse.citedMetrics.length > 0 && (
-                <div style={{ paddingTop: 10, borderTop: '1px solid var(--border)', display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
-                  <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 700 }}>
-                    Verified Database Citations:
-                  </span>
-                  {copilotResponse.citedMetrics.map((cm, idx) => (
-                    <span
-                      key={idx}
+              {loading ? (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(105px, 1fr))', gap: 8 }}>
+                  {Array.from({ length: 9 }).map((_, i) => (
+                    <div key={i} style={{ height: 75, background: 'rgba(255,255,255,0.03)', borderRadius: 10 }} />
+                  ))}
+                </div>
+              ) : funnelStages.length === 0 ? (
+                <div style={{ padding: '30px 0', textAlign: 'center', color: 'var(--text-muted)', fontSize: 13 }}>
+                  No longitudinal stage progression data available for this filter.
+                </div>
+              ) : (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(105px, 1fr))', gap: 8 }}>
+                  {funnelStages.map((st) => (
+                    <div
+                      key={st.id}
                       style={{
-                        fontSize: 11.5,
-                        padding: '3px 8px',
-                        borderRadius: 6,
-                        background: 'rgba(245,158,11,0.1)',
-                        color: 'var(--gold)',
-                        border: '1px solid var(--gold-border)',
-                        fontWeight: 600,
+                        padding: 12,
+                        background: 'rgba(255,255,255,0.02)',
+                        borderRadius: 10,
+                        border: '1px solid var(--border)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'space-between',
+                        gap: 8,
                       }}
                     >
-                      {cm.label}: <strong>{cm.value}</strong>
-                    </span>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={st.label}>
+                        {st.label}
+                      </div>
+                      <div className="font-display" style={{ fontSize: 17, fontWeight: 800, color: '#f8fafc' }}>
+                        {typeof st.count === 'number' ? st.count.toLocaleString() : st.count}
+                      </div>
+                      <div style={{ height: 4, background: 'rgba(255,255,255,0.06)', borderRadius: 2, overflow: 'hidden' }}>
+                        <div
+                          style={{
+                            width: `${Math.min(100, Math.max(8, st.percent))}%`,
+                            height: '100%',
+                            background: 'var(--gold)',
+                            borderRadius: 2,
+                          }}
+                        />
+                      </div>
+                      <div style={{ fontSize: 10.5, fontWeight: 800, color: 'var(--gold)', textAlign: 'right' }}>
+                        {st.percent}%
+                      </div>
+                    </div>
                   ))}
                 </div>
               )}
             </div>
-          )}
-        </div>
 
-        {/* ── District Intelligence Table (Maharashtra with N < 5 Privacy Protection) ── */}
-        <div className="card-linear" style={{ padding: 24, borderRadius: 14, marginBottom: 24 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 12 }}>
-            <div>
-              <h2 className="font-display" style={{ fontSize: 16, fontWeight: 700, color: '#f8fafc', margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
-                <Building size={17} color="var(--gold)" /> Maharashtra District Intelligence Drill-down
-              </h2>
-              <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '3px 0 0' }}>
-                District-level skilling telemetry with automatic DPDP Act small-sample privacy protection (N &lt; 5).
-              </p>
-            </div>
+            {/* District Intelligence Table */}
+            <div className="card-linear" style={{ padding: 24, borderRadius: 14, marginBottom: 24 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 12 }}>
+                <div>
+                  <h2 className="font-display" style={{ fontSize: 16, fontWeight: 700, color: '#f8fafc', margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <Building size={17} color="var(--gold)" /> Maharashtra District Intelligence Drill-down
+                  </h2>
+                  <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '3px 0 0' }}>
+                    District-level skilling telemetry with automatic DPDP Act small-sample privacy protection (N &lt; 5).
+                  </p>
+                </div>
 
-            <div style={{ position: 'relative', width: 240 }}>
-              <Search size={14} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Filter district..."
-                aria-label="Filter district"
-                style={{
-                  width: '100%',
-                  padding: '7px 12px 7px 32px',
-                  borderRadius: 6,
-                  background: 'var(--bg-input, #0f111a)',
-                  border: '1px solid var(--border)',
-                  color: '#fff',
-                  fontSize: 12,
-                }}
-              />
-            </div>
-          </div>
+                <div style={{ position: 'relative', width: 240 }}>
+                  <Search size={14} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+                  <input
+                    type="text"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder="Filter district..."
+                    aria-label="Filter district"
+                    style={{
+                      width: '100%',
+                      padding: '7px 12px 7px 32px',
+                      borderRadius: 6,
+                      background: 'var(--bg-input, #0f111a)',
+                      border: '1px solid var(--border)',
+                      color: '#fff',
+                      fontSize: 12,
+                    }}
+                  />
+                </div>
+              </div>
 
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12.5, textAlign: 'left' }}>
-              <thead>
-                <tr style={{ borderBottom: '1px solid var(--border)', color: 'var(--text-muted)', textTransform: 'uppercase', fontSize: 11, letterSpacing: '0.04em' }}>
-                  <th style={{ padding: '10px 12px' }}>District Cluster</th>
-                  <th style={{ padding: '10px 12px' }}>Trainees</th>
-                  <th style={{ padding: '10px 12px' }}>Placement Rate</th>
-                  <th style={{ padding: '10px 12px' }}>90-Day Retention</th>
-                  <th style={{ padding: '10px 12px' }}>Median Salary</th>
-                  <th style={{ padding: '10px 12px' }}>Employer Verified</th>
-                  <th style={{ padding: '10px 12px' }}>Data Reliability</th>
-                </tr>
-              </thead>
-              <tbody>
-                {loading ? (
-                  <tr>
-                    <td colSpan={7} style={{ padding: 24, textAlign: 'center', color: 'var(--text-muted)' }}>
-                      Loading district intelligence...
-                    </td>
-                  </tr>
-                ) : filteredDistricts.length === 0 ? (
-                  <tr>
-                    <td colSpan={7} style={{ padding: 24, textAlign: 'center', color: 'var(--text-muted)' }}>
-                      No district telemetry records found matching your filter.
-                    </td>
-                  </tr>
-                ) : (
-                  filteredDistricts.map((row, idx) => (
-                    <tr key={idx} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)', transition: 'background 0.15s ease' }}>
-                      <td style={{ padding: '12px', fontWeight: 700, color: '#f8fafc', display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <span style={{ width: 6, height: 6, borderRadius: '50%', background: row.isSmallSample ? '#ef4444' : 'var(--gold)' }} />
-                        {row.district}
-                      </td>
-                      <td style={{ padding: '12px', fontFamily: 'monospace', color: '#cbd5e1' }}>
-                        {row.totalTrainees.toLocaleString()}
-                      </td>
-                      <td style={{ padding: '12px', fontWeight: 800 }}>
-                        {row.isSmallSample ? (
-                          <span style={{ color: '#94a3b8', fontSize: 11 }} title="Suppressed under DPDP Act privacy guidelines (N < 5)">
-                            Insufficient Data
-                          </span>
-                        ) : (
-                          <span style={{ color: '#10b981' }}>{row.employmentRate}%</span>
-                        )}
-                      </td>
-                      <td style={{ padding: '12px', fontWeight: 700 }}>
-                        {row.isSmallSample ? (
-                          <span style={{ color: '#94a3b8', fontSize: 11 }}>N/A</span>
-                        ) : (
-                          <span style={{ color: '#60a5fa' }}>{row.retention90dRate}%</span>
-                        )}
-                      </td>
-                      <td style={{ padding: '12px', fontFamily: 'monospace' }}>
-                        {row.isSmallSample || !row.medianSalary ? (
-                          <span style={{ color: '#94a3b8', fontSize: 11 }}>N/A</span>
-                        ) : (
-                          <span style={{ color: '#f8fafc' }}>₹{row.medianSalary.toLocaleString('en-IN')}/mo</span>
-                        )}
-                      </td>
-                      <td style={{ padding: '12px' }}>
-                        {row.isSmallSample ? (
-                          <span style={{ color: '#94a3b8', fontSize: 11 }}>N/A</span>
-                        ) : (
-                          <span style={{ color: 'var(--gold)', fontWeight: 600 }}>{row.verificationRate}% Verified</span>
-                        )}
-                      </td>
-                      <td style={{ padding: '12px' }}>
-                        <span
-                          style={{
-                            fontSize: 10.5,
-                            fontWeight: 700,
-                            padding: '2px 8px',
-                            borderRadius: 4,
-                            background: row.isSmallSample ? 'rgba(239,68,68,0.12)' : 'rgba(16,185,129,0.12)',
-                            color: row.isSmallSample ? '#ef4444' : '#10b981',
-                            border: `1px solid ${row.isSmallSample ? 'rgba(239,68,68,0.25)' : 'rgba(16,185,129,0.25)'}`,
-                          }}
-                        >
-                          {row.statusLabel}
-                        </span>
-                      </td>
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12.5, textAlign: 'left' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '1px solid var(--border)', color: 'var(--text-muted)', textTransform: 'uppercase', fontSize: 11, letterSpacing: '0.04em' }}>
+                      <th style={{ padding: '10px 12px' }}>District Cluster</th>
+                      <th style={{ padding: '10px 12px' }}>Trainees</th>
+                      <th style={{ padding: '10px 12px' }}>Placement Rate</th>
+                      <th style={{ padding: '10px 12px' }}>90-Day Retention</th>
+                      <th style={{ padding: '10px 12px' }}>Median Salary</th>
+                      <th style={{ padding: '10px 12px' }}>Employer Verified</th>
+                      <th style={{ padding: '10px 12px' }}>Data Reliability</th>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* ── Wage Progression Curve & Attrition Reason Analytics ── */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: 20, marginBottom: 24 }}>
-          {/* Wage Progression Curve */}
-          <div className="card-linear" style={{ padding: 22, borderRadius: 14 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-              <h3 className="font-display" style={{ fontSize: 15, fontWeight: 700, color: '#f8fafc', margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
-                <TrendingUp size={16} color="var(--gold)" /> Longitudinal Wage Progression Curve
-              </h3>
-              <span style={{ fontSize: 11.5, fontWeight: 700, color: wageSummary && wageSummary.wageProgressionPercent >= 0 ? '#10b981' : '#94a3b8' }}>
-                {wageSummary && wageSummary.avgInitialSalary > 0
-                  ? `${wageSummary.wageProgressionPercent >= 0 ? `+${wageSummary.wageProgressionPercent}%` : `${wageSummary.wageProgressionPercent}%`} Average Growth`
-                  : 'No Wage Data'}
-              </span>
+                  </thead>
+                  <tbody>
+                    {loading ? (
+                      <tr>
+                        <td colSpan={7} style={{ padding: 24, textAlign: 'center', color: 'var(--text-muted)' }}>
+                          Loading district intelligence...
+                        </td>
+                      </tr>
+                    ) : filteredDistricts.length === 0 ? (
+                      <tr>
+                        <td colSpan={7} style={{ padding: 24, textAlign: 'center', color: 'var(--text-muted)' }}>
+                          No district telemetry records found matching your filter.
+                        </td>
+                      </tr>
+                    ) : (
+                      filteredDistricts.map((row, idx) => (
+                        <tr key={idx} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)', transition: 'background 0.15s ease' }}>
+                          <td style={{ padding: '12px', fontWeight: 700, color: '#f8fafc', display: 'flex', alignItems: 'center', gap: 6 }}>
+                            <span style={{ width: 6, height: 6, borderRadius: '50%', background: row.isSmallSample ? '#ef4444' : 'var(--gold)' }} />
+                            {row.district}
+                          </td>
+                          <td style={{ padding: '12px', fontFamily: 'monospace', color: '#cbd5e1' }}>
+                            {row.totalTrainees.toLocaleString()}
+                          </td>
+                          <td style={{ padding: '12px', fontWeight: 800 }}>
+                            {row.isSmallSample ? (
+                              <span style={{ color: '#94a3b8', fontSize: 11 }} title="Suppressed under DPDP Act privacy guidelines (N < 5)">
+                                Insufficient Data
+                              </span>
+                            ) : (
+                              <span style={{ color: '#10b981' }}>{row.employmentRate}%</span>
+                            )}
+                          </td>
+                          <td style={{ padding: '12px', fontWeight: 700 }}>
+                            {row.isSmallSample ? (
+                              <span style={{ color: '#94a3b8', fontSize: 11 }}>N/A</span>
+                            ) : (
+                              <span style={{ color: '#60a5fa' }}>{row.retention90dRate}%</span>
+                            )}
+                          </td>
+                          <td style={{ padding: '12px', fontFamily: 'monospace' }}>
+                            {row.isSmallSample || !row.medianSalary ? (
+                              <span style={{ color: '#94a3b8', fontSize: 11 }}>N/A</span>
+                            ) : (
+                              <span style={{ color: '#f8fafc' }}>₹{row.medianSalary.toLocaleString('en-IN')}/mo</span>
+                            )}
+                          </td>
+                          <td style={{ padding: '12px' }}>
+                            {row.isSmallSample ? (
+                              <span style={{ color: '#94a3b8', fontSize: 11 }}>N/A</span>
+                            ) : (
+                              <span style={{ color: 'var(--gold)', fontWeight: 600 }}>{row.verificationRate}% Verified</span>
+                            )}
+                          </td>
+                          <td style={{ padding: '12px' }}>
+                            <span
+                              style={{
+                                fontSize: 10.5,
+                                fontWeight: 700,
+                                padding: '2px 8px',
+                                borderRadius: 4,
+                                background: row.isSmallSample ? 'rgba(239,68,68,0.12)' : 'rgba(16,185,129,0.12)',
+                                color: row.isSmallSample ? '#ef4444' : '#10b981',
+                                border: `1px solid ${row.isSmallSample ? 'rgba(239,68,68,0.25)' : 'rgba(16,185,129,0.25)'}`,
+                              }}
+                            >
+                              {row.statusLabel}
+                            </span>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
-            <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 14 }}>
-              Traces verified candidate salary evolution from initial placement across {wageSummary?.totalTrackedWithSalary || 0} tracked salary histories.
-            </p>
-
-            {loading ? (
-              <div style={{ height: 240, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
-                Loading salary curve...
-              </div>
-            ) : wageCurve.length === 0 ? (
-              <div style={{ height: 240, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', fontSize: 13 }}>
-                No wage progression data available for this selection.
-              </div>
-            ) : (
-              <div style={{ height: 240, width: '100%' }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={wageCurve}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                    <XAxis dataKey="milestone" stroke="#64748b" fontSize={11} tick={{ fill: '#94a3b8' }} />
-                    <YAxis stroke="#64748b" fontSize={11} tickFormatter={(v) => `₹${Math.round(v / 1000)}k`} tick={{ fill: '#94a3b8' }} />
-                    <Tooltip
-                      contentStyle={{ background: '#090A0F', border: '1px solid rgba(245,158,11,0.3)', borderRadius: '8px', fontSize: 12 }}
-                      formatter={(val: any) => [`₹${Number(val).toLocaleString('en-IN')}/mo`, 'Median Salary']}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="medianSalary"
-                      stroke="#f59e0b"
-                      strokeWidth={3}
-                      dot={{ fill: '#f59e0b', r: 4 }}
-                      name="Median Salary (INR)"
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            )}
           </div>
+        )}
 
-          {/* Non-Placement Barriers */}
-          <div className="card-linear" style={{ padding: 22, borderRadius: 14 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-              <h3 className="font-display" style={{ fontSize: 15, fontWeight: 700, color: '#f8fafc', margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
-                <AlertTriangle size={16} color="#ef4444" /> Non-Placement & Attrition Reason Analysis
-              </h3>
-              <span style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>Empirical Barriers</span>
-            </div>
-            <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 14 }}>
-              Empirical candidate barriers identified through follow-up surveys and placement logs.
-            </p>
-
-            {loading ? (
-              <div style={{ height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
-                Loading barrier analysis...
+        {/* ═══════════════════════════════════════════════════════════════════════ */}
+        {/* ── TAB 3: WAGE PROGRESSION & ATTRITION ─────────────────────────────── */}
+        {/* ═══════════════════════════════════════════════════════════════════════ */}
+        {activeTab === 'wages' && (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: 20, marginBottom: 24 }}>
+            {/* Wage Progression Curve */}
+            <div className="card-linear" style={{ padding: 22, borderRadius: 14 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                <h3 className="font-display" style={{ fontSize: 15, fontWeight: 700, color: '#f8fafc', margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <TrendingUp size={16} color="var(--gold)" /> Longitudinal Wage Progression Curve
+                </h3>
+                <span style={{ fontSize: 11.5, fontWeight: 700, color: wageSummary && wageSummary.wageProgressionPercent >= 0 ? '#10b981' : '#94a3b8' }}>
+                  {wageSummary && wageSummary.avgInitialSalary > 0
+                    ? `${wageSummary.wageProgressionPercent >= 0 ? `+${wageSummary.wageProgressionPercent}%` : `${wageSummary.wageProgressionPercent}%`} Average Growth`
+                    : 'No Wage Data'}
+                </span>
               </div>
-            ) : barrierData.length === 0 ? (
-              <div style={{ height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', fontSize: 13 }}>
-                No candidate non-placement barriers recorded for this cohort.
-              </div>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                {barrierData.map((item, idx) => (
-                  <div key={idx}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12.5, marginBottom: 4 }}>
-                      <span style={{ color: '#e2e8f0', fontWeight: 600 }}>{item.reason}</span>
-                      <span style={{ fontFamily: 'monospace', color: 'var(--text-muted)' }}>
-                        {item.count} Cases ({item.pct}%)
-                      </span>
-                    </div>
-                    <div style={{ height: 5, background: 'rgba(255,255,255,0.06)', borderRadius: 3, overflow: 'hidden' }}>
-                      <div
-                        style={{
-                          width: `${item.pct}%`,
-                          height: '100%',
-                          background: '#ef4444',
-                          borderRadius: 3,
-                        }}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* ── Active Policy Interventions Panel (AI-Generated Recommendations Grounded in DB) ── */}
-        <div className="card-linear" style={{ padding: 24, borderRadius: 14 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18, borderBottom: '1px solid var(--border)', paddingBottom: 14, flexWrap: 'wrap', gap: 10 }}>
-            <div>
-              <h2 className="font-display" style={{ fontSize: 16, fontWeight: 700, color: '#f8fafc', margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
-                <Sparkles size={17} color="var(--gold)" /> Evidence-Based Policy & Curriculum Directives
-              </h2>
-              <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '3px 0 0' }}>
-                AI-generated policy interventions grounded in verified skilling outcome gaps and employer verification telemetry.
+              <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 14 }}>
+                Traces verified candidate salary evolution from initial placement across {wageSummary?.totalTrackedWithSalary || 0} tracked salary histories.
               </p>
+
+              {loading ? (
+                <div style={{ height: 240, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
+                  Loading salary curve...
+                </div>
+              ) : wageCurve.length === 0 ? (
+                <div style={{ height: 240, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', fontSize: 13 }}>
+                  No wage progression data available for this selection.
+                </div>
+              ) : (
+                <div style={{ height: 240, width: '100%' }}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={wageCurve}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                      <XAxis dataKey="milestone" stroke="#64748b" fontSize={11} tick={{ fill: '#94a3b8' }} />
+                      <YAxis stroke="#64748b" fontSize={11} tickFormatter={(v) => `₹${Math.round(v / 1000)}k`} tick={{ fill: '#94a3b8' }} />
+                      <Tooltip
+                        contentStyle={{ background: '#090A0F', border: '1px solid rgba(245,158,11,0.3)', borderRadius: '8px', fontSize: 12 }}
+                        formatter={(val: any) => [`₹${Number(val).toLocaleString('en-IN')}/mo`, 'Median Salary']}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="medianSalary"
+                        stroke="#f59e0b"
+                        strokeWidth={3}
+                        dot={{ fill: '#f59e0b', r: 4 }}
+                        name="Median Salary (INR)"
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <AIBadge type="ai" label="AI Policy Directive" />
-              <span style={{ fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 6, background: 'rgba(16,185,129,0.12)', color: '#10b981', border: '1px solid rgba(16,185,129,0.25)' }}>
-                {interventions.length} Active Directives
-              </span>
+
+            {/* Non-Placement Barriers */}
+            <div className="card-linear" style={{ padding: 22, borderRadius: 14 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                <h3 className="font-display" style={{ fontSize: 15, fontWeight: 700, color: '#f8fafc', margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <AlertTriangle size={16} color="#ef4444" /> Non-Placement & Attrition Reason Analysis
+                </h3>
+                <span style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>Empirical Barriers</span>
+              </div>
+              <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 14 }}>
+                Empirical candidate barriers identified through follow-up surveys and placement logs.
+              </p>
+
+              {loading ? (
+                <div style={{ height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
+                  Loading barrier analysis...
+                </div>
+              ) : barrierData.length === 0 ? (
+                <div style={{ height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', fontSize: 13 }}>
+                  No candidate non-placement barriers recorded for this cohort.
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  {barrierData.map((item, idx) => (
+                    <div key={idx}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12.5, marginBottom: 4 }}>
+                        <span style={{ color: '#e2e8f0', fontWeight: 600 }}>{item.reason}</span>
+                        <span style={{ fontFamily: 'monospace', color: 'var(--text-muted)' }}>
+                          {item.count} Cases ({item.pct}%)
+                        </span>
+                      </div>
+                      <div style={{ height: 5, background: 'rgba(255,255,255,0.06)', borderRadius: 3, overflow: 'hidden' }}>
+                        <div
+                          style={{
+                            width: `${item.pct}%`,
+                            height: '100%',
+                            background: '#ef4444',
+                            borderRadius: 3,
+                          }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
+        )}
 
-          {loading ? (
-            <div style={{ padding: 24, textAlign: 'center', color: 'var(--text-muted)' }}>
-              Loading policy directives...
-            </div>
-          ) : interventions.length === 0 ? (
-            <div style={{ padding: 24, textAlign: 'center', color: 'var(--text-muted)', fontSize: 13 }}>
-              No active policy directives registered in the state database.
-            </div>
-          ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16 }}>
-              {interventions.map((iv, idx) => (
-                <div
-                  key={idx}
-                  style={{
-                    padding: 18,
-                    background: 'rgba(255,255,255,0.02)',
-                    borderRadius: 12,
-                    border: '1px solid var(--border)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    gap: 12,
-                  }}
-                >
-                  <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                      <span style={{ fontSize: 10.5, fontWeight: 800, textTransform: 'uppercase', padding: '2px 8px', borderRadius: 4, background: 'rgba(245,158,11,0.12)', color: 'var(--gold)', border: '1px solid var(--gold-border)' }}>
-                        {iv.targetType}: {iv.targetName}
-                      </span>
-                      <span style={{ fontSize: 11, fontWeight: 800, color: '#10b981', fontFamily: 'monospace' }}>
-                        {Math.round(iv.confidence * 100)}% Confidence
-                      </span>
-                    </div>
-                    <h4 style={{ fontSize: 14, fontWeight: 700, color: '#f8fafc', margin: '0 0 6px' }}>{iv.title}</h4>
-                    <p style={{ fontSize: 12, color: '#cbd5e1', lineHeight: 1.5, margin: 0 }}>{iv.observation}</p>
+        {/* ═══════════════════════════════════════════════════════════════════════ */}
+        {/* ── TAB 4: AI POLICY COPILOT & INTERVENTIONS ────────────────────────── */}
+        {/* ═══════════════════════════════════════════════════════════════════════ */}
+        {activeTab === 'copilot' && (
+          <div>
+            {/* AI Policy Copilot Interactive Query Panel */}
+            <div className="card-linear" style={{ padding: 24, borderRadius: 14, marginBottom: 24, border: '1px solid rgba(245,158,11,0.3)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, flexWrap: 'wrap', gap: 10 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div style={{ padding: 8, borderRadius: 8, background: 'var(--gold)', color: '#000' }}>
+                    <Bot size={18} />
                   </div>
-
-                  <div style={{ padding: 12, borderRadius: 8, background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.06)' }}>
-                    <div style={{ fontSize: 10.5, fontWeight: 800, textTransform: 'uppercase', color: 'var(--gold)', marginBottom: 2 }}>
-                      Recommended State Directive:
-                    </div>
-                    <div style={{ fontSize: 12, color: '#f8fafc', lineHeight: 1.4 }}>{iv.recommendedAction}</div>
+                  <div>
+                    <h2 className="font-display" style={{ fontSize: 16, fontWeight: 700, color: '#f8fafc', margin: 0 }}>
+                      AI Policy Copilot (Grounded in Verified Telemetry)
+                    </h2>
+                    <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '2px 0 0' }}>
+                      Real-time query engine grounded in the live Maharashtra skilling database.
+                    </p>
                   </div>
                 </div>
-              ))}
+                <AIBadge type="ai" label="AI Recommendation · Grounded" />
+              </div>
+
+              <form onSubmit={handleCopilotSubmit} style={{ display: 'flex', gap: 10, marginBottom: 12 }}>
+                <input
+                  type="text"
+                  value={copilotQuery}
+                  onChange={(e) => setCopilotQuery(e.target.value)}
+                  placeholder="Ask policy questions e.g. 'Which districts have low employment outcomes and why?' or 'Compare wage growth across courses'"
+                  aria-label="Policy query input"
+                  style={{
+                    flex: 1,
+                    padding: '11px 16px',
+                    borderRadius: 8,
+                    background: 'var(--bg-input, #0f111a)',
+                    border: '1px solid var(--border)',
+                    color: '#fff',
+                    fontSize: 13,
+                  }}
+                />
+                <button
+                  type="submit"
+                  disabled={copilotLoading || !copilotQuery.trim()}
+                  className="btn-gold"
+                  aria-label="Submit policy query"
+                  style={{
+                    padding: '10px 20px',
+                    fontSize: 13,
+                    fontWeight: 700,
+                    cursor: copilotLoading ? 'not-allowed' : 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    flexShrink: 0,
+                  }}
+                >
+                  {copilotLoading ? <RefreshCw size={14} className="animate-spin" /> : <Send size={14} />}
+                  <span>Analyze</span>
+                </button>
+              </form>
+
+              {/* Quick Query Pills */}
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 16 }}>
+                {SAMPLE_COPILOT_QUERIES.map((sq, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => {
+                      const text = sq.replace('⚡ ', '');
+                      setCopilotQuery(text);
+                    }}
+                    style={{
+                      fontSize: 11.5,
+                      padding: '4px 10px',
+                      borderRadius: 6,
+                      background: 'rgba(255,255,255,0.03)',
+                      border: '1px solid var(--border)',
+                      color: '#cbd5e1',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {sq}
+                  </button>
+                ))}
+              </div>
+
+              {copilotResponse && (
+                <div
+                  style={{
+                    padding: 16,
+                    background: 'rgba(0,0,0,0.35)',
+                    borderRadius: 10,
+                    border: '1px solid rgba(245,158,11,0.2)',
+                  }}
+                >
+                  <div style={{ fontSize: 13, color: '#e2e8f0', lineHeight: 1.6, marginBottom: 12 }}>
+                    {copilotResponse.answer}
+                  </div>
+
+                  {copilotResponse.citedMetrics && copilotResponse.citedMetrics.length > 0 && (
+                    <div style={{ paddingTop: 10, borderTop: '1px solid var(--border)', display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}>
+                      <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 700 }}>
+                        Verified Database Citations:
+                      </span>
+                      {copilotResponse.citedMetrics.map((cm, idx) => (
+                        <span
+                          key={idx}
+                          style={{
+                            fontSize: 11.5,
+                            padding: '3px 8px',
+                            borderRadius: 6,
+                            background: 'rgba(245,158,11,0.1)',
+                            color: 'var(--gold)',
+                            border: '1px solid var(--gold-border)',
+                            fontWeight: 600,
+                          }}
+                        >
+                          {cm.label}: <strong>{cm.value}</strong>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
-          )}
-        </div>
+
+            {/* ── Active Policy Interventions Panel ── */}
+            <div className="card-linear" style={{ padding: 24, borderRadius: 14 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18, borderBottom: '1px solid var(--border)', paddingBottom: 14, flexWrap: 'wrap', gap: 10 }}>
+                <div>
+                  <h2 className="font-display" style={{ fontSize: 16, fontWeight: 700, color: '#f8fafc', margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <Sparkles size={17} color="var(--gold)" /> Evidence-Based Policy & Curriculum Directives
+                  </h2>
+                  <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '3px 0 0' }}>
+                    AI-generated policy interventions grounded in verified skilling outcome gaps and employer verification telemetry.
+                  </p>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <AIBadge type="ai" label="AI Policy Directive" />
+                  <span style={{ fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 6, background: 'rgba(16,185,129,0.12)', color: '#10b981', border: '1px solid rgba(16,185,129,0.25)' }}>
+                    {interventions.length} Active Directives
+                  </span>
+                </div>
+              </div>
+
+              {loading ? (
+                <div style={{ padding: 24, textAlign: 'center', color: 'var(--text-muted)' }}>
+                  Loading policy directives...
+                </div>
+              ) : interventions.length === 0 ? (
+                <div style={{ padding: 24, textAlign: 'center', color: 'var(--text-muted)', fontSize: 13 }}>
+                  No active policy directives registered in the state database.
+                </div>
+              ) : (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16 }}>
+                  {interventions.map((iv, idx) => (
+                    <div
+                      key={idx}
+                      style={{
+                        padding: 18,
+                        background: 'rgba(255,255,255,0.02)',
+                        borderRadius: 12,
+                        border: '1px solid var(--border)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'space-between',
+                        gap: 12,
+                      }}
+                    >
+                      <div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                          <span style={{ fontSize: 10.5, fontWeight: 800, textTransform: 'uppercase', padding: '2px 8px', borderRadius: 4, background: 'rgba(245,158,11,0.12)', color: 'var(--gold)', border: '1px solid var(--gold-border)' }}>
+                            {iv.targetType}: {iv.targetName}
+                          </span>
+                          <span style={{ fontSize: 11, fontWeight: 800, color: '#10b981', fontFamily: 'monospace' }}>
+                            {Math.round(iv.confidence * 100)}% Confidence
+                          </span>
+                        </div>
+                        <h4 style={{ fontSize: 14, fontWeight: 700, color: '#f8fafc', margin: '0 0 6px' }}>{iv.title}</h4>
+                        <p style={{ fontSize: 12, color: '#cbd5e1', lineHeight: 1.5, margin: 0 }}>{iv.observation}</p>
+                      </div>
+
+                      <div style={{ padding: 12, borderRadius: 8, background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                        <div style={{ fontSize: 10.5, fontWeight: 800, textTransform: 'uppercase', color: 'var(--gold)', marginBottom: 2 }}>
+                          Recommended State Directive:
+                        </div>
+                        <div style={{ fontSize: 12, color: '#f8fafc', lineHeight: 1.4 }}>{iv.recommendedAction}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </FadeIn>
     </ErrorBoundary>
   );

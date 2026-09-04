@@ -271,13 +271,13 @@ export default function EmployerPage() {
         {/* ── Instant Cryptographic Ledger Verification Utility ── */}
         <div className="card-linear" style={{ padding: 22, borderRadius: 14, marginBottom: 24 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-            <Lock size={16} color="var(--gold)" />
+            <ShieldCheck size={18} color="var(--gold)" />
             <h3 className="font-display" style={{ fontSize: 15, fontWeight: 800, color: '#f8fafc', margin: 0 }}>
-              Instant 1-Click Candidate Passport Ledger Verification
+              Quick Candidate Verification
             </h3>
           </div>
-          <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '0 0 14px' }}>
-            Paste any candidate’s SkillSense SHA-256 HMAC hash or scan their passport QR to confirm academic authenticity on the state ledger.
+          <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', margin: '0 0 14px' }}>
+            Enter a candidate's Skill Passport code or ledger hash to confirm NSQF credential authenticity and verified test scores.
           </p>
 
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
@@ -285,16 +285,16 @@ export default function EmployerPage() {
               type="text"
               value={verifyHashInput}
               onChange={(e) => setVerifyHashInput(e.target.value)}
-              placeholder="e.g. 0x9e7a4b12..._HMAC_VERIFIED"
+              placeholder="Enter candidate verification hash (e.g. 0x9e7a...4b12)"
               style={{
                 flex: 1,
                 minWidth: 260,
-                padding: '9px 12px',
+                padding: '10px 14px',
                 borderRadius: 8,
                 background: 'var(--bg-input, #0f111a)',
                 border: '1px solid var(--border)',
                 color: '#fff',
-                fontSize: 12.5,
+                fontSize: 13,
                 fontFamily: 'monospace',
               }}
             />
@@ -303,9 +303,9 @@ export default function EmployerPage() {
               onClick={handleVerifyLedgerHash}
               disabled={verifyLoading}
               className="btn-gold"
-              style={{ fontSize: 12.5, padding: '9px 18px', display: 'flex', alignItems: 'center', gap: 6, opacity: verifyLoading ? 0.6 : 1 }}
+              style={{ fontSize: 13, padding: '10px 20px', display: 'flex', alignItems: 'center', gap: 6, opacity: verifyLoading ? 0.6 : 1 }}
             >
-              <ShieldCheck size={14} /> {verifyLoading ? 'Verifying...' : 'Verify Authenticity'}
+              <ShieldCheck size={15} /> {verifyLoading ? 'Verifying...' : 'Verify Candidate'}
             </button>
           </div>
 
@@ -355,39 +355,60 @@ export default function EmployerPage() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18, flexWrap: 'wrap', gap: 12 }}>
             <div>
               <h2 className="font-display" style={{ fontSize: 17, fontWeight: 800, color: '#f8fafc', margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
-                <Users size={18} color="var(--gold)" /> Pre-Assessed High-Competency Talent Pool
+                <Users size={18} color="var(--gold)" /> Pre-Assessed Candidates
               </h2>
-              <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '2px 0 0' }}>
-                Graduates evaluated by multi-modal code diagnostic radar and NSQF Level 5/6 benchmarks.
+              <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', margin: '2px 0 0' }}>
+                Graduates evaluated by diagnostic assessments and ready for immediate interview.
               </p>
             </div>
 
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-              {[
-                { id: 'ALL', label: 'All Tracks' },
-                { id: 'FULLSTACK', label: 'Full-Stack' },
-                { id: 'AI', label: 'AI & ML' },
-                { id: 'CLOUD', label: 'Cloud SRE' },
-                { id: 'FRONTEND', label: 'Frontend' },
-              ].map((t) => (
-                <button
-                  key={t.id}
-                  type="button"
-                  onClick={() => setSelectedTrack(t.id)}
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
+              <div style={{ position: 'relative', minWidth: 200 }}>
+                <Search size={14} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search by name, role or skill..."
                   style={{
-                    padding: '5px 12px',
+                    padding: '6px 10px 6px 30px',
                     borderRadius: 6,
-                    fontSize: 11.5,
-                    fontWeight: 700,
-                    background: selectedTrack === t.id ? 'var(--gold)' : 'rgba(255,255,255,0.03)',
-                    border: `1px solid ${selectedTrack === t.id ? 'var(--gold)' : 'var(--border)'}`,
-                    color: selectedTrack === t.id ? '#090a0f' : '#cbd5e1',
-                    cursor: 'pointer',
+                    fontSize: 12,
+                    background: 'var(--bg-input, #0f111a)',
+                    border: '1px solid var(--border)',
+                    color: '#fff',
+                    width: '100%',
                   }}
-                >
-                  {t.label}
-                </button>
-              ))}
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                {[
+                  { id: 'ALL', label: 'All Tracks' },
+                  { id: 'FULLSTACK', label: 'Full-Stack' },
+                  { id: 'AI', label: 'AI & ML' },
+                  { id: 'CLOUD', label: 'Cloud' },
+                  { id: 'FRONTEND', label: 'Frontend' },
+                ].map((t) => (
+                  <button
+                    key={t.id}
+                    type="button"
+                    onClick={() => setSelectedTrack(t.id)}
+                    style={{
+                      padding: '5px 12px',
+                      borderRadius: 6,
+                      fontSize: 11.5,
+                      fontWeight: 700,
+                      background: selectedTrack === t.id ? 'var(--gold)' : 'rgba(255,255,255,0.03)',
+                      border: `1px solid ${selectedTrack === t.id ? 'var(--gold)' : 'var(--border)'}`,
+                      color: selectedTrack === t.id ? '#090a0f' : '#cbd5e1',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {t.label}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -413,9 +434,14 @@ export default function EmployerPage() {
                       </h3>
                       <div style={{ fontSize: 12, color: 'var(--gold)', fontWeight: 600 }}>{c.roleTitle}</div>
                     </div>
-                    <span style={{ fontSize: 10, fontWeight: 800, padding: '2px 6px', borderRadius: 4, background: 'var(--success-bg)', border: '1px solid var(--success-border)', color: 'var(--success)' }}>
-                      {c.nsqfLevel}
-                    </span>
+                    <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                      <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 6px', borderRadius: 4, background: 'rgba(59,130,246,0.12)', border: '1px solid rgba(59,130,246,0.3)', color: '#60a5fa' }}>
+                        Ready to Interview
+                      </span>
+                      <span style={{ fontSize: 10, fontWeight: 800, padding: '2px 6px', borderRadius: 4, background: 'var(--success-bg)', border: '1px solid var(--success-border)', color: 'var(--success)' }}>
+                        {c.nsqfLevel}
+                      </span>
+                    </div>
                   </div>
 
                   <div style={{ display: 'flex', gap: 12, margin: '10px 0', fontSize: 11.5, color: 'var(--text-muted)' }}>
