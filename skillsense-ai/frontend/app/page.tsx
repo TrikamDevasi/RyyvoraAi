@@ -413,28 +413,148 @@ export default function LandingPage() {
             }}
           >
             {[
-              { step: '01', title: 'Raw Profile / Code', desc: 'Resumes, GitHub commits, coursework and project scope' },
-              { step: '02', title: 'Neural Extraction', desc: '50+ competency dimensions evaluated against NSQF' },
-              { step: '03', title: 'Skill Graph & Gaps', desc: 'Deficiency matrix and step-by-step milestone roadmap' },
-              { step: '04', title: 'Career Matcher', desc: 'Live market compatibility & salary projections in INR' },
-              { step: '05', title: 'Verified Passport', desc: 'Cryptographically signed SHA-256 public credential' },
-            ].map((node, i) => (
-              <div
-                key={i}
-                className="card-linear"
-                style={{ padding: 18, position: 'relative', borderTop: '2px solid var(--gold)' }}
-              >
-                <span className="font-mono" style={{ fontSize: 11, fontWeight: 800, color: 'var(--gold)' }}>
-                  {node.step}
-                </span>
-                <h4 style={{ fontSize: 14, fontWeight: 700, color: '#f8fafc', margin: '6px 0 4px' }}>
-                  {node.title}
-                </h4>
-                <p style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.4, margin: 0 }}>
-                  {node.desc}
-                </p>
-              </div>
-            ))}
+              {
+                step: '01',
+                stage: 'INPUT',
+                title: 'Raw Profile / Code',
+                desc: 'Resumes, GitHub commits, coursework and project scope',
+                icon: Code,
+                color: '#38bdf8',
+              },
+              {
+                step: '02',
+                stage: 'EXTRACT',
+                title: 'Neural Extraction',
+                desc: '50+ competency dimensions evaluated against NSQF',
+                icon: Brain,
+                color: '#a855f7',
+              },
+              {
+                step: '03',
+                stage: 'ANALYZE',
+                title: 'Skill Graph & Gaps',
+                desc: 'Deficiency matrix and step-by-step milestone roadmap',
+                icon: Layers,
+                color: '#f59e0b',
+              },
+              {
+                step: '04',
+                stage: 'PREDICT',
+                title: 'Career Matcher',
+                desc: 'Live market compatibility & salary projections in INR',
+                icon: Compass,
+                color: '#10b981',
+              },
+              {
+                step: '05',
+                stage: 'VERIFY',
+                title: 'Verified Passport',
+                desc: 'Cryptographically signed SHA-256 public credential',
+                icon: ShieldCheck,
+                color: '#ec4899',
+              },
+            ].map((node, i) => {
+              const IconComp = node.icon;
+              return (
+                <div
+                  key={i}
+                  className="pipeline-step-card card-shine"
+                  style={{
+                    padding: '20px 18px',
+                    minHeight: 185,
+                  }}
+                >
+                  {/* Top Header Row: Step Number + Icon Badge */}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+                    <span
+                      className="font-mono pipeline-number-badge"
+                      style={{
+                        fontSize: 11,
+                        fontWeight: 800,
+                        color: 'var(--gold)',
+                        background: 'rgba(245,158,11,0.08)',
+                        border: '1px solid rgba(245,158,11,0.25)',
+                        padding: '3px 8px',
+                        borderRadius: 6,
+                        letterSpacing: '0.04em',
+                      }}
+                    >
+                      {node.step}
+                    </span>
+
+                    <div
+                      className="pipeline-icon-badge"
+                      style={{
+                        width: 32,
+                        height: 32,
+                        borderRadius: 8,
+                        background: 'rgba(255,255,255,0.03)',
+                        border: '1px solid rgba(255,255,255,0.08)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: node.color,
+                      }}
+                    >
+                      <IconComp size={16} />
+                    </div>
+                  </div>
+
+                  {/* Body Content */}
+                  <div>
+                    <h4
+                      className="pipeline-card-title"
+                      style={{
+                        fontSize: 14.5,
+                        fontWeight: 700,
+                        color: '#f8fafc',
+                        margin: '0 0 6px',
+                        letterSpacing: '-0.01em',
+                      }}
+                    >
+                      {node.title}
+                    </h4>
+                    <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.45, margin: 0 }}>
+                      {node.desc}
+                    </p>
+                  </div>
+
+                  {/* Bottom Stage Indicator */}
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 6,
+                      marginTop: 18,
+                      paddingTop: 10,
+                      borderTop: '1px solid rgba(255,255,255,0.05)',
+                    }}
+                  >
+                    <span
+                      className="pipeline-stage-dot"
+                      style={{
+                        width: 6,
+                        height: 6,
+                        borderRadius: '50%',
+                        background: 'rgba(245,158,11,0.6)',
+                      }}
+                    />
+                    <span
+                      className="pipeline-stage-label"
+                      style={{
+                        fontSize: 9.5,
+                        fontWeight: 800,
+                        color: 'var(--text-muted)',
+                        letterSpacing: '0.08em',
+                        textTransform: 'uppercase',
+                      }}
+                    >
+                      Stage {node.step} · {node.stage}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
