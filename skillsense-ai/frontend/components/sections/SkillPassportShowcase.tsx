@@ -61,7 +61,7 @@ export default function SkillPassportShowcase() {
             }}
           >
             Cryptographic Skill Passport &{' '}
-            <span className="text-gradient-gold">Employer Verification Ledger</span>
+            <span style={{ color: 'var(--gold, #f59e0b)' }}>Employer Outcome Verification</span>
           </h2>
           <p
             style={{
@@ -77,9 +77,9 @@ export default function SkillPassportShowcase() {
         </div>
 
         {/* Passport Showcase Layout */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 28, alignItems: 'center' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 24, alignItems: 'center' }}>
           {/* Left: Interactive Verification Simulator */}
-          <div className="card-accent" style={{ padding: 28, borderRadius: 20 }}>
+          <div style={{ padding: 24, borderRadius: 16, background: 'var(--bg-surface)', border: '1px solid var(--border)', boxShadow: '0 8px 24px -4px rgba(0,0,0,0.45)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
               <div style={{ width: 36, height: 36, borderRadius: 8, background: 'rgba(245,158,11,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--gold)' }}>
                 <Search size={18} />
@@ -158,13 +158,12 @@ export default function SkillPassportShowcase() {
 
           {/* Right: Realistic Verified Skill Passport Card Mockup */}
           <div
-            className="card-accent card-shine"
             style={{
-              padding: 26,
-              borderRadius: 20,
-              border: '1px solid rgba(245,158,11,0.35)',
-              background: 'linear-gradient(180deg, rgba(245,158,11,0.06) 0%, rgba(15,17,26,0.98) 100%)',
-              boxShadow: '0 20px 50px rgba(0,0,0,0.7)',
+              padding: 24,
+              borderRadius: 16,
+              border: '1px solid var(--border)',
+              background: 'var(--bg-surface)',
+              boxShadow: '0 10px 30px -4px rgba(0,0,0,0.5)',
               position: 'relative',
               overflow: 'hidden',
             }}

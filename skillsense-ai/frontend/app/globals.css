@@ -513,32 +513,22 @@ tbody tr {
 }
 
 /* ── Spatial Floating Keyframes (Hero Badges & Accents) ── */
-@keyframes float-subtle-1 {
-  0%, 100% {
-    transform: translate3d(0, 0, 0);
-  }
-  50% {
-    transform: translate3d(0, -6px, 0);
-  }
-}
-
-@keyframes float-subtle-2 {
-  0%, 100% {
-    transform: translate3d(0, 0, 0);
-  }
-  50% {
-    transform: translate3d(0, -5px, 0);
-  }
-}
-
-.floating-badge-1 {
-  animation: float-subtle-1 4.2s ease-in-out infinite;
-  will-change: transform;
-}
-
+.floating-badge-1,
 .floating-badge-2 {
-  animation: float-subtle-2 3.6s ease-in-out 0.8s infinite;
-  will-change: transform;
+  will-change: auto;
+  transform: none !important;
+}
+
+/* ── Accessibility: Prefers Reduced Motion (WCAG AA) ── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* ── Data-First & Institutional Layout Utilities ── */
@@ -2185,49 +2175,34 @@ select:focus {
 
 @media (hover: hover) {
   .pipeline-step-card:hover {
-    transform: translateY(-8px) scale(1.025);
-    border-color: rgba(245, 158, 11, 0.55) !important;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(17, 24, 39, 0.95) 100%);
-    box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.7),
-                0 0 25px rgba(245, 158, 11, 0.2),
-                0 0 0 1px rgba(245, 158, 11, 0.35);
+    transform: translateY(-2px);
+    border-color: rgba(245, 158, 11, 0.4) !important;
+    background: var(--bg-surface-elevated, rgba(17, 24, 39, 0.95));
+    box-shadow: 0 6px 20px -4px rgba(0, 0, 0, 0.45);
   }
 
   .pipeline-step-card:hover::before {
-    height: 3.5px;
+    height: 3px;
     opacity: 1;
-    box-shadow: 0 0 12px rgba(245, 158, 11, 0.8);
-  }
-
-  .pipeline-step-card:hover::after {
-    opacity: 1;
-    width: 200px;
-    height: 130px;
   }
 
   .pipeline-step-card:hover .pipeline-icon-badge {
-    transform: scale(1.15) rotate(6deg);
     border-color: var(--gold) !important;
-    background: rgba(245, 158, 11, 0.18) !important;
-    box-shadow: 0 0 14px rgba(245, 158, 11, 0.35);
+    background: rgba(245, 158, 11, 0.12) !important;
   }
 
   .pipeline-step-card:hover .pipeline-number-badge {
-    transform: scale(1.08);
-    background: rgba(245, 158, 11, 0.22) !important;
+    background: rgba(245, 158, 11, 0.15) !important;
     border-color: var(--gold) !important;
     color: #fbbf24 !important;
-    box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
   }
 
   .pipeline-step-card:hover .pipeline-card-title {
     color: #ffffff !important;
-    text-shadow: 0 0 14px rgba(245, 158, 11, 0.25);
   }
 
   .pipeline-step-card:hover .pipeline-stage-dot {
     background: #10b981 !important;
-    box-shadow: 0 0 8px #10b981;
   }
 
   .pipeline-step-card:hover .pipeline-stage-label {
@@ -2336,28 +2311,22 @@ select:focus {
 
 @media (hover: hover) {
   .tech-feature-card:hover {
-    transform: translateY(-8px) scale(1.02);
-    border-color: var(--card-accent-border, rgba(245, 158, 11, 0.5)) !important;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(20, 28, 48, 0.92) 100%);
-    box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.7),
-                0 0 30px var(--card-accent-glow, rgba(245, 158, 11, 0.2)),
-                0 0 0 1px var(--card-accent-border, rgba(245, 158, 11, 0.4));
+    transform: translateY(-2px);
+    border-color: var(--card-accent-border, rgba(245, 158, 11, 0.4)) !important;
+    background: var(--bg-surface-elevated, rgba(20, 28, 48, 0.95));
+    box-shadow: 0 6px 20px -4px rgba(0, 0, 0, 0.45);
   }
 
   .tech-feature-card:hover .tech-feature-icon {
-    transform: scale(1.18) rotate(-5deg);
-    box-shadow: 0 0 16px var(--card-accent-glow, rgba(245, 158, 11, 0.35));
     border-color: var(--card-accent, var(--gold)) !important;
   }
 
   .tech-feature-card:hover .tech-feature-link {
-    gap: 8px !important;
     color: #ffffff !important;
-    text-shadow: 0 0 10px var(--card-accent, var(--gold));
   }
 
   .tech-feature-card:hover .tech-feature-arrow {
-    transform: translateX(4px);
+    transform: translateX(2px);
   }
 }
 

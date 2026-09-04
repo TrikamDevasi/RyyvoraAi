@@ -127,43 +127,44 @@ export default function DistrictTelemetrySandbox() {
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: 40 }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-            <AIBadge type="live" label="MAHARASHTRA WORKFORCE SANDBOX" />
-            <AIBadge type="nsqf" label="DISTRICT TELEMETRY" />
+            <AIBadge type="live" label="WORKFORCE SIMULATION SANDBOX" />
+            <AIBadge type="nsqf" label="REGIONAL TELEMETRY MODEL" />
           </div>
           <h2
             className="font-display"
             style={{
-              fontSize: 'clamp(26px, 3.6vw, 40px)',
-              fontWeight: 900,
+              fontSize: 'clamp(24px, 3.2vw, 36px)',
+              fontWeight: 800,
               color: '#f8fafc',
-              letterSpacing: '-0.03em',
+              letterSpacing: '-0.025em',
               margin: '0 auto 12px',
               maxWidth: 860,
             }}
           >
             Interactive District Skill Gap &{' '}
-            <span className="text-gradient-gold">Wage Projection Sandbox</span>
+            <span style={{ color: 'var(--gold, #f59e0b)' }}>Wage Projection Sandbox</span>
           </h2>
           <p
             style={{
               color: 'var(--text-secondary)',
-              fontSize: 'clamp(14px, 1.6vw, 16px)',
+              fontSize: 'clamp(14px, 1.4vw, 15.5px)',
               maxWidth: 720,
               margin: '0 auto',
               lineHeight: 1.6,
             }}
           >
-            Explore real-time competency shortages, verified placement probabilities, and 3-year wage growth trajectories calibrated to regional industrial zones across Maharashtra.
+            Interactive scenario modeling calibrated against regional industrial zones and NSQF competency frameworks across Maharashtra.
           </p>
         </div>
 
         {/* Sandbox Command Card */}
         <div
-          className="card-accent"
           style={{
-            padding: 28,
-            borderRadius: 20,
-            boxShadow: '0 25px 60px -15px rgba(0,0,0,0.8), 0 0 0 1px rgba(245,158,11,0.2)',
+            padding: 24,
+            borderRadius: 16,
+            background: 'var(--bg-surface)',
+            border: '1px solid var(--border)',
+            boxShadow: '0 10px 30px -4px rgba(0,0,0,0.5)',
             position: 'relative',
             overflow: 'hidden',
           }}

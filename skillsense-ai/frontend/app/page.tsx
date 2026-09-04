@@ -197,35 +197,35 @@ export default function LandingPage() {
           <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
             <div
               style={{
-                width: 32,
-                height: 32,
-                borderRadius: 8,
-                background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+                width: 30,
+                height: 30,
+                borderRadius: 6,
+                background: 'var(--gold, #f59e0b)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontWeight: 900,
-                fontSize: 14,
-                color: '#090a0f',
-                boxShadow: '0 2px 10px rgba(245,158,11,0.3)',
+                fontWeight: 800,
+                fontSize: 13,
+                color: '#0B0F17',
+                flexShrink: 0,
               }}
             >
               SK
             </div>
             <span className="font-display" style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
-              SkillSense <span style={{ color: 'var(--gold)' }}>AI</span>
+              SkillSense <span style={{ color: 'var(--gold, #f59e0b)' }}>AI</span>
             </span>
           </Link>
 
           {/* Links */}
           <div className="hidden md:flex" style={{ gap: 24, alignItems: 'center' }}>
-            <a href="#roles" style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none' }}>Role Features</a>
-            <a href="#features" style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none' }}>Core Capabilities</a>
-            <a href="#how-it-works" style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none' }}>How It Works</a>
-            <a href="#passport" style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none' }}>Skill Passport</a>
-            <a href="#pricing" style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none' }}>Pricing</a>
-            <a href="#faq" style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none' }}>FAQ</a>
-            <a href="#trust" style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none' }}>DPDP Trust</a>
+            <a href="#roles" style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none', transition: 'color 0.15s ease' }}>Role Features</a>
+            <a href="#features" style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none', transition: 'color 0.15s ease' }}>Core Capabilities</a>
+            <a href="#how-it-works" style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none', transition: 'color 0.15s ease' }}>How It Works</a>
+            <a href="#passport" style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none', transition: 'color 0.15s ease' }}>Skill Passport</a>
+            <a href="#pricing" style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none', transition: 'color 0.15s ease' }}>Pricing</a>
+            <a href="#faq" style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none', transition: 'color 0.15s ease' }}>FAQ</a>
+            <a href="#trust" style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none', transition: 'color 0.15s ease' }}>DPDP Trust</a>
           </div>
 
           {/* Auth Actions & Theme Toggle */}
@@ -234,14 +234,14 @@ export default function LandingPage() {
             <Link
               href="/auth"
               className="btn-secondary hidden sm:inline-flex"
-              style={{ fontSize: 12.5, padding: '7px 14px' }}
+              style={{ fontSize: 12.5, fontWeight: 600, padding: '6px 14px', borderRadius: 7 }}
             >
               Sign In
             </Link>
             <Link
               href="/student/analyzer"
               className="btn-gold"
-              style={{ fontSize: 12.5, padding: '7px 16px' }}
+              style={{ fontSize: 12.5, fontWeight: 700, padding: '7px 16px', borderRadius: 7 }}
             >
               <BarChart3 size={13} /> Analyze Skills
             </Link>
@@ -252,28 +252,29 @@ export default function LandingPage() {
       {/* ── 2. Hero Section ── */}
       <section
         style={{
-          paddingTop: 130,
-          paddingBottom: 70,
+          paddingTop: 96,
+          paddingBottom: 48,
           position: 'relative',
           overflow: 'hidden',
-          background: 'radial-gradient(ellipse at 50% 10%, rgba(245, 158, 11, 0.08) 0%, transparent 60%)',
+          background: 'var(--bg)',
         }}
       >
         {/* Subtle Maharashtra Workforce Intelligence Silhouette Background */}
         <div
           style={{
             position: 'absolute',
-            top: 40,
+            top: 24,
             left: '50%',
             transform: 'translateX(-50%)',
             width: '100%',
-            maxWidth: 1040,
-            height: '80%',
-            opacity: 0.16,
+            maxWidth: 1000,
+            height: '75%',
+            opacity: 0.09,
+            filter: 'grayscale(60%) contrast(75%)',
             pointerEvents: 'none',
             zIndex: 0,
-            maskImage: 'radial-gradient(ellipse 70% 65% at 50% 45%, black 35%, transparent 85%)',
-            WebkitMaskImage: 'radial-gradient(ellipse 70% 65% at 50% 45%, black 35%, transparent 85%)',
+            maskImage: 'radial-gradient(ellipse 70% 60% at 50% 40%, black 25%, transparent 80%)',
+            WebkitMaskImage: 'radial-gradient(ellipse 70% 60% at 50% 40%, black 25%, transparent 80%)',
           }}
           aria-hidden="true"
         >
@@ -288,153 +289,194 @@ export default function LandingPage() {
         <div style={{ maxWidth: 1240, margin: '0 auto', padding: '0 24px', textAlign: 'center', position: 'relative', zIndex: 1 }}>
           {/* Top Badge */}
           <motion.div
-            initial={{ opacity: 0, y: 15 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: 8, marginBottom: 20 }}
+            transition={{ duration: 0.4 }}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 8, marginBottom: 14 }}
           >
             <AIBadge type="nsqf" label="GOVERNMENT OF MAHARASHTRA" />
           </motion.div>
 
           {/* Main Headline */}
           <motion.h1
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
+            transition={{ duration: 0.5, delay: 0.08 }}
             className="font-display"
             style={{
-              fontSize: 'clamp(32px, 5.5vw, 60px)',
-              fontWeight: 900,
-              lineHeight: 1.12,
-              letterSpacing: '-0.03em',
-              maxWidth: 980,
-              margin: '0 auto 20px',
+              fontSize: 'clamp(28px, 4.3vw, 50px)',
+              fontWeight: 800,
+              lineHeight: 1.15,
+              letterSpacing: '-0.025em',
+              maxWidth: 920,
+              margin: '0 auto 14px',
               color: '#f8fafc',
             }}
           >
             From Training Data to{' '}
-            <span className="text-gradient-gold">Real Employment Outcomes</span>
+            <span style={{ color: 'var(--gold, #f59e0b)' }}>Real Employment Outcomes</span>
           </motion.h1>
 
           {/* Subheadline */}
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            transition={{ duration: 0.5, delay: 0.16 }}
             style={{
-              fontSize: 'clamp(15px, 1.8vw, 18px)',
+              fontSize: 'clamp(14px, 1.4vw, 16.5px)',
               color: 'var(--text-secondary)',
-              maxWidth: 780,
-              margin: '0 auto 36px',
-              lineHeight: 1.6,
+              maxWidth: 680,
+              margin: '0 auto 24px',
+              lineHeight: 1.65,
             }}
           >
             SkillSense connects vocational training, NSQF assessments, employment transitions, 365-day retention, and longitudinal wage growth into one privacy-conscious intelligence platform.
           </motion.p>
 
-          {/* CTA Buttons & Role Portals */}
+          {/* CTA Buttons & Role Portals with Clear Institutional Hierarchy */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            style={{ display: 'flex', justifyContent: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 40 }}
+            transition={{ duration: 0.5, delay: 0.22 }}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 12,
+              marginBottom: 28,
+            }}
           >
+            {/* Primary Action — Visually Dominant Saffron Button */}
             <Link
               href="/government"
               className="btn-gold btn-3d"
-              style={{ fontSize: 13.5, padding: '12px 24px', boxShadow: '0 4px 20px rgba(245,158,11,0.3)' }}
+              style={{
+                fontSize: 14,
+                fontWeight: 700,
+                padding: '11px 26px',
+                borderRadius: 8,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 9,
+                boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+              }}
             >
-              <Landmark size={16} /> Government State Cockpit <ArrowRight size={15} className="interactive-arrow" />
+              <Landmark size={16} /> Government State Cockpit <ArrowRight size={15} />
             </Link>
 
-            <Link
-              href="/student/journey"
-              className="btn-secondary btn-3d"
-              style={{ fontSize: 13.5, padding: '12px 22px' }}
-            >
-              <Milestone size={16} /> Trainee Outcome Journey
-            </Link>
+            {/* Secondary Actions — Subordinated Neutral Surfaces */}
+            <div style={{ display: 'flex', justifyContent: 'center', gap: 10, flexWrap: 'wrap' }}>
+              <Link
+                href="/student/journey"
+                className="btn-secondary btn-3d"
+                style={{
+                  fontSize: 12.5,
+                  fontWeight: 600,
+                  padding: '8px 18px',
+                  borderRadius: 8,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  background: 'var(--bg-surface)',
+                  border: '1px solid var(--border)',
+                  color: 'var(--text-secondary)',
+                }}
+              >
+                <Milestone size={14} /> Trainee Outcome Journey
+              </Link>
 
-            <Link
-              href="/employer/validations"
-              className="btn-secondary btn-3d"
-              style={{ fontSize: 13.5, padding: '12px 22px' }}
-            >
-              <ShieldCheck size={16} /> Employer Verification Ledger
-            </Link>
+              <Link
+                href="/employer/validations"
+                className="btn-secondary btn-3d"
+                style={{
+                  fontSize: 12.5,
+                  fontWeight: 600,
+                  padding: '8px 18px',
+                  borderRadius: 8,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  background: 'var(--bg-surface)',
+                  border: '1px solid var(--border)',
+                  color: 'var(--text-secondary)',
+                }}
+              >
+                <ShieldCheck size={14} /> Employer Outcome Verification
+              </Link>
+            </div>
           </motion.div>
-
 
           {/* ── Realistic Product Dashboard Preview with 3D Spatial Tilt ── */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.96, y: 30 }}
+            initial={{ opacity: 0, scale: 0.98, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
             style={{ position: 'relative', maxWidth: 1040, margin: '0 auto' }}
           >
             {/* Spatial Floating Badge 1 (Top-Right) */}
             <div
-              className="floating-badge-1 hidden sm:flex"
+              className="hidden sm:flex"
               style={{
                 position: 'absolute',
-                top: -14,
+                top: -12,
                 right: 24,
                 background: 'var(--bg-surface)',
-                border: '1px solid var(--gold-border)',
-                boxShadow: '0 8px 24px -4px rgba(245,158,11,0.22)',
-                borderRadius: 'var(--radius-pill)',
-                padding: '6px 14px',
+                border: '1px solid var(--border)',
+                borderRadius: 'var(--radius-pill, 9999px)',
+                padding: '5px 12px',
                 alignItems: 'center',
-                gap: 8,
+                gap: 7,
                 zIndex: 10,
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
               }}
             >
-              <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#10b981', boxShadow: '0 0 6px #10b981' }} />
-              <span style={{ fontSize: 11.5, fontWeight: 800, color: 'var(--text-primary)' }}>
-                98.4% Cryptographically Verified
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10b981' }} />
+              <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-primary)' }}>
+                SHA-256 Verified Telemetry
               </span>
             </div>
 
             {/* Spatial Floating Badge 2 (Bottom-Left) */}
             <div
-              className="floating-badge-2 hidden sm:flex"
+              className="hidden sm:flex"
               style={{
                 position: 'absolute',
-                bottom: -14,
+                bottom: -12,
                 left: 24,
                 background: 'var(--bg-surface)',
                 border: '1px solid var(--border)',
-                boxShadow: '0 8px 24px -4px rgba(0, 0, 0, 0.3)',
-                borderRadius: 'var(--radius-pill)',
-                padding: '6px 14px',
+                borderRadius: 'var(--radius-pill, 9999px)',
+                padding: '5px 12px',
                 alignItems: 'center',
-                gap: 8,
+                gap: 7,
                 zIndex: 10,
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
               }}
             >
-              <Sparkles size={13} color="var(--gold)" />
-              <span style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--text-secondary)' }}>
-                NSQF Level 6 Competency Matrix
+              <Sparkles size={12} color="var(--gold)" />
+              <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-secondary)' }}>
+                NSQF Level 5 Competency Model
               </span>
             </div>
 
-            <Tilt3D maxRotation={2.5} translateZ={10}>
+            <Tilt3D maxRotation={1.2} translateZ={4}>
               <div
-                className="card-accent"
                 style={{
-                  padding: 24,
-                  borderRadius: 18,
+                  padding: 22,
+                  borderRadius: 16,
                   textAlign: 'left',
-                  boxShadow: '0 20px 80px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.08)',
+                  background: 'var(--bg-surface)',
+                  border: '1px solid var(--border)',
+                  boxShadow: '0 12px 36px -4px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255,255,255,0.04)',
                 }}
               >
                 {/* Top Preview Bar */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18, borderBottom: '1px solid var(--border)', paddingBottom: 14 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#ef4444' }} />
-                    <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#f59e0b' }} />
-                    <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#10b981' }} />
-                    <span style={{ fontSize: 12, color: 'var(--text-muted)', marginLeft: 8, fontFamily: 'monospace' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, borderBottom: '1px solid var(--border)', paddingBottom: 12 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ width: 9, height: 9, borderRadius: '50%', background: '#ef4444' }} />
+                    <span style={{ width: 9, height: 9, borderRadius: '50%', background: '#f59e0b' }} />
+                    <span style={{ width: 9, height: 9, borderRadius: '50%', background: '#10b981' }} />
+                    <span style={{ fontSize: 11.5, color: 'var(--text-muted)', marginLeft: 8, fontFamily: 'monospace' }}>
                       skillsense.ai/student/intelligence-cockpit
                     </span>
                   </div>
@@ -488,16 +530,16 @@ export default function LandingPage() {
               </div>
             </Tilt3D>
 
-            {/* Ambient Base Reflection & Spatial Glow */}
+            {/* Ambient Base Shadow (Restrained & Calm) */}
             <div
               style={{
                 position: 'absolute',
-                bottom: -28,
-                left: '10%',
-                right: '10%',
-                height: 48,
-                background: 'radial-gradient(ellipse at 50% 50%, rgba(245,158,11,0.22) 0%, rgba(6,182,212,0.14) 45%, transparent 75%)',
-                filter: 'blur(24px)',
+                bottom: -12,
+                left: '12%',
+                right: '12%',
+                height: 24,
+                background: 'radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0.4) 0%, transparent 70%)',
+                filter: 'blur(10px)',
                 zIndex: -1,
                 pointerEvents: 'none',
               }}
@@ -527,7 +569,7 @@ export default function LandingPage() {
               { label: 'OpenAI GPT-4o Mini', sub: 'Multi-Vector Reasoning', badge: 'Active' },
               { label: 'Perplexity Sonar', sub: 'Real-Time Market Grounding', badge: 'Live Data' },
               { label: 'NSQF National Framework', sub: 'Govt Aligned Standards', badge: 'Levels 1–10' },
-              { label: 'SHA-256 HMAC Signatures', sub: 'Immutable Credential Ledger', badge: 'Tamper-Proof' },
+              { label: 'SHA-256 HMAC Signatures', sub: 'Cryptographic Outcome Verification', badge: 'Verified' },
               { label: 'Algorithmic Fairness 4/5ths', sub: 'Automated Bias Auditing', badge: 'EEOC / DPDP' },
             ].map((item, idx) => (
               <div
@@ -547,7 +589,7 @@ export default function LandingPage() {
                   <span style={{ fontSize: 10, fontWeight: 800, color: 'var(--gold)', background: 'rgba(245,158,11,0.1)', padding: '2px 6px', borderRadius: 4, border: '1px solid rgba(245,158,11,0.2)' }}>
                     {item.badge}
                   </span>
-                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10b981', boxShadow: '0 0 6px #10b981' }} />
+                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10b981' }} />
                 </div>
                 <div>
                   <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1.3 }}>{item.label}</div>
@@ -1245,7 +1287,7 @@ export default function LandingPage() {
                     <div className="flip-card-front card-shine">
                       <div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                          <span className="font-display text-gradient-gold" style={{ fontSize: 30, fontWeight: 900 }}>
+                          <span className="font-display" style={{ fontSize: 30, fontWeight: 800, color: 'var(--gold, #f59e0b)' }}>
                             {step.num}
                           </span>
                           <div
@@ -1349,7 +1391,7 @@ export default function LandingPage() {
               }}
             >
               Tailored Workspaces for Every{' '}
-              <span className="text-gradient-gold">Registered Stakeholder</span>
+              <span style={{ color: 'var(--gold, #f59e0b)' }}>Registered Stakeholder</span>
             </h2>
             <p
               style={{
@@ -1360,7 +1402,7 @@ export default function LandingPage() {
                 lineHeight: 1.6,
               }}
             >
-              Every role receives a dedicated, proctored command center equipped with specialized neural diagnostics, cryptographic ledgers, and automated workflows.
+              Every role receives a dedicated, proctored command center equipped with specialized neural diagnostics, verified skill credentials, and automated workflows.
             </p>
           </div>
 
@@ -2158,11 +2200,11 @@ export default function LandingPage() {
       <PricingSection />
 
       {/* ── 11. High-Conversion Final CTA ── */}
-      <section style={{ padding: '80px 24px', background: 'radial-gradient(ellipse at 50% 50%, rgba(245, 158, 11, 0.1) 0%, transparent 70%)' }}>
+      <section style={{ padding: '80px 24px', background: 'var(--bg-surface-elevated)', borderTop: '1px solid var(--border)' }}>
         <div style={{ maxWidth: 840, margin: '0 auto', textAlign: 'center' }}>
-          <h2 className="font-display" style={{ fontSize: 'clamp(28px, 4vw, 46px)', fontWeight: 900, color: '#f8fafc', margin: '0 0 16px', lineHeight: 1.15 }}>
+          <h2 className="font-display" style={{ fontSize: 'clamp(28px, 4vw, 44px)', fontWeight: 800, color: '#f8fafc', margin: '0 0 16px', lineHeight: 1.15 }}>
             Know your skills. Know your path.<br />
-            <span className="text-gradient-gold">Build what the industry needs.</span>
+            <span style={{ color: 'var(--gold, #f59e0b)' }}>Build what the industry needs.</span>
           </h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: 15, margin: '0 auto 32px', maxWidth: 540 }}>
             Join thousands of learners, educators, and enterprise employers across India leveraging verified skill intelligence.
