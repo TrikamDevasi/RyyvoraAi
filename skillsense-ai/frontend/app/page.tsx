@@ -46,6 +46,8 @@ import Tilt3D from '@/components/ui/Tilt3D';
 import PricingSection from '@/components/sections/PricingSection';
 import ThemeToggle from '@/components/shared/ThemeToggle';
 import { ResponsiveImage } from '@/components/ui/ResponsiveImage';
+import DistrictTelemetrySandbox from '@/components/sections/DistrictTelemetrySandbox';
+import SkillPassportShowcase from '@/components/sections/SkillPassportShowcase';
 
 function DynamicBidirectionalCounter({
   target,
@@ -485,6 +487,22 @@ export default function LandingPage() {
                 </div>
               </div>
             </Tilt3D>
+
+            {/* Ambient Base Reflection & Spatial Glow */}
+            <div
+              style={{
+                position: 'absolute',
+                bottom: -28,
+                left: '10%',
+                right: '10%',
+                height: 48,
+                background: 'radial-gradient(ellipse at 50% 50%, rgba(245,158,11,0.22) 0%, rgba(6,182,212,0.14) 45%, transparent 75%)',
+                filter: 'blur(24px)',
+                zIndex: -1,
+                pointerEvents: 'none',
+              }}
+              aria-hidden="true"
+            />
           </motion.div>
         </div>
       </section>
@@ -496,18 +514,45 @@ export default function LandingPage() {
             Architected With Multi-Provider AI Inference & National Standards
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 'clamp(20px, 4vw, 48px)', flexWrap: 'wrap' }}>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(175px, 1fr))',
+              gap: 14,
+              alignItems: 'stretch',
+            }}
+          >
             {[
-              { label: 'Groq Cloud Llama-3.3', sub: 'Ultra-Low Latency Inference' },
-              { label: 'OpenAI GPT-4o Mini', sub: 'Advanced Multi-Vector Reasoning' },
-              { label: 'Perplexity Sonar', sub: 'Real-Time Market Grounding' },
-              { label: 'NSQF National Framework', sub: 'Govt Aligned Qualifications' },
-              { label: 'SHA-256 HMAC Signatures', sub: 'Immutable Credential Ledger' },
-              { label: 'Algorithmic Fairness 4/5ths', sub: 'Automated Bias Auditing' },
+              { label: 'Groq Cloud Llama-3.3', sub: 'Ultra-Low Latency Inference', badge: '120 tok/s' },
+              { label: 'OpenAI GPT-4o Mini', sub: 'Multi-Vector Reasoning', badge: 'Active' },
+              { label: 'Perplexity Sonar', sub: 'Real-Time Market Grounding', badge: 'Live Data' },
+              { label: 'NSQF National Framework', sub: 'Govt Aligned Standards', badge: 'Levels 1–10' },
+              { label: 'SHA-256 HMAC Signatures', sub: 'Immutable Credential Ledger', badge: 'Tamper-Proof' },
+              { label: 'Algorithmic Fairness 4/5ths', sub: 'Automated Bias Auditing', badge: 'EEOC / DPDP' },
             ].map((item, idx) => (
-              <div key={idx} style={{ textAlign: 'left', minWidth: 160 }}>
-                <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-primary)' }}>{item.label}</div>
-                <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{item.sub}</div>
+              <div
+                key={idx}
+                className="card-linear"
+                style={{
+                  padding: '12px 14px',
+                  borderRadius: 10,
+                  textAlign: 'left',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  gap: 8,
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: 10, fontWeight: 800, color: 'var(--gold)', background: 'rgba(245,158,11,0.1)', padding: '2px 6px', borderRadius: 4, border: '1px solid rgba(245,158,11,0.2)' }}>
+                    {item.badge}
+                  </span>
+                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10b981', boxShadow: '0 0 6px #10b981' }} />
+                </div>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1.3 }}>{item.label}</div>
+                  <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>{item.sub}</div>
+                </div>
               </div>
             ))}
           </div>
@@ -1280,6 +1325,9 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ── 7B. Live Regional Workforce Telemetry Sandbox ── */}
+      <DistrictTelemetrySandbox />
+
       {/* ── 8. Role-Based Features Matrix & Capabilities Deep-Dive ── */}
       <section id="roles" style={{ padding: '90px 24px', position: 'relative' }}>
         <div style={{ maxWidth: 1240, margin: '0 auto' }}>
@@ -1866,6 +1914,9 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* ── 8A. Sovereign Skill Passport Verification Showcase ── */}
+      <SkillPassportShowcase />
 
       {/* ── 8B. National Skilling Telemetry & Macro Impact ── */}
       <section style={{ padding: '60px 24px', background: 'rgba(245,158,11,0.03)', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}>
