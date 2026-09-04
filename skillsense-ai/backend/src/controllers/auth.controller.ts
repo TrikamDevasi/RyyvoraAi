@@ -13,7 +13,7 @@ const registerSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters').trim(),
   email: z.string().email('Please provide a valid email address').toLowerCase().trim(),
   password: z.string().min(8, 'Password must be at least 8 characters'),
-  role: z.enum(['student', 'employer', 'institute', 'industry']).default('student'),
+  role: z.enum(['student', 'employer', 'institute', 'industry', 'government', 'admin']).default('student'),
 });
 
 const loginSchema = z.object({
@@ -21,15 +21,24 @@ const loginSchema = z.object({
   password: z.string().min(1, 'Password is required'),
 });
 
-// Helper to set auth cookie
-const setAuthCookie = (res: Response, token: string) => {
+// Helper to set auth cookies (token + role for Edge proxy & frontend state)
+const setAuthCookie = (res: Response, token: string, role?: string) => {
   res.cookie('skillsense_token', token, {
-    httpOnly: true,
+    httpOnly: false,
     secure: env.NODE_ENV === 'production',
     sameSite: 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     path: '/',
   });
+  if (role) {
+    res.cookie('skillsense_role', role, {
+      httpOnly: false,
+      secure: env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      path: '/',
+    });
+  }
 };
 
 export const register = async (req: Request, res: Response, next: NextFunction) => {
@@ -39,7 +48,7 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
       res.status(400).json({
         success: false,
         data: null,
-        message: parsed.error.errors.map(e => e.message).join(', '),
+        message: parsed.error.errors.map((e: any) => e.message).join(', '),
       });
       return;
     }
@@ -68,6 +77,40 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
       verificationTokenExpires: new Date(Date.now() + 24 * 60 * 60 * 1000),
     });
 
+    // Auto-create Student document if role is student so dashboard is initialized
+    if (user.role === 'student') {
+      try {
+        const Student = (await import('../models/Student.model')).default;
+        await Student.create({
+          userId: user._id,
+          enrollmentNumber: `SKP-${user._id.toString().slice(-6).toUpperCase()}`,
+          program: 'Full-Stack Software Engineering',
+          nsqfLevel: 5,
+          state: 'Maharashtra',
+          gender: 'male',
+          skills: [],
+          overallScore: 75,
+          placementStatus: 'studying',
+          passportHash: `SKP-${user._id.toString().slice(-8).toUpperCase()}-VERIFIED`,
+        });
+      } catch (studentErr) {
+        // Non-blocking student profile creation
+      }
+    }
+
+    // Auto-link to default Institution if role is institute
+    if (user.role === 'institute') {
+      try {
+        const inst = await Institution.findOne({ contactEmail: user.email }) || await Institution.findOne({});
+        if (inst) {
+          user.institutionId = inst._id as any;
+          await user.save();
+        }
+      } catch (instErr) {
+        // Non-blocking institution link
+      }
+    }
+
     try {
       await sendVerificationEmail(user.email, verificationToken, user.name);
     } catch (emailErr) {
@@ -75,18 +118,20 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
     }
 
     const token = signToken({ id: user._id.toString(), role: user.role, email: user.email });
-    setAuthCookie(res, token);
+    setAuthCookie(res, token, user.role);
 
     res.status(201).json({
       success: true,
       data: {
         user: {
-          id: user._id,
+          id: String(user._id),
+          _id: String(user._id),
           name: user.name,
           email: user.email,
           role: user.role,
           avatar: user.avatar,
           isVerified: user.isVerified,
+          institutionId: user.institutionId ? String(user.institutionId) : undefined,
         },
         token,
       },
@@ -112,7 +157,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       res.status(400).json({
         success: false,
         data: null,
-        message: parsed.error.errors.map(e => e.message).join(', '),
+        message: parsed.error.errors.map((e: any) => e.message).join(', '),
       });
       return;
     }
@@ -161,19 +206,20 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     await user.save();
 
     const token = signToken({ id: user._id.toString(), role: user.role, email: user.email });
-    setAuthCookie(res, token);
+    setAuthCookie(res, token, user.role);
 
     res.status(200).json({
       success: true,
       data: {
         user: {
-          id: user._id,
+          id: String(user._id),
+          _id: String(user._id),
           name: user.name,
           email: user.email,
           role: user.role,
           avatar: user.avatar,
           isVerified: user.isVerified,
-          institutionId: user.institutionId,
+          institutionId: user.institutionId ? String(user.institutionId) : undefined,
         },
         token,
       },
@@ -223,7 +269,7 @@ export const updatePreferences = async (req: Request, res: Response, next: NextF
     if (!parsed.success) {
       res.status(400).json({
         success: false,
-        message: 'Invalid preferences payload: ' + parsed.error.errors.map(e => e.message).join(', '),
+        message: 'Invalid preferences payload: ' + parsed.error.errors.map((e: any) => e.message).join(', '),
       });
       return;
     }
@@ -285,31 +331,35 @@ export const getPublicStats = async (req: Request, res: Response) => {
 };
 
 export const forgotPassword = async (req: Request, res: Response) => {
-  const { email } = req.body;
-  if (!email) {
-    res.status(400).json({ success: false, message: 'Email is required' });
-    return;
-  }
-
-  const user = await User.findOne({ email: String(email).toLowerCase() });
-  if (!user) {
-    res.status(404).json({ success: false, message: 'No account found with this email' });
-    return;
-  }
-
-  const resetToken = signToken({ id: user._id.toString(), role: user.role, purpose: 'reset-password' }, '1h');
-
-  user.resetPasswordToken = resetToken;
-  user.resetPasswordExpires = new Date(Date.now() + 60 * 60 * 1000);
-  await user.save();
-
   try {
-    await sendPasswordResetEmail(user.email, resetToken, user.name);
-  } catch (err) {
-    // Continue
-  }
+    const { email } = req.body;
+    if (!email) {
+      res.status(400).json({ success: false, message: 'Email is required' });
+      return;
+    }
 
-  res.json({ success: true, message: 'Password reset link sent to your email' });
+    const user = await User.findOne({ email: String(email).toLowerCase() });
+    if (!user) {
+      res.status(404).json({ success: false, message: 'No account found with this email' });
+      return;
+    }
+
+    const resetToken = signToken({ id: user._id.toString(), role: user.role, purpose: 'reset-password' }, '1h');
+
+    user.resetPasswordToken = resetToken;
+    user.resetPasswordExpires = new Date(Date.now() + 60 * 60 * 1000);
+    await user.save();
+
+    try {
+      await sendPasswordResetEmail(user.email, resetToken, user.name);
+    } catch (err) {
+      // Continue gracefully even if SMTP is offline
+    }
+
+    res.json({ success: true, message: 'Password reset link sent to your email' });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Could not process forgot password request' });
+  }
 };
 
 export const verifyResetToken = async (req: Request, res: Response) => {
