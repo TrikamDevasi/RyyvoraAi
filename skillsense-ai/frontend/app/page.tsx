@@ -51,7 +51,7 @@ function DynamicBidirectionalCounter({
   decimals = 0,
   prefix = '',
   suffix = '',
-  duration = 1600,
+  duration = 2000,
 }: {
   target: number;
   decimals?: number;
@@ -59,7 +59,6 @@ function DynamicBidirectionalCounter({
   suffix?: string;
   duration?: number;
 }) {
-  const [count, setCount] = useState(0);
   const ref = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
@@ -68,34 +67,54 @@ function DynamicBidirectionalCounter({
 
     let animFrame: number;
 
+    const formatValue = (val: number) => {
+      const numStr =
+        decimals > 0
+          ? val.toFixed(decimals)
+          : Math.round(val).toLocaleString('en-IN');
+      return `${prefix}${numStr}${suffix}`;
+    };
+
+    // Set initial text content
+    el.textContent = formatValue(target);
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
+            if (animFrame) cancelAnimationFrame(animFrame);
             let startTime: number | null = null;
-            setCount(0);
 
             const animate = (timestamp: number) => {
               if (!startTime) startTime = timestamp;
               const elapsed = timestamp - startTime;
               const progress = Math.min(elapsed / duration, 1);
-              const easeOut = 1 - Math.pow(1 - progress, 3);
-              setCount(easeOut * target);
+
+              // Quartic ease-out curve for buttery smooth rolling stop
+              const ease = 1 - Math.pow(1 - progress, 4);
+              const current = ease * target;
+
+              if (el) {
+                el.textContent = formatValue(current);
+              }
 
               if (progress < 1) {
                 animFrame = requestAnimationFrame(animate);
               } else {
-                setCount(target);
+                if (el) el.textContent = formatValue(target);
               }
             };
 
             animFrame = requestAnimationFrame(animate);
           } else {
-            setCount(0);
+            // When scrolled out of view, reset to 0 so next scroll into view animates smoothly
+            if (el) {
+              el.textContent = formatValue(0);
+            }
           }
         });
       },
-      { threshold: 0.25 }
+      { threshold: 0.15 }
     );
 
     observer.observe(el);
@@ -103,18 +122,23 @@ function DynamicBidirectionalCounter({
       observer.disconnect();
       if (animFrame) cancelAnimationFrame(animFrame);
     };
-  }, [target, duration, decimals]);
+  }, [target, duration, decimals, prefix, suffix]);
 
-  const formatted =
+  const initialFormatted =
     decimals > 0
-      ? count.toFixed(decimals)
-      : Math.floor(count).toLocaleString('en-IN');
+      ? target.toFixed(decimals)
+      : target.toLocaleString('en-IN');
 
   return (
-    <span ref={ref}>
-      {prefix}
-      {formatted}
-      {suffix}
+    <span
+      ref={ref}
+      style={{
+        fontVariantNumeric: 'tabular-nums',
+        display: 'inline-block',
+        minWidth: '1ch',
+      }}
+    >
+      {prefix}{initialFormatted}{suffix}
     </span>
   );
 }
