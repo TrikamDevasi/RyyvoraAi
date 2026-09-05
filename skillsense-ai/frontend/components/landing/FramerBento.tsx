@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, type Variants } from 'framer-motion';
 import {
   ShieldCheck,
   CheckCircle2,
@@ -21,6 +21,51 @@ import {
   FileCheck,
 } from 'lucide-react';
 
+const EASING = [0.16, 1, 0.3, 1] as const;
+
+/* ─── Animation Variants ─────────────────────────────────────────────── */
+const fadeUpVariant: Variants = {
+  hidden: { opacity: 0, y: 48, filter: 'blur(4px)' },
+  visible: (delay: number = 0) => ({
+    opacity: 1,
+    y: 0,
+    filter: 'blur(0px)',
+    transition: {
+      duration: 0.75,
+      delay,
+      ease: EASING,
+    },
+  }),
+};
+
+const columnVariant: Variants = {
+  hidden: { opacity: 0, y: 64 },
+  visible: (delay: number = 0) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.85,
+      delay,
+      ease: EASING,
+    },
+  }),
+};
+
+const cardVariant: Variants = {
+  hidden: { opacity: 0, y: 32, scale: 0.97 },
+  visible: (delay: number = 0) => ({
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 0.65,
+      delay,
+      ease: EASING,
+    },
+  }),
+};
+
+/* ─── Data ───────────────────────────────────────────────────────────── */
 const CAPABILITIES = [
   {
     id: 1,
@@ -78,15 +123,26 @@ const CAPABILITIES = [
   },
 ];
 
+/* ─── Component ──────────────────────────────────────────────────────── */
 export default function FramerBento() {
   const [activeCapIndex, setActiveCapIndex] = useState(0);
   const activeCap = CAPABILITIES[activeCapIndex];
 
+  const VIEWPORT_OPTS = { once: true, margin: '-80px' } as const;
+
   return (
     <section style={{ padding: '80px 24px', background: '#0B0F17', position: 'relative' }}>
       <div style={{ maxWidth: 1320, margin: '0 auto' }}>
-        {/* Section Header */}
-        <div style={{ textAlign: 'center', marginBottom: 54 }}>
+
+        {/* ── Section Header ── */}
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={VIEWPORT_OPTS}
+          variants={fadeUpVariant}
+          custom={0}
+          style={{ textAlign: 'center', marginBottom: 54 }}
+        >
           <div
             style={{
               display: 'inline-flex',
@@ -124,14 +180,22 @@ export default function FramerBento() {
           >
             Six synchronized intelligence modules operating across the complete longitudinal workforce lifecycle.
           </p>
-        </div>
+        </motion.div>
 
         {/* ── BENTO GRID LAYOUT ── */}
         <div className="bento-grid-12">
-          {/* ── COLUMN 1 (Left 4 cols): Profile, Identity & Mobile Mockup ── */}
-          <div className="bento-col-4">
+
+          {/* ── COLUMN 1 (Left 4 cols) ── */}
+          <motion.div
+            className="bento-col-4"
+            initial="hidden"
+            whileInView="visible"
+            viewport={VIEWPORT_OPTS}
+            variants={columnVariant}
+            custom={0}
+          >
             {/* Widget 1: Sovereign Telemetry Profile Card */}
-            <div className="bento-glass-card" style={{ padding: 26 }}>
+            <motion.div className="bento-glass-card" style={{ padding: 26 }} variants={cardVariant} custom={0.05}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 18 }}>
                 <div
                   style={{
@@ -167,94 +231,39 @@ export default function FramerBento() {
 
               {/* Stakeholder Pill Icons */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-                <Link
-                  href="/admin/governance"
-                  title="Government Cockpit"
-                  style={{
-                    width: 38,
-                    height: 38,
-                    borderRadius: '50%',
-                    background: 'rgba(255, 255, 255, 0.08)',
-                    border: '1px solid rgba(255, 255, 255, 0.12)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#f8fafc',
-                    transition: 'all 0.2s ease',
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.borderColor = '#f59e0b')}
-                  onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.12)')}
-                >
-                  <Landmark size={17} />
-                </Link>
-
-                <Link
-                  href="/employer"
-                  title="Employer Portal"
-                  style={{
-                    width: 38,
-                    height: 38,
-                    borderRadius: '50%',
-                    background: 'rgba(255, 255, 255, 0.08)',
-                    border: '1px solid rgba(255, 255, 255, 0.12)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#f8fafc',
-                    transition: 'all 0.2s ease',
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.borderColor = '#f59e0b')}
-                  onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.12)')}
-                >
-                  <Building2 size={17} />
-                </Link>
-
-                <Link
-                  href="/student"
-                  title="Trainee Journey"
-                  style={{
-                    width: 38,
-                    height: 38,
-                    borderRadius: '50%',
-                    background: 'rgba(255, 255, 255, 0.08)',
-                    border: '1px solid rgba(255, 255, 255, 0.12)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#f8fafc',
-                    transition: 'all 0.2s ease',
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.borderColor = '#f59e0b')}
-                  onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.12)')}
-                >
-                  <GraduationCap size={17} />
-                </Link>
-
-                <Link
-                  href="/verify/demo-hash"
-                  title="Public Verifier"
-                  style={{
-                    width: 38,
-                    height: 38,
-                    borderRadius: '50%',
-                    background: 'rgba(255, 255, 255, 0.08)',
-                    border: '1px solid rgba(255, 255, 255, 0.12)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#f8fafc',
-                    transition: 'all 0.2s ease',
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.borderColor = '#f59e0b')}
-                  onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.12)')}
-                >
-                  <ShieldCheck size={17} />
-                </Link>
+                {[
+                  { href: '/admin/governance', icon: <Landmark size={17} />, title: 'Government Cockpit' },
+                  { href: '/employer', icon: <Building2 size={17} />, title: 'Employer Portal' },
+                  { href: '/student', icon: <GraduationCap size={17} />, title: 'Trainee Journey' },
+                  { href: '/verify/demo-hash', icon: <ShieldCheck size={17} />, title: 'Public Verifier' },
+                ].map(({ href, icon, title }) => (
+                  <Link
+                    key={href}
+                    href={href}
+                    title={title}
+                    style={{
+                      width: 38,
+                      height: 38,
+                      borderRadius: '50%',
+                      background: 'rgba(255, 255, 255, 0.08)',
+                      border: '1px solid rgba(255, 255, 255, 0.12)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#f8fafc',
+                      transition: 'all 0.2s ease',
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.borderColor = '#f59e0b')}
+                    onMouseLeave={(e) => (e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.12)')}
+                  >
+                    {icon}
+                  </Link>
+                ))}
               </div>
-            </div>
+            </motion.div>
 
             {/* Widget 2: Live Ledger Status Banner */}
-            <div
+            <motion.div
               className="bento-glass-card"
               style={{
                 padding: '12px 20px',
@@ -266,6 +275,8 @@ export default function FramerBento() {
                 color: '#cbd5e1',
                 fontFamily: 'var(--font-mono, monospace)',
               }}
+              variants={cardVariant}
+              custom={0.12}
             >
               <span
                 style={{
@@ -277,10 +288,10 @@ export default function FramerBento() {
                 }}
               />
               <span>Sovereign Ledger Active · 99.98% SLA</span>
-            </div>
+            </motion.div>
 
             {/* Widget 3: Mobile Skill Passport Device Mockup */}
-            <div className="bento-glass-card" style={{ padding: 24, textAlign: 'center' }}>
+            <motion.div className="bento-glass-card" style={{ padding: 24, textAlign: 'center' }} variants={cardVariant} custom={0.2}>
               <div style={{ fontSize: 11, color: '#f59e0b', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 4 }}>
                 Pocket Verification
               </div>
@@ -322,13 +333,20 @@ export default function FramerBento() {
               >
                 Launch Trainee Passport <ArrowRight size={14} />
               </Link>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
-          {/* ── COLUMN 2 (Center 5 cols): Dynamic Pulse Banner & Main Carousel ── */}
-          <div className="bento-col-5">
+          {/* ── COLUMN 2 (Center 5 cols) ── */}
+          <motion.div
+            className="bento-col-5"
+            initial="hidden"
+            whileInView="visible"
+            viewport={VIEWPORT_OPTS}
+            variants={columnVariant}
+            custom={0.12}
+          >
             {/* Widget 4: Dynamic Placement Pulse Banner */}
-            <div
+            <motion.div
               style={{
                 background: 'linear-gradient(135deg, #1E3A8A 0%, #3B82F6 100%)',
                 borderRadius: 20,
@@ -339,6 +357,8 @@ export default function FramerBento() {
                 gap: 16,
                 boxShadow: '0 12px 30px -6px rgba(30, 58, 138, 0.5)',
               }}
+              variants={cardVariant}
+              custom={0}
             >
               <div
                 style={{
@@ -362,10 +382,15 @@ export default function FramerBento() {
                   Verifying 142,800+ Placements Across 36 States & UTs
                 </div>
               </div>
-            </div>
+            </motion.div>
 
             {/* Widget 5: Interactive Capability Showcase Container */}
-            <div className="bento-glass-card" style={{ padding: 28, flex: 1, display: 'flex', flexDirection: 'column' }}>
+            <motion.div
+              className="bento-glass-card"
+              style={{ padding: 28, flex: 1, display: 'flex', flexDirection: 'column' }}
+              variants={cardVariant}
+              custom={0.08}
+            >
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
                 <span
                   style={{
@@ -486,10 +511,10 @@ export default function FramerBento() {
                   />
                 ))}
               </div>
-            </div>
+            </motion.div>
 
             {/* Widget 6: Accredited Standards Strip */}
-            <div
+            <motion.div
               className="bento-glass-card"
               style={{
                 padding: '16px 22px',
@@ -497,6 +522,8 @@ export default function FramerBento() {
                 alignItems: 'center',
                 gap: 12,
               }}
+              variants={cardVariant}
+              custom={0.18}
             >
               <div
                 style={{
@@ -516,13 +543,20 @@ export default function FramerBento() {
               <div style={{ fontSize: 12, color: '#94a3b8', lineHeight: 1.4 }}>
                 <span style={{ color: '#f8fafc', fontWeight: 700 }}>Institutional Sovereignty:</span> NCVET Aligned · NSDC Ready · APAAR & DigiLocker Interoperable.
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
-          {/* ── COLUMN 3 (Right 3 cols): Wage Uplift, SLA Speed & Ecosystem ── */}
-          <div className="bento-col-3">
-            {/* Widget 7: Employer Verification SLA Card (Purple gradient like reference) */}
-            <div
+          {/* ── COLUMN 3 (Right 3 cols) ── */}
+          <motion.div
+            className="bento-col-3"
+            initial="hidden"
+            whileInView="visible"
+            viewport={VIEWPORT_OPTS}
+            variants={columnVariant}
+            custom={0.24}
+          >
+            {/* Widget 7: Employer Verification SLA Card */}
+            <motion.div
               style={{
                 background: 'linear-gradient(145deg, #4c1d95 0%, #2e1065 100%)',
                 borderRadius: 20,
@@ -530,6 +564,8 @@ export default function FramerBento() {
                 color: '#ffffff',
                 boxShadow: '0 12px 30px -8px rgba(76, 29, 149, 0.5)',
               }}
+              variants={cardVariant}
+              custom={0}
             >
               <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#c4b5fd', fontWeight: 700 }}>
                 Verification SLA
@@ -555,10 +591,10 @@ export default function FramerBento() {
               >
                 Employer Portal <ArrowRight size={13} />
               </Link>
-            </div>
+            </motion.div>
 
             {/* Widget 8: Wage Progression Card */}
-            <div className="bento-glass-card" style={{ padding: 22 }}>
+            <motion.div className="bento-glass-card" style={{ padding: 22 }} variants={cardVariant} custom={0.1}>
               <div style={{ fontSize: 11, color: '#10b981', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
                 Livelihood Telemetry
               </div>
@@ -568,70 +604,40 @@ export default function FramerBento() {
               <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 4 }}>
                 Average verified starting wage increase across certified cohorts.
               </div>
-            </div>
+            </motion.div>
 
-            {/* Widget 9: Ecosystem Standards 2x2 Grid (Inspired by Tools I ♡) */}
-            <div className="bento-glass-card" style={{ padding: 22, flex: 1 }}>
+            {/* Widget 9: Ecosystem Standards 2x2 Grid */}
+            <motion.div className="bento-glass-card" style={{ padding: 22, flex: 1 }} variants={cardVariant} custom={0.18}>
               <div style={{ fontSize: 12, fontWeight: 700, color: '#f8fafc', marginBottom: 14, display: 'flex', alignItems: 'center', gap: 6 }}>
                 <span>Integrated Standards</span>
                 <span style={{ color: '#f59e0b' }}>✦</span>
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-                <div
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.05)',
-                    borderRadius: 12,
-                    padding: '12px 10px',
-                    textAlign: 'center',
-                    border: '1px solid rgba(255, 255, 255, 0.08)',
-                  }}
-                >
-                  <div style={{ fontSize: 13, fontWeight: 800, color: '#f8fafc' }}>NCVET</div>
-                  <div style={{ fontSize: 10, color: '#94a3b8', marginTop: 2 }}>Level 4–8</div>
-                </div>
-
-                <div
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.05)',
-                    borderRadius: 12,
-                    padding: '12px 10px',
-                    textAlign: 'center',
-                    border: '1px solid rgba(255, 255, 255, 0.08)',
-                  }}
-                >
-                  <div style={{ fontSize: 13, fontWeight: 800, color: '#f8fafc' }}>DPDP</div>
-                  <div style={{ fontSize: 10, color: '#94a3b8', marginTop: 2 }}>Act 2023</div>
-                </div>
-
-                <div
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.05)',
-                    borderRadius: 12,
-                    padding: '12px 10px',
-                    textAlign: 'center',
-                    border: '1px solid rgba(255, 255, 255, 0.08)',
-                  }}
-                >
-                  <div style={{ fontSize: 13, fontWeight: 800, color: '#f8fafc' }}>APAAR</div>
-                  <div style={{ fontSize: 10, color: '#94a3b8', marginTop: 2 }}>Edu-ID</div>
-                </div>
-
-                <div
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.05)',
-                    borderRadius: 12,
-                    padding: '12px 10px',
-                    textAlign: 'center',
-                    border: '1px solid rgba(255, 255, 255, 0.08)',
-                  }}
-                >
-                  <div style={{ fontSize: 13, fontWeight: 800, color: '#f8fafc' }}>DigiLocker</div>
-                  <div style={{ fontSize: 10, color: '#94a3b8', marginTop: 2 }}>Sovereign</div>
-                </div>
+                {[
+                  { label: 'NCVET', sub: 'Level 4–8' },
+                  { label: 'DPDP', sub: 'Act 2023' },
+                  { label: 'APAAR', sub: 'Edu-ID' },
+                  { label: 'DigiLocker', sub: 'Sovereign' },
+                ].map(({ label, sub }) => (
+                  <div
+                    key={label}
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      borderRadius: 12,
+                      padding: '12px 10px',
+                      textAlign: 'center',
+                      border: '1px solid rgba(255, 255, 255, 0.08)',
+                    }}
+                  >
+                    <div style={{ fontSize: 13, fontWeight: 800, color: '#f8fafc' }}>{label}</div>
+                    <div style={{ fontSize: 10, color: '#94a3b8', marginTop: 2 }}>{sub}</div>
+                  </div>
+                ))}
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
+
         </div>
       </div>
     </section>

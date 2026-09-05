@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { motion } from 'framer-motion';
 import {
   ShieldCheck,
   TrendingUp,
@@ -27,7 +28,11 @@ const MARQUEE_ITEMS = [
 
 export default function FramerMarquee() {
   return (
-    <section
+    <motion.section
+      initial={{ opacity: 0, y: 32 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-40px' }}
+      transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
       style={{
         padding: '36px 0',
         background: '#080c14',
@@ -70,6 +75,6 @@ export default function FramerMarquee() {
           })}
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 }

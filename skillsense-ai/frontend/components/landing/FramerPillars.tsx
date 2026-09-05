@@ -3,8 +3,12 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, Sparkles, ShieldCheck, Activity, TrendingUp, Landmark } from 'lucide-react';
+import { motion, type Variants } from 'framer-motion';
+import { ArrowRight, Sparkles } from 'lucide-react';
 
+const EASING = [0.16, 1, 0.3, 1] as const;
+
+/* ─── Data ───────────────────────────────────────────────────────────── */
 const PILLARS = [
   {
     id: 'stage-01',
@@ -60,36 +64,135 @@ const PILLARS = [
     reversed: false,
     stats: [
       { label: '12-Month Retention', value: '89.6%' },
-      { label: 'Median Wage Uplift', value: '+34.2%' },
+      { label: 'Wage Uplift', value: '+34.2%' },
     ],
   },
   {
     id: 'stage-04',
     stageNumber: 'Stage 04',
-    title: 'Sovereign Governance & State Policy Cockpit',
-    subtitle: 'Macro Impact Intelligence for National Skill Missions',
+    title: 'State & National Governance Intelligence Cockpit',
+    subtitle: 'Policy Action Intelligence for 36 States & UTs',
     description:
-      'Equips state skill development missions and national policymakers with district-level skill supply-demand heatmaps, training provider performance rankings, scheme expenditure ROI, and automated intervention recommendations.',
-    tags: ['Policy Intelligence', 'District Heatmaps', 'Scheme ROI', 'State Missions', 'National Ledger'],
-    ctaText: 'Access Government Cockpit',
+      'Governments access live district-level heatmaps, scheme expenditure ROI dashboards, and automated policy intervention triggers. Transforms passive reporting into proactive, data-driven workforce policy reform.',
+    tags: ['District Heatmaps', 'Scheme ROI', 'Policy Interventions', 'Real-Time Analytics', 'National Coverage'],
+    ctaText: 'Enter Governance Cockpit',
     ctaLink: '/admin/governance',
     image: '/images/reference/cockpit-laptop-preview.png',
     bgColor: 'linear-gradient(150deg, rgba(120, 53, 15, 0.4) 0%, rgba(15, 23, 42, 0.9) 100%)',
     borderColor: 'rgba(245, 158, 11, 0.25)',
     reversed: true,
     stats: [
-      { label: 'Coverage', value: '36 States & UTs' },
-      { label: 'Verified Cohorts', value: '142.8k+' },
+      { label: 'States & UTs', value: '36' },
+      { label: 'National Coverage', value: '87.4%' },
     ],
   },
 ];
 
+/* ─── Animation Variants ─────────────────────────────────────────────── */
+const headerVariant: Variants = {
+  hidden: { opacity: 0, y: 40, filter: 'blur(4px)' },
+  visible: {
+    opacity: 1,
+    y: 0,
+    filter: 'blur(0px)',
+    transition: { duration: 0.75, ease: EASING },
+  },
+};
+
+// Each panel slides up with slight scale from below
+const panelVariant: Variants = {
+  hidden: { opacity: 0, y: 80, scale: 0.97 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { duration: 0.9, ease: EASING },
+  },
+};
+
+// Image enters from the relevant side
+const imageVariantLeft: Variants = {
+  hidden: { opacity: 0, x: -60 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.85, delay: 0.15, ease: EASING },
+  },
+};
+
+const imageVariantRight: Variants = {
+  hidden: { opacity: 0, x: 60 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.85, delay: 0.15, ease: EASING },
+  },
+};
+
+// Content fades up after image
+const contentVariant: Variants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.7, delay: 0.25, ease: EASING },
+  },
+};
+
+// Tags stagger in one by one
+const tagContainerVariant: Variants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.06, delayChildren: 0.35 } },
+};
+
+const tagVariant: Variants = {
+  hidden: { opacity: 0, scale: 0.85, y: 8 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: { duration: 0.4, ease: EASING },
+  },
+};
+
+/* ─── Component ──────────────────────────────────────────────────────── */
 export default function FramerPillars() {
+  const VIEWPORT = { once: true, margin: '-80px' } as const;
+
   return (
-    <section style={{ padding: '90px 24px', background: '#070a10', position: 'relative' }}>
-      <div style={{ maxWidth: 1320, margin: '0 auto' }}>
-        {/* Section Header */}
-        <div style={{ textAlign: 'center', marginBottom: 64 }}>
+    <section
+      style={{
+        padding: '100px 24px',
+        background: '#080c14',
+        position: 'relative',
+        overflow: 'hidden',
+      }}
+    >
+      {/* Ambient glow */}
+      <div
+        style={{
+          position: 'absolute',
+          top: '10%',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: '800px',
+          height: '400px',
+          background: 'radial-gradient(circle, rgba(30,58,138,0.18) 0%, transparent 70%)',
+          filter: 'blur(80px)',
+          pointerEvents: 'none',
+        }}
+      />
+
+      <div style={{ maxWidth: 1240, margin: '0 auto', position: 'relative', zIndex: 2 }}>
+
+        {/* ── Section Header ── */}
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={VIEWPORT}
+          variants={headerVariant}
+          style={{ textAlign: 'center', marginBottom: 72 }}
+        >
           <div
             style={{
               display: 'inline-flex',
@@ -97,14 +200,14 @@ export default function FramerPillars() {
               gap: 8,
               padding: '6px 16px',
               borderRadius: 9999,
-              background: 'rgba(6, 182, 212, 0.12)',
+              background: 'rgba(6, 182, 212, 0.1)',
               border: '1px solid rgba(6, 182, 212, 0.3)',
               color: '#06b6d4',
               fontSize: 12,
               fontWeight: 700,
               textTransform: 'uppercase',
               letterSpacing: '0.08em',
-              marginBottom: 14,
+              marginBottom: 16,
             }}
           >
             <Sparkles size={13} /> Editorial Showcase
@@ -112,11 +215,12 @@ export default function FramerPillars() {
           <h2
             className="font-outfit"
             style={{
-              fontSize: 'clamp(32px, 4.5vw, 56px)',
-              fontWeight: 800,
+              fontSize: 'clamp(32px, 5vw, 64px)',
+              fontWeight: 900,
               color: '#f8fafc',
-              letterSpacing: '-0.02em',
-              marginBottom: 12,
+              letterSpacing: '-0.03em',
+              lineHeight: 1.05,
+              marginBottom: 16,
             }}
           >
             Pillars That Drive Sustainable Livelihoods
@@ -127,22 +231,29 @@ export default function FramerPillars() {
           >
             Deep dive into the 4 strategic phases engineered to guarantee measurable career and economic outcomes.
           </p>
-        </div>
+        </motion.div>
 
         {/* ── Case Study Panels Stack ── */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 40 }}>
-          {PILLARS.map((pillar) => (
-            <div
+          {PILLARS.map((pillar, panelIdx) => (
+            <motion.div
               key={pillar.id}
               className="editorial-case-panel"
               style={{
                 background: pillar.bgColor,
                 borderColor: pillar.borderColor,
               }}
+              initial="hidden"
+              whileInView="visible"
+              viewport={VIEWPORT}
+              variants={panelVariant}
             >
               <div className={`pillar-layout-row${pillar.reversed ? ' reversed' : ''}`}>
-                {/* Visual Preview (Mockup) */}
-                <div>
+
+                {/* Visual Preview */}
+                <motion.div
+                  variants={pillar.reversed ? imageVariantRight : imageVariantLeft}
+                >
                   <div
                     style={{
                       position: 'relative',
@@ -162,10 +273,10 @@ export default function FramerPillars() {
                       style={{ objectFit: 'cover' }}
                     />
                   </div>
-                </div>
+                </motion.div>
 
                 {/* Content & Details */}
-                <div>
+                <motion.div variants={contentVariant}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
                     <span
                       style={{
@@ -213,17 +324,21 @@ export default function FramerPillars() {
                     {pillar.description}
                   </p>
 
-                  {/* Tag Pills Inspired by Reference */}
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 28 }}>
+                  {/* Tag Pills with stagger */}
+                  <motion.div
+                    style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 28 }}
+                    variants={tagContainerVariant}
+                  >
                     {pillar.tags.map((tag, tIdx) => (
-                      <span
+                      <motion.span
                         key={tIdx}
                         className={tIdx === 0 ? 'editorial-tag-pill' : 'editorial-tag-pill-dark'}
+                        variants={tagVariant}
                       >
                         {tag}
-                      </span>
+                      </motion.span>
                     ))}
-                  </div>
+                  </motion.div>
 
                   {/* Stats Callouts */}
                   <div
@@ -237,14 +352,20 @@ export default function FramerPillars() {
                     }}
                   >
                     {pillar.stats.map((s, sIdx) => (
-                      <div key={sIdx}>
+                      <motion.div
+                        key={sIdx}
+                        initial={{ opacity: 0, y: 16 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={VIEWPORT}
+                        transition={{ duration: 0.5, delay: 0.4 + sIdx * 0.1, ease: EASING }}
+                      >
                         <div style={{ fontSize: 22, fontWeight: 900, color: '#f8fafc' }}>
                           {s.value}
                         </div>
                         <div style={{ fontSize: 11, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                           {s.label}
                         </div>
-                      </div>
+                      </motion.div>
                     ))}
                   </div>
 
@@ -253,9 +374,10 @@ export default function FramerPillars() {
                     <span>{pillar.ctaText}</span>
                     <ArrowRight size={18} />
                   </Link>
-                </div>
+                </motion.div>
+
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>
