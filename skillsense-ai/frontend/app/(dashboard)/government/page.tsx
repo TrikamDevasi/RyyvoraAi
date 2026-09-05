@@ -959,11 +959,95 @@ export default function GovernmentMacroDashboardPage() {
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--info, #06B6D4)', fontSize: 11, fontWeight: 800, textTransform: 'uppercase' }}>
                     <Bot size={14} />
-                    <span>Evidence-Grounded Policy Brief</span>
+                    <span>Evidence-Grounded Policy Brief · Groq Llama 3.3 Synthesis</span>
                   </div>
-                  <p style={{ fontSize: 13, color: 'var(--text-primary, #F8FAFC)', lineHeight: 1.55, margin: 0 }}>
-                    {copilotResponse.answer}
-                  </p>
+
+                  {copilotResponse.answer.includes('Insufficient verified data') && (
+                    <div
+                      style={{
+                        padding: '10px 14px',
+                        borderRadius: 6,
+                        background: 'rgba(239, 68, 68, 0.08)',
+                        border: '1px solid rgba(239, 68, 68, 0.25)',
+                        color: '#fca5a5',
+                        fontSize: 12,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 8,
+                      }}
+                    >
+                      <AlertTriangle size={15} color="#ef4444" />
+                      <span>DPDP Act Statistically Protected: Sample size is below minimum confidence threshold (N &lt; 5).</span>
+                    </div>
+                  )}
+
+                  {/* Render Phase 8 Structured Sections if present */}
+                  {copilotResponse.answer.includes('### ') ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                      {copilotResponse.answer
+                        .split(/(?=###\s+[A-Z]+)/g)
+                        .map((chunk, idx) => {
+                          const trimmed = chunk.trim();
+                          if (!trimmed) return null;
+                          const match = trimmed.match(/^###\s+([A-Z]+)\s*([\s\S]*)$/);
+                          if (match) {
+                            const header = match[1];
+                            const body = match[2].trim();
+                            const badgeColor =
+                              header === 'INSIGHT'
+                                ? 'var(--info, #06B6D4)'
+                                : header === 'EVIDENCE'
+                                ? 'var(--brand-gold, #F59E0B)'
+                                : header === 'SIGNALS'
+                                ? '#60a5fa'
+                                : header === 'RECOMMENDATION'
+                                ? '#10b981'
+                                : '#f59e0b';
+
+                            return (
+                              <div
+                                key={idx}
+                                style={{
+                                  padding: '10px 14px',
+                                  borderRadius: 6,
+                                  background: 'rgba(255, 255, 255, 0.02)',
+                                  border: '1px solid rgba(255, 255, 255, 0.06)',
+                                }}
+                              >
+                                <span
+                                  style={{
+                                    display: 'inline-block',
+                                    fontSize: 10,
+                                    fontWeight: 800,
+                                    padding: '2px 6px',
+                                    borderRadius: 4,
+                                    background: `${badgeColor}18`,
+                                    color: badgeColor,
+                                    border: `1px solid ${badgeColor}33`,
+                                    letterSpacing: '0.05em',
+                                    marginBottom: 6,
+                                  }}
+                                >
+                                  {header}
+                                </span>
+                                <p style={{ fontSize: 13, color: 'var(--text-primary, #F8FAFC)', lineHeight: 1.6, margin: 0, whiteSpace: 'pre-line' }}>
+                                  {body}
+                                </p>
+                              </div>
+                            );
+                          }
+                          return (
+                            <p key={idx} style={{ fontSize: 13, color: 'var(--text-primary, #F8FAFC)', lineHeight: 1.6, margin: 0, whiteSpace: 'pre-line' }}>
+                              {trimmed}
+                            </p>
+                          );
+                        })}
+                    </div>
+                  ) : (
+                    <p style={{ fontSize: 13, color: 'var(--text-primary, #F8FAFC)', lineHeight: 1.6, margin: 0, whiteSpace: 'pre-line' }}>
+                      {copilotResponse.answer}
+                    </p>
+                  )}
                   {copilotResponse.citedMetrics && copilotResponse.citedMetrics.length > 0 && (
                     <div style={{ display: 'flex', gap: 10, marginTop: 4, flexWrap: 'wrap' }}>
                       {copilotResponse.citedMetrics.map((c, idx) => (

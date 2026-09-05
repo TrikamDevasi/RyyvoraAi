@@ -32,12 +32,21 @@ export class AIProviderManager {
   }
 
   reloadProviders(): void {
-    this.providers = [
-      new GeminiProvider(),
-      new GroqProvider(),
-      new OpenAIProvider(),
-      new PerplexityProvider(),
-    ];
+    const groq = new GroqProvider();
+    const gemini = new GeminiProvider();
+    const openai = new OpenAIProvider();
+    const perplexity = new PerplexityProvider();
+
+    // Prioritize configured and operational providers: Groq is primary
+    const primary = (process.env.PRIMARY_AI_PROVIDER || 'groq').toLowerCase();
+    if (primary === 'gemini') {
+      this.providers = [gemini, groq, openai, perplexity];
+    } else if (primary === 'openai') {
+      this.providers = [openai, groq, gemini, perplexity];
+    } else {
+      this.providers = [groq, gemini, openai, perplexity];
+    }
+
     for (const p of this.providers) {
       if (!this.runtimeStates.has(p.name.toLowerCase())) {
         this.runtimeStates.set(p.name.toLowerCase(), {

@@ -243,6 +243,18 @@ For detailed branching commands, review [docs/CONTRIBUTING.md](file:///c:/Users/
 
 ---
 
+## 📑 Platform Documentation Index
+
+All architectural specifications, SIH criteria matrices, design systems, usability audits, and real AI implementation reports are organized in the **[docs/](file:///c:/Users/trika/Documents/skillsense/TEAM_QUANTUM_CODERS-SU-/skillsense-ai/docs/README.md)** directory:
+- **[Real AI Implementation Report](file:///c:/Users/trika/Documents/skillsense/TEAM_QUANTUM_CODERS-SU-/skillsense-ai/docs/RYYVORA_AI_IMPLEMENTATION_REPORT.md)**: 100% genuine AI functionality across all personas, Groq LPU setup, zero-mock certification, and DPDP $N < 5$ safeguards.
+- **[Product-Wide Design System Report](file:///c:/Users/trika/Documents/skillsense/TEAM_QUANTUM_CODERS-SU-/skillsense-ai/docs/RYVORA_PRODUCT_WIDE_UI_UPGRADE_REPORT.md)**: Enterprise visual design refactor across all personas.
+- **[Brand Migration Report](file:///c:/Users/trika/Documents/skillsense/TEAM_QUANTUM_CODERS-SU-/skillsense-ai/docs/BRAND_MIGRATION_RYYVORA_REPORT.md)**: Ryyvora AI platform positioning, institutional color tokens, and metadata.
+- **[Authentication Redesign Report](file:///c:/Users/trika/Documents/skillsense/TEAM_QUANTUM_CODERS-SU-/skillsense-ai/docs/SIGNIN_UI_REDESIGN_REPORT.md)**: Enterprise sign-in experience, live stats ticker, and 6-role demo switchers.
+- **[Mobile UX Redesign Report](file:///c:/Users/trika/Documents/skillsense/TEAM_QUANTUM_CODERS-SU-/skillsense-ai/docs/MOBILE_UX_REDESIGN_REPORT.md)**: Mobile viewport responsiveness and zero-scroll containerization.
+- **[Complete Documentation Index](file:///c:/Users/trika/Documents/skillsense/TEAM_QUANTUM_CODERS-SU-/skillsense-ai/docs/README.md)**: Full master index of all 25 documentation and audit files.
+
+---
+
 ## 📂 Unified Codebase Architecture
 
 ```

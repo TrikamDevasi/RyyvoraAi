@@ -166,3 +166,31 @@ export const FairnessAuditSchema = z.object({
   recommendations: z.array(z.string()).default([]),
 });
 export type FairnessAuditResult = z.infer<typeof FairnessAuditSchema>;
+
+// 8. Employer Candidate Match
+export const CandidateMatchSchema = z.object({
+  candidateId: z.string().optional(),
+  matchPercent: z.number().min(0).max(100),
+  fitLevel: z.enum(['Exceptional', 'Strong', 'Moderate', 'Developing']).default('Strong'),
+  why: z.array(z.string()).default([]),
+  matchingSkills: z.array(z.string()).default([]),
+  missingSkills: z.array(z.string()).default([]),
+  recommendation: z.string().default(''),
+  nsqfAlignment: z.string().default('Aligned with role requirements'),
+  confidence: z.number().min(0).max(1).default(0.9),
+});
+export type CandidateMatchResult = z.infer<typeof CandidateMatchSchema>;
+
+// 9. Institute Cohort Analysis
+export const CohortAnalysisSchema = z.object({
+  cohortInsight: z.string(),
+  placementRiskLevel: z.enum(['Low', 'Moderate', 'High', 'Critical']).default('Moderate'),
+  potentialFactors: z.array(z.string()).default([]),
+  curriculumGaps: z.array(z.string()).default([]),
+  recommendations: z.array(z.string()).default([]),
+  dataSufficiency: z.enum(['sufficient', 'insufficient', 'partial']).default('sufficient'),
+  limitations: z.array(z.string()).default([]),
+  confidence: z.number().min(0).max(1).default(0.9),
+});
+export type CohortAnalysisResult = z.infer<typeof CohortAnalysisSchema>;
+

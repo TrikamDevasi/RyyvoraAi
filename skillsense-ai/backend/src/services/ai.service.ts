@@ -17,6 +17,10 @@ import {
   AssessmentEvaluationResult,
   IndustryDemandSchema,
   IndustryDemandResult,
+  CandidateMatchSchema,
+  CandidateMatchResult,
+  CohortAnalysisSchema,
+  CohortAnalysisResult,
 } from './providers';
 import logger from '../utils/logger';
 import { resolveBranch } from '../data/branches.data';
@@ -202,19 +206,9 @@ Return ONLY valid JSON:
       const parsed = parseAndValidateAIOutput<GapAnalysisResult>(response, GapAnalysisSchema);
       return parsed.data;
     } catch (err: any) {
-      logger.warn('analyzeSkillGaps using adaptive fallback:', err.message);
-      const topSkill = input.skills[0]?.skill || branch.skills[0]?.name || 'Domain Core Competency';
-      const template = branch.skillGapTemplate;
-      return {
-        targetRole,
-        overallGapScore: 28,
-        criticalGaps: template.criticalGaps as any,
-        prioritySkills: template.prioritySkills,
-        roadmap: template.roadmap,
-        estimatedTimeToClose: '2-3 months',
-        confidence: 0.92,
-        aiSummary: `Candidate demonstrates strong foundational capability in ${topSkill}. Closing targeted gaps in ${template.prioritySkills.join(', ')} will ensure high alignment with leading industry employers (${branch.topEmployers.slice(0, 3).join(', ')}).`,
-      };
+      if (err instanceof AIUnavailableError) throw err;
+      logger.error('analyzeSkillGaps error:', err.message);
+      throw new AIUnavailableError();
     }
   }
 
@@ -265,22 +259,9 @@ Return ONLY valid JSON:
       const parsed = parseAndValidateAIOutput<CareerPredictionResult>(response, CareerPredictionSchema);
       return parsed.data;
     } catch (err: any) {
-      logger.warn('matchCareerPaths using adaptive fallback:', err.message);
-      const topSkill = input.skills[0]?.skill || branch.skills[0]?.name || 'Domain Core Competency';
-      return {
-        topCareerPaths: branch.careerPaths.map((cp) => ({
-          title: cp.title,
-          matchPercent: cp.match,
-          salaryRange: cp.salaryRange,
-          growth: (['Exponential', 'High', 'Moderate', 'Stable'].includes(cp.growth) ? cp.growth : 'High') as any,
-          requiredSkills: cp.requiredSkills,
-          missingSkills: cp.missingSkills,
-          timeToAchieve: cp.timeToReady,
-          roadmap: cp.roadmap,
-          reasoning: cp.reasoning || `Strong alignment with candidate skills in ${topSkill} and contemporary requirements across ${branch.topEmployers.slice(0, 3).join(', ')}.`,
-        })),
-        aiExplanation: `Profile demonstrates solid foundation in ${branch.name}. With targeted development in ${branch.skills.slice(0, 2).map((s) => s.name).join(' and ')}, the candidate is well poised for opportunities with leading sector employers like ${branch.topEmployers.slice(0, 3).join(', ')}.`,
-      };
+      if (err instanceof AIUnavailableError) throw err;
+      logger.error('matchCareerPaths error:', err.message);
+      throw new AIUnavailableError();
     }
   }
 
@@ -485,7 +466,168 @@ Return ONLY valid JSON:
     }
   }
 
-  // ── 11. Test Connectivity & Provider Latency Diagnostics ──────────────────
+  // ── 11. Employer Candidate Match Engine ────────────────────────────────────
+  async matchCandidateForEmployer(input: {
+    candidate: {
+      name?: string;
+      nsqfLevel?: number;
+      program?: string;
+      overallScore?: number;
+      skills: { name?: string; skillId?: any; score?: number }[] | string[];
+      certifications?: string[];
+      experienceMonths?: number;
+    };
+    job: {
+      title: string;
+      description?: string;
+      minNsqfLevel?: number;
+      requiredSkills: string[];
+      preferredSkills?: string[];
+      minExperienceMonths?: number;
+    };
+  }): Promise<CandidateMatchResult> {
+    // Sanitize and strip PII
+    const candidateSkills = Array.isArray(input.candidate.skills)
+      ? input.candidate.skills.map((s: any) => {
+          if (typeof s === 'string') return s;
+          const skillName = s.name || (s.skillId?.name) || String(s.skillId || 'Skill');
+          return `${skillName} (${s.score || 75}%)`;
+        })
+      : [];
+
+    const prompt = `You are a Principal Technical Talent Assessor for Indian Enterprise Employers.
+Evaluate this candidate strictly against the employer job requisition:
+
+JOB REQUISITION:
+- Title: ${input.job.title}
+- Required Skills: ${input.job.requiredSkills.join(', ')}
+- Preferred Skills: ${input.job.preferredSkills?.join(', ') || 'None specified'}
+- Minimum NSQF Level: ${input.job.minNsqfLevel || 4}
+- Minimum Experience: ${input.job.minExperienceMonths || 0} months
+- Job Context: ${input.job.description || 'Standard industry role'}
+
+CANDIDATE PROFILE (Anonymized):
+- Program / Degree: ${input.candidate.program || 'Engineering / Technical'}
+- Verified NSQF Level: ${input.candidate.nsqfLevel || 4}
+- Overall Competency Score: ${input.candidate.overallScore || 75}/100
+- Verified Skills: ${candidateSkills.join(', ')}
+- Certifications: ${input.candidate.certifications?.join(', ') || 'None listed'}
+- Experience: ${input.candidate.experienceMonths || 0} months
+
+Evaluate candidate match percentage (0-100), explain WHY with grounded evidence, list matching skills, identify missing skill gaps, and provide actionable next step recommendation.
+NEVER fabricate candidate attributes not present in the profile.
+
+Return ONLY valid JSON matching this schema:
+{
+  "matchPercent": <0-100>,
+  "fitLevel": "Exceptional" | "Strong" | "Moderate" | "Developing",
+  "why": ["Concrete reason 1", "Concrete reason 2"],
+  "matchingSkills": ["Skill 1", "Skill 2"],
+  "missingSkills": ["Missing Skill 1", "Missing Skill 2"],
+  "recommendation": "Actionable recruiter next step",
+  "nsqfAlignment": "Brief explanation of NSQF level alignment",
+  "confidence": <0.0-1.0>
+}`;
+
+    try {
+      const response = await this.chatWithFallback(
+        [
+          { role: 'system', content: 'You are an objective talent matching AI. Ground your match strictly in candidate competencies. Output valid JSON only.' },
+          { role: 'user', content: prompt },
+        ],
+        { temperature: 0.2, max_tokens: 1500, response_format: { type: 'json_object' } }
+      );
+
+      if (!response) throw new AIUnavailableError();
+      const parsed = parseAndValidateAIOutput<CandidateMatchResult>(response, CandidateMatchSchema);
+      return parsed.data;
+    } catch (err: any) {
+      if (err instanceof AIUnavailableError) throw err;
+      logger.error('matchCandidateForEmployer error:', err.message);
+      throw new AIUnavailableError();
+    }
+  }
+
+  // ── 12. Institute Cohort Performance & Curriculum Analysis ─────────────────
+  async analyzeInstituteCohort(input: {
+    institutionName?: string;
+    program?: string;
+    totalEnrolled: number;
+    totalCompleted: number;
+    totalPlaced: number;
+    placementRate: number;
+    avgScore: number;
+    placementTrends?: { month: string; placed: number }[];
+    topBarriers?: { reason: string; count: number }[];
+    recentCurriculumFeedback?: string[];
+  }): Promise<CohortAnalysisResult> {
+    // Insufficient data handling (Phase 9)
+    if (input.totalEnrolled < 5) {
+      return {
+        cohortInsight: 'Insufficient verified data to answer this confidently. A reliable cohort-level analysis requires at least 5 enrolled trainees with verified assessment or placement milestones.',
+        placementRiskLevel: 'Moderate',
+        potentialFactors: ['Cohort sample size is below statistical significance threshold (N < 5).'],
+        curriculumGaps: ['Data coverage is incomplete for this cohort.'],
+        recommendations: ['Enroll additional trainees and complete skill assessments to unlock AI cohort intelligence.'],
+        dataSufficiency: 'insufficient',
+        limitations: [`Total enrolled trainees (${input.totalEnrolled}) is below privacy and statistical threshold (N >= 5).`],
+        confidence: 0.3,
+      };
+    }
+
+    const prompt = `You are a Principal Academic & Placement Director for Technical Training Institutes in India.
+Analyze this cohort's performance metrics grounded in verified institutional data:
+
+COHORT METRICS:
+- Institution: ${input.institutionName || 'Technical Institute'}
+- Program: ${input.program || 'All Programs'}
+- Total Enrolled: ${input.totalEnrolled}
+- Total Completed: ${input.totalCompleted} (${Math.round((input.totalCompleted / input.totalEnrolled) * 100)}% Completion Rate)
+- Total Placed / Employed: ${input.totalPlaced} (${input.placementRate}% Placement Rate)
+- Average Assessment Competency Score: ${input.avgScore}/100
+- Placement Trend (Monthly Placed): ${JSON.stringify(input.placementTrends || [])}
+- Reported Non-Placement Barriers: ${JSON.stringify(input.topBarriers || [])}
+- Employer Feedback Notes: ${JSON.stringify(input.recentCurriculumFeedback || [])}
+
+Provide:
+1. Cohort Insight: Clear finding about placement velocity and completion (only show factors supported by actual data).
+2. Placement Risk Level: Low, Moderate, High, or Critical.
+3. Potential Factors: Root causes identified directly in the evidence.
+4. Curriculum Gaps: Specific missing technical competencies or employer-demanded topics.
+5. Actionable Recommendations: Specific interventions for faculty/curriculum directors.
+
+Return ONLY valid JSON matching this schema:
+{
+  "cohortInsight": "Concise 2-3 sentence finding grounded in numbers",
+  "placementRiskLevel": "Low" | "Moderate" | "High" | "Critical",
+  "potentialFactors": ["Factor 1", "Factor 2"],
+  "curriculumGaps": ["Curriculum gap 1", "Curriculum gap 2"],
+  "recommendations": ["Recommendation 1", "Recommendation 2"],
+  "dataSufficiency": "sufficient",
+  "limitations": ["Any limitation or missing variable"],
+  "confidence": <0.0-1.0>
+}`;
+
+    try {
+      const response = await this.chatWithFallback(
+        [
+          { role: 'system', content: 'You are an objective academic and workforce outcome analyst. Output valid JSON only.' },
+          { role: 'user', content: prompt },
+        ],
+        { temperature: 0.2, max_tokens: 1800, response_format: { type: 'json_object' } }
+      );
+
+      if (!response) throw new AIUnavailableError();
+      const parsed = parseAndValidateAIOutput<CohortAnalysisResult>(response, CohortAnalysisSchema);
+      return parsed.data;
+    } catch (err: any) {
+      if (err instanceof AIUnavailableError) throw err;
+      logger.error('analyzeInstituteCohort error:', err.message);
+      throw new AIUnavailableError();
+    }
+  }
+
+  // ── 13. Test Connectivity & Provider Latency Diagnostics ──────────────────
   async testConnectivity(): Promise<Record<string, ProviderHealth>> {
     return providerManager.checkAllHealth();
   }

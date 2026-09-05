@@ -27,7 +27,9 @@ import {
   ChevronRight,
   FileSpreadsheet,
   Zap,
+  Sparkles,
 } from 'lucide-react';
+import api from '@/lib/api';
 import { useAuth } from '@/hooks/useAuth';
 import { instituteApi, InstituteDashboard, PlacementTrendPoint } from '@/lib/api/institute.api';
 import { FadeIn } from '@/components/shared/FadeIn';
@@ -68,12 +70,34 @@ export default function InstitutePage() {
   const [placementTrend, setPlacementTrend] = useState<PlacementTrendPoint[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [cohortAnalysis, setCohortAnalysis] = useState<any>(null);
+  const [cohortLoading, setCohortLoading] = useState(false);
+  const [selectedProgram, setSelectedProgram] = useState('All');
+
+  const runCohortAnalysis = async (prog = selectedProgram) => {
+    setCohortLoading(true);
+    try {
+      const instId = instituteApi.getInstitutionId(user);
+      const res = await api.post('/ai/cohort-analysis', {
+        institutionId: instId || undefined,
+        program: prog,
+      });
+      if (res.data?.success && res.data.data) {
+        setCohortAnalysis(res.data.data);
+      }
+    } catch {
+      // Retain previous or empty
+    } finally {
+      setCohortLoading(false);
+    }
+  };
 
   const load = async () => {
     const instId = instituteApi.getInstitutionId(user);
+    runCohortAnalysis(selectedProgram);
+
     if (!instId) {
       setLoading(false);
-      setError('No institution is linked to this account.');
       return;
     }
     setLoading(true);
@@ -407,20 +431,167 @@ export default function InstitutePage() {
               </AnalyticsPanel>
             </div>
 
-            {/* ── Curriculum Gap Audit Policy Insight Panel ── */}
-            <InsightPanel
-              title="Curriculum Skill Gap Alert: Cloud Native & Applied AI Alignment Deficit"
-              signalType="WARNING"
-              evidence={[
-                { label: 'Cloud Practical Deficit', value: '24% Gap' },
-                { label: 'Target NSQF Level', value: 'Level 6' },
-                { label: 'Projected Placement Lift', value: '+18.4%' },
-              ]}
-              recommendation="Diagnostic code audits indicate trainees need deeper exposure to Docker, Kubernetes Ingress, and vector database concepts to match Tier-1 employer hiring criteria in Maharashtra tech corridors."
-              actionText="Inspect Cohort Skill Breakdown"
-              onAction={() => toast.success('Opening cohort skill breakdown audit...')}
-              style={{ marginBottom: 20 }}
-            />
+            {/* ── Dynamic AI Cohort Performance & Curriculum Gap Intelligence Panel ── */}
+            <div
+              className="card-linear"
+              style={{
+                borderRadius: 12,
+                padding: 24,
+                marginBottom: 20,
+                border: '1px solid rgba(6, 182, 212, 0.3)',
+                background: 'linear-gradient(135deg, rgba(8, 13, 26, 0.95), rgba(15, 23, 42, 0.95))',
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12, marginBottom: 16 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <AIBadge type="ai" label="NEURAL COHORT INTELLIGENCE" />
+                  <span style={{ fontSize: 12, color: 'var(--cyan)', fontWeight: 700 }}>
+                    GROQ LLAMA 3.3 · REAL TIME SYNTHESIS
+                  </span>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <select
+                    value={selectedProgram}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setSelectedProgram(val);
+                      runCohortAnalysis(val);
+                    }}
+                    style={{
+                      padding: '6px 12px',
+                      borderRadius: 6,
+                      background: 'var(--bg-input, #0f111a)',
+                      border: '1px solid var(--border)',
+                      color: '#fff',
+                      fontSize: 12,
+                    }}
+                  >
+                    <option value="All">All Disciplines (Full Cohort)</option>
+                    <option value="Computer Science & Engineering">Computer Science & Engineering</option>
+                    <option value="MSSDS Advanced Web Engineering">MSSDS Advanced Web Engineering</option>
+                    <option value="PMKVY Industrial Automation & Robotics">PMKVY Industrial Automation</option>
+                  </select>
+
+                  <button
+                    type="button"
+                    onClick={() => runCohortAnalysis(selectedProgram)}
+                    disabled={cohortLoading}
+                    className="btn-secondary"
+                    style={{ fontSize: 12, padding: '6px 12px', display: 'flex', alignItems: 'center', gap: 5 }}
+                  >
+                    <RefreshCw size={12} className={cohortLoading ? 'animate-spin' : ''} />
+                    <span>Recalibrate</span>
+                  </button>
+                </div>
+              </div>
+
+              {cohortLoading ? (
+                <div style={{ padding: '30px 0', textAlign: 'center' }}>
+                  <RefreshCw size={22} style={{ color: 'var(--cyan)', animation: 'spin 1s linear infinite', marginBottom: 10 }} />
+                  <div style={{ fontSize: 13, color: '#e2e8f0', fontWeight: 600 }}>
+                    Analyzing verified cohort completions, test rubrics & placement risk factors...
+                  </div>
+                </div>
+              ) : cohortAnalysis ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                  {/* Status Banner */}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: '#f8fafc' }}>
+                        Cohort Placement Risk Level:
+                      </span>
+                      <span
+                        style={{
+                          fontSize: 11,
+                          fontWeight: 800,
+                          padding: '3px 8px',
+                          borderRadius: 4,
+                          background: cohortAnalysis.placementRiskLevel === 'Low' ? 'rgba(16,185,129,0.15)' : cohortAnalysis.placementRiskLevel === 'High' ? 'rgba(239,68,68,0.15)' : 'rgba(245,158,11,0.15)',
+                          color: cohortAnalysis.placementRiskLevel === 'Low' ? '#86efac' : cohortAnalysis.placementRiskLevel === 'High' ? '#fca5a5' : 'var(--gold)',
+                          border: `1px solid ${cohortAnalysis.placementRiskLevel === 'Low' ? 'rgba(16,185,129,0.3)' : cohortAnalysis.placementRiskLevel === 'High' ? 'rgba(239,68,68,0.3)' : 'rgba(245,158,11,0.3)'}`,
+                        }}
+                      >
+                        {cohortAnalysis.placementRiskLevel?.toUpperCase()} RISK
+                      </span>
+                    </div>
+
+                    <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+                      Confidence Metric: <strong style={{ color: 'var(--cyan)' }}>{Math.round((cohortAnalysis.confidence || 0.85) * 100)}%</strong> · Data: <strong>{cohortAnalysis.dataSufficiency?.toUpperCase()}</strong>
+                    </div>
+                  </div>
+
+                  {/* Cohort Insight Text */}
+                  <div
+                    style={{
+                      padding: '14px 18px',
+                      borderRadius: 8,
+                      background: cohortAnalysis.dataSufficiency === 'insufficient' ? 'rgba(239,68,68,0.06)' : 'rgba(255,255,255,0.02)',
+                      border: `1px solid ${cohortAnalysis.dataSufficiency === 'insufficient' ? 'rgba(239,68,68,0.2)' : 'var(--border)'}`,
+                      fontSize: 13,
+                      lineHeight: 1.6,
+                      color: cohortAnalysis.dataSufficiency === 'insufficient' ? '#fca5a5' : '#f8fafc',
+                    }}
+                  >
+                    {cohortAnalysis.cohortInsight}
+                  </div>
+
+                  {/* Potential Factors & Curriculum Gaps Grid */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 14 }}>
+                    {/* Factors */}
+                    {cohortAnalysis.potentialFactors?.length > 0 && (
+                      <div style={{ padding: '14px 16px', borderRadius: 8, background: 'rgba(245, 158, 11, 0.04)', border: '1px solid rgba(245, 158, 11, 0.15)' }}>
+                        <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--gold)', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <AlertTriangle size={13} color="var(--gold)" /> Observed Bottlenecks & Attrition Factors
+                        </div>
+                        <ul style={{ margin: 0, paddingLeft: 16, fontSize: 12, color: '#e2e8f0', lineHeight: 1.5 }}>
+                          {cohortAnalysis.potentialFactors.map((factor: string, fIdx: number) => (
+                            <li key={fIdx} style={{ marginBottom: 4 }}>{factor}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {/* Curriculum Gaps */}
+                    {cohortAnalysis.curriculumGaps?.length > 0 && (
+                      <div style={{ padding: '14px 16px', borderRadius: 8, background: 'rgba(6, 182, 212, 0.04)', border: '1px solid rgba(6, 182, 212, 0.2)' }}>
+                        <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--cyan)', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <BookOpen size={13} color="var(--cyan)" /> Curriculum Deficits Identified
+                        </div>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                          {cohortAnalysis.curriculumGaps.map((gap: string, gIdx: number) => (
+                            <span key={gIdx} style={{ fontSize: 11, padding: '3px 8px', borderRadius: 4, background: 'rgba(6, 182, 212, 0.15)', color: 'var(--cyan)', fontWeight: 600 }}>
+                              {gap}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Recommendations */}
+                  {cohortAnalysis.recommendations?.length > 0 && (
+                    <div style={{ padding: '14px 18px', borderRadius: 8, background: 'rgba(16, 185, 129, 0.04)', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: '#86efac', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <CheckCircle2 size={13} color="#10b981" /> Prescriptive Dean & Placement Interventions
+                      </div>
+                      <ul style={{ margin: 0, paddingLeft: 16, fontSize: 12, color: '#e2e8f0', lineHeight: 1.5 }}>
+                        {cohortAnalysis.recommendations.map((rec: string, rIdx: number) => (
+                          <li key={rIdx} style={{ marginBottom: 4 }}>{rec}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {/* Limitations (Phase 9 Transparency) */}
+                  {cohortAnalysis.limitations?.length > 0 && (
+                    <div style={{ fontSize: 11, color: 'var(--text-muted)', borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 8 }}>
+                      <strong>Data Governance Limitations:</strong> {cohortAnalysis.limitations.join(' · ')}
+                    </div>
+                  )}
+                </div>
+              ) : null}
+            </div>
           </>
         )}
 

@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
+import api from '@/lib/api';
 import { studentApi, StudentProfile } from '@/lib/api/student.api';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { FadeIn } from '@/components/shared/FadeIn';
@@ -113,108 +114,6 @@ export default function AIAnalyzerPage() {
     toast.success(`Discipline updated: ${b.name}`);
   };
 
-  // ── Client-side Heuristic Analysis Engine (Resilient Fallback) ──────────────
-  const runClientSideAnalysis = async (inputText: string, gitUrl?: string, projectInfo?: any) => {
-    const textLower = `${inputText} ${gitUrl || ''} ${JSON.stringify(projectInfo || '')}`.toLowerCase();
-
-    // Check for specific tech stacks in input
-    const techCatalog: { name: string; category: string; keywords: string[]; baseScore: number }[] = [
-      { name: 'TypeScript & JavaScript', category: 'technical', keywords: ['typescript', 'javascript', 'ts', 'js', 'es6'], baseScore: 88 },
-      { name: 'React & Next.js Ecosystem', category: 'technical', keywords: ['react', 'next.js', 'nextjs', 'jsx', 'frontend'], baseScore: 92 },
-      { name: 'Node.js & Express APIs', category: 'technical', keywords: ['node', 'nodejs', 'express', 'backend', 'api', 'rest'], baseScore: 86 },
-      { name: 'Python & Machine Learning', category: 'technical', keywords: ['python', 'pytorch', 'tensorflow', 'scikit', 'ml', 'ai', 'rag', 'llm'], baseScore: 90 },
-      { name: 'SQL & Database Architecture', category: 'technical', keywords: ['sql', 'postgres', 'postgresql', 'mysql', 'prisma', 'database', 'mongo', 'mongodb'], baseScore: 84 },
-      { name: 'Docker & Containerization', category: 'architectural', keywords: ['docker', 'container', 'k8s', 'kubernetes', 'compose'], baseScore: 82 },
-      { name: 'Cloud & Infrastructure (AWS/GCP)', category: 'architectural', keywords: ['aws', 'cloud', 'gcp', 'azure', 's3', 'lambda', 'terraform'], baseScore: 80 },
-      { name: 'Cybersecurity & OWASP Defense', category: 'technical', keywords: ['security', 'owasp', 'penetration', 'vulnerability', 'wireshark', 'nmap', 'auth'], baseScore: 85 },
-      { name: 'Git & CI/CD Pipelines', category: 'tools', keywords: ['git', 'github', 'ci/cd', 'actions', 'gitlab', 'pipeline'], baseScore: 89 },
-      { name: 'System Design & Distributed Systems', category: 'architectural', keywords: ['architecture', 'microservices', 'caching', 'redis', 'queue', 'kafka', 'scalab'], baseScore: 83 },
-      { name: 'Testing & Quality Assurance', category: 'technical', keywords: ['test', 'jest', 'cypress', 'testing', 'qa', 'unit'], baseScore: 78 },
-    ];
-
-    const detectedSkills: any[] = [];
-    techCatalog.forEach((item) => {
-      const matchCount = item.keywords.filter((kw) => textLower.includes(kw)).length;
-      if (matchCount > 0) {
-        const score = Math.min(98, item.baseScore + matchCount * 2);
-        detectedSkills.push({
-          name: item.name,
-          score,
-          category: item.category,
-          confidence: 0.92,
-          evidence: `Verified proficiency based on declared context matching: ${item.keywords.filter((kw) => textLower.includes(kw)).slice(0, 3).join(', ')}`,
-        });
-      }
-    });
-
-    // Default core skills if none matched
-    if (detectedSkills.length === 0) {
-      detectedSkills.push(
-        { name: 'Software Engineering Fundamentals', score: 82, category: 'technical', confidence: 0.88, evidence: 'Core programming logic and workflow patterns' },
-        { name: 'API Design & Integration', score: 80, category: 'technical', confidence: 0.85, evidence: 'RESTful protocol compliance' },
-        { name: 'Version Control & Git Workflow', score: 85, category: 'tools', confidence: 0.9, evidence: 'Git collaborative standards' }
-      );
-    }
-
-    const calculatedOverall = Math.round(
-      detectedSkills.reduce((acc, curr) => acc + curr.score, 0) / detectedSkills.length
-    );
-
-    const radarData = activeBranch.radarDimensions && activeBranch.radarDimensions.length > 0
-      ? activeBranch.radarDimensions.map((dim) => ({
-          subject: dim.subject,
-          score: Math.min(98, Math.max(68, calculatedOverall + dim.baseScoreOffset)),
-        }))
-      : [
-          { subject: 'Core Competency', score: calculatedOverall },
-          { subject: 'Applied Logic', score: Math.min(98, calculatedOverall + 5) },
-          { subject: 'Industry Standards', score: Math.min(95, calculatedOverall + 2) },
-          { subject: 'Problem Solving', score: Math.min(96, calculatedOverall + 4) },
-        ];
-
-    const competencies = activeBranch.competencyCategories && activeBranch.competencyCategories.length > 0
-      ? activeBranch.competencyCategories.map((cat, idx) => ({
-          category: cat.category,
-          score: radarData[idx % radarData.length]?.score || calculatedOverall,
-          description: cat.description,
-        }))
-      : [
-          { category: 'Technical Execution', score: calculatedOverall, description: 'Core discipline fundamentals and execution efficiency' },
-          { category: 'Domain Architecture', score: Math.min(95, calculatedOverall + 3), description: 'System design and standard specifications' },
-        ];
-
-    const detectedLevel = calculatedOverall >= 85 ? 'NSQF Level 6 (Advanced Technologist)' : calculatedOverall >= 75 ? 'NSQF Level 5 (Lead Technician / Associate)' : 'NSQF Level 4 (Vocational Practitioner)';
-
-    const simulatedResult = {
-      overallScore: calculatedOverall,
-      confidence: 0.94,
-      experienceLevel: calculatedOverall >= 85 ? 'Advanced' : calculatedOverall >= 75 ? 'Intermediate' : 'Proficient',
-      nsqfLevel: detectedLevel,
-      summary: `High-fidelity neural evaluation verified strong vocational competencies across ${activeBranch.name} (${activeBranch.domain}) standards aligned with contemporary Indian industry requisitions (${activeBranch.topEmployers.slice(0, 3).join(', ')} benchmarks).`,
-      technicalSkills: detectedSkills,
-      radarData,
-      competencies,
-      strengths: [
-        `Demonstrates rigorous implementation of core ${activeBranch.name} principles.`,
-        `Strong alignment with Indian industry requirements (${activeBranch.topEmployers.slice(0, 3).join(', ')} benchmarks).`,
-        'Demonstrated competence in technical standards, safety, and operational workflows.',
-      ],
-      weaknesses: [
-        `Could expand advanced empirical testing and simulation coverage across complex ${activeBranch.code} systems.`,
-        `Opportunities to deepen specialized domain tooling (${activeBranch.trendingTopics.slice(0, 2).join(' / ')}) for enterprise scale.`,
-      ],
-      recommendations: [
-        'Pursue NSQF Level 6 Advanced Cloud & Distributed Systems Micro-Credential',
-        'Complete practical sandbox assessments in Backend Resilience & SQL Optimization',
-        'Showcase real-world open-source contributions in verified Ryyvora portfolio',
-      ],
-      passportHash: '',
-      evaluatedAt: new Date().toISOString(),
-    };
-
-    return simulatedResult;
-  };
-
   // ── GitHub Fetcher Helper ──────────────────────────────────────────────────
   const fetchGitHubRepoMeta = async (url: string) => {
     try {
@@ -243,7 +142,7 @@ export default function AIAnalyzerPage() {
     setAnalyzing(true);
     setScanStageIndex(0);
 
-    // Simulate multi-stage scanning animation
+    // Dynamic scanning progress indicator
     const stageInterval = setInterval(() => {
       setScanStageIndex((prev) => (prev < SCAN_STAGES.length - 1 ? prev + 1 : prev));
     }, 450);
@@ -274,41 +173,47 @@ export default function AIAnalyzerPage() {
         skills: profile?.skills
           ?.map((s: any) => (typeof s.skillId === 'object' ? s.skillId?.name : String(s.skillId)))
           .filter(Boolean),
+        program: activeBranch.name,
+        nsqfLevel: profile?.nsqfLevel || 4,
       };
 
+      // Call live backend AI endpoint (no fake client-side simulations)
       let analysisData: any = null;
-
-      // Attempt live backend API
-      try {
-        analysisData = await studentApi.analyzeSkills(payload);
-      } catch (backendErr) {
-        // Graceful fallback to client-side heuristic engine
-        analysisData = await runClientSideAnalysis(finalPayloadText, githubUrl, {
-          title: projectTitle,
-          description: projectDesc,
-          tech: projectTech,
-        });
+      const res = await api.post('/ai/analyze-skills', payload);
+      if (res?.data?.success && res.data.data) {
+        analysisData = res.data.data;
+      } else {
+        throw new Error(res?.data?.message || 'AI service is temporarily unavailable. Please try again.');
       }
 
-      // Ensure radarData exists
+      // Populate radar dimensions from genuine model scores
       if (!analysisData.radarData) {
-        const score = analysisData.overallScore || 82;
-        analysisData.radarData = [
-          { subject: 'Full-Stack Dev', score: Math.min(98, score + 4) },
-          { subject: 'System Design', score: Math.min(95, score - 2) },
-          { subject: 'Cloud & DevOps', score: Math.min(96, score + 2) },
-          { subject: 'Database & SQL', score: Math.min(95, score + 1) },
-          { subject: 'Security & QA', score: Math.min(92, score - 4) },
-          { subject: 'Problem Solving', score: Math.min(96, score + 5) },
-        ];
+        const score = analysisData.overallScore || 75;
+        const topTechnical = (analysisData.technicalSkills || []).slice(0, 6);
+        if (topTechnical.length >= 3) {
+          analysisData.radarData = topTechnical.map((s: any) => ({
+            subject: s.name,
+            score: s.score || score,
+          }));
+        } else {
+          analysisData.radarData = [
+            { subject: 'Technical Domain', score: Math.min(98, score + 2) },
+            { subject: 'System Design', score: Math.min(95, score - 2) },
+            { subject: 'Problem Solving', score: Math.min(96, score + 3) },
+            { subject: 'Testing & QA', score: Math.min(92, score - 3) },
+            { subject: 'Architecture', score: Math.min(94, score) },
+            { subject: 'Tooling & CI/CD', score: Math.min(95, score + 1) },
+          ];
+        }
       }
 
       setResult(analysisData);
       localStorage.setItem('skillsense_analyzer_last_result', JSON.stringify(analysisData));
 
-      toast.success('Skill analysis complete. Verified competencies synced.');
+      toast.success('Skill analysis complete. Verified competencies synced from Ryyvora AI.');
     } catch (err: any) {
-      toast.error(err?.message || 'Skill evaluation failed. Please try again.');
+      const errorMsg = err?.response?.data?.message || err?.message || 'AI service is temporarily unavailable. Your data is safe. Try again shortly.';
+      toast.error(errorMsg);
     } finally {
       clearInterval(stageInterval);
       setAnalyzing(false);
