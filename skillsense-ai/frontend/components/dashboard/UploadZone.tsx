@@ -154,12 +154,20 @@ export default function UploadZone() {
                                 <div style={{ fontSize: 11, color: MUTED, marginTop: 2 }}>{formatSize(job.fileSize)} • {new Date(job.uploadedAt).toLocaleTimeString()}</div>
                             </div>
                             <div style={{ textAlign: 'right' }}>
-                                <div style={{ fontSize: 12, fontWeight: 700, color: job.status === 'complete' ? '#22c55e' : job.status === 'error' ? '#ef4444' : GOLD }}>
-                                    {job.status === 'complete'
-                                        ? `✓ Ingested (${job.recordsProcessed || 0} records)`
-                                        : job.status === 'error'
-                                            ? '✕ Upload Failed'
-                                            : `${job.progress}%`}
+                                <div style={{ fontSize: 12, fontWeight: 700, color: job.status === 'complete' ? '#22c55e' : job.status === 'error' ? '#ef4444' : GOLD, display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+                                    {job.status === 'complete' ? (
+                                        <>
+                                            <CheckCircle size={13} aria-hidden="true" />
+                                            <span>Ingested ({job.recordsProcessed || 0} records)</span>
+                                        </>
+                                    ) : job.status === 'error' ? (
+                                        <>
+                                            <AlertCircle size={13} aria-hidden="true" />
+                                            <span>Upload Failed</span>
+                                        </>
+                                    ) : (
+                                        <span>{job.progress}%</span>
+                                    )}
                                 </div>
                             </div>
                         </div>

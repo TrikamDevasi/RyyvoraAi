@@ -114,10 +114,10 @@ interface CopilotResponse {
 }
 
 const SAMPLE_COPILOT_QUERIES = [
-  '⚡ Which districts have high skill certification but low placement?',
-  '⚡ What are the primary non-placement barriers in rural clusters?',
-  '⚡ Compare wage growth across vocational programs',
-  '⚡ How is 90-day job retention trending across Maharashtra?',
+  'Which districts have high skill certification but low placement?',
+  'What are the primary non-placement barriers in rural clusters?',
+  'Compare wage growth across vocational programs',
+  'How is 90-day job retention trending across Maharashtra?',
 ];
 
 export default function GovernmentMacroDashboardPage() {
@@ -350,9 +350,34 @@ export default function GovernmentMacroDashboardPage() {
             alignItems: 'center',
             flexWrap: 'wrap',
             gap: 16,
+            position: 'relative',
+            overflow: 'hidden',
           }}
         >
-          <div style={{ flex: '1 1 500px', display: 'flex', alignItems: 'flex-start', gap: 16 }}>
+          {/* Subtle Institutional Context Image Vignette */}
+          <div
+            style={{
+              position: 'absolute',
+              right: 0,
+              top: 0,
+              bottom: 0,
+              width: '38%',
+              minWidth: 260,
+              opacity: 0.16,
+              pointerEvents: 'none',
+              maskImage: 'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.8) 35%, rgba(0,0,0,1) 100%)',
+              WebkitMaskImage: 'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.8) 35%, rgba(0,0,0,1) 100%)',
+            }}
+            aria-hidden="true"
+          >
+            <img
+              src="/images/government/government-workforce.jpg"
+              alt=""
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            />
+          </div>
+
+          <div style={{ flex: '1 1 500px', display: 'flex', alignItems: 'flex-start', gap: 16, position: 'relative', zIndex: 1 }}>
             <div style={{ flexShrink: 0, marginTop: 2 }} className="hidden sm:block">
               <img
                 src="/images/brand/maharashtra-seal-emblem.svg"
@@ -1186,6 +1211,42 @@ export default function GovernmentMacroDashboardPage() {
         {/* ═══════════════════════════════════════════════════════════════════════ */}
         {activeTab === 'copilot' && (
           <div>
+            {/* AI Policy Intelligence Briefing Banner */}
+            <div
+              className="card-elevated"
+              style={{
+                borderRadius: 14,
+                overflow: 'hidden',
+                marginBottom: 20,
+                border: '1px solid var(--border)',
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'stretch',
+                minHeight: 120,
+              }}
+            >
+              <div style={{ width: 220, position: 'relative', flexShrink: 0 }} className="hidden sm:block">
+                <img
+                  src="/images/government/policy-analytics.jpg"
+                  alt="State Department of Skills and Vocational Training analytics chamber"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, transparent 0%, var(--bg-surface) 100%)' }} />
+              </div>
+              <div style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                  <AIBadge type="live" label="TELEMETRY-GROUNDED REASONING" />
+                  <span style={{ fontSize: 11, color: 'var(--gold)', fontWeight: 700 }}>Maharashtra State Skill Development Society (MSSDS)</span>
+                </div>
+                <div className="font-display" style={{ fontSize: 15, fontWeight: 800, color: '#f8fafc' }}>
+                  Macro-Level Policy Formulation & Budget Allocation Engine
+                </div>
+                <p style={{ fontSize: 12, color: 'var(--text-secondary)', margin: '4px 0 0', lineHeight: 1.5 }}>
+                  The Policy Copilot correlates multi-district training throughput against 90-day retention and industrial wage gains to recommend evidence-backed scheme interventions.
+                </p>
+              </div>
+            </div>
+
             {/* AI Policy Copilot Interactive Query Panel */}
             <div className="card-linear" style={{ padding: 24, borderRadius: 14, marginBottom: 24, border: '1px solid rgba(245,158,11,0.3)' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, flexWrap: 'wrap', gap: 10 }}>
@@ -1250,20 +1311,23 @@ export default function GovernmentMacroDashboardPage() {
                     key={idx}
                     type="button"
                     onClick={() => {
-                      const text = sq.replace('⚡ ', '');
-                      setCopilotQuery(text);
+                      setCopilotQuery(sq);
                     }}
                     style={{
                       fontSize: 11.5,
-                      padding: '4px 10px',
+                      padding: '5px 10px',
                       borderRadius: 6,
                       background: 'rgba(255,255,255,0.03)',
                       border: '1px solid var(--border)',
                       color: '#cbd5e1',
                       cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 6,
                     }}
                   >
-                    {sq}
+                    <Sparkles size={12} style={{ color: 'var(--gold)', flexShrink: 0 }} />
+                    <span>{sq}</span>
                   </button>
                 ))}
               </div>

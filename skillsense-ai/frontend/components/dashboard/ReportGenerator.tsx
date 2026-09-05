@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { CheckCircle2, AlertTriangle } from 'lucide-react';
 import api from '@/lib/api';
 import type { ReportConfig } from '../../types/charts';
 
@@ -222,8 +223,9 @@ export default function ReportGenerator({ onGenerate }: Props) {
 
             {/* Status message */}
             {status && (
-                <div style={{ marginBottom: 12, fontSize: 12, color: status.ok ? '#22c55e' : '#ef4444', lineHeight: 1.4 }}>
-                    {status.ok ? '✓ ' : '⚠ '}{status.text}
+                <div style={{ marginBottom: 12, fontSize: 12, color: status.ok ? '#22c55e' : '#ef4444', lineHeight: 1.4, display: 'flex', alignItems: 'center', gap: 6 }}>
+                    {status.ok ? <CheckCircle2 size={14} aria-hidden="true" /> : <AlertTriangle size={14} aria-hidden="true" />}
+                    <span>{status.text}</span>
                 </div>
             )}
 

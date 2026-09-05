@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { X, CheckCircle2 } from 'lucide-react';
 import type { Intervention } from '../../types/charts';
 import { useDashboardStore } from '../../store/dashboardStore';
 
@@ -118,20 +119,26 @@ export default function InterventionFeed({ items, maxVisible = 6 }: Props) {
                                     {item.message}
                                 </p>
                                 <button
-                                    onClick={() => dismissIntervention(item.id)}
+                                    type="button"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        dismissIntervention(item.id);
+                                    }}
                                     style={{
                                         background: 'none',
                                         border: 'none',
                                         color: MUTED,
                                         cursor: 'pointer',
                                         padding: '0 0 0 8px',
-                                        fontSize: 14,
-                                        lineHeight: 1,
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
                                         flexShrink: 0,
                                     }}
                                     title="Dismiss"
+                                    aria-label="Dismiss intervention"
                                 >
-                                    ✕
+                                    <X size={14} aria-hidden="true" />
                                 </button>
                             </div>
                             <div
@@ -166,9 +173,14 @@ export default function InterventionFeed({ items, maxVisible = 6 }: Props) {
                         textAlign: 'center',
                         color: MUTED,
                         fontSize: 13,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: 6,
                     }}
                 >
-                    ✓ No active interventions
+                    <CheckCircle2 size={15} style={{ color: '#10b981' }} aria-hidden="true" />
+                    <span>No active interventions</span>
                 </div>
             )}
         </div>

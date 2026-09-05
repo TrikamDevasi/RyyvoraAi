@@ -39,6 +39,7 @@ import {
   Database,
   Target,
   Code,
+  Settings,
 } from 'lucide-react';
 
 import { AIBadge } from '@/components/ui/AIBadge';
@@ -259,7 +260,32 @@ export default function LandingPage() {
           background: 'var(--bg)',
         }}
       >
-        {/* Subtle Maharashtra Workforce Intelligence Silhouette Background */}
+        {/* Subtle Maharashtra Workforce Intelligence & Human Skilling Ecosystem Background */}
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: '100%',
+            maxWidth: 1360,
+            height: '100%',
+            opacity: 0.10,
+            pointerEvents: 'none',
+            zIndex: 0,
+            maskImage: 'radial-gradient(ellipse 75% 65% at 50% 35%, black 20%, transparent 80%)',
+            WebkitMaskImage: 'radial-gradient(ellipse 75% 65% at 50% 35%, black 20%, transparent 80%)',
+          }}
+          aria-hidden="true"
+        >
+          <img
+            src="/images/landing/hero-workforce-ecosystem.jpg"
+            alt=""
+            style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 25%', filter: 'grayscale(35%) contrast(85%)' }}
+            loading="eager"
+          />
+        </div>
+
         <div
           style={{
             position: 'absolute',
@@ -269,8 +295,7 @@ export default function LandingPage() {
             width: '100%',
             maxWidth: 1000,
             height: '75%',
-            opacity: 0.09,
-            filter: 'grayscale(60%) contrast(75%)',
+            opacity: 0.08,
             pointerEvents: 'none',
             zIndex: 0,
             maskImage: 'radial-gradient(ellipse 70% 60% at 50% 40%, black 25%, transparent 80%)',
@@ -493,8 +518,9 @@ export default function LandingPage() {
                     <div className="font-display" style={{ fontSize: 32, fontWeight: 900, color: 'var(--text-primary)', marginTop: 2 }}>
                       84<span style={{ fontSize: 16, color: 'var(--text-muted)' }}>/100</span>
                     </div>
-                    <div style={{ fontSize: 12, color: 'var(--success)', fontWeight: 600, marginTop: 4 }}>
-                      ✓ NSQF Level 5 (Software Engineering)
+                    <div style={{ fontSize: 12, color: 'var(--success)', fontWeight: 600, marginTop: 4, display: 'flex', alignItems: 'center', gap: 5 }}>
+                      <CheckCircle2 size={13} />
+                      <span>NSQF Level 5 (Software Engineering)</span>
                     </div>
                     <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 8 }}>
                       Top Strengths: TypeScript, Node.js REST APIs, Database Optimization.
@@ -797,6 +823,15 @@ export default function LandingPage() {
               }
             >
               <div>
+                <div style={{ marginBottom: 16, overflow: 'hidden', borderRadius: 10, border: '1px solid rgba(255,255,255,0.08)' }}>
+                  <ResponsiveImage
+                    src="/images/training/code-diagnostic.jpg"
+                    alt="Multi-modal neural skill extraction and code diagnostic evaluation in Pune lab"
+                    aspectRatio="16 / 9"
+                    borderRadius={10}
+                    overlayGradient="subtle"
+                  />
+                </div>
                 <div
                   className="tech-feature-icon"
                   style={{
@@ -841,6 +876,15 @@ export default function LandingPage() {
               }
             >
               <div>
+                <div style={{ marginBottom: 16, overflow: 'hidden', borderRadius: 10, border: '1px solid rgba(255,255,255,0.08)' }}>
+                  <ResponsiveImage
+                    src="/images/workforce/career-pathways.jpg"
+                    alt="Predictive career matching and Indian tech salary trajectories in modern workspace"
+                    aspectRatio="16 / 9"
+                    borderRadius={10}
+                    overlayGradient="subtle"
+                  />
+                </div>
                 <div
                   className="tech-feature-icon"
                   style={{
@@ -885,6 +929,15 @@ export default function LandingPage() {
               }
             >
               <div>
+                <div style={{ marginBottom: 16, overflow: 'hidden', borderRadius: 10, border: '1px solid rgba(255,255,255,0.08)' }}>
+                  <ResponsiveImage
+                    src="/images/training/skill-gap-analysis.jpg"
+                    alt="Dynamic skill gap analysis and NSQF competency roadmap review"
+                    aspectRatio="16 / 9"
+                    borderRadius={10}
+                    overlayGradient="subtle"
+                  />
+                </div>
                 <div
                   className="tech-feature-icon"
                   style={{
@@ -929,6 +982,15 @@ export default function LandingPage() {
               }
             >
               <div>
+                <div style={{ marginBottom: 16, overflow: 'hidden', borderRadius: 10, border: '1px solid rgba(255,255,255,0.08)' }}>
+                  <ResponsiveImage
+                    src="/images/credentials/credential-passport.jpg"
+                    alt="Tamper-proof digital skill passport certificate with SHA-256 HMAC ledger signature"
+                    aspectRatio="16 / 9"
+                    borderRadius={10}
+                    overlayGradient="subtle"
+                  />
+                </div>
                 <div
                   className="tech-feature-icon"
                   style={{
@@ -973,6 +1035,15 @@ export default function LandingPage() {
               }
             >
               <div>
+                <div style={{ marginBottom: 16, overflow: 'hidden', borderRadius: 10, border: '1px solid rgba(255,255,255,0.08)' }}>
+                  <ResponsiveImage
+                    src="/images/training/diagnostic-quiz.jpg"
+                    alt="Proctored online technical assessment hall and candidate diagnostic evaluation"
+                    aspectRatio="16 / 9"
+                    borderRadius={10}
+                    overlayGradient="subtle"
+                  />
+                </div>
                 <div
                   className="tech-feature-icon"
                   style={{
@@ -1017,6 +1088,15 @@ export default function LandingPage() {
               }
             >
               <div>
+                <div style={{ marginBottom: 16, overflow: 'hidden', borderRadius: 10, border: '1px solid rgba(255,255,255,0.08)' }}>
+                  <ResponsiveImage
+                    src="/images/government/policy-intelligence.jpg"
+                    alt="Public sector data analyst examining regional workforce intelligence and policy interventions"
+                    aspectRatio="16 / 9"
+                    borderRadius={10}
+                    overlayGradient="subtle"
+                  />
+                </div>
                 <div
                   className="tech-feature-icon"
                   style={{
@@ -1207,94 +1287,170 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── 7. How It Works (4 Clean Steps) ── */}
+      {/* ── 7. How It Works (7-Stage Longitudinal Workforce Journey) ── */}
       <section id="how-it-works" style={{ padding: '80px 24px', background: 'var(--bg-surface)' }}>
-        <div style={{ maxWidth: 1140, margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 50 }}>
-            <AIBadge type="nsqf" label="SIMPLE 4-STEP WORKFLOW" />
-            <h2 className="font-display" style={{ fontSize: 'clamp(26px, 3.5vw, 38px)', fontWeight: 800, color: '#f8fafc', margin: '8px 0 10px' }}>
-              How SkillSense Works
+        <div style={{ maxWidth: 1240, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 46 }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+              <AIBadge type="nsqf" label="7-STAGE WORKFORCE JOURNEY" />
+              <AIBadge type="verified" label="END-TO-END OUTCOME ARCHITECTURE" />
+            </div>
+            <h2 className="font-display" style={{ fontSize: 'clamp(26px, 3.5vw, 40px)', fontWeight: 800, color: '#f8fafc', margin: '0 0 12px' }}>
+              The SkillSense <span style={{ color: 'var(--gold, #f59e0b)' }}>Workforce Outcome Journey</span>
             </h2>
-            <p style={{ color: 'var(--text-secondary)', fontSize: 15 }}>
-              From initial profile ingestion to cryptographic passport verification.
+            <p style={{ color: 'var(--text-secondary)', fontSize: 15, maxWidth: 740, margin: '0 auto' }}>
+              Following what happens to candidates after skilling — connecting vocational training, NSQF proctored assessment, state certification, campus placement, employer verification, 365-day retention, and policy intelligence.
             </p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: 16 }}>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+              gap: 16,
+            }}
+          >
             {[
               {
                 num: '01',
-                title: 'Submit Profile & Code',
-                desc: 'Paste your resume, link a public GitHub repository, or describe technical project architecture.',
+                title: 'Vocational Training',
+                desc: 'Technical lab instruction aligned with NSQF Levels 4-7 across accredited ITIs and skilling centers.',
+                image: '/images/training/training-lab.jpg',
+                alt: 'Indian technical students learning microcontrollers and circuit diagnostics in an ITI laboratory',
                 icon: FileText,
                 accent: '#f59e0b',
-                phase: 'PHASE 01 · INGESTION',
+                phase: '01 · TRAINING LAB',
                 specs: [
-                  'Multi-format PDF/Word OCR Parsing',
-                  'GitHub API AST Abstract Syntax Tree',
-                  'DPDP Sovereign Consent Encryption',
+                  'Electronics, Cloud & Core Trades',
+                  'NCVET Aligned Coursework',
+                  'Hands-on Hardware Lab Hours',
                 ],
-                metric: 'Latency: <800ms · 99.4% Parsing Accuracy',
+                metric: '1,200+ Accredited ITIs & Centers',
               },
               {
                 num: '02',
-                title: 'Multi-Vector AI Extraction',
-                desc: 'Neural models extract competencies across 50+ technical, architectural, and soft skill vectors.',
+                title: 'Proctored Assessment',
+                desc: 'Timed, multi-domain cognitive and code syntax evaluations across 50+ technical competency dimensions.',
+                image: '/images/training/assessment-testing.jpg',
+                alt: 'Indian candidates taking proctored online NSQF technical certification exams in a testing hall',
                 icon: Brain,
                 accent: '#60a5fa',
-                phase: 'PHASE 02 · NEURAL EXTRACTION',
+                phase: '02 · NSQF ASSESSMENT',
                 specs: [
-                  '50+ Dimension Competency Embeddings',
-                  'NSQF Level 4-7 Taxonomy Mapping',
-                  'Multi-Provider LLM Consensus Verification',
+                  'Multi-Axis Radar Extraction',
+                  'AI Anti-Cheating Telemetry',
+                  'Dynamic Question Synthesis',
                 ],
-                metric: 'Zero-Hallucination Safe Zod Schemas',
+                metric: 'Zero Hallucination Zod Schemas',
               },
               {
                 num: '03',
-                title: 'Identify Gaps & Milestones',
-                desc: 'Instant gap analysis benchmarks your capabilities against top tech employers in India.',
-                icon: Layers,
-                accent: '#f59e0b',
-                phase: 'PHASE 03 · GAP BENCHMARK',
+                title: 'State Certification',
+                desc: 'Issuance of authenticated digital certificates sealed with official government authority marks.',
+                image: '/images/credentials/digital-credential.jpg',
+                alt: 'Official Government of Maharashtra verified digital skill credential and skill passport certificate',
+                icon: Award,
+                accent: '#10b981',
+                phase: '03 · STATE CREDENTIAL',
                 specs: [
-                  'Real-Time Enterprise Requisition Match',
-                  'Severity-Weighted Shortage Matrix',
-                  'Milestone-by-Milestone Timeline Roadmap',
+                  'Government Directorate Seal',
+                  'Tamper-Proof Ledger Stamp',
+                  'Micro-Print Security Guilloche',
                 ],
-                metric: 'Live Market Grounding via Perplexity Sonar',
+                metric: '100% Legally Recognized Record',
               },
               {
                 num: '04',
-                title: 'Issue Verifiable Passport',
-                desc: 'Receive a cryptographically signed digital credential to share with employers and recruiters.',
-                icon: ShieldCheck,
-                accent: '#10b981',
-                phase: 'PHASE 04 · CREDENTIAL MINT',
+                title: 'Enterprise Placement',
+                desc: 'Graduates matched directly to industrial tech, manufacturing, and IT corridors across Maharashtra.',
+                image: '/images/workforce/workplace-employment.jpg',
+                alt: 'Newly hired Indian engineering graduates collaborating at modern technology workstation in Pune',
+                icon: Briefcase,
+                accent: '#c084fc',
+                phase: '04 · CAMPUS PLACEMENT',
                 specs: [
-                  'SHA-256 HMAC Immutable Ledger Signature',
-                  '1-Click Instant Recruiter Verification QR',
-                  'Sovereign Candidate Credential Revocation',
+                  'High-Frequency Job Matching',
+                  'Direct Recruiter Fast-Tracking',
+                  'Pre-Assessed Candidate Pools',
                 ],
-                metric: 'Govt & Enterprise Interoperable Record',
+                metric: 'Average Starting: ₹7.80 LPA',
+              },
+              {
+                num: '05',
+                title: 'Employer Verification',
+                desc: 'Hiring managers instantly validate candidate competencies directly against the state ledger.',
+                image: '/images/employers/employer-verification.jpg',
+                alt: 'Corporate HR leaders validating candidate cryptographic skill passports and NSQF scores on screen',
+                icon: ShieldCheck,
+                accent: '#f59e0b',
+                phase: '05 · LEDGER VERIFICATION',
+                specs: [
+                  '1-Click SHA-256 Hash Query',
+                  'Instant Recruiter QR Scan',
+                  'Zero Resume Keyword Fraud',
+                ],
+                metric: '<800ms Verification Latency',
+              },
+              {
+                num: '06',
+                title: '365-Day Retention',
+                desc: 'Tracking 30-day, 90-day, 180-day, and 365-day industry tenure to ensure sustainable career stability.',
+                image: '/images/workforce/career-progression.jpg',
+                alt: 'Senior Indian engineering mentor reviewing career progression and system scalability with junior engineer',
+                icon: TrendingUp,
+                accent: '#10b981',
+                phase: '06 · TENURE & WAGE GROWTH',
+                specs: [
+                  'Automated Follow-up Check-ins',
+                  'Milestone Promotion Tracking',
+                  'Longitudinal Wage Analytics',
+                ],
+                metric: '91.8% Retention Across Cohorts',
+              },
+              {
+                num: '07',
+                title: 'Policy Intelligence',
+                desc: 'State policymakers synthesize district data to allocate funding and forecast emerging workforce trends.',
+                image: '/images/government/policy-analytics.jpg',
+                alt: 'Public policy analyst in Maharashtra Directorate of Skill Development evaluating district telemetry',
+                icon: Landmark,
+                accent: '#06b6d4',
+                phase: '07 · STATE POLICY INSIGHT',
+                specs: [
+                  '36-District Heatmap Intelligence',
+                  'Grounded AI Policy Copilot',
+                  'Empirical Budget Optimizations',
+                ],
+                metric: 'Data-Driven Sovereign Decisions',
               },
             ].map((step, i) => {
               const IconComp = step.icon;
               return (
-                <div key={i} className="flip-card-container">
+                <div key={i} className="flip-card-container" style={{ minHeight: 330 }}>
                   <div className="flip-card-inner">
                     {/* ── Front Side ── */}
-                    <div className="flip-card-front card-shine">
+                    <div className="flip-card-front card-shine" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: 18 }}>
                       <div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                          <span className="font-display" style={{ fontSize: 30, fontWeight: 800, color: 'var(--gold, #f59e0b)' }}>
+                        {/* Compact Visual Thumbnail */}
+                        <div style={{ marginBottom: 12, borderRadius: 8, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.08)' }}>
+                          <ResponsiveImage
+                            src={step.image}
+                            alt={step.alt}
+                            aspectRatio="16 / 9"
+                            borderRadius={8}
+                            overlayGradient="subtle"
+                          />
+                        </div>
+
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                          <span className="font-display" style={{ fontSize: 24, fontWeight: 800, color: step.accent }}>
                             {step.num}
                           </span>
                           <div
                             style={{
-                              width: 36,
-                              height: 36,
-                              borderRadius: 10,
+                              width: 32,
+                              height: 32,
+                              borderRadius: 8,
                               background: 'rgba(255,255,255,0.03)',
                               border: `1px solid ${step.accent}40`,
                               display: 'flex',
@@ -1303,14 +1459,14 @@ export default function LandingPage() {
                               color: step.accent,
                             }}
                           >
-                            <IconComp size={18} />
+                            <IconComp size={16} />
                           </div>
                         </div>
 
-                        <h3 style={{ fontSize: 15, fontWeight: 700, color: '#f8fafc', margin: '0 0 8px' }}>
+                        <h3 style={{ fontSize: 14.5, fontWeight: 700, color: '#f8fafc', margin: '0 0 6px' }}>
                           {step.title}
                         </h3>
-                        <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.5, margin: 0 }}>
+                        <p style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.45, margin: 0 }}>
                           {step.desc}
                         </p>
                       </div>
@@ -1321,31 +1477,32 @@ export default function LandingPage() {
                           display: 'flex',
                           alignItems: 'center',
                           gap: 6,
-                          paddingTop: 12,
+                          paddingTop: 10,
                           borderTop: '1px solid rgba(255,255,255,0.06)',
-                          color: 'var(--gold)',
-                          fontSize: 11,
+                          color: step.accent,
+                          fontSize: 10.5,
                           fontWeight: 700,
+                          marginTop: 10,
                         }}
                       >
-                        <span style={{ fontSize: 13 }}>↻</span>
+                        <span style={{ fontSize: 12 }}>↻</span>
                         <span>Hover to flip specifications</span>
                       </div>
                     </div>
 
                     {/* ── Back Side (Revealed on 3D Flip) ── */}
-                    <div className="flip-card-back">
+                    <div className="flip-card-back" style={{ padding: 18 }}>
                       <div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
                           <span style={{ fontSize: 10, fontWeight: 800, color: step.accent, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
                             {step.phase}
                           </span>
-                          <span style={{ fontSize: 10, padding: '2px 6px', borderRadius: 4, background: 'rgba(16,185,129,0.15)', color: '#10b981', fontWeight: 800, border: '1px solid rgba(16,185,129,0.3)' }}>
-                            ACTIVE
+                          <span style={{ fontSize: 9.5, padding: '2px 6px', borderRadius: 4, background: 'rgba(16,185,129,0.15)', color: '#10b981', fontWeight: 800, border: '1px solid rgba(16,185,129,0.3)' }}>
+                            VERIFIED
                           </span>
                         </div>
 
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, margin: '8px 0' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, margin: '12px 0' }}>
                           {step.specs.map((spec, sIdx) => (
                             <div key={sIdx} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11.5, color: '#f1f5f9' }}>
                               <span style={{ color: step.accent, fontSize: 12 }}>▹</span>
@@ -1355,8 +1512,9 @@ export default function LandingPage() {
                         </div>
                       </div>
 
-                      <div style={{ paddingTop: 10, borderTop: '1px solid rgba(255,255,255,0.08)', fontSize: 10.5, color: 'var(--text-muted)' }}>
-                        ✓ {step.metric}
+                      <div style={{ paddingTop: 10, borderTop: '1px solid rgba(255,255,255,0.08)', fontSize: 10.5, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 5 }}>
+                        <CheckCircle2 size={12} style={{ color: 'var(--success)', flexShrink: 0 }} />
+                        <span>{step.metric}</span>
                       </div>
                     </div>
                   </div>
@@ -1417,13 +1575,14 @@ export default function LandingPage() {
             }}
           >
             {[
-              { id: 'student', name: '🎓 Student / Trainee', color: '#10B981' },
-              { id: 'employer', name: '💼 Hiring Employer', color: '#C084FC' },
-              { id: 'institute', name: '🏛️ Training Institute', color: '#60A5FA' },
-              { id: 'government', name: '🌐 State Government', color: '#F59E0B' },
-              { id: 'industry', name: '🏭 Sector Council (SSC)', color: '#EC4899' },
-              { id: 'admin', name: '⚙️ Platform Admin', color: '#94A3B8' },
+              { id: 'student', name: 'Student / Trainee', icon: GraduationCap, color: '#10B981' },
+              { id: 'employer', name: 'Hiring Employer', icon: Building2, color: '#C084FC' },
+              { id: 'institute', name: 'Training Institute', icon: School, color: '#60A5FA' },
+              { id: 'government', name: 'State Government', icon: Landmark, color: '#F59E0B' },
+              { id: 'industry', name: 'Sector Council (SSC)', icon: Layers, color: '#EC4899' },
+              { id: 'admin', name: 'Platform Admin', icon: Settings, color: '#94A3B8' },
             ].map((tab) => {
+              const TabIcon = tab.icon;
               const isActive = activeRoleTab === tab.id;
               return (
                 <button
@@ -1441,9 +1600,13 @@ export default function LandingPage() {
                     cursor: 'pointer',
                     transition: 'all 0.15s ease',
                     boxShadow: isActive ? '0 4px 18px rgba(245,158,11,0.25)' : 'none',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 8,
                   }}
                 >
-                  {tab.name}
+                  <TabIcon size={15} color={isActive ? '#090a0f' : tab.color} />
+                  <span>{tab.name}</span>
                 </button>
               );
             })}
@@ -1815,7 +1978,7 @@ export default function LandingPage() {
 
             {activeRoleTab === 'industry' && (
               <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16, marginBottom: 24, borderBottom: '1px solid var(--border)', paddingBottom: 20 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 24, alignItems: 'center', marginBottom: 28, borderBottom: '1px solid var(--border)', paddingBottom: 24 }}>
                   <div>
                     <span style={{ fontSize: 11, fontWeight: 800, color: '#EC4899', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                       Sector Skill Council (SSC) Workspace
@@ -1823,18 +1986,35 @@ export default function LandingPage() {
                     <h3 className="font-display" style={{ fontSize: 24, fontWeight: 900, color: '#f8fafc', margin: '4px 0 6px' }}>
                       Industry & Sector Skill Demand Intelligence
                     </h3>
-                    <p style={{ color: 'var(--text-secondary)', fontSize: 13.5, margin: 0, maxWidth: 640 }}>
-                      Calibrate National Occupational Standards (NOS), forecast emerging tech surges (GenAI, Cloud), and map talent availability heatmaps.
+                    <p style={{ color: 'var(--text-secondary)', fontSize: 13.5, margin: '0 0 18px', maxWidth: 560, lineHeight: 1.6 }}>
+                      Calibrate National Occupational Standards (NOS), forecast emerging tech surges (GenAI, Cloud), and map regional talent availability heatmaps.
                     </p>
+                    <Link
+                      href="/industry"
+                      className="btn-gold"
+                      style={{ fontSize: 13, padding: '10px 22px', display: 'inline-flex', alignItems: 'center', gap: 8 }}
+                    >
+                      <span>Launch Industry Suite</span>
+                      <ArrowRight size={15} />
+                    </Link>
                   </div>
-                  <Link
-                    href="/industry"
-                    className="btn-gold"
-                    style={{ fontSize: 13, padding: '10px 22px', display: 'flex', alignItems: 'center', gap: 8 }}
-                  >
-                    <span>Launch Industry Suite</span>
-                    <ArrowRight size={15} />
-                  </Link>
+
+                  <div style={{ maxWidth: 420, justifySelf: 'end', width: '100%' }}>
+                    <div style={{ position: 'relative', borderRadius: 12, overflow: 'hidden', border: '1px solid rgba(236,72,153,0.3)', boxShadow: '0 12px 32px -8px rgba(0,0,0,0.6)' }}>
+                      <ResponsiveImage
+                        src="/images/stakeholders/industry-council.jpg"
+                        alt="Indian Sector Skill Council leaders and engineering heads reviewing technical qualifications in automotive facility"
+                        aspectRatio="16 / 9"
+                        borderRadius={12}
+                        overlayGradient="subtle"
+                      />
+                      <div style={{ position: 'absolute', bottom: 8, left: 10, right: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center', pointerEvents: 'none' }}>
+                        <span style={{ fontSize: 10.5, fontWeight: 800, color: '#f8fafc', background: 'rgba(11,15,23,0.85)', padding: '3px 8px', borderRadius: 4, border: '1px solid rgba(255,255,255,0.1)' }}>
+                          Automotive & Tech SSC · Standards Board
+                        </span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
@@ -1885,7 +2065,7 @@ export default function LandingPage() {
 
             {activeRoleTab === 'admin' && (
               <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16, marginBottom: 24, borderBottom: '1px solid var(--border)', paddingBottom: 20 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 24, alignItems: 'center', marginBottom: 28, borderBottom: '1px solid var(--border)', paddingBottom: 24 }}>
                   <div>
                     <span style={{ fontSize: 11, fontWeight: 800, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                       System Governance & Audit Workspace
@@ -1893,18 +2073,35 @@ export default function LandingPage() {
                     <h3 className="font-display" style={{ fontSize: 24, fontWeight: 900, color: '#f8fafc', margin: '4px 0 6px' }}>
                       Platform Administrator & Audit Center
                     </h3>
-                    <p style={{ color: 'var(--text-secondary)', fontSize: 13.5, margin: 0, maxWidth: 640 }}>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: 13.5, margin: '0 0 18px', maxWidth: 560, lineHeight: 1.6 }}>
                       Manage decentralized ledger integrity, audit algorithmic fairness models, monitor LLM telemetry, and oversee DPDP compliance.
                     </p>
+                    <Link
+                      href="/admin"
+                      className="btn-gold"
+                      style={{ fontSize: 13, padding: '10px 22px', display: 'inline-flex', alignItems: 'center', gap: 8 }}
+                    >
+                      <span>Launch Admin Center</span>
+                      <ArrowRight size={15} />
+                    </Link>
                   </div>
-                  <Link
-                    href="/admin"
-                    className="btn-gold"
-                    style={{ fontSize: 13, padding: '10px 22px', display: 'flex', alignItems: 'center', gap: 8 }}
-                  >
-                    <span>Launch Admin Center</span>
-                    <ArrowRight size={15} />
-                  </Link>
+
+                  <div style={{ maxWidth: 420, justifySelf: 'end', width: '100%' }}>
+                    <div style={{ position: 'relative', borderRadius: 12, overflow: 'hidden', border: '1px solid rgba(148,163,184,0.3)', boxShadow: '0 12px 32px -8px rgba(0,0,0,0.6)' }}>
+                      <ResponsiveImage
+                        src="/images/stakeholders/admin-governance.jpg"
+                        alt="State government data operations center engineers monitoring server telemetry and cryptographic ledgers"
+                        aspectRatio="16 / 9"
+                        borderRadius={12}
+                        overlayGradient="subtle"
+                      />
+                      <div style={{ position: 'absolute', bottom: 8, left: 10, right: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center', pointerEvents: 'none' }}>
+                        <span style={{ fontSize: 10.5, fontWeight: 800, color: '#f8fafc', background: 'rgba(11,15,23,0.85)', padding: '3px 8px', borderRadius: 4, border: '1px solid rgba(255,255,255,0.1)' }}>
+                          State IT Center · System Audit Node
+                        </span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
@@ -2141,7 +2338,10 @@ export default function LandingPage() {
             <div style={{ padding: 20, background: 'var(--bg-surface)', borderRadius: 14, border: '1px solid var(--border)', maxWidth: 420, width: '100%' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border)', paddingBottom: 10, marginBottom: 12 }}>
                 <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-primary)' }}>Digital Passport #SKP-7819</div>
-                <span style={{ fontSize: 10, color: '#10b981', fontWeight: 700 }}>✓ VERIFIED (DEMO SAMPLE)</span>
+                <span style={{ fontSize: 10, color: '#10b981', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                  <CheckCircle2 size={11} />
+                  <span>VERIFIED (DEMO SAMPLE)</span>
+                </span>
               </div>
               <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginBottom: 6 }}>Candidate: Arjun Mehta (illustrative)</div>
               <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginBottom: 6 }}>NSQF Tier: Level 5 (Advanced Diploma)</div>
@@ -2156,41 +2356,75 @@ export default function LandingPage() {
 
       {/* ── 10. Algorithmic Fairness & Trust Governance ── */}
       <section id="trust" style={{ padding: '80px 24px' }}>
-        <div style={{ maxWidth: 1140, margin: '0 auto', textAlign: 'center' }}>
-          <AIBadge type="verified" label="ALGORITHMIC GOVERNANCE" />
-          <h2 className="font-display" style={{ fontSize: 'clamp(24px, 3vw, 36px)', fontWeight: 800, color: '#f8fafc', margin: '8px 0 12px' }}>
-            Built on Rigorous Bias Monitoring & Ethical AI
-          </h2>
-          <p style={{ color: 'var(--text-secondary)', fontSize: 14.5, maxWidth: 640, margin: '0 auto 40px' }}>
-            SkillSense includes an active fairness auditing engine that monitors demographic parity across gender, states, and institution types to ensure merit-based opportunities.
-          </p>
+        <div style={{ maxWidth: 1140, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 40 }}>
+            <AIBadge type="verified" label="ALGORITHMIC GOVERNANCE & TRUST" />
+            <h2 className="font-display" style={{ fontSize: 'clamp(24px, 3vw, 36px)', fontWeight: 800, color: '#f8fafc', margin: '8px 0 12px' }}>
+              Built on Rigorous Bias Monitoring & Ethical AI
+            </h2>
+            <p style={{ color: 'var(--text-secondary)', fontSize: 14.5, maxWidth: 640, margin: '0 auto' }}>
+              SkillSense includes an active fairness auditing engine that monitors demographic parity across gender, states, and institution types to ensure merit-based opportunities.
+            </p>
+          </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 16, textAlign: 'left' }}>
-            <div className="card-linear" style={{ padding: 20 }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: '#10b981', marginBottom: 6, display: 'flex', alignItems: 'center', gap: 6 }}>
-                <ShieldCheck size={16} /> Disparate Impact Auditing
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 20, alignItems: 'stretch' }}>
+            {/* Visual Trust Card */}
+            <div className="card-elevated" style={{ borderRadius: 'var(--radius-lg)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+              <div style={{ height: 220, position: 'relative' }}>
+                <ResponsiveImage
+                  src="/images/credentials/dpdp-trust-security.jpg"
+                  alt="Government data sovereignty and algorithmic fairness verification center"
+                  aspectRatio="16/9"
+                  overlayGradient="navy"
+                  style={{ height: '100%', width: '100%' }}
+                />
+                <div style={{ position: 'absolute', bottom: 12, left: 12, right: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '4px 10px', borderRadius: 6, background: 'rgba(11, 15, 23, 0.85)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.1)', fontSize: 11, fontWeight: 700, color: '#10b981' }}>
+                    <ShieldCheck size={14} /> DPDP Act 2023 Compliant
+                  </div>
+                  <span style={{ fontSize: 10.5, fontWeight: 700, color: '#94a3b8', background: 'rgba(11, 15, 23, 0.85)', padding: '3px 8px', borderRadius: 4 }}>
+                    ISO-27001 Tier
+                  </span>
+                </div>
               </div>
-              <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', margin: 0, lineHeight: 1.5 }}>
-                Enforces the 80% (4/5ths) rule on recommendation and evaluation algorithms to prevent systemic bias.
-              </p>
+              <div style={{ padding: 18, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 4 }}>
+                  Audited Demographic Parity & Sovereign Hosting
+                </div>
+                <p style={{ fontSize: 12, color: 'var(--text-secondary)', margin: 0, lineHeight: 1.5 }}>
+                  All candidate inference, credential records, and enterprise telemetry run strictly within sovereign cloud boundaries with automated disparate-impact mitigation.
+                </p>
+              </div>
             </div>
 
-            <div className="card-linear" style={{ padding: 20 }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: '#60a5fa', marginBottom: 6, display: 'flex', alignItems: 'center', gap: 6 }}>
-                <Lock size={16} /> Complete Secret Isolation
+            {/* Feature List */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <div className="card-linear" style={{ padding: 18, flex: 1 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#10b981', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <ShieldCheck size={16} /> Disparate Impact Auditing
+                </div>
+                <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', margin: 0, lineHeight: 1.5 }}>
+                  Enforces the 80% (4/5ths) rule on recommendation and evaluation algorithms to prevent systemic bias across gender and socio-economic cohorts.
+                </p>
               </div>
-              <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', margin: 0, lineHeight: 1.5 }}>
-                All LLM provider keys and HMAC signing secrets remain strictly on the server and are never exposed to clients.
-              </p>
-            </div>
 
-            <div className="card-linear" style={{ padding: 20 }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--gold)', marginBottom: 6, display: 'flex', alignItems: 'center', gap: 6 }}>
-                <Zap size={16} /> Explainable Competency Models
+              <div className="card-linear" style={{ padding: 18, flex: 1 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#60a5fa', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <Lock size={16} /> Complete Secret Isolation
+                </div>
+                <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', margin: 0, lineHeight: 1.5 }}>
+                  All LLM provider keys and HMAC signing secrets remain strictly on the server and are never exposed to clients or third-party trackers.
+                </p>
               </div>
-              <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', margin: 0, lineHeight: 1.5 }}>
-                Every score is backed by granular evidence snippets, model confidence metrics, and clear improvement plans.
-              </p>
+
+              <div className="card-linear" style={{ padding: 18, flex: 1 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--gold)', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <Zap size={16} /> Explainable Competency Models
+                </div>
+                <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', margin: 0, lineHeight: 1.5 }}>
+                  Every score is backed by granular evidence snippets, model confidence metrics, and clear national NSQF qualification mappings.
+                </p>
+              </div>
             </div>
           </div>
         </div>

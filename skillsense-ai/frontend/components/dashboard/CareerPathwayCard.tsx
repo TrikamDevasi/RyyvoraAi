@@ -1,6 +1,6 @@
 import React from 'react';
 import type { CareerPathway } from '@/types/charts';
-import { Briefcase, TrendingUp, Map as MapIcon, ChevronDown, ChevronUp } from 'lucide-react';
+import { Briefcase, TrendingUp, Map as MapIcon, ChevronDown, ChevronUp, Star } from 'lucide-react';
 
 interface Props {
     pathway: CareerPathway;
@@ -77,9 +77,13 @@ export default function CareerPathwayCard({ pathway, onSelect }: Props) {
                         textTransform: 'uppercase',
                         letterSpacing: '0.05em',
                         boxShadow: '0 2px 6px rgba(245, 158, 11, 0.25)',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 3,
                     }}
                 >
-                    ★ Recommended
+                    <Star size={10} style={{ fill: 'currentColor' }} aria-hidden="true" />
+                    <span>Recommended</span>
                 </div>
             )}
 

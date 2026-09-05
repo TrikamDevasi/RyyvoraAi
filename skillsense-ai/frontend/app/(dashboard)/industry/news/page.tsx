@@ -19,9 +19,10 @@ import {
   Share2,
   Tag,
   Briefcase,
-  Factory,
   Handshake,
   Check,
+  IndianRupee,
+  Lock,
 } from 'lucide-react';
 import { FadeIn } from '@/components/shared/FadeIn';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
@@ -301,32 +302,40 @@ export default function IndustryNewsPage() {
           {/* Category Tabs */}
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
             {[
-              { id: 'ALL', label: 'All Industry Wire' },
-              { id: 'ALLIANCE', label: '🤝 Hiring Alliances' },
-              { id: 'SUBSIDY', label: '💰 Corporate Subsidies' },
-              { id: 'NOS_STANDARDS', label: '📜 NOS Qualification Packs' },
-              { id: 'WAGE_SURGE', label: '📈 Wage Intelligence' },
-              { id: 'DPDP_PRIVACY', label: '🔒 DPDP Privacy' },
-            ].map((cat) => (
-              <button
-                key={cat.id}
-                type="button"
-                onClick={() => setSelectedCategory(cat.id)}
-                style={{
-                  padding: '6px 12px',
-                  borderRadius: 6,
-                  fontSize: 12,
-                  fontWeight: 700,
-                  background: selectedCategory === cat.id ? 'var(--gold)' : 'rgba(255,255,255,0.03)',
-                  border: `1px solid ${selectedCategory === cat.id ? 'var(--gold)' : 'var(--border)'}`,
-                  color: selectedCategory === cat.id ? '#090a0f' : '#cbd5e1',
-                  cursor: 'pointer',
-                  transition: 'all 0.15s ease',
-                }}
-              >
-                {cat.label}
-              </button>
-            ))}
+              { id: 'ALL', label: 'All Industry Wire', icon: Newspaper },
+              { id: 'ALLIANCE', label: 'Hiring Alliances', icon: Handshake },
+              { id: 'SUBSIDY', label: 'Corporate Subsidies', icon: IndianRupee },
+              { id: 'NOS_STANDARDS', label: 'NOS Qualification Packs', icon: FileText },
+              { id: 'WAGE_SURGE', label: 'Wage Intelligence', icon: TrendingUp },
+              { id: 'DPDP_PRIVACY', label: 'DPDP Privacy', icon: Lock },
+            ].map((cat) => {
+              const TabIcon = cat.icon;
+              const isActive = selectedCategory === cat.id;
+              return (
+                <button
+                  key={cat.id}
+                  type="button"
+                  onClick={() => setSelectedCategory(cat.id)}
+                  style={{
+                    padding: '6px 12px',
+                    borderRadius: 6,
+                    fontSize: 12,
+                    fontWeight: 700,
+                    background: isActive ? 'var(--gold)' : 'rgba(255,255,255,0.03)',
+                    border: `1px solid ${isActive ? 'var(--gold)' : 'var(--border)'}`,
+                    color: isActive ? '#090a0f' : '#cbd5e1',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
+                  }}
+                >
+                  <TabIcon size={13} color={isActive ? '#090a0f' : 'currentColor'} />
+                  <span>{cat.label}</span>
+                </button>
+              );
+            })}
           </div>
 
           {/* Search Box */}

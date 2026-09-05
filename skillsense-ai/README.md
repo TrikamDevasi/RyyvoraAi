@@ -163,8 +163,9 @@ Pre-seeded accounts ready for jury evaluation:
 | **State Admin** | `admin@skillsense.demo` | `Demo@1234` | SkillSense Chief Administrator | [`/admin`](http://localhost:5173/admin) |
 | **Trainee / Student** | `trainee@skillsense.demo` | `Demo@1234` | Aarav Deshmukh (Certified Trainee) | [`/student/journey`](http://localhost:5173/student/journey) |
 
-> 📖 **Evaluator Demonstration Guide:** For a comprehensive step-by-step evaluator click-through walkthrough, see [DEMO_GUIDE.md](file:///c:/Users/trika/Documents/skillsense/TEAM_QUANTUM_CODERS-SU-/skillsense-ai/DEMO_GUIDE.md).  
-> 📋 **SIH Requirement Traceability Matrix:** For systematic mapping of SIH26135 problem statements to code, APIs, and tests, see [SIH_REQUIREMENT_MATRIX.md](file:///c:/Users/trika/Documents/skillsense/TEAM_QUANTUM_CODERS-SU-/skillsense-ai/SIH_REQUIREMENT_MATRIX.md).
+> 📖 **Evaluator Demonstration Guide:** For a comprehensive step-by-step evaluator click-through walkthrough, see [DEMO_GUIDE.md](file:///c:/Users/trika/Documents/skillsense/TEAM_QUANTUM_CODERS-SU-/skillsense-ai/docs/DEMO_GUIDE.md).  
+> 📋 **SIH Requirement Traceability Matrix:** For systematic mapping of SIH26135 problem statements to code, APIs, and tests, see [SIH_REQUIREMENT_MATRIX.md](file:///c:/Users/trika/Documents/skillsense/TEAM_QUANTUM_CODERS-SU-/skillsense-ai/docs/SIH_REQUIREMENT_MATRIX.md).  
+> 📑 **Master Documentation Index:** Access all platform reports, audits, and architectural specifications in [docs/README.md](file:///c:/Users/trika/Documents/skillsense/TEAM_QUANTUM_CODERS-SU-/skillsense-ai/docs/README.md).
 
 ---
 
@@ -237,7 +238,7 @@ SkillSense AI is deployed on **Vercel Hobby** infrastructure under the repositor
      ```
 6. **Genuine Contributor Attribution**: All commits permanently retain their original author metadata (`git log`), properly crediting every teammate's contributions.
 
-For detailed branching commands, review [CONTRIBUTING.md](file:///c:/Users/trika/Documents/skillsense/TEAM_QUANTUM_CODERS-SU-/skillsense-ai/CONTRIBUTING.md).
+For detailed branching commands, review [docs/CONTRIBUTING.md](file:///c:/Users/trika/Documents/skillsense/TEAM_QUANTUM_CODERS-SU-/skillsense-ai/docs/CONTRIBUTING.md).
 
 ---
 
@@ -245,6 +246,7 @@ For detailed branching commands, review [CONTRIBUTING.md](file:///c:/Users/trika
 
 ```
 skillsense-ai/
+├── docs/                         # Platform Audits, Reports, Architecture & SIH Specs
 ├── frontend/                     # Next.js 15 App Router Frontend
 │   ├── app/                      # Route Handlers & Dashboard Workspaces
 │   │   ├── (dashboard)/          # Authenticated Dashboards

@@ -31,6 +31,8 @@ import {
   Send,
   Zap,
   AlertCircle,
+  MapPin,
+  FileCode,
 } from 'lucide-react';
 import { FadeIn } from '@/components/shared/FadeIn';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
@@ -212,9 +214,34 @@ export default function EmployerPage() {
             alignItems: 'center',
             flexWrap: 'wrap',
             gap: 16,
+            position: 'relative',
+            overflow: 'hidden',
           }}
         >
-          <div>
+          {/* Subtle Industrial Employer Workforce Image Vignette */}
+          <div
+            style={{
+              position: 'absolute',
+              right: 0,
+              top: 0,
+              bottom: 0,
+              width: '36%',
+              minWidth: 240,
+              opacity: 0.16,
+              pointerEvents: 'none',
+              maskImage: 'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.8) 35%, rgba(0,0,0,1) 100%)',
+              WebkitMaskImage: 'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.8) 35%, rgba(0,0,0,1) 100%)',
+            }}
+            aria-hidden="true"
+          >
+            <img
+              src="/images/employers/industrial-employer.jpg"
+              alt=""
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            />
+          </div>
+
+          <div style={{ position: 'relative', zIndex: 1 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, flexWrap: 'wrap' }}>
               <AIBadge type="nsqf" label="ENTERPRISE TALENT SUITE" />
               <AIBadge type="verified" label="NSQF PRE-ASSESSED COHORTS" />
@@ -444,10 +471,19 @@ export default function EmployerPage() {
                     </div>
                   </div>
 
-                  <div style={{ display: 'flex', gap: 12, margin: '10px 0', fontSize: 11.5, color: 'var(--text-muted)' }}>
-                    <span>📍 {c.location}</span>
-                    <span>⚡ Score: <strong style={{ color: 'var(--success)' }}>{c.score}%</strong></span>
-                    <span>💻 Code Audit: <strong style={{ color: 'var(--gold)' }}>{c.githubScore}%</strong></span>
+                  <div style={{ display: 'flex', gap: 14, margin: '10px 0', fontSize: 11.5, color: 'var(--text-muted)', alignItems: 'center' }}>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                      <MapPin size={12} style={{ color: 'var(--text-muted)' }} />
+                      <span>{c.location}</span>
+                    </span>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                      <Zap size={12} style={{ color: 'var(--gold)' }} />
+                      <span>Score: <strong style={{ color: 'var(--success)' }}>{c.score}%</strong></span>
+                    </span>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                      <FileCode size={12} style={{ color: 'var(--info)' }} />
+                      <span>Code Audit: <strong style={{ color: 'var(--gold)' }}>{c.githubScore}%</strong></span>
+                    </span>
                   </div>
 
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginTop: 8 }}>

@@ -6,7 +6,7 @@ import Link from 'next/link';
 
 interface EmptyStateProps {
   icon?: React.ReactNode;
-  illustration?: 'outcomes' | 'candidates' | 'validations' | 'reports';
+  illustration?: 'outcomes' | 'candidates' | 'validations' | 'reports' | 'skill-gap';
   illustrationSrc?: string;
   title: string;
   description: string;
@@ -32,6 +32,10 @@ const ILLUSTRATION_MAP: Record<string, { src: string; alt: string }> = {
   reports: {
     src: '/images/empty-states/no-reports.svg',
     alt: 'District analytics and reporting pipeline illustration',
+  },
+  'skill-gap': {
+    src: '/images/empty-states/no-skill-gap.svg',
+    alt: 'Skills to analytics and career roadmap progression illustration',
   },
 };
 

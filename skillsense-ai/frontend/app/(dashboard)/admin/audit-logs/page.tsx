@@ -19,9 +19,10 @@ import {
   Users,
   Activity,
   Terminal,
-  ExternalLink,
-  X,
   Clock,
+  Scale,
+  IndianRupee,
+  X,
 } from 'lucide-react';
 import { FadeIn } from '@/components/shared/FadeIn';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
@@ -257,32 +258,40 @@ export default function AuditLogsPage() {
           {/* Category Tabs */}
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
             {[
-              { id: 'ALL', label: 'All Event Logs' },
-              { id: 'LEDGER', label: '🔒 Passport Ledger' },
-              { id: 'GOVERNANCE', label: '⚖️ AI Governance' },
-              { id: 'GRANTS', label: '💰 Fiscal Grants' },
-              { id: 'DPDP', label: '🛡️ DPDP Privacy' },
-              { id: 'AUTH', label: '🔑 Auth & Keys' },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setCategoryFilter(tab.id)}
-                style={{
-                  padding: '6px 12px',
-                  borderRadius: 6,
-                  fontSize: 12,
-                  fontWeight: 700,
-                  background: categoryFilter === tab.id ? 'var(--gold)' : 'rgba(255,255,255,0.03)',
-                  border: `1px solid ${categoryFilter === tab.id ? 'var(--gold)' : 'var(--border)'}`,
-                  color: categoryFilter === tab.id ? '#090a0f' : '#cbd5e1',
-                  cursor: 'pointer',
-                  transition: 'all 0.15s ease',
-                }}
-              >
-                {tab.label}
-              </button>
-            ))}
+              { id: 'ALL', label: 'All Event Logs', icon: FileText },
+              { id: 'LEDGER', label: 'Passport Ledger', icon: Lock },
+              { id: 'GOVERNANCE', label: 'AI Governance', icon: Scale },
+              { id: 'GRANTS', label: 'Fiscal Grants', icon: IndianRupee },
+              { id: 'DPDP', label: 'DPDP Privacy', icon: ShieldCheck },
+              { id: 'AUTH', label: 'Auth & Keys', icon: Key },
+            ].map((tab) => {
+              const TabIcon = tab.icon;
+              const isActive = categoryFilter === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setCategoryFilter(tab.id)}
+                  style={{
+                    padding: '6px 12px',
+                    borderRadius: 6,
+                    fontSize: 12,
+                    fontWeight: 700,
+                    background: isActive ? 'var(--gold)' : 'rgba(255,255,255,0.03)',
+                    border: `1px solid ${isActive ? 'var(--gold)' : 'var(--border)'}`,
+                    color: isActive ? '#090a0f' : '#cbd5e1',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
+                  }}
+                >
+                  <TabIcon size={13} color={isActive ? '#090a0f' : 'currentColor'} />
+                  <span>{tab.label}</span>
+                </button>
+              );
+            })}
           </div>
 
           {/* Search Box */}

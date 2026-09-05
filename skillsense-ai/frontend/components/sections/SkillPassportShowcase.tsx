@@ -168,6 +168,28 @@ export default function SkillPassportShowcase() {
               overflow: 'hidden',
             }}
           >
+            {/* Visual Credential Header Banner */}
+            <div style={{ height: 120, position: 'relative', margin: '-24px -24px 16px -24px', overflow: 'hidden' }}>
+              <img
+                src="/images/credentials/digital-credential.jpg"
+                alt="Official cryptographically-signed NSQF Skill Passport certificate with state security seals"
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+              <div
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  background: 'linear-gradient(to top, var(--bg-surface) 0%, rgba(11,15,23,0.7) 60%, rgba(11,15,23,0.3) 100%)',
+                }}
+              />
+              <div style={{ position: 'absolute', top: 12, right: 12 }}>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 10, fontWeight: 800, color: '#10b981', background: 'rgba(11,15,23,0.85)', padding: '3px 8px', borderRadius: 4, border: '1px solid rgba(16,185,129,0.3)', backdropFilter: 'blur(4px)' }}>
+                  <ShieldCheck size={11} aria-hidden="true" />
+                  <span>DIGITALLY SEALED</span>
+                </span>
+              </div>
+            </div>
+
             {/* Guilloche Watermark Pattern */}
             <div
               style={{

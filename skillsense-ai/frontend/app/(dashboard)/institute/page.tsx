@@ -132,9 +132,34 @@ export default function InstitutePage() {
             alignItems: 'center',
             flexWrap: 'wrap',
             gap: 16,
+            position: 'relative',
+            overflow: 'hidden',
           }}
         >
-          <div>
+          {/* Subtle Vocational Training Lab Image Vignette */}
+          <div
+            style={{
+              position: 'absolute',
+              right: 0,
+              top: 0,
+              bottom: 0,
+              width: '36%',
+              minWidth: 240,
+              opacity: 0.16,
+              pointerEvents: 'none',
+              maskImage: 'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.8) 35%, rgba(0,0,0,1) 100%)',
+              WebkitMaskImage: 'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.8) 35%, rgba(0,0,0,1) 100%)',
+            }}
+            aria-hidden="true"
+          >
+            <img
+              src="/images/training/vocational-lab.jpg"
+              alt=""
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            />
+          </div>
+
+          <div style={{ position: 'relative', zIndex: 1 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, flexWrap: 'wrap' }}>
               <AIBadge type="nsqf" label={inst?.nsqfAffiliation || 'NSQF CERTIFIED'} />
               <AIBadge type="verified" label="NCVET ACCREDITED INSTITUTION" />

@@ -283,10 +283,15 @@ export default function AuthPage() {
               SkillSense AI · Neural Telemetry
             </span>
           </div>
-          <h1 className="auth-title" style={{ fontSize: 24, fontWeight: 800, color: '#f8fafc', margin: 0 }}>
+          <h1 className="auth-title" style={{ fontSize: 24, fontWeight: 800, color: '#f8fafc', margin: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
             {activeTab === 'signin' && 'Welcome to SkillSense'}
             {activeTab === 'signup' && 'Create Verified Account'}
-            {activeTab === 'demo' && '⚡ Instant Demo Portals'}
+            {activeTab === 'demo' && (
+              <>
+                <Zap size={20} style={{ color: 'var(--gold)' }} />
+                <span>Instant Demo Portals</span>
+              </>
+            )}
           </h1>
           <p className="auth-subtitle" style={{ fontSize: 13, color: '#94a3b8', marginTop: 4 }}>
             {activeTab === 'signin' && 'Sign in to access your skills dashboard and verified credentials'}
@@ -405,7 +410,7 @@ export default function AuthPage() {
                   fontWeight: 700,
                   color: '#f8fafc',
                 }}>
-                  <span>🇮🇳</span>
+                  <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.04em', color: 'var(--gold)', background: 'rgba(245,158,11,0.12)', padding: '1px 5px', borderRadius: 3, border: '1px solid rgba(245,158,11,0.25)' }}>IND</span>
                   <span>+91</span>
                 </div>
                 <input

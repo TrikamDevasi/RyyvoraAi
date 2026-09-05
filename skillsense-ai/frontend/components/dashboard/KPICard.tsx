@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { useAnimatedCounter } from '../../hooks/useAnimatedCounter';
 import type { KPIData } from '../../types/charts';
 
@@ -129,7 +130,13 @@ export default function KPICard({
                                 }`,
                             }}
                         >
-                            <span>{trendDirection === 'up' ? '↑' : trendDirection === 'down' ? '↓' : '→'}</span>
+                            {trendDirection === 'up' ? (
+                                <TrendingUp size={11} aria-hidden="true" />
+                            ) : trendDirection === 'down' ? (
+                                <TrendingDown size={11} aria-hidden="true" />
+                            ) : (
+                                <Minus size={11} aria-hidden="true" />
+                            )}
                             <span>{Math.abs(trend)}%</span>
                         </span>
                     )}

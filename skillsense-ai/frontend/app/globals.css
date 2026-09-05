@@ -676,10 +676,75 @@ tbody tr {
     box-shadow: 0 4px 14px rgba(245, 158, 11, 0.25);
   }
 
-  .btn-primary:hover svg,
-  .btn-gold:hover svg {
+  .btn-primary:hover svg:last-child:not(:first-child),
+  .btn-gold:hover svg:last-child:not(:first-child) {
     transform: translateX(2px);
   }
+}
+
+/* ── Standardized Institutional Icon Containers ── */
+.icon-container-sm {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.icon-container-md {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.icon-container-lg {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.icon-box-neutral {
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+.icon-box-brand {
+  background: var(--brand-gold-subtle);
+  border: 1px solid var(--brand-gold-border);
+  color: var(--brand-gold);
+}
+.icon-box-navy {
+  background: var(--brand-navy-subtle);
+  border: 1px solid var(--brand-navy-border);
+  color: var(--brand-navy-light);
+}
+.icon-box-success {
+  background: var(--success-surface);
+  border: 1px solid var(--success-border);
+  color: var(--success);
+}
+.icon-box-warning {
+  background: var(--warning-surface);
+  border: 1px solid var(--warning-border);
+  color: var(--warning);
+}
+.icon-box-error {
+  background: var(--error-surface);
+  border: 1px solid var(--error-border);
+  color: var(--error);
+}
+.icon-box-ai {
+  background: var(--info-surface);
+  border: 1px solid var(--info-border);
+  color: var(--info);
 }
 
 .btn-primary:active,

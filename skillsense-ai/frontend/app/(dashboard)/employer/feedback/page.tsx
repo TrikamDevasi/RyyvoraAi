@@ -281,29 +281,37 @@ export default function EmployerFeedbackPage() {
           {/* Filter Tabs */}
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
             {[
-              { id: 'ALL', label: 'All Reviews' },
-              { id: 'PPO_OFFERED', label: '🏆 PPO Offered' },
-              { id: 'HIGH_POTENTIAL', label: '⚡ High Potential' },
-              { id: 'MEETS_STANDARDS', label: '✓ Meets Standards' },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setRecFilter(tab.id)}
-                style={{
-                  padding: '6px 12px',
-                  borderRadius: 6,
-                  fontSize: 12,
-                  fontWeight: 700,
-                  background: recFilter === tab.id ? 'var(--gold)' : 'rgba(255,255,255,0.03)',
-                  border: `1px solid ${recFilter === tab.id ? 'var(--gold)' : 'var(--border)'}`,
-                  color: recFilter === tab.id ? '#090a0f' : '#cbd5e1',
-                  cursor: 'pointer',
-                }}
-              >
-                {tab.label}
-              </button>
-            ))}
+              { id: 'ALL', label: 'All Reviews', icon: MessageSquare },
+              { id: 'PPO_OFFERED', label: 'PPO Offered', icon: Award },
+              { id: 'HIGH_POTENTIAL', label: 'High Potential', icon: TrendingUp },
+              { id: 'MEETS_STANDARDS', label: 'Meets Standards', icon: CheckCircle2 },
+            ].map((tab) => {
+              const TabIcon = tab.icon;
+              const isActive = recFilter === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setRecFilter(tab.id)}
+                  style={{
+                    padding: '6px 12px',
+                    borderRadius: 6,
+                    fontSize: 12,
+                    fontWeight: 700,
+                    background: isActive ? 'var(--gold)' : 'rgba(255,255,255,0.03)',
+                    border: `1px solid ${isActive ? 'var(--gold)' : 'var(--border)'}`,
+                    color: isActive ? '#090a0f' : '#cbd5e1',
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
+                  }}
+                >
+                  <TabIcon size={13} color={isActive ? '#090a0f' : 'currentColor'} />
+                  <span>{tab.label}</span>
+                </button>
+              );
+            })}
           </div>
 
           {/* Search Box */}

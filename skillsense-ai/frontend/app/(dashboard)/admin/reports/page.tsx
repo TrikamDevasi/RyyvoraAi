@@ -21,9 +21,11 @@ import {
   Lock,
   Layers,
   FileCheck,
-  ArrowUpRight,
   Printer,
   Check,
+  BarChart3,
+  Scale,
+  IndianRupee,
 } from 'lucide-react';
 import { FadeIn } from '@/components/shared/FadeIn';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
@@ -347,32 +349,40 @@ export default function ReportsPage() {
           {/* Category Tabs */}
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
             {[
-              { id: 'ALL', label: 'All Report Categories' },
-              { id: 'STATE_CENSUS', label: '📊 State Census' },
-              { id: 'NCVET_COMPLIANCE', label: '📜 NCVET Compliance' },
-              { id: 'DPDP_PRIVACY', label: '🛡️ DPDP Privacy' },
-              { id: 'FISCAL_ROI', label: '💰 Fiscal ROI' },
-              { id: 'FAIRNESS_AUDIT', label: '⚖️ AI Fairness' },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setSelectedCategory(tab.id)}
-                style={{
-                  padding: '6px 12px',
-                  borderRadius: 6,
-                  fontSize: 12,
-                  fontWeight: 700,
-                  background: selectedCategory === tab.id ? 'var(--gold)' : 'rgba(255,255,255,0.03)',
-                  border: `1px solid ${selectedCategory === tab.id ? 'var(--gold)' : 'var(--border)'}`,
-                  color: selectedCategory === tab.id ? '#090a0f' : '#cbd5e1',
-                  cursor: 'pointer',
-                  transition: 'all 0.15s ease',
-                }}
-              >
-                {tab.label}
-              </button>
-            ))}
+              { id: 'ALL', label: 'All Report Categories', icon: FileText },
+              { id: 'STATE_CENSUS', label: 'State Census', icon: BarChart3 },
+              { id: 'NCVET_COMPLIANCE', label: 'NCVET Compliance', icon: FileCheck },
+              { id: 'DPDP_PRIVACY', label: 'DPDP Privacy', icon: ShieldCheck },
+              { id: 'FISCAL_ROI', label: 'Fiscal ROI', icon: IndianRupee },
+              { id: 'FAIRNESS_AUDIT', label: 'AI Fairness', icon: Scale },
+            ].map((tab) => {
+              const TabIcon = tab.icon;
+              const isActive = selectedCategory === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setSelectedCategory(tab.id)}
+                  style={{
+                    padding: '6px 12px',
+                    borderRadius: 6,
+                    fontSize: 12,
+                    fontWeight: 700,
+                    background: isActive ? 'var(--gold)' : 'rgba(255,255,255,0.03)',
+                    border: `1px solid ${isActive ? 'var(--gold)' : 'var(--border)'}`,
+                    color: isActive ? '#090a0f' : '#cbd5e1',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s ease',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
+                  }}
+                >
+                  <TabIcon size={13} color={isActive ? '#090a0f' : 'currentColor'} />
+                  <span>{tab.label}</span>
+                </button>
+              );
+            })}
           </div>
 
           {/* Search Box */}

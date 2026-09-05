@@ -15,6 +15,8 @@ import {
   Lock,
   ArrowRight,
   RefreshCw,
+  X,
+  Info,
 } from 'lucide-react';
 import { AIBadge } from '@/components/ui/AIBadge';
 import { billingApi, SubscriptionResponse, PlanId, BillingCycle } from '@/lib/api/billing.api';
@@ -292,7 +294,7 @@ function BillingPageInner() {
     try {
       const res = await billingApi.checkout(planId, cycle);
       if (res.success) {
-        setSuccessMsg(`✦ ${PLAN_META[planId].label} plan activated successfully!`);
+        setSuccessMsg(`${PLAN_META[planId].label} plan activated successfully!`);
         await loadData();
       } else {
         setError(res.message ?? 'Plan change failed. Please try again.');
@@ -389,7 +391,7 @@ function BillingPageInner() {
       <div style={{ marginBottom: 24 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, flexWrap: 'wrap' }}>
           <AIBadge type="verified" label="BILLING & SUBSCRIPTION" />
-          {isDemoMode && <AIBadge type="nsqf" label="🧪 DEMO MODE — NO REAL PAYMENT" />}
+          {isDemoMode && <AIBadge type="nsqf" label="DEMO MODE — NO REAL PAYMENT" />}
         </div>
         <h1 className="font-display" style={{ fontSize: 24, fontWeight: 900, color: '#f8fafc', margin: '0 0 4px' }}>
           Billing & <span style={{ color: 'var(--gold)' }}>Subscription</span>
@@ -417,7 +419,7 @@ function BillingPageInner() {
           fontSize: 13, color: '#10b981', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8,
         }}>
           <Check size={14} /> {successMsg}
-          <button type="button" onClick={() => setSuccessMsg('')} style={{ marginLeft: 'auto', background: 'none', border: 'none', color: '#10b981', cursor: 'pointer', fontSize: 14 }}>✕</button>
+          <button type="button" onClick={() => setSuccessMsg('')} aria-label="Dismiss message" style={{ marginLeft: 'auto', background: 'none', border: 'none', color: '#10b981', cursor: 'pointer', display: 'flex', alignItems: 'center' }}><X size={14} /></button>
         </div>
       )}
       {error && data && (
@@ -427,7 +429,7 @@ function BillingPageInner() {
           fontSize: 13, color: '#f87171', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8,
         }}>
           <AlertTriangle size={14} /> {error}
-          <button type="button" onClick={() => setError('')} style={{ marginLeft: 'auto', background: 'none', border: 'none', color: '#f87171', cursor: 'pointer', fontSize: 14 }}>✕</button>
+          <button type="button" onClick={() => setError('')} aria-label="Dismiss error" style={{ marginLeft: 'auto', background: 'none', border: 'none', color: '#f87171', cursor: 'pointer', display: 'flex', alignItems: 'center' }}><X size={14} /></button>
         </div>
       )}
 

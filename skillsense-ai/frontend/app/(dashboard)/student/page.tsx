@@ -215,8 +215,40 @@ export default function StudentDashboardPage() {
         {!loading && !error && profile && (
         <>
         {/* ── Top Intelligence Briefing ── */}
-        <div style={{ marginBottom: 20 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 14 }}>
+        <div
+          className="card-accent"
+          style={{
+            padding: 24,
+            borderRadius: 16,
+            marginBottom: 20,
+            position: 'relative',
+            overflow: 'hidden',
+          }}
+        >
+          {/* Subtle Student Technical Training Context Image Vignette */}
+          <div
+            style={{
+              position: 'absolute',
+              right: 0,
+              top: 0,
+              bottom: 0,
+              width: '35%',
+              minWidth: 220,
+              opacity: 0.15,
+              pointerEvents: 'none',
+              maskImage: 'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.8) 35%, rgba(0,0,0,1) 100%)',
+              WebkitMaskImage: 'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.8) 35%, rgba(0,0,0,1) 100%)',
+            }}
+            aria-hidden="true"
+          >
+            <img
+              src="/images/students/student-skills-training.jpg"
+              alt=""
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            />
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 14, position: 'relative', zIndex: 1 }}>
             <div style={{ minWidth: 0, flex: 1 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
                 <AIBadge type="nsqf" label={`NSQF LEVEL ${nsqfLevel || 5}`} />
@@ -720,18 +752,44 @@ export default function StudentDashboardPage() {
         {/* ── TAB 3: CAREER PATHWAYS ── */}
         {activeTab === 'careers' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
-              <div>
-                <h3 className="font-display" style={{ fontSize: 20, fontWeight: 800, color: '#f8fafc', margin: 0 }}>
-                  AI Predicted Career Pathways
-                </h3>
-                <p style={{ color: 'var(--text-secondary)', fontSize: 13, marginTop: 2 }}>
-                  Matched against verified skill scores and real-time hiring demand signals in India.
-                </p>
+            {/* Visual Career Pathway Header Card */}
+            <div
+              className="card-elevated"
+              style={{
+                borderRadius: 14,
+                overflow: 'hidden',
+                border: '1px solid var(--border)',
+                display: 'flex',
+                alignItems: 'stretch',
+                minHeight: 110,
+              }}
+            >
+              <div style={{ width: 180, position: 'relative', flexShrink: 0 }} className="hidden sm:block">
+                <img
+                  src="/images/workforce/career-pathways.jpg"
+                  alt="Career growth and advancement trajectory"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, transparent 0%, var(--bg-surface) 100%)' }} />
               </div>
-              <Link href="/student/career" className="btn-gold" style={{ fontSize: 12.5, padding: '7px 16px' }}>
-                Open Career Explorer →
-              </Link>
+              <div style={{ padding: '16px 20px', flex: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                    <AIBadge type="ai" label="LONGITUDINAL CAREER PROJECTION" />
+                    <span style={{ fontSize: 11, color: '#10b981', fontWeight: 700 }}>+42% Average 3-Yr Wage Delta</span>
+                  </div>
+                  <h3 className="font-display" style={{ fontSize: 18, fontWeight: 800, color: '#f8fafc', margin: 0 }}>
+                    AI Predicted Career Pathways &amp; Salary Curves
+                  </h3>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: 12.5, margin: '4px 0 0', maxWidth: 640 }}>
+                    Matched against verified competency ledgers and live hiring demand signals across Maharashtra tech and industrial hubs.
+                  </p>
+                </div>
+                <Link href="/student/career" className="btn-gold" style={{ fontSize: 12.5, padding: '8px 16px', display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span>Open Career Explorer</span>
+                  <ArrowRight size={14} />
+                </Link>
+              </div>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 16 }}>

@@ -26,10 +26,11 @@ import {
   ExternalLink,
   Layers,
   ArrowUpRight,
-  Clock,
-  DollarSign,
   Activity,
   Zap,
+  CheckCircle2,
+  DollarSign,
+  IndianRupee,
 } from 'lucide-react';
 import { FadeIn } from '@/components/shared/FadeIn';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
@@ -217,7 +218,7 @@ export default function DemandPage() {
           {[
             { label: 'Avg YoY Demand Surge', value: '+39.2%', sub: 'Across Modern Tech Stacks', color: '#10b981', icon: TrendingUp },
             { label: 'Total Tracked Openings', value: `${totalOpenings.toLocaleString('en-IN')}+`, sub: 'Active Requisitions in MH', color: 'var(--gold)', icon: Briefcase },
-            { label: 'Peak Compensation Median', value: '₹11.20 LPA', sub: 'Applied Generative AI Tier', color: '#60a5fa', icon: DollarSign },
+            { label: 'Peak Compensation Median', value: '₹11.20 LPA', sub: 'Applied Generative AI Tier', color: '#60a5fa', icon: IndianRupee },
             { label: 'Scarcity Risk Index', value: 'CRITICAL', sub: 'Supply Shortage in 4/5 Stacks', color: '#ef4444', icon: AlertTriangle },
           ].map((stat, idx) => {
             const Icon = stat.icon;
@@ -341,29 +342,37 @@ export default function DemandPage() {
           {/* Phase Filter Tabs */}
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
             {[
-              { id: 'ALL', label: 'All Signals' },
-              { id: 'EMERGING', label: '🚀 Emerging Tech' },
-              { id: 'HIGH_GROWTH', label: '⚡ High Growth' },
-              { id: 'STABLE_CORE', label: '✓ Core Foundation' },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setPhaseFilter(tab.id)}
-                style={{
-                  padding: '6px 12px',
-                  borderRadius: 6,
-                  fontSize: 12,
-                  fontWeight: 700,
-                  background: phaseFilter === tab.id ? 'var(--gold)' : 'rgba(255,255,255,0.03)',
-                  border: `1px solid ${phaseFilter === tab.id ? 'var(--gold)' : 'var(--border)'}`,
-                  color: phaseFilter === tab.id ? '#090a0f' : '#cbd5e1',
-                  cursor: 'pointer',
-                }}
-              >
-                {tab.label}
-              </button>
-            ))}
+              { id: 'ALL', label: 'All Signals', icon: Target },
+              { id: 'EMERGING', label: 'Emerging Tech', icon: TrendingUp },
+              { id: 'HIGH_GROWTH', label: 'High Growth', icon: Zap },
+              { id: 'STABLE_CORE', label: 'Core Foundation', icon: CheckCircle2 },
+            ].map((tab) => {
+              const TabIcon = tab.icon;
+              const isActive = phaseFilter === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setPhaseFilter(tab.id)}
+                  style={{
+                    padding: '6px 12px',
+                    borderRadius: 6,
+                    fontSize: 12,
+                    fontWeight: 700,
+                    background: isActive ? 'var(--gold)' : 'rgba(255,255,255,0.03)',
+                    border: `1px solid ${isActive ? 'var(--gold)' : 'var(--border)'}`,
+                    color: isActive ? '#090a0f' : '#cbd5e1',
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
+                  }}
+                >
+                  <TabIcon size={13} color={isActive ? '#090a0f' : 'currentColor'} />
+                  <span>{tab.label}</span>
+                </button>
+              );
+            })}
           </div>
 
           {/* Search Box */}

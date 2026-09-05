@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Trophy, Award, Star, Flame } from 'lucide-react';
+import { Trophy, Award, Star, Flame, Medal } from 'lucide-react';
 import api from '@/lib/api';
 import { studentApi, StudentProfile } from '@/lib/api/student.api';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
@@ -96,8 +96,13 @@ export default function LeaderboardPage() {
                                             background: r.isCurrentUser ? 'rgba(212,168,67,0.1)' : 'transparent',
                                         }}
                                     >
-                                        <td style={{ padding: '12px 16px', fontWeight: 800, color: r.rank === 1 ? '#eab308' : r.rank === 2 ? '#94a3b8' : r.rank === 3 ? '#b45309' : '#fff' }}>
-                                            #{r.rank} {r.rank === 1 && '🥇'} {r.rank === 2 && '🥈'} {r.rank === 3 && '🥉'}
+                                        <td style={{ padding: '12px 16px', fontWeight: 800, color: r.rank === 1 ? '#eab308' : r.rank === 2 ? '#94a3b8' : r.rank === 3 ? '#d97706' : '#fff' }}>
+                                            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                                                <span>#{r.rank}</span>
+                                                {r.rank === 1 && <Medal size={15} style={{ color: '#eab308' }} />}
+                                                {r.rank === 2 && <Medal size={15} style={{ color: '#94a3b8' }} />}
+                                                {r.rank === 3 && <Medal size={15} style={{ color: '#d97706' }} />}
+                                            </div>
                                         </td>
                                         <td style={{ padding: '12px 16px', fontWeight: 600 }}>
                                             {r.name} {r.isCurrentUser && <span style={{ fontSize: 11, color: GOLD, marginLeft: 6 }}>(You)</span>}

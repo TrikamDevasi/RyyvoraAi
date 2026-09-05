@@ -1,7 +1,7 @@
 import assert from 'assert';
 
 console.log('====================================================');
-console.log('🧪 SkillSense AI Frontend Automated Test Runner');
+console.log('[RUNNER] SkillSense AI Frontend Automated Test Runner');
 console.log('====================================================\n');
 
 function runFrontendUnitTests() {
@@ -28,7 +28,7 @@ function runFrontendUnitTests() {
     'user_fallback',
     'Must fall back to id'
   );
-  console.log('✓ Institute ID resolver correctly handles priorities and null safety.');
+  console.log('[PASS] Institute ID resolver correctly handles priorities and null safety.');
 
   // ── Test 2: Demo Credentials Alignment ───────────────────────────────────
   console.log('Testing Demo Credentials Alignment with Seeded Data...');
@@ -45,7 +45,7 @@ function runFrontendUnitTests() {
   assert.strictEqual(DEMO_USERS.institute, 'provider@skillsense.demo', 'Institute must match MSSDS seed');
   assert.strictEqual(DEMO_USERS.government, 'government@skillsense.demo', 'Government must match Directorate seed');
   assert.strictEqual(DEMO_USERS.admin, 'admin@skillsense.demo', 'Admin must match System Admin seed');
-  console.log('✓ Demo credentials alignment passed: 5/5 role accounts match MongoDB seeder.');
+  console.log('[PASS] Demo credentials alignment passed: 5/5 role accounts match MongoDB seeder.');
 
   // ── Test 3: Billing Plan Integrity ───────────────────────────────────────
   console.log('Testing Billing Plans & Invariants...');
@@ -57,7 +57,7 @@ function runFrontendUnitTests() {
 
   assert.ok(PLANS.starter.priceYearly < PLANS.starter.priceMonthly * 12, 'Annual plan must include 2 months discount');
   assert.ok(PLANS.growth.priceYearly < PLANS.growth.priceMonthly * 12, 'Annual growth plan must include 2 months discount');
-  console.log('✓ Billing tier calculations and discount invariants verified.');
+  console.log('[PASS] Billing tier calculations and discount invariants verified.');
 
   // ── Test 4: Dynamic ROI Insufficient Data Guard ─────────────────────────
   console.log('Testing Dynamic ROI Threshold Guard...');
@@ -71,7 +71,7 @@ function runFrontendUnitTests() {
   assert.strictEqual(evaluateCohortData(4, 2).isSufficientData, false, 'Cohort < 5 must return insufficient data');
   assert.strictEqual(evaluateCohortData(20, 2).isSufficientData, false, 'Placed < 3 must return insufficient data');
   assert.strictEqual(evaluateCohortData(25, 18).isSufficientData, true, 'Valid cohort must return sufficient data');
-  console.log('✓ Dynamic ROI threshold guard verified across sample boundaries.');
+  console.log('[PASS] Dynamic ROI threshold guard verified across sample boundaries.');
 
   // ── Test 5: Verifiable Passport Hash Structure ──────────────────────────
   console.log('Testing Skill Passport Hash Verification Structure...');
@@ -83,7 +83,7 @@ function runFrontendUnitTests() {
   assert.ok(isValidPassportHash('0x8f4c2e91b5a3d76e48c10927fa118239cb72e01a'), 'Hex-prefixed hash must be valid');
   assert.ok(isValidPassportHash('SKP-0101-VERIFIED'), 'SKP-prefixed hash must be valid');
   assert.strictEqual(isValidPassportHash(''), false, 'Empty string must be invalid');
-  console.log('✓ Skill Passport hash structure verified.');
+  console.log('[PASS] Skill Passport hash structure verified.');
 
   // ── Test 6: Role-Based Mobile Bottom Navigation (4 Items + More Contract) ──
   console.log('Testing Mobile Bottom Navigation Role Resolution (4 Destinations Contract)...');
@@ -103,7 +103,7 @@ function runFrontendUnitTests() {
     const uniqueHrefs = new Set(primaryHrefs);
     assert.strictEqual(uniqueHrefs.size, 4, `Role ${role} destinations must be unique`);
   }
-  console.log('✓ Mobile bottom navigation contract: 4 unique canonical destinations verified for all 5 roles.');
+  console.log('[PASS] Mobile bottom navigation contract: 4 unique canonical destinations verified for all 5 roles.');
 
   // ── Test 7: Mobile Navigation Item Label & Non-wrapping Guarantee ─────────
   console.log('Testing Mobile Navigation Label Length & Non-wrapping Constraints...');
@@ -122,7 +122,7 @@ function runFrontendUnitTests() {
       assert.ok(label.length <= 12, `Label "${label}" must be <= 12 characters to prevent mobile line wrap`);
     }
   }
-  console.log('✓ All mobile labels conform to compact single-line bounds (<= 12 chars).');
+  console.log('[PASS] All mobile labels conform to compact single-line bounds (<= 12 chars).');
 
   // ── Test 8: Nested Route Active State Matching ───────────────────────────
   console.log('Testing Mobile Navigation Active State & Nested Route Matching...');
@@ -152,7 +152,7 @@ function runFrontendUnitTests() {
   assert.strictEqual(isSecondaryActiveRoute('/student/passport', PREFERRED_MOBILE_HREFS.student), true, 'Passport must activate More indicator');
   assert.strictEqual(isSecondaryActiveRoute('/student/profile', PREFERRED_MOBILE_HREFS.student), true, 'Profile must activate More indicator');
   assert.strictEqual(isSecondaryActiveRoute('/student/journey', PREFERRED_MOBILE_HREFS.student), false, 'Journey must not activate More');
-  console.log('✓ Nested route matching and secondary route detection passed.');
+  console.log('[PASS] Nested route matching and secondary route detection passed.');
 
   // ── Test 9: Canonical Profile Route Resolution Across Roles ──────────────
   console.log('Testing Canonical Profile Route Resolution & Consistency...');
@@ -164,7 +164,7 @@ function runFrontendUnitTests() {
 
   assert.strictEqual(PROFILE_REDIRECT_TARGETS['/profile'], CANONICAL_PROFILE_HREF, '/profile must redirect to canonical /student/profile');
   assert.strictEqual(PROFILE_REDIRECT_TARGETS['/settings/profile'], CANONICAL_PROFILE_HREF, '/settings/profile must redirect to canonical /student/profile');
-  console.log('✓ Canonical profile routes verified for reliable mobile navigation.');
+  console.log('[PASS] Canonical profile routes verified for reliable mobile navigation.');
 
   // ── Test 10: Mobile Content Offset & Safe Area Invariants ────────────────
   console.log('Testing Mobile Content Offset & Safe Area Invariants...');
@@ -177,7 +177,7 @@ function runFrontendUnitTests() {
   assert.strictEqual(calculateMobileClearance(0), 84, 'Standard mobile clearance without home bar must be >= 84px');
   assert.strictEqual(calculateMobileClearance(34), 118, 'iPhone/gesture device with 34px inset must have 118px clearance');
   assert.ok(calculateMobileClearance(0) > 64, 'Clearance must exceed fixed navbar height so content is not obscured');
-  console.log('✓ Mobile content offset and safe area invariants verified.');
+  console.log('[PASS] Mobile content offset and safe area invariants verified.');
 
   // ── Test 11: AI Copilot Launcher Clearance Above Bottom Navigation ────────
   console.log('Testing AI Copilot Floating Widget Clearance Above Mobile Bottom Nav...');
@@ -187,7 +187,7 @@ function runFrontendUnitTests() {
 
   assert.ok(clearanceGap >= 12, 'Launcher must float at least 12px above bottom nav to prevent obscuring navigation destinations');
   assert.strictEqual(clearanceGap, 12, 'Mobile bottom clearance gap is exactly 12px');
-  console.log('✓ AI Copilot floating launcher clearance invariant verified (no overlap with bottom nav).');
+  console.log('[PASS] AI Copilot floating launcher clearance invariant verified (no overlap with bottom nav).');
 
   // ── Test 12: Micro-Interaction & Transition Timing Standards ───────────
   console.log('Testing Micro-Interaction Timing & Elevation Bounds...');
@@ -214,7 +214,7 @@ function runFrontendUnitTests() {
 
   const UI_CARD_ELEVATION_PX = -2;
   assert.ok(UI_CARD_ELEVATION_PX >= -3 && UI_CARD_ELEVATION_PX <= -1, 'Card hover elevation must be between -1px and -3px for subtle lift');
-  console.log('✓ Micro-interaction timing (150-220ms), elevation (-2px), and scale invariants verified.');
+  console.log('[PASS] Micro-interaction timing (150-220ms), elevation (-2px), and scale invariants verified.');
 
   // ── Test 13: Touch Safety & Reduced Motion Accessibility Invariants ────
   console.log('Testing Touch Safety & Reduced Motion Accessibility Invariants...');
@@ -233,7 +233,7 @@ function runFrontendUnitTests() {
 
   assert.strictEqual(reducedMotionConfig.transform, 'none', 'Reduced motion must disable translation and scaling');
   assert.ok(reducedMotionConfig.transitionDurationMs <= 0.1, 'Transitions must be instantaneous under reduced motion');
-  console.log('✓ Touch safety (@media (hover: hover)) and reduced motion invariants verified.');
+  console.log('[PASS] Touch safety (@media (hover: hover)) and reduced motion invariants verified.');
 
   // ── Test 14: Card Design System Token & Variant Invariants ───────────
   console.log('Testing Card Design System Tokens, Radii & Padding Invariants...');
@@ -272,7 +272,7 @@ function runFrontendUnitTests() {
     'status-info',
   ];
   assert.strictEqual(CARD_VARIANTS.length, 11, 'Card system defines all 11 standardized variants');
-  console.log('✓ Card design system radii (10px/14px), padding, and variant hierarchy verified.');
+  console.log('[PASS] Card design system radii (10px/14px), padding, and variant hierarchy verified.');
 
   // ── Test 15: 3D Micro-Depth & Non-Interactive Card Invariants ───────────
   console.log('Testing 3D Micro-Depth Constraints & Non-Interactive Card Invariants...');
@@ -299,7 +299,7 @@ function runFrontendUnitTests() {
   assert.strictEqual(informationalCardBehavior.cursor, 'default', 'Informational cards must maintain default cursor');
   assert.strictEqual(informationalCardBehavior.hoverElevationPx, 0, 'Informational cards must not jump or elevate on hover');
   assert.strictEqual(informationalCardBehavior.is3D, false, 'Informational cards must not tilt in 3D');
-  console.log('✓ 3D micro-depth constraints (<=3° tilt, >=768px desktop only) and static informational card invariants verified.');
+  console.log('[PASS] 3D micro-depth constraints (<=3° tilt, >=768px desktop only) and static informational card invariants verified.');
 
   // ── Test 16: 3D Motion Timing & Easing Invariants ───────────────────────
   console.log('Testing 3D Motion Timing & Easing Invariants...');
@@ -314,7 +314,7 @@ function runFrontendUnitTests() {
   assert.ok(MOTION_SYSTEM_TIMING_MS.normal >= 180 && MOTION_SYSTEM_TIMING_MS.normal <= 300, 'Normal interactions must be 180-300ms');
   assert.ok(MOTION_SYSTEM_TIMING_MS.pageTransition >= 250 && MOTION_SYSTEM_TIMING_MS.pageTransition <= 450, 'Page transitions must be 250-450ms');
   assert.ok(MOTION_SYSTEM_TIMING_MS.entrance >= 500 && MOTION_SYSTEM_TIMING_MS.entrance <= 800, 'Entrance animations must be 500-800ms');
-  console.log('✓ 3D Motion timing invariants (micro: 160ms, normal: 220ms, page: 280ms, enter: 600ms) verified.');
+  console.log('[PASS] 3D Motion timing invariants (micro: 160ms, normal: 220ms, page: 280ms, enter: 600ms) verified.');
 
   // ── Test 17: Spatial Perspective & Floating Parallax Bounds ──────────────
   console.log('Testing Spatial Perspective & Floating Parallax Bounds...');
@@ -329,7 +329,7 @@ function runFrontendUnitTests() {
   assert.ok(SPATIAL_BOUNDS.maxFloatingDeltaPx <= 8, 'Floating badges must stay within 8px translation to avoid disorienting users');
   assert.ok(SPATIAL_BOUNDS.perspectiveMinPx >= 800, 'Perspective must be >= 800px');
   assert.strictEqual(SPATIAL_BOUNDS.dropdownEntranceScale, 0.96, 'Dropdown entrance scale must be 0.96 for subtle spatial pop-in');
-  console.log('✓ Spatial perspective (<=3.5° tilt, <=6px float, >=800px perspective) verified.');
+  console.log('[PASS] Spatial perspective (<=3.5° tilt, <=6px float, >=800px perspective) verified.');
 
   // ── Test 18: Mobile Touch & Accessibility (Reduced Motion) Bypass ────────
   console.log('Testing Mobile Touch & Reduced Motion 3D Bypass Invariants...');
@@ -344,10 +344,10 @@ function runFrontendUnitTests() {
   assert.strictEqual(ACCESSIBILITY_INVARIANTS.reducedMotionDurationMs, 0.01, 'prefers-reduced-motion must collapse animation durations');
   assert.strictEqual(ACCESSIBILITY_INVARIANTS.touchBypassTilt, true, 'Touch devices without hover must bypass 3D tilt');
   assert.ok(ACCESSIBILITY_INVARIANTS.mobileActiveScale >= 0.94 && ACCESSIBILITY_INVARIANTS.mobileActiveScale <= 0.98, 'Mobile touch compression must provide tactile feedback (scale 0.95)');
-  console.log('✓ Mobile touch tactile feedback and prefers-reduced-motion 3D bypass invariants verified.');
+  console.log('[PASS] Mobile touch tactile feedback and prefers-reduced-motion 3D bypass invariants verified.');
 
   console.log('\n====================================================');
-  console.log('🎉 ALL FRONTEND INTEGRATION & CONTRACT TESTS PASSED! (18/18)');
+  console.log('[SUCCESS] ALL FRONTEND INTEGRATION & CONTRACT TESTS PASSED! (18/18)');
   console.log('====================================================');
 }
 

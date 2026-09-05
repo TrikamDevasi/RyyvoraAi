@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { studentApi, StudentProfile } from '@/lib/api/student.api';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { resolveBranch, getAllBranchesSummary, BranchData, BranchTestInfo, saveBranchId } from '@/lib/branches';
-import { GraduationCap } from 'lucide-react';
+import { GraduationCap, CheckCircle2 } from 'lucide-react';
 
 const GOLD = '#D4A843';
 const AMBER = '#F59E0B';
@@ -160,8 +160,9 @@ export default function TestsPage() {
                                     </div>
 
                                     {done ? (
-                                        <div style={{ textAlign: 'center', padding: '8px', background: 'rgba(34,197,94,0.1)', borderRadius: 8, color: '#22c55e', fontSize: 12, fontWeight: 700 }}>
-                                            ✓ Verified & Saved to Skill Passport
+                                        <div style={{ textAlign: 'center', padding: '8px', background: 'rgba(34,197,94,0.1)', borderRadius: 8, color: '#22c55e', fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                                            <CheckCircle2 size={13} />
+                                            <span>Verified & Saved to Skill Passport</span>
                                         </div>
                                     ) : (
                                         <Link href="/student/assessment" className="btn-gold" style={{ width: '100%', padding: '10px 0', fontSize: 13, fontWeight: 700, textAlign: 'center', textDecoration: 'none', display: 'block' }}>

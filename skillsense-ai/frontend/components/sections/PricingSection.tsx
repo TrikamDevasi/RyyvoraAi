@@ -14,6 +14,7 @@ import {
   ShieldCheck,
   ChevronDown,
   ChevronUp,
+  Star,
 } from 'lucide-react';
 
 // ─── Plan Data (display-only — never used for pricing logic) ──────────────────
@@ -372,11 +373,13 @@ export default function PricingSection() {
                   <div style={{
                     position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)',
                     background: 'var(--brand-gold)',
-                    color: 'var(--text-inverse, #ffffff)', fontSize: 10.5, fontWeight: 800,
+                    color: '#090a0f', fontSize: 10.5, fontWeight: 800,
                     padding: '3px 12px', borderRadius: 'var(--radius-pill, 9999px)', letterSpacing: '0.04em',
                     whiteSpace: 'nowrap',
+                    display: 'inline-flex', alignItems: 'center', gap: 4,
                   }}>
-                    ★ MOST POPULAR
+                    <Star size={11} style={{ fill: 'currentColor' }} aria-hidden="true" />
+                    <span>MOST POPULAR</span>
                   </div>
                 )}
 

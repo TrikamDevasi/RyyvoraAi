@@ -290,7 +290,7 @@ export const BRANCH_REGISTRY: Record<string, BranchData> = {
     ],
     analyzerPresets: [
       {
-        title: '🚀 Full-Stack Web Engineer (Next.js / TypeScript)',
+        title: 'Full-Stack Web Engineer (Next.js / TypeScript)',
         mode: 'text',
         text: `Full-Stack Software Engineer with 2+ years of hands-on experience building scalable web applications. Proficient in React 19, Next.js App Router, TypeScript, Node.js, Express, and PostgreSQL. Experienced with Prisma ORM, Redis caching, Tailwind CSS, Docker containerization, and automated CI/CD pipelines via GitHub Actions. Designed RESTful and GraphQL APIs handling 5,000+ daily requests. Implemented OAuth2 / JWT authentication, role-based access control (RBAC), and unit testing with Jest and React Testing Library.`,
         targetLevel: 5,
@@ -415,7 +415,7 @@ export const BRANCH_REGISTRY: Record<string, BranchData> = {
     ],
     analyzerPresets: [
       {
-        title: '☁️ Enterprise Cloud & Infrastructure Engineer',
+        title: 'Enterprise Cloud & Infrastructure Engineer',
         mode: 'text',
         text: `Cloud Infrastructure Engineer specializing in AWS (VPC, EC2, S3, RDS), Terraform infrastructure-as-code, and Docker container orchestration. Managed automated zero-downtime blue/green deployment workflows via GitLab CI. Strong Linux system administration, bash scripting, and network security fundamentals.`,
         targetLevel: 5,
@@ -647,14 +647,14 @@ export const BRANCH_REGISTRY: Record<string, BranchData> = {
     ],
     analyzerPresets: [
       {
-        title: '⚙️ Mechanical Design & Simulation Engineer',
+        title: 'Mechanical Design & Simulation Engineer',
         mode: 'text',
         text: `Mechanical Design Engineer with expertise in parametric 3D modeling using SolidWorks and CATIA V5. Experienced in conducting structural static, thermal, and modal simulations in ANSYS Workbench. Proficient in ASME Y14.5 Geometric Dimensioning & Tolerancing (GD&T), design for injection molding and sheet metal fabrication, and preparing production release engineering drawings.`,
         targetLevel: 5,
         keywords: ['solidworks', 'catia', 'ansys', 'fea', 'gd&t', 'cad', 'thermodynamics', 'machining', 'dfm'],
       },
       {
-        title: '🔥 Thermal & HVAC Systems Analyst',
+        title: 'Thermal & HVAC Systems Analyst',
         mode: 'text',
         text: `Thermal Systems Engineer specialized in thermodynamics, conjugate heat transfer, and CFD modeling using ANSYS Fluent. Designed compact fin-and-tube heat exchangers, calculated pressure drops across industrial ductwork, and modeled liquid cooling cold-plates for high-power electronics.`,
         targetLevel: 6,
@@ -811,7 +811,7 @@ export const BRANCH_REGISTRY: Record<string, BranchData> = {
     ],
     analyzerPresets: [
       {
-        title: '🏗️ Structural Design Engineer (RCC / Steel)',
+        title: 'Structural Design Engineer (RCC / Steel)',
         mode: 'text',
         text: `Civil Structural Engineer experienced in 3D frame modeling and seismic analysis in ETABS and STAAD.Pro to IS 456, IS 800, and IS 1893 codes. Prepared reinforced concrete bar bending schedules, foundation raft designs, and geotechnical settlement calculations.`,
         targetLevel: 5,
@@ -931,7 +931,7 @@ export const BRANCH_REGISTRY: Record<string, BranchData> = {
     ],
     analyzerPresets: [
       {
-        title: '🔌 Embedded Firmware & Microcontroller Engineer',
+        title: 'Embedded Firmware & Microcontroller Engineer',
         mode: 'text',
         text: `Embedded Systems Engineer proficient in bare-metal C and FreeRTOS programming on ARM Cortex-M microcontrollers (STM32/ESP32). Developed peripheral drivers for I2C, SPI, UART, and CAN bus protocols. Designed hardware schematics and 4-layer PCB layouts using KiCad.`,
         targetLevel: 5,
@@ -1035,7 +1035,7 @@ export const BRANCH_REGISTRY: Record<string, BranchData> = {
     ],
     analyzerPresets: [
       {
-        title: '⚡ Power Systems & Electrical Design Engineer',
+        title: 'Power Systems & Electrical Design Engineer',
         mode: 'text',
         text: `Electrical Engineer experienced in load flow and short-circuit fault studies using ETAP and MATLAB Simulink. Designed medium-voltage single-line diagrams (SLD), configured numerical protection relays, and sized transformer and battery energy storage systems (BESS).`,
         targetLevel: 5,
@@ -1139,7 +1139,7 @@ export const BRANCH_REGISTRY: Record<string, BranchData> = {
     ],
     analyzerPresets: [
       {
-        title: '📊 Data Scientist & Predictive Modeler',
+        title: 'Data Scientist & Predictive Modeler',
         mode: 'text',
         text: `Data Scientist with extensive experience building predictive machine learning pipelines in Python (Pandas, Scikit-Learn, XGBoost). Proficient in exploratory data analysis, statistical hypothesis testing, SQL database querying, and packaging models with FastAPI and Docker.`,
         targetLevel: 5,
@@ -1243,7 +1243,7 @@ export const BRANCH_REGISTRY: Record<string, BranchData> = {
     ],
     analyzerPresets: [
       {
-        title: '🤖 Deep Learning & LLM Specialist',
+        title: 'Deep Learning & LLM Specialist',
         mode: 'text',
         text: `Applied Machine Learning Engineer with deep foundations in Python, PyTorch, and Transformers. Experience fine-tuning open-source LLMs using LoRA/QLoRA and deploying Retrieval-Augmented Generation (RAG) systems with LangChain and vector databases. Built computer vision object detection and classification models in PyTorch.`,
         targetLevel: 6,
@@ -1347,7 +1347,7 @@ export const BRANCH_REGISTRY: Record<string, BranchData> = {
     ],
     analyzerPresets: [
       {
-        title: '🧪 Chemical Process & Simulation Engineer',
+        title: 'Chemical Process & Simulation Engineer',
         mode: 'text',
         text: `Chemical Engineer skilled in steady-state process flowsheet simulation using Aspen Plus and HYSYS. Developed heat and mass balance flow diagrams (PFD/P&ID), sized distillation columns and shell-and-tube heat exchangers, and conducted HAZOP safety studies.`,
         targetLevel: 5,
@@ -1451,7 +1451,7 @@ export const BRANCH_REGISTRY: Record<string, BranchData> = {
     ],
     analyzerPresets: [
       {
-        title: '🚗 Automotive Design & Powertrain Engineer',
+        title: 'Automotive Design & Powertrain Engineer',
         mode: 'text',
         text: `Automotive Systems Engineer experienced in vehicle suspension kinematics, chassis packaging in CATIA, and EV battery thermal management. Performed vehicle dynamics simulations in MATLAB/Simulink and calibrated CAN bus diagnostic messages via OBD-II logging.`,
         targetLevel: 5,
@@ -1555,7 +1555,7 @@ export const BRANCH_REGISTRY: Record<string, BranchData> = {
     ],
     analyzerPresets: [
       {
-        title: '🧬 Bioprocess & Molecular Research Scientist',
+        title: 'Bioprocess & Molecular Research Scientist',
         mode: 'text',
         text: `Biotechnology Researcher with hands-on expertise in fed-batch microbial fermentation and pilot-scale bioreactor operation. Experienced in downstream purification using protein A affinity chromatography, HPLC analytical characterization, and molecular cloning techniques.`,
         targetLevel: 5,
@@ -1658,7 +1658,7 @@ export const BRANCH_REGISTRY: Record<string, BranchData> = {
     ],
     analyzerPresets: [
       {
-        title: '⚙️ Technical Systems & Operations Engineer',
+        title: 'Technical Systems & Operations Engineer',
         mode: 'text',
         text: `Multidisciplinary Engineering Practitioner with experience in scientific data analysis, sensor instrumentation, technical drawing documentation (ISO/BIS standards), and root-cause fault diagnosis in industrial setups.`,
         targetLevel: 5,

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { FileCheck, Play } from 'lucide-react';
+import { FileCheck, Play, CheckCircle2 } from 'lucide-react';
 import { studentApi, StudentProfile } from '@/lib/api/student.api';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -107,8 +107,9 @@ export default function AssessmentsPage() {
                                                 <span style={{ fontSize: 13, fontWeight: 800, color: GOLD, background: 'rgba(212,168,67,0.15)', padding: '4px 10px', borderRadius: 99 }}>
                                                     {s.score}%
                                                 </span>
-                                                <span style={{ fontSize: 11, color: '#22c55e', fontWeight: 600 }}>
-                                                    ✓ NSQF Certified
+                                                <span style={{ fontSize: 11, color: '#22c55e', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                                                    <CheckCircle2 size={13} />
+                                                    <span>NSQF Certified</span>
                                                 </span>
                                             </div>
                                         </div>
