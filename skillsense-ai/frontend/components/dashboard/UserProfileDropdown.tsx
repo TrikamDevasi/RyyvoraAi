@@ -297,7 +297,7 @@ export default function UserProfileDropdown() {
                     textOverflow: 'ellipsis',
                   }}
                 >
-                  {user?.email || 'user@skillsense.ai'}
+                  {user?.email || 'user@ryyvora.ai'}
                 </div>
               </div>
             </div>

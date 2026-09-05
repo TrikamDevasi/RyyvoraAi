@@ -220,12 +220,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     boxShadow: '0 2px 10px rgba(245,158,11,0.25)',
                   }}
                 >
-                  SK
+                  RY
                 </div>
                 {!sidebarCollapsed && (
                   <div>
                     <span className="font-display" style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
-                      SkillSense <span style={{ color: 'var(--gold)' }}>AI</span>
+                      Ryyvora <span style={{ color: 'var(--gold)' }}>AI</span>
                     </span>
                     <div style={{ fontSize: 9.5, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>
                       {role} Intelligence
@@ -516,7 +516,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     flexShrink: 0,
                   }}
                 >
-                  SK
+                  RY
                 </div>
                 <span
                   className="font-display"
@@ -531,7 +531,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     gap: 4,
                   }}
                 >
-                  SkillSense <span style={{ color: 'var(--gold)' }}>AI</span>
+                  Ryyvora <span style={{ color: 'var(--gold)' }}>AI</span>
                 </span>
               </Link>
             </div>
@@ -681,16 +681,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   flexShrink: 0,
                 }}
               >
-                SK
+                RY
               </div>
               <span className="font-display" style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-primary)', whiteSpace: 'nowrap' }}>
-                SkillSense <span style={{ color: 'var(--gold)' }}>AI</span>
+                Ryyvora <span style={{ color: 'var(--gold)' }}>AI</span>
               </span>
             </div>
 
             {/* Desktop Breadcrumbs in Sidebar mode */}
             <div className="hidden md:flex" style={{ alignItems: 'center', gap: 6, fontSize: 13, color: 'var(--text-secondary)' }}>
-              <span style={{ color: 'var(--text-muted)' }}>SkillSense</span>
+              <span style={{ color: 'var(--text-muted)' }}>Ryyvora</span>
               <span>/</span>
               <span style={{ textTransform: 'capitalize', color: 'var(--text-muted)' }}>{activeSection}</span>
               <span>/</span>
@@ -844,10 +844,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <div style={{ width: 28, height: 28, borderRadius: 6, background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#090a0f', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 12 }}>
-                      SK
+                      RY
                     </div>
                     <span className="font-display" style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-primary)' }}>
-                      SkillSense AI
+                      Ryyvora AI
                     </span>
                   </div>
 

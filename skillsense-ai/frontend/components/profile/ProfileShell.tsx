@@ -526,7 +526,7 @@ export function ProfileShell({ forcedRole }: ProfileShellProps) {
               </div>
               <div style={{ padding: 12, background: 'var(--bg-surface-elevated)', borderRadius: 6, border: '1px solid var(--border)' }}>
                 <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Email Address</div>
-                <div style={{ fontSize: 13.5, fontWeight: 650, color: 'var(--text-primary)', marginTop: 4 }}>{email || user?.email || 'user@skillsense.ai'}</div>
+                <div style={{ fontSize: 13.5, fontWeight: 650, color: 'var(--text-primary)', marginTop: 4 }}>{email || user?.email || 'user@ryyvora.ai'}</div>
               </div>
               <div style={{ padding: 12, background: 'var(--bg-surface-elevated)', borderRadius: 6, border: '1px solid var(--border)' }}>
                 <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{meta.trackLabel}</div>

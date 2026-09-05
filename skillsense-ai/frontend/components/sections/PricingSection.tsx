@@ -43,7 +43,7 @@ const PLANS: DisplayPlan[] = [
   {
     id: 'free',
     name: 'Free',
-    tagline: 'Explore SkillSense AI at no cost.',
+    tagline: 'Explore Ryyvora AI at no cost.',
     monthlyPrice: 0,
     yearlyPrice: 0,
     yearlyPerMonth: 0,

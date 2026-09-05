@@ -78,7 +78,7 @@ const FRAMEWORKS: ComplianceFramework[] = [
   {
     id: 'fairness',
     name: 'Algorithmic Fairness & Bias Governance',
-    authority: 'SkillSense AI Ethical Governance Board',
+    authority: 'Ryyvora AI Ethical Governance Board',
     totalRequirements: 14,
     met: 13,
     partial: 1,
@@ -138,7 +138,7 @@ export default function CompliancePage() {
         status: f.status,
         metRequirements: `${f.met}/${f.totalRequirements}`,
       })),
-      complianceAuthority: 'SkillSense AI Regulatory Ledger · MSDE Calibrated',
+      complianceAuthority: 'Ryyvora AI Regulatory Ledger · MSDE Calibrated',
     };
 
     const blob = new Blob([JSON.stringify(reportData, null, 2)], { type: 'application/json' });

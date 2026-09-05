@@ -360,7 +360,7 @@ export default function SkillSenseIntro({ children }: { children?: React.ReactNo
         }
       }
 
-      // 4. "SkillSense AI" Typography State & Transitions
+      // 4. "Ryyvora AI" Typography State & Transitions
       if (textRef.current) {
         if (elapsed < 0.6) {
           textRef.current.style.opacity = '0';
@@ -605,7 +605,7 @@ export default function SkillSenseIntro({ children }: { children?: React.ReactNo
       <div
         ref={overlayRef}
         role="dialog"
-        aria-label="SkillSense AI Initialization"
+        aria-label="Ryyvora AI Initialization"
         aria-modal="true"
         style={{
           position: 'fixed',
@@ -688,7 +688,7 @@ export default function SkillSenseIntro({ children }: { children?: React.ReactNo
           }}
         />
 
-        {/* Hero "SkillSense AI" Typography */}
+        {/* Hero "Ryyvora AI" Typography */}
         <div
           ref={textRef}
           style={{
@@ -718,7 +718,7 @@ export default function SkillSenseIntro({ children }: { children?: React.ReactNo
               textShadow: '0 2px 24px rgba(0, 0, 0, 0.8), 0 0 35px rgba(245, 158, 11, 0.35)',
             }}
           >
-            SkillSense
+            Ryyvora
             <span
               style={{
                 display: 'inline-block',

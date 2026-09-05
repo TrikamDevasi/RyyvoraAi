@@ -58,7 +58,7 @@ const POLICY_NEWS: PolicyArticle[] = [
     highlights: [
       'Direct allocation of ₹8.4 Cr per district vocational center in Marathwada & Vidarbha',
       'Mandatory NSQF Level 5 calibration for all computer engineering curricula',
-      'Integration with SkillSense AI decentralized workforce telemetry ledger',
+      'Integration with Ryyvora AI decentralized workforce telemetry ledger',
     ],
     sourceUrl: 'https://skillsense-ai-seven.vercel.app/government',
     isFeatured: true,
@@ -110,7 +110,7 @@ const POLICY_NEWS: PolicyArticle[] = [
     highlights: [
       'Prohibition of unauthorized candidate PII sharing with unverified recruiters',
       '100% sovereign right for trainees to revoke tracking or export records in JSON',
-      'SkillSense AI certified as fully compliant with Section 6 & 12 safeguards',
+      'Ryyvora AI certified as fully compliant with Section 6 & 12 safeguards',
     ],
     sourceUrl: 'https://skillsense-ai-seven.vercel.app/student/consent',
   },
@@ -126,7 +126,7 @@ const POLICY_NEWS: PolicyArticle[] = [
     grNumber: 'NASSCOM-MH/2026/ALLIANCE-04',
     highlights: [
       'Hiring targets focused on React 19, Python AI, and Kubernetes platform engineering',
-      'Zero-cost credential screening for verified SkillSense digital passport holders',
+      'Zero-cost credential screening for verified Ryyvora digital passport holders',
       'Co-funding of final semester capstone projects with corporate mentors',
     ],
     sourceUrl: 'https://skillsense-ai-seven.vercel.app/employer',
@@ -160,7 +160,7 @@ export default function GovernmentNewsPage() {
           title: 'Government of Maharashtra · Skilling Policy & Gazette Digest',
           exportedAt: new Date().toISOString(),
           articles: POLICY_NEWS,
-          officialPortal: 'SkillSense AI Governance Center',
+          officialPortal: 'Ryyvora AI Governance Center',
         },
         null,
         2

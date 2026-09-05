@@ -73,7 +73,7 @@ export default function FairnessPage() {
   const handleExportAuditDossier = () => {
     const auditReport = {
       title: 'State Algorithmic Fairness & Disparate Impact Audit Report',
-      authority: 'SkillSense AI Ethical Governance Center & Maharashtra Skill Board',
+      authority: 'Ryyvora AI Ethical Governance Center & Maharashtra Skill Board',
       evaluatedAt: new Date().toISOString(),
       standardsCalibrated: ['IEEE 7000-2021', 'US EEOC 4/5ths Rule', 'DPDP Act 2023 Article 12'],
       globalMetrics: {

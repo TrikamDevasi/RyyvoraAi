@@ -876,7 +876,7 @@ export default function StudentsPage() {
               ) : (
                 <div>
                   <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: 16 }}>
-                    Upload a cohort roster CSV with columns: <code>name, email, program, nsqfLevel, gender, batch</code>. SkillSense AI automatically parses the records, validates DPDP consent boundaries, and generates SHA-256 verifiable credentials.
+                    Upload a cohort roster CSV with columns: <code>name, email, program, nsqfLevel, gender, batch</code>. Ryyvora AI automatically parses the records, validates DPDP consent boundaries, and generates SHA-256 verifiable credentials.
                   </p>
                   <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
                     <button

@@ -106,7 +106,7 @@ export default function MobileNamePage() {
         selectedRole
       );
 
-      toast.success(`Welcome to SkillSense AI, ${result.user.name}!`);
+      toast.success(`Welcome to Ryyvora AI, ${result.user.name}!`);
       const destination = ROLE_DASHBOARD[selectedRole] || '/student';
       window.location.replace(destination);
     } catch (err: any) {

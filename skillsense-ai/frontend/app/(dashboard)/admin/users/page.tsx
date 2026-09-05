@@ -195,7 +195,7 @@ export default function UsersPage() {
     const url = URL.createObjectURL(blob);
     const downloadAnchor = document.createElement('a');
     downloadAnchor.href = url;
-    downloadAnchor.download = `skillsense_user_registry_${Date.now()}.csv`;
+    downloadAnchor.download = `ryyvora_user_registry_${Date.now()}.csv`;
     downloadAnchor.click();
     toast.success('User Governance Registry exported to CSV!');
   };

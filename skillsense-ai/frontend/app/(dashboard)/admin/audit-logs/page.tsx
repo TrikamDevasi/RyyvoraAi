@@ -113,7 +113,7 @@ const DEFAULT_LOGS: AuditLogEvent[] = [
     id: 'evt_9477',
     action: 'AUTH_KEY_ROTATION',
     category: 'AUTH',
-    actor: 'root_admin@skillsense.ai',
+    actor: 'root_admin@ryyvora.ai',
     role: 'ADMIN',
     ipAddress: '127.0.0.1',
     target: 'Cluster Node Keypair MH-01',
@@ -154,7 +154,7 @@ export default function AuditLogsPage() {
     const url = URL.createObjectURL(blob);
     const downloadAnchor = document.createElement('a');
     downloadAnchor.href = url;
-    downloadAnchor.download = `skillsense_audit_ledger_${Date.now()}.csv`;
+    downloadAnchor.download = `ryyvora_audit_ledger_${Date.now()}.csv`;
     downloadAnchor.click();
     toast.success('Immutable Audit Ledger exported to CSV!');
   };

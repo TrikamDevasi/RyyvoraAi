@@ -1,6 +1,6 @@
-# 🖥️ SkillSense AI — Frontend Application
+# 🖥️ Ryyvora AI — Frontend Application
 
-Next.js 15 App Router frontend client for **SkillSense AI**, the verifiable longitudinal skilling and outcome intelligence platform for the Government of Maharashtra.
+Next.js 15 App Router frontend client for **Ryyvora AI**, the verifiable longitudinal skilling and outcome intelligence platform for the Government of Maharashtra.
 
 [![Next.js](https://img.shields.io/badge/Next.js-15.x-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-19.x-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://react.dev/)

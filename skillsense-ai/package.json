@@ -1,7 +1,7 @@
 {
   "name": "skillsense-ai",
   "version": "1.0.0",
-  "description": "SkillSense AI — Monorepo root",
+  "description": "Ryyvora AI — Monorepo root",
   "scripts": {
     "dev:backend": "cd backend && npm run dev",
     "dev:frontend": "cd frontend && npm run dev",

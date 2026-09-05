@@ -217,7 +217,7 @@ export default function AIChatWidget() {
     {
       id: '0',
       role: 'assistant',
-      content: "Hello! I am your SkillSense Workforce & Policy Copilot. Ask me about state retention outcomes, NSQF competency benchmarks, candidate verification, or district skill analytics.",
+      content: "Hello! I am your Ryyvora Workforce & Policy Copilot. Ask me about state retention outcomes, NSQF competency benchmarks, candidate verification, or district skill analytics.",
       suggestions: currentRoleSuggestions,
     },
   ]);
@@ -348,7 +348,7 @@ export default function AIChatWidget() {
       }, 20000);
 
       try {
-        const token = localStorage.getItem('skillsense_token');
+        const token = localStorage.getItem('ryyvora_token') || localStorage.getItem('skillsense_token');
         const headers: Record<string, string> = { 'Content-Type': 'application/json' };
         if (token && token !== 'null' && token !== 'undefined') {
           headers['Authorization'] = `Bearer ${token}`;
@@ -472,7 +472,7 @@ export default function AIChatWidget() {
         <button
           type="button"
           onClick={() => setOpen(true)}
-          aria-label="Open SkillSense Policy & Skill Copilot"
+          aria-label="Open Ryyvora Policy & Skill Copilot"
           className="ai-copilot-launcher hover:border-amber-500"
         >
           <Bot size={16} color="var(--gold, #f59e0b)" />
@@ -497,7 +497,7 @@ export default function AIChatWidget() {
       {open && (
         <div
           role="dialog"
-          aria-label="SkillSense AI Copilot"
+          aria-label="Ryyvora AI Copilot"
           className="ai-copilot-modal"
           style={{
             position: 'fixed',
@@ -547,7 +547,7 @@ export default function AIChatWidget() {
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                   <h3 style={{ fontSize: 13.5, fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
-                    SkillSense Copilot
+                    Ryyvora Copilot
                   </h3>
                   <AIBadge type="live" label="LIVE" />
                 </div>
@@ -785,7 +785,7 @@ export default function AIChatWidget() {
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask Copilot about skills, career paths, interview prep..."
               disabled={loading}
-              aria-label="Ask SkillSense AI Copilot"
+              aria-label="Ask Ryyvora AI Copilot"
               style={{
                 flex: 1,
                 padding: '9px 12px',

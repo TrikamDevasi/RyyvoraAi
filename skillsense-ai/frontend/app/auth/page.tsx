@@ -248,7 +248,7 @@ export default function AuthPage() {
                   alt=""
                   style={{ width: 18, height: 18 }}
                 />
-                <span>SkillSense AI · Maharashtra</span>
+                <span>Ryyvora AI · Maharashtra</span>
               </div>
 
               <div className="auth-visual-footer">
@@ -280,11 +280,11 @@ export default function AuthPage() {
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(245,158,11,0.12)', border: '1px solid rgba(245,158,11,0.3)', padding: '4px 12px', borderRadius: 99, marginBottom: 12 }}>
             <Sparkles size={13} color="var(--gold, #f59e0b)" />
             <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--gold, #f59e0b)', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
-              SkillSense AI · Neural Telemetry
+              Ryyvora AI · Neural Telemetry
             </span>
           </div>
           <h1 className="auth-title" style={{ fontSize: 24, fontWeight: 800, color: '#f8fafc', margin: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-            {activeTab === 'signin' && 'Welcome to SkillSense'}
+            {activeTab === 'signin' && 'Welcome to Ryyvora AI'}
             {activeTab === 'signup' && 'Create Verified Account'}
             {activeTab === 'demo' && (
               <>

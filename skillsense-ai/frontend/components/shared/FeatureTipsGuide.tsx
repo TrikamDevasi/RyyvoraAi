@@ -119,7 +119,7 @@ export const PLATFORM_TIPS: FeatureTip[] = [
     ],
     actionLink: '/institute',
     actionText: 'Preview College Dashboard',
-    shortcutTip: 'Great for evaluating how SkillSense AI connects students with colleges and employers.',
+    shortcutTip: 'Great for evaluating how Ryyvora AI connects students with colleges and employers.',
   },
   {
     id: 'layout-toggle',
@@ -244,7 +244,7 @@ export function FeatureTipsGuideModal({ isOpen, onClose }: FeatureTipsGuideProps
             </div>
             <div>
               <h2 className="font-display" style={{ fontSize: 16, fontWeight: 800, color: '#f8fafc', margin: 0 }}>
-                SkillSense AI — Feature Guide & Pro Tips
+                Ryyvora AI — Feature Guide & Pro Tips
               </h2>
               <p style={{ fontSize: 11.5, color: 'var(--text-muted)', margin: '2px 0 0' }}>
                 Understand all intelligent features, verifiable tools, and workflows

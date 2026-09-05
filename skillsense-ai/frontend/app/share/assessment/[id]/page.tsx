@@ -60,7 +60,7 @@ export default function SharedAssessment() {
                     <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-amber-500 text-xs font-bold uppercase tracking-widest mb-6">
                         <Award size={14} /> Verifiable Skill Passport
                     </div>
-                    <h1 className="text-4xl font-black text-white mb-2">SkillSense <span className="text-amber-500">AI</span></h1>
+                    <h1 className="text-4xl font-black text-white mb-2">Ryyvora <span className="text-amber-500">AI</span></h1>
                     <p className="text-slate-400">Official AI-Verified Assessment Record</p>
                 </div>
 
@@ -79,7 +79,7 @@ export default function SharedAssessment() {
                             )}
                         </div>
                         <div className="text-center md:text-left flex-1">
-                            <h2 className="text-2xl font-bold text-white">{assessment.student?.name || 'SkillSense Learner'}</h2>
+                            <h2 className="text-2xl font-bold text-white">{assessment.student?.name || 'Ryyvora Learner'}</h2>
                             <p className="text-slate-400 text-sm flex items-center justify-center md:justify-start gap-2 mt-1">
                                 <Calendar size={14} />
                                 Completed on {new Date(assessment.completedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
@@ -147,7 +147,7 @@ export default function SharedAssessment() {
 
                     <div className="p-8 bg-white/[0.03] border-t border-white/5 text-center">
                         <p className="text-xs text-slate-500 mb-6">
-                            This record is cryptographically tied to the SkillSense AI platform and represents a legitimate skill assessment event. 
+                            This record is cryptographically tied to the Ryyvora AI platform and represents a legitimate skill assessment event. 
                             ID: <span className="font-mono text-[10px]">{assessment.id}</span>
                         </p>
                         <button className="px-8 py-3 bg-white text-slate-950 font-black rounded-xl hover:bg-slate-200 transition-all active:scale-95 text-sm uppercase tracking-tight">
@@ -158,7 +158,7 @@ export default function SharedAssessment() {
 
                 {/* Footer */}
                 <div className="text-center mt-12 opacity-40">
-                    <p className="text-[10px] text-slate-500 uppercase tracking-widest">© 2026 SkillSense AI • Digital Skill Infrastructure</p>
+                    <p className="text-[10px] text-slate-500 uppercase tracking-widest">© 2026 Ryyvora AI • Workforce Outcome Intelligence</p>
                 </div>
             </div>
         </div>

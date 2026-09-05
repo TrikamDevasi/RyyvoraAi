@@ -186,7 +186,7 @@ export default function TraineeConsentPage() {
           activePurposes: selectedPurposes,
           auditHistory: consent.consentHistory,
           exportedAt: new Date().toISOString(),
-          issuingAuthority: 'SkillSense AI · Government of Maharashtra',
+          issuingAuthority: 'Ryyvora AI · Government of Maharashtra',
         },
         null,
         2
@@ -194,7 +194,7 @@ export default function TraineeConsentPage() {
     );
     const downloadAnchor = document.createElement('a');
     downloadAnchor.setAttribute('href', dataStr);
-    downloadAnchor.setAttribute('download', `skillsense_privacy_data_${Date.now()}.json`);
+    downloadAnchor.setAttribute('download', `ryyvora_privacy_data_${Date.now()}.json`);
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();

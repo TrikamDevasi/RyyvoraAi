@@ -155,7 +155,7 @@ export default function SkillSenseLoader({ children }: { children?: React.ReactN
         <div
           role="status"
           aria-live="polite"
-          aria-label="Loading SkillSense AI"
+          aria-label="Loading Ryyvora AI"
           style={{
             position: 'fixed',
             inset: 0,
@@ -170,7 +170,7 @@ export default function SkillSenseLoader({ children }: { children?: React.ReactN
             pointerEvents: isExiting ? 'none' : 'all',
           }}
         >
-          <img src="/logo.png" alt="SkillSense AI" style={{ width: 90, height: 90, objectFit: 'contain' }} />
+          <img src="/logo.png" alt="Ryyvora AI" style={{ width: 90, height: 90, objectFit: 'contain' }} />
           <p style={{ marginTop: 24, color: '#f8fafc', fontSize: 14, fontFamily: 'var(--font-space-grotesk, sans-serif)' }}>
             {STATUS_MESSAGES[statusIndex]}
           </p>
@@ -189,7 +189,7 @@ export default function SkillSenseLoader({ children }: { children?: React.ReactN
       <div
         role="status"
         aria-live="polite"
-        aria-label="SkillSense AI is loading"
+        aria-label="Ryyvora AI is loading"
         className={`ss-loader-root ${isExiting ? 'ss-loader-exit' : ''}`}
       >
         {/* Ambient subtle cyber-grid background */}
@@ -333,7 +333,7 @@ export default function SkillSenseLoader({ children }: { children?: React.ReactN
             <div className="ss-logo-aura" />
             <img
               src="/logo.png"
-              alt="SkillSense AI"
+              alt="Ryyvora AI"
               className="ss-logo-img"
             />
           </div>

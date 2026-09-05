@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Space_Grotesk } from "next/font/google";
+import { Inter, Space_Grotesk, Manrope, Outfit } from "next/font/google";
 import "./globals.css";
 import SplashScreen from "../components/SplashScreen";
 import ChatWidgetLoader from "../components/ChatWidgetLoader";
@@ -17,6 +17,18 @@ const spaceGrotesk = Space_Grotesk({
   display: "swap",
 });
 
+const manrope = Manrope({
+  subsets: ["latin"],
+  variable: "--font-manrope",
+  display: "swap",
+});
+
+const outfit = Outfit({
+  subsets: ["latin"],
+  variable: "--font-outfit",
+  display: "swap",
+});
+
 export const viewport: Viewport = {
   themeColor: "#F59E0B",
   width: "device-width",
@@ -26,46 +38,47 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "SkillSense AI — Measuring Skills, Predicting Futures",
+  title: "Ryyvora AI | Workforce Outcome Intelligence",
   description:
-    "AI-powered skill gap analysis, verifiable Skill Passports, career matching, and national workforce intelligence for India's IT and software engineering ecosystem.",
+    "Ryyvora AI connects training, certification, employment, verification, retention and workforce outcomes into one intelligence platform.",
   keywords: [
-    "AI Career Counselor",
+    "Ryyvora AI",
+    "Workforce Outcome Intelligence",
     "Skill Assessment",
-    "Next.js",
-    "Career Prediction",
-    "Market Trends",
-    "Verifiable Credentials",
+    "Outcome Verification",
     "Skill Passport",
+    "Labor Market Analytics",
+    "Workforce Policy Intelligence",
   ],
-  authors: [{ name: "SkillSense Team" }],
+  authors: [{ name: "Ryyvora AI Team" }],
   manifest: "/manifest.json",
   openGraph: {
     type: "website",
     locale: "en_IN",
+    siteName: "Ryyvora AI",
     url: "https://skillsense-ai.vercel.app",
-    title: "SkillSense AI — Measuring Skills, Predicting Futures",
+    title: "Ryyvora AI | Workforce Outcome Intelligence",
     description:
-      "AI-powered skill gap analysis, verifiable Skill Passports, and career matching for the modern workforce.",
+      "Ryyvora AI connects training, certification, employment, verification, retention and workforce outcomes into one intelligence platform.",
     images: [
       {
         url: "https://skillsense-ai.vercel.app/og-image.png",
         width: 1200,
         height: 630,
-        alt: "SkillSense AI",
+        alt: "Ryyvora AI — Workforce Outcome Intelligence",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "SkillSense AI",
-    description: "AI-powered skill gap analysis and career matching.",
+    title: "Ryyvora AI | Workforce Outcome Intelligence",
+    description: "From Skills to Sustainable Outcomes. Enterprise & Government Workforce Outcome Intelligence.",
     images: ["https://skillsense-ai.vercel.app/og-image.png"],
   },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "SkillSense AI",
+    title: "Ryyvora AI",
   },
 };
 
@@ -73,7 +86,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable} ${manrope.variable} ${outfit.variable}`} suppressHydrationWarning>
       <head>
         <ThemeScript />
       </head>

@@ -260,7 +260,7 @@ export default function DistrictTelemetrySandbox() {
               </div>
               <div style={{ padding: 14 }}>
                 <p style={{ fontSize: 12, color: 'var(--text-secondary)', margin: 0, lineHeight: 1.5 }}>
-                  SkillSense telemetry synchronizes hiring data directly across MIDC clusters, Hinjawadi tech corridors, and tier-2 manufacturing hubs to validate live wage premiums.
+                  Ryyvora telemetry synchronizes hiring data directly across MIDC clusters, Hinjawadi tech corridors, and tier-2 manufacturing hubs to validate live wage premiums.
                 </p>
               </div>
             </div>

@@ -1,4 +1,4 @@
-export function downloadPageAsPDF(title: string = 'SkillSense-AI-Report') {
+export function downloadPageAsPDF(title: string = 'Ryyvora-AI-Report') {
     const printWindow = window.open('', '_blank');
     if (!printWindow) { alert('Please allow popups to download PDF'); return; }
 
@@ -26,8 +26,8 @@ export function downloadPageAsPDF(title: string = 'SkillSense-AI-Report') {
         <body>
             <div class="header">
                 <div>
-                    <h1>SkillSense AI</h1>
-                    <p>Measuring Skills, Predicting Futures</p>
+                    <h1>Ryyvora AI</h1>
+                    <p>Workforce Outcome Intelligence</p>
                 </div>
                 <div>
                     <p>${title}</p>

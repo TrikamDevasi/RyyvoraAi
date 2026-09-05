@@ -903,7 +903,7 @@ export default function StudentDashboardPage() {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
                 <div>
                   <div style={{ fontSize: 11, fontWeight: 800, color: 'var(--gold)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-                    Government of India · SkillSense Digital Seal
+                    Government of India · Ryyvora Digital Seal
                   </div>
                   <div style={{ fontSize: 18, fontWeight: 800, color: '#f8fafc', marginTop: 4 }}>{studentName}</div>
                   <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', marginTop: 2 }}>Enrollment ID: {profile?.enrollmentNumber || 'Not assigned'}</div>

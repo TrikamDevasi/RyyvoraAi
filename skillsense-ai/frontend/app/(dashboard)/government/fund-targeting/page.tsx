@@ -263,7 +263,7 @@ export default function FundTargetingPage() {
         {/* ── Key Budget Scorecards ── */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14, marginBottom: 24 }}>
           {[
-            { label: 'Total Recommended Need', value: `₹${totalRecommended.toLocaleString('en-IN')} Cr`, sub: 'Calculated by SkillSense Engine', color: 'var(--gold)', icon: DollarSign },
+            { label: 'Total Recommended Need', value: `₹${totalRecommended.toLocaleString('en-IN')} Cr`, sub: 'Calculated by Ryyvora Engine', color: 'var(--gold)', icon: DollarSign },
             { label: 'Currently Approved Budget', value: `₹${totalApproved.toLocaleString('en-IN')} Cr`, sub: `${((totalApproved / totalRecommended) * 100).toFixed(1)}% Allocation Ratio`, color: '#10b981', icon: ShieldCheck },
             { label: 'Trainees Funded', value: `${(totalBeneficiaries / 1000).toFixed(0)}k Candidates`, sub: 'Across 36 Districts', color: '#60a5fa', icon: Users },
             { label: 'Projected Economic ROI', value: `${averageROI}x Multiplier`, sub: '₹8,420 Cr 3-Yr Wage Return', color: '#a855f7', icon: TrendingUp },

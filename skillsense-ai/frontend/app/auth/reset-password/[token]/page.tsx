@@ -70,8 +70,8 @@ export default function ResetPasswordPage() {
             <div className="auth-card">
                 <div className="auth-header">
                     <div className="auth-logo">
-                        <img src="/logo.png" alt="SkillSense AI" />
-                        <p className="auth-tagline">Measuring Skills · Predicting Futures</p>
+                        <img src="/logo.png" alt="Ryyvora AI" />
+                        <p className="auth-tagline">Workforce Outcome Intelligence</p>
                     </div>
                     <h1 className="auth-title">Reset Password</h1>
                     <p className="auth-subtitle">

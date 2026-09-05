@@ -36,9 +36,9 @@ export const sendPasswordResetEmail = async (
 
   try {
     await transporter.sendMail({
-      from: `"SkillSense AI" <${env.GMAIL_USER}>`,
+      from: `"Ryyvora AI" <${env.GMAIL_USER}>`,
       to: toEmail,
-      subject: 'Reset Your SkillSense AI Password',
+      subject: 'Reset Your Ryyvora AI Password',
       html: `
         <!DOCTYPE html>
         <html>
@@ -46,11 +46,11 @@ export const sendPasswordResetEmail = async (
           <div style="max-width:480px;margin:0 auto;background:#0d0a1a;
                       border:1px solid rgba(245,158,11,0.3);border-radius:16px;padding:40px;">
             <h2 style="color:#F59E0B;text-align:center;font-size:24px;margin-bottom:8px;">
-              SkillSense AI
+              Ryyvora AI
             </h2>
             <p style="color:#9ca3af;text-align:center;font-size:12px;
                       letter-spacing:0.1em;margin-bottom:32px;">
-              MEASURING SKILLS · PREDICTING FUTURES
+              WORKFORCE OUTCOME INTELLIGENCE
             </p>
             <h3 style="color:#ffffff;font-size:18px;margin-bottom:12px;">
               Hi ${userName},
@@ -73,7 +73,7 @@ export const sendPasswordResetEmail = async (
             </p>
             <hr style="border:none;border-top:1px solid rgba(255,255,255,0.08);margin:24px 0;" />
             <p style="color:#374151;font-size:11px;text-align:center;">
-              © 2026 SkillSense AI. All rights reserved.
+              © 2026 Ryyvora AI. All rights reserved.
             </p>
           </div>
         </body>
@@ -99,9 +99,9 @@ export const sendVerificationEmail = async (
 
   try {
     await transporter.sendMail({
-      from: `"SkillSense AI" <${env.GMAIL_USER}>`,
+      from: `"Ryyvora AI" <${env.GMAIL_USER}>`,
       to: toEmail,
-      subject: 'Verify Your SkillSense AI Account',
+      subject: 'Verify Your Ryyvora AI Account',
       html: `
         <!DOCTYPE html>
         <html>
@@ -109,17 +109,17 @@ export const sendVerificationEmail = async (
           <div style="max-width:480px;margin:0 auto;background:#0d0a1a;
                       border:1px solid rgba(139,92,246,0.3);border-radius:16px;padding:40px;">
             <h2 style="color:#8B5CF6;text-align:center;font-size:24px;margin-bottom:8px;">
-              SkillSense AI
+              Ryyvora AI
             </h2>
             <p style="color:#9ca3af;text-align:center;font-size:12px;
                       letter-spacing:0.1em;margin-bottom:32px;">
-              MEASURING SKILLS · PREDICTING FUTURES
+              WORKFORCE OUTCOME INTELLIGENCE
             </p>
             <h3 style="color:#ffffff;font-size:18px;margin-bottom:12px;">
               Welcome, ${userName}!
             </h3>
             <p style="color:#9ca3af;font-size:14px;line-height:1.6;margin-bottom:24px;">
-              Thank you for joining SkillSense AI. Please verify your email address to 
+              Thank you for joining Ryyvora AI. Please verify your email address to 
               unlock all features and start your career assessment journey.
             </p>
             <a href="${verificationUrl}"
@@ -134,7 +134,7 @@ export const sendVerificationEmail = async (
             </p>
             <hr style="border:none;border-top:1px solid rgba(255,255,255,0.08);margin:24px 0;" />
             <p style="color:#374151;font-size:11px;text-align:center;">
-              © 2026 SkillSense AI. All rights reserved.
+              © 2026 Ryyvora AI. All rights reserved.
             </p>
           </div>
         </body>

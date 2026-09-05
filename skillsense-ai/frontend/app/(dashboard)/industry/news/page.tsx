@@ -68,7 +68,7 @@ const INDUSTRY_ARTICLES: IndustryNewsArticle[] = [
   {
     id: 'ind_2026_02',
     title: 'MSDE Expands 50% Apprenticeship Stipend Co-Funding Scheme for Maharashtra Enterprises',
-    summary: 'Under PMKVY 4.0 guidelines, registered corporate employers receive a 50% direct benefit transfer (DBT) subsidy on trainee monthly stipends for candidates verified via SkillSense AI digital passports.',
+    summary: 'Under PMKVY 4.0 guidelines, registered corporate employers receive a 50% direct benefit transfer (DBT) subsidy on trainee monthly stipends for candidates verified via Ryyvora AI digital passports.',
     category: 'SUBSIDY',
     categoryLabel: 'Corporate Subsidy & DBT',
     source: 'Ministry of Skill Development and Entrepreneurship (MSDE)',
@@ -95,7 +95,7 @@ const INDUSTRY_ARTICLES: IndustryNewsArticle[] = [
     referenceNumber: 'NCVET/NOS-REV/2026/COMP-512',
     highlights: [
       'Accredited qualification packs SSC/Q0501, SSC/Q0702, and SSC/Q0801 revised',
-      'Direct integration with SkillSense SHA-256 HMAC cryptographic skill passports',
+      'Direct integration with Ryyvora SHA-256 HMAC cryptographic skill passports',
       'Recognition of hands-on practical code execution as formal coursework',
     ],
     actionLink: '/industry/demand',
@@ -131,7 +131,7 @@ const INDUSTRY_ARTICLES: IndustryNewsArticle[] = [
     referenceNumber: 'DPB/ADV/2026/RECRUIT-09',
     highlights: [
       'Strict prohibition of unauthorized candidate PII sharing',
-      'SkillSense AI certified as 100% DPDP sovereign compliant',
+      'Ryyvora AI certified as 100% DPDP sovereign compliant',
       'Instant candidate privacy package JSON export capability',
     ],
     actionLink: '/industry/talent',
@@ -164,7 +164,7 @@ export default function IndustryNewsPage() {
       title: 'Sector Skill Council (SSC) & Maharashtra Industry Hiring Wire Digest',
       exportedAt: new Date().toISOString(),
       articles: INDUSTRY_ARTICLES,
-      governingAuthority: 'SkillSense AI Industry Intelligence Center',
+      governingAuthority: 'Ryyvora AI Industry Intelligence Center',
     };
 
     const blob = new Blob([JSON.stringify(reportData, null, 2)], { type: 'application/json' });

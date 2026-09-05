@@ -119,7 +119,7 @@ export default function AIHealthPage() {
               transition: 'all 0.2s ease',
             }}
           >
-            <ArrowLeft size={15} /> Back to SkillSense AI
+            <ArrowLeft size={15} /> Back to Ryyvora AI
           </Link>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>

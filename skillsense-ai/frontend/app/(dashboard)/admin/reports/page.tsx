@@ -135,7 +135,7 @@ export default function ReportsPage() {
 
       const dossierPayload = {
         title: rep.title,
-        authority: 'SkillSense AI State Administrative Reporting Desk',
+        authority: 'Ryyvora AI State Administrative Reporting Desk',
         stateAffiliation: 'Government of Maharashtra & MSDE',
         generatedAt: new Date().toISOString(),
         category: rep.categoryLabel,

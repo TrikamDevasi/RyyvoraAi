@@ -80,7 +80,7 @@ export default function PublicVerifyPage() {
           href="/"
           style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text-secondary)', textDecoration: 'none', fontSize: 13 }}
         >
-          <ArrowLeft size={16} /> Back to SkillSense AI
+          <ArrowLeft size={16} /> Back to Ryyvora AI
         </Link>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -93,7 +93,7 @@ export default function PublicVerifyPage() {
         {loading && (
           <ScanningState
             title="Validating Cryptographic Credential"
-            subtitle={`Verifying SHA-256 HMAC digital seal against the SkillSense national competency ledger for hash: ${hash.slice(0, 16)}...`}
+            subtitle={`Verifying SHA-256 HMAC digital seal against the Ryyvora national competency ledger for hash: ${hash.slice(0, 16)}...`}
             stage="Consensus Validation · SHA-256 Digest Verification"
           />
         )}
@@ -308,7 +308,7 @@ export default function PublicVerifyPage() {
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 <div style={{ textAlign: 'right' }}>
                   <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Verification Authority</div>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: '#f8fafc' }}>SkillSense AI Validator</div>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: '#f8fafc' }}>Ryyvora AI Validator</div>
                   <div style={{ fontSize: 10.5, color: '#10b981' }}>Live Consensus</div>
                 </div>
 

@@ -263,7 +263,7 @@ export default function SkillPassport({ student }: Props) {
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <div style={{ textAlign: 'right' }}>
               <div style={{ fontSize: 10.5, color: 'var(--text-muted)' }}>Authority Seal</div>
-              <div style={{ fontSize: 11.5, fontWeight: 700, color: '#f8fafc' }}>SkillSense AI Validator</div>
+              <div style={{ fontSize: 11.5, fontWeight: 700, color: '#f8fafc' }}>Ryyvora AI Validator</div>
               <div style={{ fontSize: 10, color: '#10b981' }}>Live Consensus</div>
             </div>
 

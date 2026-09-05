@@ -28,7 +28,7 @@ const PLAN_META: Record<PlanId, {
   label: string; color: string; icon: React.ElementType;
   monthlyDisplay: string; yearlyDisplay: string; tagline: string;
 }> = {
-  free:       { label: 'Free',       color: '#64748b', icon: Zap,      monthlyDisplay: '₹0',      yearlyDisplay: '₹0',         tagline: 'For exploring SkillSense AI' },
+  free:       { label: 'Free',       color: '#64748b', icon: Zap,      monthlyDisplay: '₹0',      yearlyDisplay: '₹0',         tagline: 'For exploring Ryyvora AI' },
   starter:    { label: 'Starter',    color: '#60a5fa', icon: Zap,      monthlyDisplay: '₹1,999',  yearlyDisplay: '₹1,666/mo',  tagline: 'For small training institutes' },
   growth:     { label: 'Growth',     color: '#f59e0b', icon: Sparkles, monthlyDisplay: '₹4,999',  yearlyDisplay: '₹4,166/mo',  tagline: 'For growing organizations' },
   enterprise: { label: 'Enterprise', color: '#10b981', icon: Landmark, monthlyDisplay: 'Custom',  yearlyDisplay: 'Custom',     tagline: 'For government & universities' },
@@ -251,7 +251,7 @@ function BillingPageInner() {
   }, [authLoading, isAuthenticated, router]);
 
   const isDemo = isDemoToken(
-    typeof window !== 'undefined' ? localStorage.getItem('skillsense_token') : null
+    typeof window !== 'undefined' ? (localStorage.getItem('ryyvora_token') || localStorage.getItem('skillsense_token')) : null
   );
 
   const loadData = useCallback(async () => {

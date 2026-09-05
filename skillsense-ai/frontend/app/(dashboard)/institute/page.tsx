@@ -103,7 +103,7 @@ export default function InstitutePage() {
       programs: stats.topPrograms,
       placementTrend,
       generatedAt: new Date().toISOString(),
-      accreditedBy: 'Maharashtra NCVET State Board · SkillSense AI Engine',
+      accreditedBy: 'Maharashtra NCVET State Board · Ryyvora AI Engine',
     };
 
     const blob = new Blob([JSON.stringify(dossierData, null, 2)], { type: 'application/json' });

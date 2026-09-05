@@ -1,11 +1,12 @@
 <div align="center">
 
-# ⚡ SkillSense AI
-### **Smart India Hackathon 2026 · Problem Statement SIH26135**
+# ⚡ Ryyvora AI
+### **Workforce Outcome Intelligence Platform**
+#### **Smart India Hackathon 2026 · Problem Statement SIH26135**
 #### **Organization:** Government of Maharashtra · Department of Skills, Employment, Entrepreneurship & Innovation
 #### **Theme:** Miscellaneous | **Category:** Software
 
-> *"Measuring Skills, Predicting Futures — A Cryptographically Verified, Longitudinal Outcome Intelligence Platform for Vocational Skilling & Apprenticeships"*
+> *"Workforce Outcome Intelligence — From Skills to Sustainable Outcomes"*
 
 [![Next.js](https://img.shields.io/badge/Next.js-15.x-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-19.x-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://react.dev/)
@@ -50,7 +51,7 @@ In India, vocational skilling tracking historically ceased at course completion 
 3. **Curriculum & Geographical Mismatches**: High trainee output in trades experiencing localized supply saturation.
 4. **Data Privacy Deficits**: Lack of purpose-bound, revocable consent mandated under India's **DPDP Act 2023**.
 
-**SkillSense AI** solves this with a privacy-first **Longitudinal Skilling & Outcome Intelligence Platform** built for the Government of Maharashtra and accredited technical institutions.
+**Ryyvora AI** solves this with a privacy-first **Longitudinal Skilling & Outcome Intelligence Platform** built for the Government of Maharashtra and accredited technical institutions.
 
 ---
 
@@ -133,7 +134,7 @@ Built natively to comply with India's **Digital Personal Data Protection Act 202
 
 ## 🤖 Multi-Provider AI Architecture & Grounded Policy Copilot
 
-SkillSense features an intelligent multi-provider LLM manager with automated runtime health probes, strict Zod validation, and zero-hallucination guarantees:
+Ryyvora AI features an intelligent multi-provider LLM manager with automated runtime health probes, strict Zod validation, and zero-hallucination guarantees:
 
 ```
 User Query ──► AIProviderManager ──► [ Groq Cloud (Primary) ] ──► Fast Inference (788ms)
@@ -177,8 +178,8 @@ Pre-seeded accounts ready for jury evaluation:
 
 ### 1. Clone & Install
 ```bash
-git clone https://github.com/TrikamDevasi/TEAM_QUANTUM_CODERS-SU-.git
-cd TEAM_QUANTUM_CODERS-SU-/skillsense-ai
+git clone https://github.com/TrikamDevasi/SkillSenseAi.git
+cd SkillSenseAi
 npm install
 ```
 

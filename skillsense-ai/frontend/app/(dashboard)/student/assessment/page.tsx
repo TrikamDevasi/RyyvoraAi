@@ -236,7 +236,7 @@ export default function AssessmentPage() {
       strengths: [`${selectedTopic} Principles`, 'Problem Solving Logic', 'Discipline Standards Compliance'],
       improvementPlan: `Candidate demonstrated solid grasp of ${selectedTopic} in ${activeBranch.name}. Focus upskilling on advanced real-world implementations and industry simulations.`,
       nextSteps: [
-        'Sync score with the SkillSense Passport after verification',
+        'Sync score with the Ryyvora Passport after verification',
         `Explore verified openings in ${activeBranch.name} (${selectedTopic})`,
         'Complete targeted capstone practical project',
       ],
@@ -686,7 +686,7 @@ export default function AssessmentPage() {
                 </p>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 12, fontSize: 11.5, color: 'var(--text-secondary)', fontFamily: 'monospace' }}>
-                  <ShieldCheck size={14} /> Passport seal: Pending verification on the SkillSense ledger.
+                  <ShieldCheck size={14} /> Passport seal: Pending verification on the Ryyvora ledger.
                 </div>
               </div>
 

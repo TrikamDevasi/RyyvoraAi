@@ -150,9 +150,9 @@ export default function ResetPasswordPage() {
       <main className="auth-page">
         <div className="auth-card" style={{ maxWidth: '420px' }}>
           <div className="auth-logo">
-            <img src="/logo.png" alt="SkillSense AI" />
+            <img src="/logo.png" alt="Ryyvora AI" />
             <p className="auth-tagline" style={{ color: 'rgba(156,163,175,0.5)' }}>
-              Measuring Skills · Predicting Futures
+              Workforce Outcome Intelligence
             </p>
           </div>
           

@@ -86,7 +86,7 @@ export default function ReportGenerator({ onGenerate }: Props) {
             }
 
             const csv = rows.map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
-            downloadFile(`skillsense-${type}-report-${new Date().toISOString().slice(0, 10)}.csv`, csv, 'text/csv;charset=utf-8');
+            downloadFile(`ryyvora-${type}-report-${new Date().toISOString().slice(0, 10)}.csv`, csv, 'text/csv;charset=utf-8');
 
             onGenerate?.(config);
             setStatus({ ok: true, text: 'Report generated from live system data and downloaded.' });

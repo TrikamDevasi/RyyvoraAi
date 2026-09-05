@@ -21,8 +21,8 @@ export default function AuditLogViewer() {
                     setLogs(data);
                 } else {
                     setLogs([
-                        { _id: 'AL-1', action: 'ASSESSMENT_COMPLETED', actor: 'student@skillsense.ai', role: 'student', ipAddress: '127.0.0.1', status: 'success', createdAt: new Date().toISOString() },
-                        { _id: 'AL-2', action: 'VERIFY_INSTITUTION', actor: 'admin@skillsense.ai', role: 'admin', ipAddress: '127.0.0.1', status: 'success', createdAt: new Date().toISOString() },
+                        { _id: 'AL-1', action: 'ASSESSMENT_COMPLETED', actor: 'student@ryyvora.ai', role: 'student', ipAddress: '127.0.0.1', status: 'success', createdAt: new Date().toISOString() },
+                        { _id: 'AL-2', action: 'VERIFY_INSTITUTION', actor: 'admin@ryyvora.ai', role: 'admin', ipAddress: '127.0.0.1', status: 'success', createdAt: new Date().toISOString() },
                         { _id: 'AL-3', action: 'EXPORT_COMPLIANCE', actor: 'gov@meity.gov.in', role: 'government', ipAddress: '127.0.0.1', status: 'success', createdAt: new Date().toISOString() },
                     ]);
                 }
@@ -30,7 +30,7 @@ export default function AuditLogViewer() {
             })
             .catch(() => {
                 setLogs([
-                    { _id: 'AL-1', action: 'ASSESSMENT_COMPLETED', actor: 'student@skillsense.ai', role: 'student', ipAddress: '127.0.0.1', status: 'success', createdAt: new Date().toISOString() },
+                    { _id: 'AL-1', action: 'ASSESSMENT_COMPLETED', actor: 'student@ryyvora.ai', role: 'student', ipAddress: '127.0.0.1', status: 'success', createdAt: new Date().toISOString() },
                 ]);
                 setLoading(false);
             });

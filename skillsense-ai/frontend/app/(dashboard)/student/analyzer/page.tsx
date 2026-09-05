@@ -206,7 +206,7 @@ export default function AIAnalyzerPage() {
       recommendations: [
         'Pursue NSQF Level 6 Advanced Cloud & Distributed Systems Micro-Credential',
         'Complete practical sandbox assessments in Backend Resilience & SQL Optimization',
-        'Showcase real-world open-source contributions in verified SkillSense portfolio',
+        'Showcase real-world open-source contributions in verified Ryyvora portfolio',
       ],
       passportHash: '',
       evaluatedAt: new Date().toISOString(),
@@ -350,7 +350,7 @@ export default function AIAnalyzerPage() {
     const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(result, null, 2));
     const downloadAnchor = document.createElement('a');
     downloadAnchor.setAttribute('href', dataStr);
-    downloadAnchor.setAttribute('download', `SkillSense_Evaluation_${new Date().toISOString().split('T')[0]}.json`);
+    downloadAnchor.setAttribute('download', `Ryyvora_Evaluation_${new Date().toISOString().split('T')[0]}.json`);
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();
@@ -893,7 +893,7 @@ export default function AIAnalyzerPage() {
                       </button>
                     </>
                   ) : (
-                    <span>Seal: Pending verification on the SkillSense ledger.</span>
+                    <span>Seal: Pending verification on the Ryyvora ledger.</span>
                   )}
                 </div>
               </div>

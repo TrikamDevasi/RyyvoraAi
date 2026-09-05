@@ -226,14 +226,14 @@ export default function LandingPage() {
                   boxShadow: '0 0 16px rgba(245,158,11,0.25)',
                 }}
               >
-                SK
+                RY
               </div>
               <div style={{ flexShrink: 0 }}>
                 <span className="font-display" style={{ fontSize: 16, fontWeight: 800, color: '#f8fafc', letterSpacing: '-0.02em', display: 'block', lineHeight: 1.1, whiteSpace: 'nowrap' }}>
-                  SkillSense <span style={{ color: 'var(--gold, #f59e0b)' }}>AI</span>
+                  Ryyvora <span style={{ color: 'var(--gold, #f59e0b)' }}>AI</span>
                 </span>
                 <span className="font-mono" style={{ fontSize: 8.5, color: 'var(--gold)', letterSpacing: '0.06em', textTransform: 'uppercase', whiteSpace: 'nowrap', display: 'block' }}>
-                  GovTech & Enterprise
+                  Workforce Intelligence
                 </span>
               </div>
             </Link>
@@ -691,7 +691,7 @@ export default function LandingPage() {
               lineHeight: 1.6,
             }}
           >
-            SkillSense connects training, certification and employment outcomes into one privacy-conscious workforce intelligence platform.
+            Ryyvora AI connects training, certification and employment outcomes into one privacy-conscious workforce outcome intelligence platform.
           </motion.p>
 
           {/* CTA Buttons & Role Portals with Clear Institutional Hierarchy */}
@@ -790,7 +790,7 @@ export default function LandingPage() {
                   <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#f59e0b' }} />
                   <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#10b981' }} />
                   <span style={{ fontSize: 11, color: 'var(--text-muted)', marginLeft: 6, fontFamily: 'monospace' }}>
-                    skillsense.ai/cockpit
+                    ryyvora.ai/cockpit
                   </span>
                 </div>
                 <span style={{ fontSize: 9.5, fontWeight: 700, padding: '2px 6px', borderRadius: 4, background: 'rgba(16,185,129,0.12)', color: '#10b981', border: '1px solid rgba(16,185,129,0.25)', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
@@ -907,7 +907,7 @@ export default function LandingPage() {
                       <span style={{ width: 9, height: 9, borderRadius: '50%', background: '#f59e0b' }} />
                       <span style={{ width: 9, height: 9, borderRadius: '50%', background: '#10b981' }} />
                       <span style={{ fontSize: 11.5, color: 'var(--text-muted)', marginLeft: 8, fontFamily: 'monospace' }}>
-                        skillsense.ai/student/intelligence-cockpit
+                        ryyvora.ai/student/intelligence-cockpit
                       </span>
                     </div>
                     <AIBadge type="verified" label="SHA-256 VERIFIED" />
@@ -1042,7 +1042,7 @@ export default function LandingPage() {
               From Unverified Resumes to a Shared Intelligence Layer
             </h2>
             <p style={{ color: 'var(--text-secondary)', fontSize: 15, maxWidth: 640, margin: '0 auto' }}>
-              Traditional educational degrees lack granular competency verification, while employers struggle with hiring friction. SkillSense bridges this divide.
+              Traditional educational degrees lack granular competency verification, while employers struggle with hiring friction. Ryyvora AI bridges this divide.
             </p>
           </div>
 
@@ -1354,7 +1354,7 @@ export default function LandingPage() {
               Built for Deep Technical Precision
             </h2>
             <p style={{ color: 'var(--text-secondary)', fontSize: 15, maxWidth: 680, margin: '0 auto' }}>
-              Every AI capability in SkillSense is backed by resilient multi-provider LLMs, safe JSON repair, and strict Zod runtime schemas.
+              Every AI capability in Ryyvora is backed by resilient multi-provider LLMs, safe JSON repair, and strict Zod runtime schemas.
             </p>
           </div>
 
@@ -1845,7 +1845,7 @@ export default function LandingPage() {
               <AIBadge type="verified" label="END-TO-END OUTCOME ARCHITECTURE" />
             </div>
             <h2 className="font-display" style={{ fontSize: 'clamp(26px, 3.5vw, 40px)', fontWeight: 800, color: '#f8fafc', margin: '0 0 12px' }}>
-              The SkillSense <span style={{ color: 'var(--gold, #f59e0b)' }}>Workforce Outcome Journey</span>
+              The Ryyvora <span style={{ color: 'var(--gold, #f59e0b)' }}>Workforce Outcome Journey</span>
             </h2>
             <p style={{ color: 'var(--text-secondary)', fontSize: 15, maxWidth: 740, margin: '0 auto' }}>
               Following what happens to candidates after skilling — connecting vocational training, NSQF proctored assessment, state certification, campus placement, employer verification, 365-day retention, and policy intelligence.
@@ -2798,34 +2798,30 @@ export default function LandingPage() {
           <div style={{ textAlign: 'center', marginBottom: 44 }}>
             <AIBadge type="verified" label="FREQUENTLY ASKED QUESTIONS" />
             <h2 className="font-display" style={{ fontSize: 'clamp(24px, 3.2vw, 36px)', fontWeight: 800, color: '#f8fafc', margin: '8px 0 10px' }}>
-              Everything You Need to Know About <span style={{ color: 'var(--gold)' }}>SkillSense AI</span>
+              Everything You Need to Know About <span style={{ color: 'var(--gold)' }}>Ryyvora AI</span>
             </h2>
             <p style={{ color: 'var(--text-secondary)', fontSize: 14, margin: 0 }}>
-              Transparent answers regarding algorithmic scoring, NSQF mapping, cryptographic passports, and DPDP compliance.
+              Essential answers regarding sovereign outcome intelligence, NSQF alignment, and algorithmic fairness.
             </p>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {[
               {
-                q: 'How does SkillSense AI evaluate candidate competency without bias?',
-                a: 'SkillSense utilizes a multi-modal analysis engine that evaluates source code architecture, test coverage, algorithmic efficiency, and timed diagnostic quizzes. All scoring models are continuously audited against disparate impact metrics enforcing the 80% rule across gender, institution, and geographical demographics.',
+                q: 'How does Ryyvora AI evaluate candidate competency without bias?',
+                a: 'Ryyvora AI utilizes a multi-modal analysis engine that evaluates source code architecture, test coverage, algorithmic efficiency, and timed diagnostic quizzes. All scoring models are continuously audited against disparate impact metrics enforcing the 80% rule across gender, institution, and geographical demographics.',
               },
               {
-                q: 'What is a Cryptographic Skill Passport and how do recruiters verify it?',
-                a: 'The Skill Passport is an immutable digital credential containing verified technical competency percentiles and NSQF certification tiers. Each credential is authenticated with a SHA-256 HMAC ledger signature. Employers can verify claims in one click by scanning the QR code or querying the public endpoint (/verify/:hash).',
+                q: 'What makes the Skill Passport verifiable and tamper-proof?',
+                a: 'Every assessment milestone generates a cryptographic SHA-256 HMAC payload containing candidate anonymized hash, NSQF competency levels, and issuing authority identity. This signature can be independently verified on-chain or via public QR code verification endpoints without accessing raw student records.',
               },
               {
-                q: 'How does the platform align with National Skills Qualifications Framework (NSQF)?',
-                a: 'Assessments and career pathways are directly calibrated against NSQF Levels 4 through 7. Each level establishes concrete proficiency thresholds for knowledge, core skills, autonomy, and vocational applicability recognized by the Ministry of Skill Development and Entrepreneurship (MSDE).',
+                q: 'How does the platform ensure compliance with DPDP Act 2023?',
+                a: 'Ryyvora implements sovereign consent governance. Candidates have granular control to grant or revoke specific processing purposes (e.g. longitudinal tracking vs wage benchmarking). All personal identifying information is masked in government macro views, and trainees can export or request deletion of their data under DPDP Article 12.',
               },
               {
-                q: 'How is candidate privacy protected under the India DPDP Act 2023?',
-                a: 'SkillSense implements sovereign consent governance. Candidates have granular control to grant or revoke specific processing purposes (e.g. longitudinal tracking vs wage benchmarking). All personal identifying information is masked in government macro views, and trainees can export or request deletion of their data under DPDP Article 12.',
-              },
-              {
-                q: 'Can institutions and ITIs integrate their existing learning management systems?',
-                a: 'Yes. SkillSense provides open REST APIs and batch CSV integration tools allowing vocational training providers to bulk enroll cohorts, synchronize exam results, and monitor longitudinal graduate retention without replacing existing LMS tools.',
+                q: 'Can existing vocational institutes integrate with the platform?',
+                a: 'Yes. Ryyvora AI provides open REST APIs and batch CSV integration tools allowing vocational training providers to bulk enroll cohorts, synchronize exam results, and monitor longitudinal graduate retention without replacing existing LMS tools.',
               },
               {
                 q: 'How does the Grounded AI Policy Copilot assist government officers?',
@@ -2966,7 +2962,7 @@ export default function LandingPage() {
               Built on Rigorous Bias Monitoring & Ethical AI
             </h2>
             <p style={{ color: 'var(--text-secondary)', fontSize: 14.5, maxWidth: 640, margin: '0 auto' }}>
-              SkillSense includes an active fairness auditing engine that monitors demographic parity across gender, states, and institution types to ensure merit-based opportunities.
+              Ryyvora AI includes an active fairness auditing engine that monitors demographic parity across gender, states, and institution types to ensure merit-based opportunities.
             </p>
           </div>
 
@@ -3138,14 +3134,14 @@ export default function LandingPage() {
                     boxShadow: '0 0 16px rgba(245,158,11,0.25)',
                   }}
                 >
-                  SK
+                  RY
                 </div>
                 <div>
                   <span className="font-display" style={{ fontWeight: 800, fontSize: 16, color: '#f8fafc', display: 'block', lineHeight: 1.1 }}>
-                    SkillSense AI
+                    Ryyvora AI
                   </span>
                   <span className="font-mono" style={{ fontSize: 9, color: 'var(--gold)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-                    GovTech & Enterprise Intelligence
+                    Workforce Outcome Intelligence
                   </span>
                 </div>
               </div>
@@ -3306,7 +3302,7 @@ export default function LandingPage() {
           <div className="footer-bottom-rail">
             <div>
               <div style={{ fontSize: 12, color: '#94a3b8', marginBottom: 3 }}>
-                © {new Date().getFullYear()} SkillSense AI · Developed by <strong style={{ color: '#f8fafc', fontWeight: 600 }}>Team Quantum Coders</strong>. All rights reserved.
+                © {new Date().getFullYear()} Ryyvora AI · Developed by <strong style={{ color: '#f8fafc', fontWeight: 600 }}>Team Quantum Coders</strong>. All rights reserved.
               </div>
               <div className="font-mono" style={{ fontSize: 10.5, color: '#64748b', letterSpacing: '0.02em' }}>
                 Engineered for National Workforce Intelligence, Technical Competency Verification & Sovereign Data Privacy.
