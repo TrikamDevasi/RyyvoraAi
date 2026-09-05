@@ -351,20 +351,15 @@ export default function PricingSection() {
             return (
               <div
                 key={plan.id}
-                className={isHighlighted ? 'pricing-card-growth' : 'pricing-card-standard'}
                 onMouseEnter={() => setHoveredPlanId(plan.id)}
                 style={{
                   position: 'relative',
-                  borderRadius: 18,
-                  padding: '28px 24px',
-                  transition: 'transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s ease, border-color 0.25s ease, background 0.25s ease',
-                  transform: isHighlighted ? 'scale(1.03) translateY(-8px)' : 'scale(1)',
-                  boxShadow: isHighlighted
-                    ? '0 24px 64px rgba(245,158,11,0.22)'
-                    : 'none',
+                  borderRadius: 10,
+                  padding: '26px 22px',
+                  background: isHighlighted && plan.isPopular ? 'rgba(245,158,11,0.025)' : 'var(--bg-surface)',
+                  border: isHighlighted && plan.isPopular ? '1px solid var(--gold)' : '1px solid var(--border)',
                   opacity: inView ? 1 : 0,
-                  animationDelay: `${i * 100}ms`,
-                  backdropFilter: 'blur(12px)',
+                  transition: 'border-color 0.15s ease, background 0.15s ease',
                   cursor: 'pointer',
                 }}
               >

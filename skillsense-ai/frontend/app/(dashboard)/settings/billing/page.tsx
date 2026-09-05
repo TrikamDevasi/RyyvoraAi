@@ -121,7 +121,7 @@ function UsageMeter({
   const isWarning = !isUnlimited && pct >= 80;
 
   return (
-    <div className="card-linear" style={{ padding: '13px 16px', borderRadius: 12 }}>
+    <div style={{ padding: '12px 14px', borderRadius: 6, border: '1px solid var(--border)', background: 'rgba(255,255,255,0.015)' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <Icon size={13} color={color} />
@@ -163,17 +163,17 @@ function PlanOptionRow({
 
   return (
     <div style={{
-      padding: '14px 18px', borderRadius: 12, display: 'flex',
+      padding: '12px 16px', borderRadius: 8, display: 'flex',
       justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap',
-      border: `1px solid ${isCurrent ? 'rgba(245,158,11,0.4)' : 'rgba(255,255,255,0.07)'}`,
+      border: `1px solid ${isCurrent ? 'var(--gold)' : 'var(--border)'}`,
       background: isCurrent
-        ? 'linear-gradient(135deg,rgba(245,158,11,0.06) 0%,rgba(15,17,26,0.9) 100%)'
-        : 'rgba(255,255,255,0.02)',
-      opacity: loading ? 0.55 : 1, transition: 'all 0.2s ease',
+        ? 'rgba(245,158,11,0.025)'
+        : 'rgba(255,255,255,0.015)',
+      opacity: loading ? 0.55 : 1, transition: 'all 0.15s ease',
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         <div style={{
-          width: 34, height: 34, borderRadius: 9, flexShrink: 0,
+          width: 32, height: 32, borderRadius: 6, flexShrink: 0,
           background: `${meta.color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>
           <Icon size={16} color={meta.color} />
@@ -434,11 +434,11 @@ function BillingPageInner() {
       )}
 
       {/* ── Current Plan ── */}
-      <div className="card-accent" style={{ padding: 22, borderRadius: 16, marginBottom: 18 }}>
+      <div className="editorial-panel" style={{ padding: 22, borderRadius: 10, marginBottom: 18 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 14 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
             <div style={{
-              width: 48, height: 48, borderRadius: 14,
+              width: 44, height: 44, borderRadius: 8,
               background: `${currentMeta.color}18`,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}>
@@ -485,12 +485,12 @@ function BillingPageInner() {
         {isPaidPlan(plan) && (
           <div style={{ marginTop: 16, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
             {subscription?.cancelAtPeriodEnd ? (
-              <button type="button" onClick={handleResume} disabled={actionLoading} className="btn-gold" style={{ fontSize: 12.5 }}>
+              <button type="button" onClick={handleResume} disabled={actionLoading} className="btn-gold" style={{ fontSize: 12.5, borderRadius: 6 }}>
                 {actionLoading ? <Spinner size={12} /> : <Check size={13} />}
                 Resume Subscription
               </button>
             ) : (
-              <button type="button" onClick={handleCancel} disabled={actionLoading} className="btn-secondary" style={{ fontSize: 12.5 }}>
+              <button type="button" onClick={handleCancel} disabled={actionLoading} className="btn-secondary" style={{ fontSize: 12.5, borderRadius: 6 }}>
                 {actionLoading ? <Spinner size={12} /> : null}
                 Cancel at Period End
               </button>
@@ -500,7 +500,7 @@ function BillingPageInner() {
       </div>
 
       {/* ── Usage This Period ── */}
-      <div className="card-linear" style={{ padding: 20, borderRadius: 16, marginBottom: 18 }}>
+      <div style={{ padding: 20, borderRadius: 10, border: '1px solid var(--border)', background: 'var(--bg-surface)', marginBottom: 18 }}>
         <h3 className="font-display" style={{ fontSize: 14, fontWeight: 800, color: '#f8fafc', margin: '0 0 14px', display: 'flex', alignItems: 'center', gap: 7 }}>
           <Zap size={14} color="var(--gold)" />
           Usage This Period
@@ -520,7 +520,7 @@ function BillingPageInner() {
       </div>
 
       {/* ── Available Plans ── */}
-      <div className="card-linear" style={{ padding: 20, borderRadius: 16, marginBottom: 18 }}>
+      <div style={{ padding: 20, borderRadius: 10, border: '1px solid var(--border)', background: 'var(--bg-surface)', marginBottom: 18 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14, flexWrap: 'wrap', gap: 10 }}>
           <h3 className="font-display" style={{ fontSize: 14, fontWeight: 800, color: '#f8fafc', margin: 0 }}>Available Plans</h3>
           <div style={{ display: 'inline-flex', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: 99, padding: 3, gap: 3 }}>

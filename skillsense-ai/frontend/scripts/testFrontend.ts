@@ -238,14 +238,14 @@ function runFrontendUnitTests() {
   // ── Test 14: Card Design System Token & Variant Invariants ───────────
   console.log('Testing Card Design System Tokens, Radii & Padding Invariants...');
   const CARD_RADII_PX = {
-    compact: 10,
-    standard: 14,
-    feature: 14,
+    compact: 8,
+    standard: 10,
+    feature: 10,
   };
 
-  assert.strictEqual(CARD_RADII_PX.compact, 10, 'Compact card radius must be 10px (var(--radius-md))');
-  assert.strictEqual(CARD_RADII_PX.standard, 14, 'Standard card radius must be 14px (var(--radius-lg))');
-  assert.strictEqual(CARD_RADII_PX.feature, 14, 'Feature card radius must be 14px (var(--radius-lg))');
+  assert.strictEqual(CARD_RADII_PX.compact, 8, 'Compact card radius must be 8px (var(--radius-md))');
+  assert.strictEqual(CARD_RADII_PX.standard, 10, 'Standard card radius must be 10px (var(--radius-lg))');
+  assert.strictEqual(CARD_RADII_PX.feature, 10, 'Feature card radius must be 10px (var(--radius-lg))');
 
   const CARD_PADDING_PX = {
     compact: 14,

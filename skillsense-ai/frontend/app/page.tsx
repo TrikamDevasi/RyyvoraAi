@@ -40,6 +40,12 @@ import {
   Target,
   Code,
   Settings,
+  Search,
+  Activity,
+  Globe,
+  Terminal,
+  Menu,
+  X,
 } from 'lucide-react';
 
 import { AIBadge } from '@/components/ui/AIBadge';
@@ -153,6 +159,7 @@ export default function LandingPage() {
   const [activeRoleTab, setActiveRoleTab] = useState<'student' | 'employer' | 'institute' | 'government' | 'industry' | 'admin'>('student');
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [copiedHash, setCopiedHash] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -168,92 +175,399 @@ export default function LandingPage() {
 
   return (
     <div style={{ background: 'var(--bg)', color: 'var(--text-primary)', minHeight: '100vh', overflowX: 'hidden' }}>
-      {/* ── 1. Sticky Navigation Bar ── */}
-      <nav
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: 64,
-          zIndex: 100,
-          background: scrolled ? 'var(--bg-surface)' : 'transparent',
-          backdropFilter: scrolled ? 'blur(16px)' : 'none',
-          borderBottom: scrolled ? '1px solid var(--border)' : '1px solid transparent',
-          transition: 'all 0.25s ease',
-        }}
-      >
-        <div
-          style={{
-            maxWidth: 1240,
-            margin: '0 auto',
-            padding: '0 24px',
-            height: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
-        >
-          {/* Logo */}
-          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
-            <div
-              style={{
-                width: 30,
-                height: 30,
-                borderRadius: 6,
-                background: 'var(--gold, #f59e0b)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontWeight: 800,
-                fontSize: 13,
-                color: '#0B0F17',
-                flexShrink: 0,
-              }}
-            >
-              SK
+      {/* ── 1. Institutional Enterprise Header & Navigation ── */}
+      <header className={`landing-header-wrapper ${scrolled ? 'is-scrolled' : ''}`}>
+        {/* Top Institutional Sovereignty & Telemetry Bar */}
+        <div className="landing-top-bar">
+          <div style={{ maxWidth: 1280, margin: '0 auto', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span className="landing-gov-badge">
+                <Landmark size={11} /> Sovereign Workforce Intelligence
+              </span>
+              <span className="hidden sm:inline font-mono" style={{ fontSize: 11, color: '#94a3b8' }}>
+                NSQF Level 4–8 Aligned · DPDP Act 2023 Compliant · Sovereign Data Architecture
+              </span>
             </div>
-            <span className="font-display" style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
-              SkillSense <span style={{ color: 'var(--gold, #f59e0b)' }}>AI</span>
-            </span>
-          </Link>
-
-          {/* Links */}
-          <div className="hidden md:flex" style={{ gap: 24, alignItems: 'center' }}>
-            <a href="#roles" style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none', transition: 'color 0.15s ease' }}>Role Features</a>
-            <a href="#features" style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none', transition: 'color 0.15s ease' }}>Core Capabilities</a>
-            <a href="#how-it-works" style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none', transition: 'color 0.15s ease' }}>How It Works</a>
-            <a href="#passport" style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none', transition: 'color 0.15s ease' }}>Skill Passport</a>
-            <a href="#pricing" style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none', transition: 'color 0.15s ease' }}>Pricing</a>
-            <a href="#faq" style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none', transition: 'color 0.15s ease' }}>FAQ</a>
-            <a href="#trust" style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)', textDecoration: 'none', transition: 'color 0.15s ease' }}>DPDP Trust</a>
-          </div>
-
-          {/* Auth Actions & Theme Toggle */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <ThemeToggle variant="icon" />
-            <Link
-              href="/auth"
-              className="btn-secondary hidden sm:inline-flex"
-              style={{ fontSize: 12.5, fontWeight: 600, padding: '6px 14px', borderRadius: 7 }}
-            >
-              Sign In
-            </Link>
-            <Link
-              href="/student/analyzer"
-              className="btn-gold"
-              style={{ fontSize: 12.5, fontWeight: 700, padding: '7px 16px', borderRadius: 7 }}
-            >
-              <BarChart3 size={13} /> Analyze Skills
-            </Link>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              <span style={{ color: '#10b981', display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 11 }} className="font-mono">
+                <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10b981', boxShadow: '0 0 6px #10b981' }} />
+                Ledger Live (99.98%)
+              </span>
+              <span style={{ color: 'rgba(255,255,255,0.15)' }} className="hidden sm:inline">|</span>
+              <Link
+                href="/verify/demo-hash"
+                style={{ color: 'var(--gold)', textDecoration: 'none', fontWeight: 700, fontSize: 11, display: 'inline-flex', alignItems: 'center', gap: 4 }}
+                className="font-mono"
+              >
+                Public Ledger Verifier <ArrowRight size={11} />
+              </Link>
+            </div>
           </div>
         </div>
-      </nav>
+
+        {/* Main Glassmorphic Navigation Bar */}
+        <div className="landing-header-glass">
+          <div className="landing-navbar">
+            {/* Logo */}
+            <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', flexShrink: 0 }}>
+              <div
+                style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: 8,
+                  background: 'var(--gold, #f59e0b)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: 900,
+                  fontSize: 14,
+                  color: '#090a0f',
+                  flexShrink: 0,
+                  boxShadow: '0 0 16px rgba(245,158,11,0.25)',
+                }}
+              >
+                SK
+              </div>
+              <div style={{ flexShrink: 0 }}>
+                <span className="font-display" style={{ fontSize: 16, fontWeight: 800, color: '#f8fafc', letterSpacing: '-0.02em', display: 'block', lineHeight: 1.1, whiteSpace: 'nowrap' }}>
+                  SkillSense <span style={{ color: 'var(--gold, #f59e0b)' }}>AI</span>
+                </span>
+                <span className="font-mono" style={{ fontSize: 8.5, color: 'var(--gold)', letterSpacing: '0.06em', textTransform: 'uppercase', whiteSpace: 'nowrap', display: 'block' }}>
+                  GovTech & Enterprise
+                </span>
+              </div>
+            </Link>
+
+            {/* Desktop Navigation Links with Dropdowns */}
+            <div className="landing-nav-links">
+              {/* Dropdown 1: Ecosystem Workspaces */}
+              <div className="nav-item-dropdown">
+                <button className="nav-link-pill" style={{ background: 'transparent', border: 'none', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                  Workspaces <ChevronDown size={13} style={{ opacity: 0.7 }} />
+                </button>
+                <div className="nav-dropdown-menu">
+                  <Link href="/student" className="nav-dropdown-item">
+                    <div className="nav-dropdown-icon">
+                      <GraduationCap size={15} />
+                    </div>
+                    <div>
+                      <div className="nav-dropdown-title" style={{ fontSize: 13, fontWeight: 700, color: '#f8fafc' }}>Student Cockpit</div>
+                      <div style={{ fontSize: 11, color: '#94a3b8' }}>Portfolio, passport & milestone journey</div>
+                    </div>
+                  </Link>
+                  <Link href="/institute" className="nav-dropdown-item">
+                    <div className="nav-dropdown-icon">
+                      <School size={15} />
+                    </div>
+                    <div>
+                      <div className="nav-dropdown-title" style={{ fontSize: 13, fontWeight: 700, color: '#f8fafc' }}>Institute Portal</div>
+                      <div style={{ fontSize: 11, color: '#94a3b8' }}>Accreditation, cohort ROI & placement analytics</div>
+                    </div>
+                  </Link>
+                  <Link href="/industry" className="nav-dropdown-item">
+                    <div className="nav-dropdown-icon">
+                      <Briefcase size={15} />
+                    </div>
+                    <div>
+                      <div className="nav-dropdown-title" style={{ fontSize: 13, fontWeight: 700, color: '#f8fafc' }}>Industry Talent Pool</div>
+                      <div style={{ fontSize: 11, color: '#94a3b8' }}>Verified candidates with zero resume fraud</div>
+                    </div>
+                  </Link>
+                  <Link href="/government" className="nav-dropdown-item">
+                    <div className="nav-dropdown-icon">
+                      <Landmark size={15} />
+                    </div>
+                    <div>
+                      <div className="nav-dropdown-title" style={{ fontSize: 13, fontWeight: 700, color: '#f8fafc' }}>Governance Center</div>
+                      <div style={{ fontSize: 11, color: '#94a3b8' }}>District skill heatmaps & policy analytics</div>
+                    </div>
+                  </Link>
+                </div>
+              </div>
+
+              {/* Dropdown 2: AI Engines */}
+              <div className="nav-item-dropdown">
+                <button className="nav-link-pill" style={{ background: 'transparent', border: 'none', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                  AI Engines <ChevronDown size={13} style={{ opacity: 0.7 }} />
+                </button>
+                <div className="nav-dropdown-menu">
+                  <Link href="/student/analyzer" className="nav-dropdown-item">
+                    <div className="nav-dropdown-icon">
+                      <Brain size={15} />
+                    </div>
+                    <div>
+                      <div className="nav-dropdown-title" style={{ fontSize: 13, fontWeight: 700, color: '#f8fafc' }}>AI Skill Analyzer</div>
+                      <div style={{ fontSize: 11, color: '#94a3b8' }}>Multi-modal GitHub code & resume diagnostics</div>
+                    </div>
+                  </Link>
+                  <Link href="/student/career" className="nav-dropdown-item">
+                    <div className="nav-dropdown-icon">
+                      <Compass size={15} />
+                    </div>
+                    <div>
+                      <div className="nav-dropdown-title" style={{ fontSize: 13, fontWeight: 700, color: '#f8fafc' }}>Career Predictor</div>
+                      <div style={{ fontSize: 11, color: '#94a3b8' }}>Live INR compensation & market affinity</div>
+                    </div>
+                  </Link>
+                  <Link href="/student/assessment" className="nav-dropdown-item">
+                    <div className="nav-dropdown-icon">
+                      <FileCheck size={15} />
+                    </div>
+                    <div>
+                      <div className="nav-dropdown-title" style={{ fontSize: 13, fontWeight: 700, color: '#f8fafc' }}>Diagnostic Quizzes</div>
+                      <div style={{ fontSize: 11, color: '#94a3b8' }}>Adaptive NSQF-calibrated testing</div>
+                    </div>
+                  </Link>
+                  <Link href="/student/market" className="nav-dropdown-item">
+                    <div className="nav-dropdown-icon">
+                      <BarChart3 size={15} />
+                    </div>
+                    <div>
+                      <div className="nav-dropdown-title" style={{ fontSize: 13, fontWeight: 700, color: '#f8fafc' }}>Market Demand Radar</div>
+                      <div style={{ fontSize: 11, color: '#94a3b8' }}>Macro hiring trends & skill shortages</div>
+                    </div>
+                  </Link>
+                </div>
+              </div>
+
+              {/* Direct Links */}
+              <a href="#how-it-works" className="nav-link-pill" style={{ whiteSpace: 'nowrap' }}>How It Works</a>
+              <a href="#passport" className="nav-link-pill" style={{ display: 'inline-flex', alignItems: 'center', gap: 5, whiteSpace: 'nowrap' }}>
+                <span>Skill Passport</span>
+                <span style={{ fontSize: 9.5, fontWeight: 700, padding: '1px 5px', borderRadius: 4, background: 'rgba(16,185,129,0.12)', color: '#10b981', border: '1px solid rgba(16,185,129,0.25)', whiteSpace: 'nowrap' }}>
+                  SHA-256
+                </span>
+              </a>
+              <a href="#pricing" className="nav-link-pill" style={{ whiteSpace: 'nowrap' }}>Pricing</a>
+              <a href="#faq" className="nav-link-pill" style={{ whiteSpace: 'nowrap' }}>FAQ</a>
+              <a href="#trust" className="nav-link-pill" style={{ whiteSpace: 'nowrap' }}>DPDP Trust</a>
+            </div>
+
+            {/* Auth Actions, Fast Verifier & Theme Toggle */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+              {/* Quick Verifier Action (Desktop only) */}
+              <Link href="/verify/demo-hash" className="nav-verify-btn" style={{ whiteSpace: 'nowrap' }}>
+                <ShieldCheck size={14} /> Verify Hash
+              </Link>
+
+              <div style={{ minWidth: 44, minHeight: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <ThemeToggle variant="icon" />
+              </div>
+
+              <Link
+                href="/auth"
+                className="btn-secondary landing-signin-btn"
+                style={{ fontSize: 12.5, fontWeight: 600, padding: '6px 14px', borderRadius: 7, whiteSpace: 'nowrap' }}
+              >
+                Sign In
+              </Link>
+
+              <Link
+                href="/student/analyzer"
+                className="btn-gold landing-header-cta"
+                style={{ fontSize: 12.5, fontWeight: 700, padding: '7px 16px', borderRadius: 7, display: 'inline-flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap' }}
+              >
+                <BarChart3 size={13} /> Analyze Skills <ArrowRight size={13} />
+              </Link>
+
+              {/* Mobile Menu Hamburger Toggle (Minimum 44x44px touch target) */}
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="landing-nav-mobile-btn"
+                style={{
+                  width: 44,
+                  height: 44,
+                  minWidth: 44,
+                  minHeight: 44,
+                  borderRadius: 8,
+                  background: 'rgba(255,255,255,0.05)',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#f8fafc',
+                  cursor: 'pointer',
+                  flexShrink: 0,
+                }}
+                aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+                aria-expanded={mobileMenuOpen}
+                aria-controls="mobile-nav-drawer"
+              >
+                {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+              </button>
+            </div>
+          </div>
+
+          {/* Mobile Drawer */}
+          {mobileMenuOpen && (
+            <div id="mobile-nav-drawer" className="mobile-nav-drawer">
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                {/* Group 1: Product */}
+                <div>
+                  <div className="mobile-nav-group-label">Product</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    <a
+                      href="#roles"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="mobile-nav-link-item"
+                    >
+                      <div className="mobile-nav-icon-box">
+                        <Users size={15} />
+                      </div>
+                      <div>
+                        <div style={{ fontSize: 14, fontWeight: 700, color: '#f8fafc' }}>Role Features</div>
+                        <div style={{ fontSize: 11.5, color: 'var(--text-secondary)' }}>Student, Institute, Industry & Govt portals</div>
+                      </div>
+                    </a>
+
+                    <a
+                      href="#features"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="mobile-nav-link-item"
+                    >
+                      <div className="mobile-nav-icon-box">
+                        <Cpu size={15} />
+                      </div>
+                      <div>
+                        <div style={{ fontSize: 14, fontWeight: 700, color: '#f8fafc' }}>Core Capabilities</div>
+                        <div style={{ fontSize: 11.5, color: 'var(--text-secondary)' }}>AI Analyzer, Career Match & Diagnostic Quizzes</div>
+                      </div>
+                    </a>
+
+                    <a
+                      href="#how-it-works"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="mobile-nav-link-item"
+                    >
+                      <div className="mobile-nav-icon-box">
+                        <Layers size={15} />
+                      </div>
+                      <div>
+                        <div style={{ fontSize: 14, fontWeight: 700, color: '#f8fafc' }}>How It Works</div>
+                        <div style={{ fontSize: 11.5, color: 'var(--text-secondary)' }}>7-Stage Longitudinal Workforce Journey</div>
+                      </div>
+                    </a>
+                  </div>
+                </div>
+
+                {/* Group 2: Resources */}
+                <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: 14 }}>
+                  <div className="mobile-nav-group-label">Resources</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    <a
+                      href="#passport"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="mobile-nav-link-item"
+                    >
+                      <div className="mobile-nav-icon-box">
+                        <ShieldCheck size={15} />
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                        <span style={{ fontSize: 14, fontWeight: 700, color: '#f8fafc' }}>Skill Passport</span>
+                        <span style={{ fontSize: 9.5, fontWeight: 700, padding: '1px 6px', borderRadius: 4, background: 'rgba(16,185,129,0.12)', color: '#10b981', border: '1px solid rgba(16,185,129,0.25)' }}>
+                          SHA-256
+                        </span>
+                      </div>
+                    </a>
+
+                    <a
+                      href="#faq"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="mobile-nav-link-item"
+                    >
+                      <div className="mobile-nav-icon-box">
+                        <HelpCircle size={15} />
+                      </div>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: '#f8fafc' }}>Frequently Asked Questions</div>
+                    </a>
+
+                    <a
+                      href="#trust"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="mobile-nav-link-item"
+                    >
+                      <div className="mobile-nav-icon-box">
+                        <Lock size={15} />
+                      </div>
+                      <div style={{ fontSize: 14, fontWeight: 700, color: '#f8fafc' }}>DPDP Act 2023 Trust & Governance</div>
+                    </a>
+                  </div>
+                </div>
+
+                {/* Group 3: Actions */}
+                <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  <Link
+                    href="/student/analyzer"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="btn-gold"
+                    style={{
+                      height: 48,
+                      fontSize: 14,
+                      fontWeight: 700,
+                      borderRadius: 8,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 8,
+                      textDecoration: 'none',
+                    }}
+                  >
+                    <BarChart3 size={16} /> Analyze Skills Now <ArrowRight size={15} />
+                  </Link>
+
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <Link
+                      href="/verify/demo-hash"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="btn-secondary"
+                      style={{
+                        flex: 1,
+                        height: 44,
+                        fontSize: 12.5,
+                        fontWeight: 600,
+                        borderRadius: 8,
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: 6,
+                        textDecoration: 'none',
+                        color: 'var(--text-secondary)',
+                      }}
+                    >
+                      <ShieldCheck size={14} /> Verify Hash
+                    </Link>
+
+                    <Link
+                      href="/auth"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="btn-secondary"
+                      style={{
+                        flex: 1,
+                        height: 44,
+                        fontSize: 12.5,
+                        fontWeight: 600,
+                        borderRadius: 8,
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        textDecoration: 'none',
+                        color: 'var(--text-secondary)',
+                      }}
+                    >
+                      Sign In
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </header>
 
       {/* ── 2. Hero Section ── */}
       <section
+        className="landing-hero-section"
         style={{
-          paddingTop: 96,
+          paddingTop: 116,
           paddingBottom: 48,
           position: 'relative',
           overflow: 'hidden',
@@ -262,6 +576,7 @@ export default function LandingPage() {
       >
         {/* Subtle Maharashtra Workforce Intelligence & Human Skilling Ecosystem Background */}
         <div
+          className="hero-bg-ecosystem"
           style={{
             position: 'absolute',
             top: 0,
@@ -287,6 +602,7 @@ export default function LandingPage() {
         </div>
 
         <div
+          className="hero-bg-map"
           style={{
             position: 'absolute',
             top: 24,
@@ -312,29 +628,48 @@ export default function LandingPage() {
         </div>
 
         <div style={{ maxWidth: 1240, margin: '0 auto', padding: '0 24px', textAlign: 'center', position: 'relative', zIndex: 1 }}>
-          {/* Top Badge */}
+          {/* Top Badge (Compact, High-Contrast, Institutional) */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: 8, marginBottom: 14 }}
+            style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', marginBottom: 14 }}
           >
-            <AIBadge type="nsqf" label="GOVERNMENT OF MAHARASHTRA" />
+            <div
+              className="hero-gov-badge"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '4px 12px',
+                background: 'rgba(245, 158, 11, 0.08)',
+                border: '1px solid rgba(245, 158, 11, 0.3)',
+                borderRadius: 6,
+                color: 'var(--gold, #f59e0b)',
+                fontSize: 10.5,
+                fontWeight: 700,
+                letterSpacing: '0.06em',
+                textTransform: 'uppercase',
+              }}
+            >
+              <Landmark size={12} />
+              <span>GOVERNMENT OF MAHARASHTRA</span>
+            </div>
           </motion.div>
 
-          {/* Main Headline */}
+          {/* Main Headline (Balanced responsive typography) */}
           <motion.h1
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.08 }}
-            className="font-display"
+            className="font-display hero-headline-mobile"
             style={{
-              fontSize: 'clamp(28px, 4.3vw, 50px)',
+              fontSize: 'clamp(32px, 4.3vw, 50px)',
               fontWeight: 800,
-              lineHeight: 1.15,
+              lineHeight: 1.12,
               letterSpacing: '-0.025em',
-              maxWidth: 920,
-              margin: '0 auto 14px',
+              maxWidth: 880,
+              margin: '0 auto 16px',
               color: '#f8fafc',
             }}
           >
@@ -342,20 +677,21 @@ export default function LandingPage() {
             <span style={{ color: 'var(--gold, #f59e0b)' }}>Real Employment Outcomes</span>
           </motion.h1>
 
-          {/* Subheadline */}
+          {/* Subheadline (Clean 2-4 lines, high readability) */}
           <motion.p
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.16 }}
+            className="hero-desc-mobile"
             style={{
-              fontSize: 'clamp(14px, 1.4vw, 16.5px)',
+              fontSize: 'clamp(14px, 1.4vw, 16px)',
               color: 'var(--text-secondary)',
-              maxWidth: 680,
+              maxWidth: 620,
               margin: '0 auto 24px',
-              lineHeight: 1.65,
+              lineHeight: 1.6,
             }}
           >
-            SkillSense connects vocational training, NSQF assessments, employment transitions, 365-day retention, and longitudinal wage growth into one privacy-conscious intelligence platform.
+            SkillSense connects training, certification and employment outcomes into one privacy-conscious workforce intelligence platform.
           </motion.p>
 
           {/* CTA Buttons & Role Portals with Clear Institutional Hierarchy */}
@@ -367,37 +703,39 @@ export default function LandingPage() {
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              gap: 12,
-              marginBottom: 28,
+              gap: 10,
+              marginBottom: 32,
+              width: '100%',
             }}
           >
             {/* Primary Action — Visually Dominant Saffron Button */}
             <Link
               href="/government"
-              className="btn-gold btn-3d"
+              className="btn-gold hero-primary-cta"
               style={{
                 fontSize: 14,
                 fontWeight: 700,
-                padding: '11px 26px',
+                padding: '12px 26px',
                 borderRadius: 8,
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: 9,
+                gap: 8,
                 boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+                textDecoration: 'none',
               }}
             >
               <Landmark size={16} /> Government State Cockpit <ArrowRight size={15} />
             </Link>
 
             {/* Secondary Actions — Subordinated Neutral Surfaces */}
-            <div style={{ display: 'flex', justifyContent: 'center', gap: 10, flexWrap: 'wrap' }}>
+            <div className="hero-secondary-ctas" style={{ display: 'flex', justifyContent: 'center', gap: 10, flexWrap: 'wrap', width: '100%' }}>
               <Link
                 href="/student/journey"
-                className="btn-secondary btn-3d"
+                className="btn-secondary hero-secondary-btn"
                 style={{
                   fontSize: 12.5,
                   fontWeight: 600,
-                  padding: '8px 18px',
+                  padding: '10px 18px',
                   borderRadius: 8,
                   display: 'inline-flex',
                   alignItems: 'center',
@@ -405,18 +743,19 @@ export default function LandingPage() {
                   background: 'var(--bg-surface)',
                   border: '1px solid var(--border)',
                   color: 'var(--text-secondary)',
+                  textDecoration: 'none',
                 }}
               >
-                <Milestone size={14} /> Trainee Outcome Journey
+                <ArrowRight size={14} /> Trainee Outcome Journey
               </Link>
 
               <Link
                 href="/employer/validations"
-                className="btn-secondary btn-3d"
+                className="btn-secondary hero-secondary-btn"
                 style={{
                   fontSize: 12.5,
                   fontWeight: 600,
-                  padding: '8px 18px',
+                  padding: '10px 18px',
                   borderRadius: 8,
                   display: 'inline-flex',
                   alignItems: 'center',
@@ -424,6 +763,7 @@ export default function LandingPage() {
                   background: 'var(--bg-surface)',
                   border: '1px solid var(--border)',
                   color: 'var(--text-secondary)',
+                  textDecoration: 'none',
                 }}
               >
                 <ShieldCheck size={14} /> Employer Outcome Verification
@@ -431,147 +771,213 @@ export default function LandingPage() {
             </div>
           </motion.div>
 
-          {/* ── Realistic Product Dashboard Preview with 3D Spatial Tilt ── */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.98, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            style={{ position: 'relative', maxWidth: 1040, margin: '0 auto' }}
-          >
-            {/* Spatial Floating Badge 1 (Top-Right) */}
+          {/* ── Product Dashboard Preview: Dedicated Mobile View ── */}
+          <div className="mobile-only-block" style={{ width: '100%', maxWidth: 360, margin: '0 auto 12px' }}>
             <div
-              className="hidden sm:flex"
               style={{
-                position: 'absolute',
-                top: -12,
-                right: 24,
                 background: 'var(--bg-surface)',
                 border: '1px solid var(--border)',
-                borderRadius: 'var(--radius-pill, 9999px)',
-                padding: '5px 12px',
-                alignItems: 'center',
-                gap: 7,
-                zIndex: 10,
-                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+                borderRadius: 12,
+                padding: '14px 16px',
+                boxShadow: '0 8px 24px rgba(0, 0, 0, 0.45)',
+                textAlign: 'left',
               }}
             >
-              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10b981' }} />
-              <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-primary)' }}>
-                SHA-256 Verified Telemetry
-              </span>
-            </div>
+              {/* Preview Header */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, paddingBottom: 10, borderBottom: '1px solid var(--border)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#ef4444' }} />
+                  <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#f59e0b' }} />
+                  <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#10b981' }} />
+                  <span style={{ fontSize: 11, color: 'var(--text-muted)', marginLeft: 6, fontFamily: 'monospace' }}>
+                    skillsense.ai/cockpit
+                  </span>
+                </div>
+                <span style={{ fontSize: 9.5, fontWeight: 700, padding: '2px 6px', borderRadius: 4, background: 'rgba(16,185,129,0.12)', color: '#10b981', border: '1px solid rgba(16,185,129,0.25)', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                  <CheckCircle2 size={10} /> VERIFIED
+                </span>
+              </div>
 
-            {/* Spatial Floating Badge 2 (Bottom-Left) */}
-            <div
-              className="hidden sm:flex"
-              style={{
-                position: 'absolute',
-                bottom: -12,
-                left: 24,
-                background: 'var(--bg-surface)',
-                border: '1px solid var(--border)',
-                borderRadius: 'var(--radius-pill, 9999px)',
-                padding: '5px 12px',
-                alignItems: 'center',
-                gap: 7,
-                zIndex: 10,
-                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
-              }}
-            >
-              <Sparkles size={12} color="var(--gold)" />
-              <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-secondary)' }}>
-                NSQF Level 5 Competency Model
-              </span>
-            </div>
-
-            <Tilt3D maxRotation={1.2} translateZ={4}>
-              <div
-                style={{
-                  padding: 22,
-                  borderRadius: 16,
-                  textAlign: 'left',
-                  background: 'var(--bg-surface)',
-                  border: '1px solid var(--border)',
-                  boxShadow: '0 12px 36px -4px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255,255,255,0.04)',
-                }}
-              >
-                {/* Top Preview Bar */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, borderBottom: '1px solid var(--border)', paddingBottom: 12 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span style={{ width: 9, height: 9, borderRadius: '50%', background: '#ef4444' }} />
-                    <span style={{ width: 9, height: 9, borderRadius: '50%', background: '#f59e0b' }} />
-                    <span style={{ width: 9, height: 9, borderRadius: '50%', background: '#10b981' }} />
-                    <span style={{ fontSize: 11.5, color: 'var(--text-muted)', marginLeft: 8, fontFamily: 'monospace' }}>
-                      skillsense.ai/student/intelligence-cockpit
+              {/* Strongest 2 Insights */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {/* 1. Verified Readiness Score */}
+                <div style={{ padding: '12px 14px', background: 'rgba(255,255,255,0.02)', borderRadius: 8, border: '1px solid var(--border)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                    <span style={{ fontSize: 10, fontWeight: 800, color: 'var(--gold)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                      Verified Readiness Score
+                    </span>
+                    <span style={{ fontSize: 24, fontWeight: 900, color: '#f8fafc' }}>
+                      84<span style={{ fontSize: 13, color: 'var(--text-muted)' }}>/100</span>
                     </span>
                   </div>
-                  <AIBadge type="verified" label="SHA-256 VERIFIED" />
+                  <div style={{ fontSize: 11.5, color: '#10b981', fontWeight: 600, marginTop: 4, display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <CheckCircle2 size={12} />
+                    <span>NSQF Level 5 (Software Engineering)</span>
+                  </div>
+                  <div style={{ fontSize: 11.5, color: 'var(--text-secondary)', marginTop: 4 }}>
+                    Top Strengths: TypeScript, Node.js REST APIs
+                  </div>
                 </div>
 
-                {/* Mock Cockpit Content */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
-                  {/* Score & Profile */}
-                  <div className="card-standard" style={{ padding: 18, borderRadius: 'var(--radius-lg)' }}>
-                    <div style={{ fontSize: 11, fontWeight: 800, color: 'var(--gold)', textTransform: 'uppercase' }}>
-                      Verified Readiness Score
-                    </div>
-                    <div className="font-display" style={{ fontSize: 32, fontWeight: 900, color: 'var(--text-primary)', marginTop: 2 }}>
-                      84<span style={{ fontSize: 16, color: 'var(--text-muted)' }}>/100</span>
-                    </div>
-                    <div style={{ fontSize: 12, color: 'var(--success)', fontWeight: 600, marginTop: 4, display: 'flex', alignItems: 'center', gap: 5 }}>
-                      <CheckCircle2 size={13} />
-                      <span>NSQF Level 5 (Software Engineering)</span>
-                    </div>
-                    <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 8 }}>
-                      Top Strengths: TypeScript, Node.js REST APIs, Database Optimization.
-                    </div>
+                {/* 2. Top Career Match */}
+                <div style={{ padding: '12px 14px', background: 'rgba(255,255,255,0.02)', borderRadius: 8, border: '1px solid var(--border)' }}>
+                  <div style={{ fontSize: 10, fontWeight: 800, color: 'var(--info)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                    Top Career Match
                   </div>
-
-                  {/* Career Match */}
-                  <div className="card-standard" style={{ padding: 18, borderRadius: 'var(--radius-lg)' }}>
-                    <div style={{ fontSize: 11, fontWeight: 800, color: 'var(--info)', textTransform: 'uppercase' }}>
-                      Top Career Match
-                    </div>
-                    <div className="font-display" style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-primary)', marginTop: 4 }}>
-                      Full-Stack Cloud Engineer
-                    </div>
-                    <div style={{ fontSize: 12, color: 'var(--gold)', fontWeight: 700, marginTop: 2 }}>
-                      92% Compatibility · ₹8L–₹16L/yr (Est.)
-                    </div>
-                    <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 8 }}>
-                      Targeted Upskilling: Distributed Caching & Docker CI/CD (+8%).
-                    </div>
+                  <div style={{ fontSize: 15, fontWeight: 800, color: '#f8fafc', marginTop: 2 }}>
+                    Full-Stack Cloud Engineer
                   </div>
-
-                  {/* AI Insight Pill */}
-                  <div className="card-ai" style={{ padding: 18, borderRadius: 'var(--radius-lg)' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, fontWeight: 800, color: 'var(--gold)', textTransform: 'uppercase' }}>
-                      <Sparkles size={13} className="interactive-ai-icon" /> Active AI Copilot Recommendation
-                    </div>
-                    <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.5, margin: '8px 0 0' }}>
-                      "Candidate has demonstrated advanced API and state management capabilities. Closing the container orchestration gap will accelerate placement readiness in Tier-1 tech hubs."
-                    </p>
+                  <div style={{ fontSize: 11.5, color: 'var(--gold)', fontWeight: 700, marginTop: 2 }}>
+                    92% Match · ₹8L–₹16L/yr (Est.)
                   </div>
                 </div>
               </div>
-            </Tilt3D>
+            </div>
+          </div>
 
-            {/* Ambient Base Shadow (Restrained & Calm) */}
-            <div
-              style={{
-                position: 'absolute',
-                bottom: -12,
-                left: '12%',
-                right: '12%',
-                height: 24,
-                background: 'radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0.4) 0%, transparent 70%)',
-                filter: 'blur(10px)',
-                zIndex: -1,
-                pointerEvents: 'none',
-              }}
-              aria-hidden="true"
-            />
-          </motion.div>
+          {/* ── Product Dashboard Preview: Realistic Desktop View with 3D Spatial Tilt ── */}
+          <div className="desktop-only-block">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.98, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              style={{ position: 'relative', maxWidth: 1040, margin: '0 auto' }}
+            >
+              {/* Spatial Floating Badge 1 (Top-Right) */}
+              <div
+                className="hidden sm:flex"
+                style={{
+                  position: 'absolute',
+                  top: -12,
+                  right: 24,
+                  background: 'var(--bg-surface)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 'var(--radius-pill, 9999px)',
+                  padding: '5px 12px',
+                  alignItems: 'center',
+                  gap: 7,
+                  zIndex: 10,
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+                }}
+              >
+                <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10b981' }} />
+                <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-primary)' }}>
+                  SHA-256 Verified Telemetry
+                </span>
+              </div>
+
+              {/* Spatial Floating Badge 2 (Bottom-Left) */}
+              <div
+                className="hidden sm:flex"
+                style={{
+                  position: 'absolute',
+                  bottom: -12,
+                  left: 24,
+                  background: 'var(--bg-surface)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 'var(--radius-pill, 9999px)',
+                  padding: '5px 12px',
+                  alignItems: 'center',
+                  gap: 7,
+                  zIndex: 10,
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+                }}
+              >
+                <Sparkles size={12} color="var(--gold)" />
+                <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-secondary)' }}>
+                  NSQF Level 5 Competency Model
+                </span>
+              </div>
+
+              <Tilt3D maxRotation={1.2} translateZ={4}>
+                <div
+                  style={{
+                    padding: 22,
+                    borderRadius: 10,
+                    textAlign: 'left',
+                    background: 'var(--bg-surface)',
+                    border: '1px solid var(--border)',
+                    boxShadow: '0 12px 36px -4px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255,255,255,0.04)',
+                  }}
+                >
+                  {/* Top Preview Bar */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, borderBottom: '1px solid var(--border)', paddingBottom: 12 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{ width: 9, height: 9, borderRadius: '50%', background: '#ef4444' }} />
+                      <span style={{ width: 9, height: 9, borderRadius: '50%', background: '#f59e0b' }} />
+                      <span style={{ width: 9, height: 9, borderRadius: '50%', background: '#10b981' }} />
+                      <span style={{ fontSize: 11.5, color: 'var(--text-muted)', marginLeft: 8, fontFamily: 'monospace' }}>
+                        skillsense.ai/student/intelligence-cockpit
+                      </span>
+                    </div>
+                    <AIBadge type="verified" label="SHA-256 VERIFIED" />
+                  </div>
+
+                  {/* Mock Cockpit Content */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
+                    {/* Score & Profile */}
+                    <div className="card-standard" style={{ padding: 18, borderRadius: 'var(--radius-lg)' }}>
+                      <div style={{ fontSize: 11, fontWeight: 800, color: 'var(--gold)', textTransform: 'uppercase' }}>
+                        Verified Readiness Score
+                      </div>
+                      <div className="font-display" style={{ fontSize: 32, fontWeight: 900, color: 'var(--text-primary)', marginTop: 2 }}>
+                        84<span style={{ fontSize: 16, color: 'var(--text-muted)' }}>/100</span>
+                      </div>
+                      <div style={{ fontSize: 12, color: 'var(--success)', fontWeight: 600, marginTop: 4, display: 'flex', alignItems: 'center', gap: 5 }}>
+                        <CheckCircle2 size={13} />
+                        <span>NSQF Level 5 (Software Engineering)</span>
+                      </div>
+                      <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 8 }}>
+                        Top Strengths: TypeScript, Node.js REST APIs, Database Optimization.
+                      </div>
+                    </div>
+
+                    {/* Career Match */}
+                    <div className="card-standard" style={{ padding: 18, borderRadius: 'var(--radius-lg)' }}>
+                      <div style={{ fontSize: 11, fontWeight: 800, color: 'var(--info)', textTransform: 'uppercase' }}>
+                        Top Career Match
+                      </div>
+                      <div className="font-display" style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-primary)', marginTop: 4 }}>
+                        Full-Stack Cloud Engineer
+                      </div>
+                      <div style={{ fontSize: 12, color: 'var(--gold)', fontWeight: 700, marginTop: 2 }}>
+                        92% Compatibility · ₹8L–₹16L/yr (Est.)
+                      </div>
+                      <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 8 }}>
+                        Targeted Upskilling: Distributed Caching & Docker CI/CD (+8%).
+                      </div>
+                    </div>
+
+                    {/* AI Insight Pill */}
+                    <div className="card-ai" style={{ padding: 18, borderRadius: 'var(--radius-lg)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, fontWeight: 800, color: 'var(--gold)', textTransform: 'uppercase' }}>
+                        <Sparkles size={13} className="interactive-ai-icon" /> Active AI Copilot Recommendation
+                      </div>
+                      <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.5, margin: '8px 0 0' }}>
+                        "Candidate has demonstrated advanced API and state management capabilities. Closing the container orchestration gap will accelerate placement readiness in Tier-1 tech hubs."
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </Tilt3D>
+
+              {/* Ambient Base Shadow (Restrained & Calm) */}
+              <div
+                style={{
+                  position: 'absolute',
+                  bottom: -12,
+                  left: '12%',
+                  right: '12%',
+                  height: 24,
+                  background: 'radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0.4) 0%, transparent 70%)',
+                  filter: 'blur(10px)',
+                  zIndex: -1,
+                  pointerEvents: 'none',
+                }}
+                aria-hidden="true"
+              />
+            </motion.div>
+          </div>
         </div>
       </section>
 
@@ -641,157 +1047,300 @@ export default function LandingPage() {
           </div>
 
           {/* Visual Progression Flow */}
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))',
-              gap: 12,
-              marginBottom: 40,
-            }}
-          >
-            {[
-              {
-                step: '01',
-                stage: 'INPUT',
-                title: 'Raw Profile / Code',
-                desc: 'Resumes, GitHub commits, coursework and project scope',
-                icon: Code,
-                color: '#38bdf8',
-              },
-              {
-                step: '02',
-                stage: 'EXTRACT',
-                title: 'Neural Extraction',
-                desc: '50+ competency dimensions evaluated against NSQF',
-                icon: Brain,
-                color: '#a855f7',
-              },
-              {
-                step: '03',
-                stage: 'ANALYZE',
-                title: 'Skill Graph & Gaps',
-                desc: 'Deficiency matrix and step-by-step milestone roadmap',
-                icon: Layers,
-                color: '#f59e0b',
-              },
-              {
-                step: '04',
-                stage: 'PREDICT',
-                title: 'Career Matcher',
-                desc: 'Live market compatibility & salary projections in INR',
-                icon: Compass,
-                color: '#10b981',
-              },
-              {
-                step: '05',
-                stage: 'VERIFY',
-                title: 'Verified Passport',
-                desc: 'Cryptographically signed SHA-256 public credential',
-                icon: ShieldCheck,
-                color: '#ec4899',
-              },
-            ].map((node, i) => {
-              const IconComp = node.icon;
-              return (
-                <div
-                  key={i}
-                  className="pipeline-step-card card-shine"
+          <div className="pipeline-flow-wrapper">
+            {/* Top Telemetry Strip */}
+            <div className="pipeline-telemetry-strip">
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span
                   style={{
-                    padding: '20px 18px',
-                    minHeight: 185,
+                    display: 'inline-flex',
+                    width: 7,
+                    height: 7,
+                    borderRadius: '50%',
+                    background: '#10b981',
+                    boxShadow: '0 0 8px #10b981',
+                  }}
+                />
+                <span className="font-mono" style={{ fontSize: 11, fontWeight: 700, color: '#f8fafc', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                  National Workforce Verification Flow
+                </span>
+                <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>//</span>
+                <span className="font-mono" style={{ fontSize: 11, color: 'var(--text-secondary)' }}>
+                  5-Stage Deterministic Intelligence Pipeline
+                </span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <span className="font-mono" style={{ fontSize: 10, color: 'var(--text-muted)' }}>
+                  INPUT ➔ EXTRACT ➔ ANALYZE ➔ MATCH ➔ ATTEST
+                </span>
+                <span
+                  className="font-mono"
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 700,
+                    padding: '2px 8px',
+                    borderRadius: 4,
+                    background: 'rgba(16,185,129,0.12)',
+                    color: '#10b981',
+                    border: '1px solid rgba(16,185,129,0.25)',
+                    letterSpacing: '0.04em',
                   }}
                 >
-                  {/* Top Header Row: Step Number + Icon Badge */}
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-                    <span
-                      className="font-mono pipeline-number-badge"
-                      style={{
-                        fontSize: 11,
-                        fontWeight: 800,
-                        color: 'var(--gold)',
-                        background: 'rgba(245,158,11,0.08)',
-                        border: '1px solid rgba(245,158,11,0.25)',
-                        padding: '3px 8px',
-                        borderRadius: 6,
-                        letterSpacing: '0.04em',
-                      }}
-                    >
-                      {node.step}
-                    </span>
+                  100% AUDITABLE
+                </span>
+              </div>
+            </div>
 
-                    <div
-                      className="pipeline-icon-badge"
-                      style={{
-                        width: 32,
-                        height: 32,
-                        borderRadius: 8,
-                        background: 'rgba(255,255,255,0.03)',
-                        border: '1px solid rgba(255,255,255,0.08)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        color: node.color,
-                      }}
-                    >
-                      <IconComp size={16} />
+            {/* 5-Node Connected Flow Grid */}
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                gap: 12,
+              }}
+            >
+              {[
+                {
+                  step: '01',
+                  code: 'STG-01',
+                  stage: 'INPUT',
+                  tag: 'MULTI-SOURCE INTAKE',
+                  title: 'Raw Profile / Code',
+                  desc: 'Resumes, GitHub commits, coursework and project scope parsed into structured semantic tokens.',
+                  chips: ['GitHub AST', 'ATS Resumes', 'Transcripts'],
+                  progress: 20,
+                  progressLabel: '20% Ingestion',
+                  icon: Code,
+                  accent: '#38bdf8',
+                  accentBg: 'rgba(56, 189, 248, 0.08)',
+                  accentBorder: 'rgba(56, 189, 248, 0.28)',
+                  accentGlow: 'rgba(56, 189, 248, 0.2)',
+                },
+                {
+                  step: '02',
+                  code: 'STG-02',
+                  stage: 'EXTRACT',
+                  tag: 'NSQF ONTOLOGY ENGINE',
+                  title: 'Neural Extraction',
+                  desc: '50+ competency dimensions evaluated against National Skills Qualification Framework benchmarks.',
+                  chips: ['50+ Dimensions', 'Bloom Taxonomy', 'Code AST'],
+                  progress: 40,
+                  progressLabel: '40% Extracted',
+                  icon: Brain,
+                  accent: '#a855f7',
+                  accentBg: 'rgba(168, 85, 247, 0.08)',
+                  accentBorder: 'rgba(168, 85, 247, 0.28)',
+                  accentGlow: 'rgba(168, 85, 247, 0.2)',
+                },
+                {
+                  step: '03',
+                  code: 'STG-03',
+                  stage: 'ANALYZE',
+                  tag: 'GAP RADAR SYNTHESIS',
+                  title: 'Skill Graph & Gaps',
+                  desc: 'Multi-dimensional deficiency matrix with step-by-step milestone curriculum roadmaps.',
+                  chips: ['Gap Radar', 'Priority Roadmap', 'Curricula'],
+                  progress: 60,
+                  progressLabel: '60% Synthesis',
+                  icon: Layers,
+                  accent: '#f59e0b',
+                  accentBg: 'rgba(245, 158, 11, 0.08)',
+                  accentBorder: 'rgba(245, 158, 11, 0.28)',
+                  accentGlow: 'rgba(245, 158, 11, 0.2)',
+                },
+                {
+                  step: '04',
+                  code: 'STG-04',
+                  stage: 'PREDICT',
+                  tag: 'ECONOMIC COMPATIBILITY',
+                  title: 'Career Matcher',
+                  desc: 'Live market compatibility, hiring demand indices, and salary projections in INR.',
+                  chips: ['INR Benchmark', 'Role Affinity', '500+ Roles'],
+                  progress: 80,
+                  progressLabel: '80% Matched',
+                  icon: Compass,
+                  accent: '#10b981',
+                  accentBg: 'rgba(16, 185, 129, 0.08)',
+                  accentBorder: 'rgba(16, 185, 129, 0.28)',
+                  accentGlow: 'rgba(16, 185, 129, 0.2)',
+                },
+                {
+                  step: '05',
+                  code: 'STG-05',
+                  stage: 'VERIFY',
+                  tag: 'CRYPTOGRAPHIC ATTESTATION',
+                  title: 'Verified Passport',
+                  desc: 'Cryptographically signed SHA-256 public credential instant-verifiable by employers & state.',
+                  chips: ['SHA-256 Hash', 'Public Verifier', 'W3C Standard'],
+                  progress: 100,
+                  progressLabel: '100% Sealed',
+                  icon: ShieldCheck,
+                  accent: '#eab308',
+                  accentBg: 'rgba(234, 179, 8, 0.1)',
+                  accentBorder: 'rgba(234, 179, 8, 0.35)',
+                  accentGlow: 'rgba(234, 179, 8, 0.25)',
+                },
+              ].map((node, i) => {
+                const IconComp = node.icon;
+                return (
+                  <div
+                    key={i}
+                    className="pipeline-step-card card-shine"
+                    style={{
+                      '--card-accent': node.accent,
+                      '--card-accent-bg': node.accentBg,
+                      '--card-accent-border': node.accentBorder,
+                      '--card-accent-glow': node.accentGlow,
+                    } as React.CSSProperties}
+                  >
+                    {/* Header Row: Stage Number + Code + Icon Pod */}
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <span
+                            className="font-mono pipeline-number-badge"
+                            style={{
+                              color: node.accent,
+                              background: node.accentBg,
+                              border: `1px solid ${node.accentBorder}`,
+                            }}
+                          >
+                            {node.step}
+                          </span>
+                          <span
+                            className="font-mono"
+                            style={{
+                              fontSize: 9.5,
+                              fontWeight: 700,
+                              color: 'var(--text-muted)',
+                              letterSpacing: '0.06em',
+                            }}
+                          >
+                            {node.code}
+                          </span>
+                        </div>
+
+                        <div
+                          className="pipeline-icon-badge"
+                          style={{
+                            background: node.accentBg,
+                            border: `1px solid ${node.accentBorder}`,
+                            color: node.accent,
+                          }}
+                        >
+                          <IconComp size={17} />
+                        </div>
+                      </div>
+
+                      {/* Technical Protocol Tag */}
+                      <div
+                        className="font-mono"
+                        style={{
+                          fontSize: 9,
+                          fontWeight: 750,
+                          color: node.accent,
+                          letterSpacing: '0.08em',
+                          marginBottom: 6,
+                          textTransform: 'uppercase',
+                        }}
+                      >
+                        {node.tag}
+                      </div>
+
+                      {/* Title & Description */}
+                      <h4
+                        className="pipeline-card-title"
+                        style={{
+                          fontSize: 14.5,
+                          fontWeight: 700,
+                          color: '#f8fafc',
+                          margin: '0 0 6px',
+                          letterSpacing: '-0.015em',
+                          lineHeight: 1.35,
+                        }}
+                      >
+                        {node.title}
+                      </h4>
+                      <p style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.48, margin: '0 0 12px' }}>
+                        {node.desc}
+                      </p>
+
+                      {/* Technical Capability Micro-Chips */}
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginBottom: 14 }}>
+                        {node.chips.map((chip, cIdx) => (
+                          <span key={cIdx} className="pipeline-tech-chip">
+                            {chip}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Bottom Pipeline Progress & Verification Status */}
+                    <div>
+                      <div className="pipeline-progress-rail">
+                        <div
+                          className="pipeline-progress-fill"
+                          style={{
+                            width: `${node.progress}%`,
+                            background: node.accent,
+                          }}
+                        />
+                      </div>
+
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          gap: 6,
+                          paddingTop: 4,
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 5, minWidth: 0 }}>
+                          <span
+                            className="pipeline-stage-dot"
+                            style={{
+                              width: 5.5,
+                              height: 5.5,
+                              borderRadius: '50%',
+                              background: node.accent,
+                              flexShrink: 0,
+                            }}
+                          />
+                          <span
+                            className="pipeline-stage-label font-mono"
+                            style={{
+                              fontSize: 9,
+                              fontWeight: 800,
+                              color: '#cbd5e1',
+                              letterSpacing: '0.04em',
+                              textTransform: 'uppercase',
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
+                            STG {node.step} · {node.stage}
+                          </span>
+                        </div>
+
+                        <span
+                          className="font-mono"
+                          style={{
+                            fontSize: 9,
+                            fontWeight: 700,
+                            color: node.accent,
+                            letterSpacing: '0.02em',
+                            whiteSpace: 'nowrap',
+                            flexShrink: 0,
+                          }}
+                        >
+                          {node.progressLabel}
+                        </span>
+                      </div>
                     </div>
                   </div>
-
-                  {/* Body Content */}
-                  <div>
-                    <h4
-                      className="pipeline-card-title"
-                      style={{
-                        fontSize: 14.5,
-                        fontWeight: 700,
-                        color: '#f8fafc',
-                        margin: '0 0 6px',
-                        letterSpacing: '-0.01em',
-                      }}
-                    >
-                      {node.title}
-                    </h4>
-                    <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.45, margin: 0 }}>
-                      {node.desc}
-                    </p>
-                  </div>
-
-                  {/* Bottom Stage Indicator */}
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 6,
-                      marginTop: 18,
-                      paddingTop: 10,
-                      borderTop: '1px solid rgba(255,255,255,0.05)',
-                    }}
-                  >
-                    <span
-                      className="pipeline-stage-dot"
-                      style={{
-                        width: 6,
-                        height: 6,
-                        borderRadius: '50%',
-                        background: 'rgba(245,158,11,0.6)',
-                      }}
-                    />
-                    <span
-                      className="pipeline-stage-label"
-                      style={{
-                        fontSize: 9.5,
-                        fontWeight: 800,
-                        color: 'var(--text-muted)',
-                        letterSpacing: '0.08em',
-                        textTransform: 'uppercase',
-                      }}
-                    >
-                      Stage {node.step} · {node.stage}
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         </div>
       </section>
@@ -809,322 +1358,322 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: 20 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 340px), 1fr))', gap: 20 }}>
             {/* Feature 1: AI Skill Analyzer */}
             <div
-              className="tech-feature-card card-shine"
-              style={
-                {
-                  padding: 24,
-                  '--card-accent': 'var(--gold)',
-                  '--card-accent-glow': 'rgba(245,158,11,0.25)',
-                  '--card-accent-border': 'rgba(245,158,11,0.5)',
-                } as React.CSSProperties
-              }
+              className="editorial-panel"
+              style={{
+                padding: 22,
+                borderRadius: 10,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+              }}
             >
               <div>
-                <div style={{ marginBottom: 16, overflow: 'hidden', borderRadius: 10, border: '1px solid rgba(255,255,255,0.08)' }}>
+                <div style={{ marginBottom: 14, overflow: 'hidden', borderRadius: 8, border: '1px solid rgba(255,255,255,0.08)' }}>
                   <ResponsiveImage
                     src="/images/training/code-diagnostic.jpg"
                     alt="Multi-modal neural skill extraction and code diagnostic evaluation in Pune lab"
                     aspectRatio="16 / 9"
-                    borderRadius={10}
+                    borderRadius={8}
                     overlayGradient="subtle"
                   />
                 </div>
-                <div
-                  className="tech-feature-icon"
-                  style={{
-                    width: 42,
-                    height: 42,
-                    borderRadius: 10,
-                    background: 'rgba(245,158,11,0.12)',
-                    border: '1px solid rgba(245,158,11,0.25)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: 'var(--gold)',
-                    marginBottom: 16,
-                  }}
-                >
-                  <Brain size={20} />
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                  <span style={{ fontSize: 10.5, fontWeight: 800, color: 'var(--gold)', letterSpacing: '0.06em' }}>01 / NEURAL EXTRACTION</span>
+                  <div
+                    style={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: 6,
+                      background: 'rgba(245,158,11,0.1)',
+                      border: '1px solid rgba(245,158,11,0.25)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: 'var(--gold)',
+                    }}
+                  >
+                    <Brain size={16} />
+                  </div>
                 </div>
-                <h3 className="font-display" style={{ fontSize: 17, fontWeight: 800, color: '#f8fafc', margin: '0 0 8px' }}>
+                <h3 className="font-display" style={{ fontSize: 16.5, fontWeight: 800, color: '#f8fafc', margin: '0 0 8px' }}>
                   Multi-Modal AI Skill Analyzer
                 </h3>
-                <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 16 }}>
+                <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 14 }}>
                   <strong style={{ color: '#f8fafc' }}>WHAT:</strong> Ingests raw resume text, GitHub repositories, and submitted code snippets.<br />
                   <strong style={{ color: '#f8fafc' }}>WHY:</strong> Eliminates keyword stuffing by verifying actual architectural and coding syntax.<br />
                   <strong style={{ color: '#f8fafc' }}>HOW:</strong> Powered by Groq Llama-3.3-70b with safe JSON repair and NSQF taxonomy mapping.
                 </p>
               </div>
-              <Link href="/student/analyzer" className="tech-feature-link" style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--gold)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>
-                Test Skill Analyzer <ChevronRight size={14} className="tech-feature-arrow" />
+              <Link href="/student/analyzer" style={{ fontSize: 12, fontWeight: 700, color: 'var(--gold)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4, paddingTop: 10, borderTop: '1px solid var(--border)' }}>
+                Test Skill Analyzer <ChevronRight size={13} />
               </Link>
             </div>
 
             {/* Feature 2: Career Prediction */}
             <div
-              className="tech-feature-card card-shine"
-              style={
-                {
-                  padding: 24,
-                  '--card-accent': '#60a5fa',
-                  '--card-accent-glow': 'rgba(96,165,250,0.25)',
-                  '--card-accent-border': 'rgba(96,165,250,0.5)',
-                } as React.CSSProperties
-              }
+              className="editorial-panel"
+              style={{
+                padding: 22,
+                borderRadius: 10,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+              }}
             >
               <div>
-                <div style={{ marginBottom: 16, overflow: 'hidden', borderRadius: 10, border: '1px solid rgba(255,255,255,0.08)' }}>
+                <div style={{ marginBottom: 14, overflow: 'hidden', borderRadius: 8, border: '1px solid rgba(255,255,255,0.08)' }}>
                   <ResponsiveImage
                     src="/images/workforce/career-pathways.jpg"
                     alt="Predictive career matching and Indian tech salary trajectories in modern workspace"
                     aspectRatio="16 / 9"
-                    borderRadius={10}
+                    borderRadius={8}
                     overlayGradient="subtle"
                   />
                 </div>
-                <div
-                  className="tech-feature-icon"
-                  style={{
-                    width: 42,
-                    height: 42,
-                    borderRadius: 10,
-                    background: 'rgba(59,130,246,0.12)',
-                    border: '1px solid rgba(59,130,246,0.25)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#60a5fa',
-                    marginBottom: 16,
-                  }}
-                >
-                  <Compass size={20} />
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                  <span style={{ fontSize: 10.5, fontWeight: 800, color: '#60a5fa', letterSpacing: '0.06em' }}>02 / PREDICTIVE TELEMETRY</span>
+                  <div
+                    style={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: 6,
+                      background: 'rgba(59,130,246,0.1)',
+                      border: '1px solid rgba(59,130,246,0.25)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#60a5fa',
+                    }}
+                  >
+                    <Compass size={16} />
+                  </div>
                 </div>
-                <h3 className="font-display" style={{ fontSize: 17, fontWeight: 800, color: '#f8fafc', margin: '0 0 8px' }}>
+                <h3 className="font-display" style={{ fontSize: 16.5, fontWeight: 800, color: '#f8fafc', margin: '0 0 8px' }}>
                   Predictive Career Pathways
                 </h3>
-                <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 16 }}>
+                <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 14 }}>
                   <strong style={{ color: '#f8fafc' }}>WHAT:</strong> Matches candidate competencies to high-growth Indian tech roles.<br />
                   <strong style={{ color: '#f8fafc' }}>WHY:</strong> Prevents career misalignment by forecasting market demand and compensation.<br />
                   <strong style={{ color: '#f8fafc' }}>HOW:</strong> Calculates mathematical compatibility scores and transparent INR model estimates.
                 </p>
               </div>
-              <Link href="/student/career" className="tech-feature-link" style={{ fontSize: 12.5, fontWeight: 700, color: '#60a5fa', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>
-                Explore Career Paths <ChevronRight size={14} className="tech-feature-arrow" />
+              <Link href="/student/career" style={{ fontSize: 12, fontWeight: 700, color: '#60a5fa', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4, paddingTop: 10, borderTop: '1px solid var(--border)' }}>
+                Explore Career Paths <ChevronRight size={13} />
               </Link>
             </div>
 
             {/* Feature 3: Gap Analysis */}
             <div
-              className="tech-feature-card card-shine"
-              style={
-                {
-                  padding: 24,
-                  '--card-accent': '#ef4444',
-                  '--card-accent-glow': 'rgba(239,68,68,0.25)',
-                  '--card-accent-border': 'rgba(239,68,68,0.5)',
-                } as React.CSSProperties
-              }
+              className="editorial-panel"
+              style={{
+                padding: 22,
+                borderRadius: 10,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+              }}
             >
               <div>
-                <div style={{ marginBottom: 16, overflow: 'hidden', borderRadius: 10, border: '1px solid rgba(255,255,255,0.08)' }}>
+                <div style={{ marginBottom: 14, overflow: 'hidden', borderRadius: 8, border: '1px solid rgba(255,255,255,0.08)' }}>
                   <ResponsiveImage
                     src="/images/training/skill-gap-analysis.jpg"
                     alt="Dynamic skill gap analysis and NSQF competency roadmap review"
                     aspectRatio="16 / 9"
-                    borderRadius={10}
+                    borderRadius={8}
                     overlayGradient="subtle"
                   />
                 </div>
-                <div
-                  className="tech-feature-icon"
-                  style={{
-                    width: 42,
-                    height: 42,
-                    borderRadius: 10,
-                    background: 'rgba(239,68,68,0.12)',
-                    border: '1px solid rgba(239,68,68,0.25)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#ef4444',
-                    marginBottom: 16,
-                  }}
-                >
-                  <AlertTriangle size={20} />
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                  <span style={{ fontSize: 10.5, fontWeight: 800, color: '#ef4444', letterSpacing: '0.06em' }}>03 / SKILL GAP ROADMAPS</span>
+                  <div
+                    style={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: 6,
+                      background: 'rgba(239,68,68,0.1)',
+                      border: '1px solid rgba(239,68,68,0.25)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#ef4444',
+                    }}
+                  >
+                    <AlertTriangle size={16} />
+                  </div>
                 </div>
-                <h3 className="font-display" style={{ fontSize: 17, fontWeight: 800, color: '#f8fafc', margin: '0 0 8px' }}>
+                <h3 className="font-display" style={{ fontSize: 16.5, fontWeight: 800, color: '#f8fafc', margin: '0 0 8px' }}>
                   Dynamic Skill Gap Analysis
                 </h3>
-                <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 16 }}>
+                <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 14 }}>
                   <strong style={{ color: '#f8fafc' }}>WHAT:</strong> Compares student skills against target enterprise benchmarks.<br />
                   <strong style={{ color: '#f8fafc' }}>WHY:</strong> Gives learners concrete clarity on what to study rather than generic advice.<br />
                   <strong style={{ color: '#f8fafc' }}>HOW:</strong> Generates priority-tagged deficiencies and phase-by-phase timeline roadmaps.
                 </p>
               </div>
-              <Link href="/student" className="tech-feature-link" style={{ fontSize: 12.5, fontWeight: 700, color: '#ef4444', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>
-                View Gap Roadmap <ChevronRight size={14} className="tech-feature-arrow" />
+              <Link href="/student" style={{ fontSize: 12, fontWeight: 700, color: '#ef4444', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4, paddingTop: 10, borderTop: '1px solid var(--border)' }}>
+                View Gap Roadmap <ChevronRight size={13} />
               </Link>
             </div>
 
             {/* Feature 4: Cryptographic Passport */}
             <div
-              className="tech-feature-card card-shine"
-              style={
-                {
-                  padding: 24,
-                  '--card-accent': '#10b981',
-                  '--card-accent-glow': 'rgba(16,185,129,0.25)',
-                  '--card-accent-border': 'rgba(16,185,129,0.5)',
-                } as React.CSSProperties
-              }
+              className="editorial-panel"
+              style={{
+                padding: 22,
+                borderRadius: 10,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+              }}
             >
               <div>
-                <div style={{ marginBottom: 16, overflow: 'hidden', borderRadius: 10, border: '1px solid rgba(255,255,255,0.08)' }}>
+                <div style={{ marginBottom: 14, overflow: 'hidden', borderRadius: 8, border: '1px solid rgba(255,255,255,0.08)' }}>
                   <ResponsiveImage
                     src="/images/credentials/credential-passport.jpg"
                     alt="Tamper-proof digital skill passport certificate with SHA-256 HMAC ledger signature"
                     aspectRatio="16 / 9"
-                    borderRadius={10}
+                    borderRadius={8}
                     overlayGradient="subtle"
                   />
                 </div>
-                <div
-                  className="tech-feature-icon"
-                  style={{
-                    width: 42,
-                    height: 42,
-                    borderRadius: 10,
-                    background: 'rgba(16,185,129,0.12)',
-                    border: '1px solid rgba(16,185,129,0.25)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#10b981',
-                    marginBottom: 16,
-                  }}
-                >
-                  <Award size={20} />
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                  <span style={{ fontSize: 10.5, fontWeight: 800, color: '#10b981', letterSpacing: '0.06em' }}>04 / VERIFIABLE CREDENTIALS</span>
+                  <div
+                    style={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: 6,
+                      background: 'rgba(16,185,129,0.1)',
+                      border: '1px solid rgba(16,185,129,0.25)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#10b981',
+                    }}
+                  >
+                    <Award size={16} />
+                  </div>
                 </div>
-                <h3 className="font-display" style={{ fontSize: 17, fontWeight: 800, color: '#f8fafc', margin: '0 0 8px' }}>
+                <h3 className="font-display" style={{ fontSize: 16.5, fontWeight: 800, color: '#f8fafc', margin: '0 0 8px' }}>
                   Verifiable Skill Passport
                 </h3>
-                <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 16 }}>
+                <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 14 }}>
                   <strong style={{ color: '#f8fafc' }}>WHAT:</strong> A tamper-proof digital credential issued with a cryptographic hash.<br />
                   <strong style={{ color: '#f8fafc' }}>WHY:</strong> Employers can verify skills in seconds without relying on self-reported resumes.<br />
                   <strong style={{ color: '#f8fafc' }}>HOW:</strong> SHA-256 HMAC digest computed over student scores and NSQF certification tier.
                 </p>
               </div>
-              <Link href="/student/passport" className="tech-feature-link" style={{ fontSize: 12.5, fontWeight: 700, color: '#10b981', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>
-                Inspect Passport <ChevronRight size={14} className="tech-feature-arrow" />
+              <Link href="/student/passport" style={{ fontSize: 12, fontWeight: 700, color: '#10b981', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4, paddingTop: 10, borderTop: '1px solid var(--border)' }}>
+                Inspect Passport <ChevronRight size={13} />
               </Link>
             </div>
 
             {/* Feature 5: Adaptive Assessments */}
             <div
-              className="tech-feature-card card-shine"
-              style={
-                {
-                  padding: 24,
-                  '--card-accent': 'var(--gold)',
-                  '--card-accent-glow': 'rgba(245,158,11,0.25)',
-                  '--card-accent-border': 'rgba(245,158,11,0.5)',
-                } as React.CSSProperties
-              }
+              className="editorial-panel"
+              style={{
+                padding: 22,
+                borderRadius: 10,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+              }}
             >
               <div>
-                <div style={{ marginBottom: 16, overflow: 'hidden', borderRadius: 10, border: '1px solid rgba(255,255,255,0.08)' }}>
+                <div style={{ marginBottom: 14, overflow: 'hidden', borderRadius: 8, border: '1px solid rgba(255,255,255,0.08)' }}>
                   <ResponsiveImage
                     src="/images/training/diagnostic-quiz.jpg"
                     alt="Proctored online technical assessment hall and candidate diagnostic evaluation"
                     aspectRatio="16 / 9"
-                    borderRadius={10}
+                    borderRadius={8}
                     overlayGradient="subtle"
                   />
                 </div>
-                <div
-                  className="tech-feature-icon"
-                  style={{
-                    width: 42,
-                    height: 42,
-                    borderRadius: 10,
-                    background: 'rgba(245,158,11,0.12)',
-                    border: '1px solid rgba(245,158,11,0.25)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: 'var(--gold)',
-                    marginBottom: 16,
-                  }}
-                >
-                  <CheckCircle2 size={20} />
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                  <span style={{ fontSize: 10.5, fontWeight: 800, color: 'var(--gold)', letterSpacing: '0.06em' }}>05 / ADAPTIVE EVALUATION</span>
+                  <div
+                    style={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: 6,
+                      background: 'rgba(245,158,11,0.1)',
+                      border: '1px solid rgba(245,158,11,0.25)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: 'var(--gold)',
+                    }}
+                  >
+                    <CheckCircle2 size={16} />
+                  </div>
                 </div>
-                <h3 className="font-display" style={{ fontSize: 17, fontWeight: 800, color: '#f8fafc', margin: '0 0 8px' }}>
+                <h3 className="font-display" style={{ fontSize: 16.5, fontWeight: 800, color: '#f8fafc', margin: '0 0 8px' }}>
                   Adaptive Assessment Engine
                 </h3>
-                <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 16 }}>
+                <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 14 }}>
                   <strong style={{ color: '#f8fafc' }}>WHAT:</strong> Distraction-free diagnostic quizzes with keyboard navigation (A, B, C, D).<br />
                   <strong style={{ color: '#f8fafc' }}>WHY:</strong> Continuously validates real practical mastery across multiple difficulty tiers.<br />
                   <strong style={{ color: '#f8fafc' }}>HOW:</strong> Dynamic question synthesis, automated grading, and instant passport ledger sync.
                 </p>
               </div>
-              <Link href="/student/assessment" className="tech-feature-link" style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--gold)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>
-                Take Diagnostic Quiz <ChevronRight size={14} className="tech-feature-arrow" />
+              <Link href="/student/assessment" style={{ fontSize: 12, fontWeight: 700, color: 'var(--gold)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4, paddingTop: 10, borderTop: '1px solid var(--border)' }}>
+                Take Diagnostic Quiz <ChevronRight size={13} />
               </Link>
             </div>
 
             {/* Feature 6: Real-Time Copilot */}
             <div
-              className="tech-feature-card card-shine"
-              style={
-                {
-                  padding: 24,
-                  '--card-accent': '#c084fc',
-                  '--card-accent-glow': 'rgba(192,132,252,0.25)',
-                  '--card-accent-border': 'rgba(192,132,252,0.5)',
-                } as React.CSSProperties
-              }
+              className="editorial-panel"
+              style={{
+                padding: 22,
+                borderRadius: 10,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+              }}
             >
               <div>
-                <div style={{ marginBottom: 16, overflow: 'hidden', borderRadius: 10, border: '1px solid rgba(255,255,255,0.08)' }}>
+                <div style={{ marginBottom: 14, overflow: 'hidden', borderRadius: 8, border: '1px solid rgba(255,255,255,0.08)' }}>
                   <ResponsiveImage
                     src="/images/government/policy-intelligence.jpg"
                     alt="Public sector data analyst examining regional workforce intelligence and policy interventions"
                     aspectRatio="16 / 9"
-                    borderRadius={10}
+                    borderRadius={8}
                     overlayGradient="subtle"
                   />
                 </div>
-                <div
-                  className="tech-feature-icon"
-                  style={{
-                    width: 42,
-                    height: 42,
-                    borderRadius: 10,
-                    background: 'rgba(168,85,247,0.12)',
-                    border: '1px solid rgba(168,85,247,0.25)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#c084fc',
-                    marginBottom: 16,
-                  }}
-                >
-                  <Bot size={20} />
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                  <span style={{ fontSize: 10.5, fontWeight: 800, color: '#c084fc', letterSpacing: '0.06em' }}>06 / PROFILE-AWARE COPILOT</span>
+                  <div
+                    style={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: 6,
+                      background: 'rgba(168,85,247,0.1)',
+                      border: '1px solid rgba(168,85,247,0.25)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#c084fc',
+                    }}
+                  >
+                    <Bot size={16} />
+                  </div>
                 </div>
-                <h3 className="font-display" style={{ fontSize: 17, fontWeight: 800, color: '#f8fafc', margin: '0 0 8px' }}>
+                <h3 className="font-display" style={{ fontSize: 16.5, fontWeight: 800, color: '#f8fafc', margin: '0 0 8px' }}>
                   Profile-Aware AI Copilot
                 </h3>
-                <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 16 }}>
+                <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: 14 }}>
                   <strong style={{ color: '#f8fafc' }}>WHAT:</strong> Conversational mentor embedded natively into the student dashboard.<br />
                   <strong style={{ color: '#f8fafc' }}>WHY:</strong> Answers personalized questions about interview prep, salary, and gap closure.<br />
                   <strong style={{ color: '#f8fafc' }}>HOW:</strong> Injects live student NSQF competencies into prompts with SSE typewriter streaming.
                 </p>
               </div>
-              <Link href="/student" className="tech-feature-link" style={{ fontSize: 12.5, fontWeight: 700, color: '#c084fc', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>
-                Chat with Copilot <ChevronRight size={14} className="tech-feature-arrow" />
+              <Link href="/student" style={{ fontSize: 12, fontWeight: 700, color: '#c084fc', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4, paddingTop: 10, borderTop: '1px solid var(--border)' }}>
+                Chat with Copilot <ChevronRight size={13} />
               </Link>
             </div>
           </div>
@@ -1176,7 +1725,7 @@ export default function LandingPage() {
           </div>
 
           {/* Interactive Screen Display */}
-          <div className="card-accent" style={{ padding: 26, borderRadius: 16 }}>
+          <div className="card-accent" style={{ padding: 26, borderRadius: 10 }}>
             {activeShowcaseTab === 'dashboard' && (
               <div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
@@ -1303,7 +1852,86 @@ export default function LandingPage() {
             </p>
           </div>
 
+          {/* Mobile Vertical Step Timeline */}
+          <div className="mobile-only-block" style={{ marginTop: 20 }}>
+            <div style={{ position: 'relative', paddingLeft: 30, display: 'flex', flexDirection: 'column', gap: 14 }}>
+              {/* Continuous vertical connecting line */}
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 14,
+                  bottom: 14,
+                  left: 13,
+                  width: 2,
+                  background: 'linear-gradient(180deg, rgba(245,158,11,0.5) 0%, rgba(16,185,129,0.5) 50%, rgba(6,182,212,0.5) 100%)',
+                  borderRadius: 1,
+                }}
+              />
+
+              {[
+                { num: '01', title: 'Vocational Training', desc: 'Accredited ITI & lab instruction aligned with NSQF Levels 4–7.', icon: FileText, accent: '#f59e0b' },
+                { num: '02', title: 'Proctored Assessment', desc: 'Timed multi-domain evaluations across 50+ technical dimensions.', icon: Brain, accent: '#60a5fa' },
+                { num: '03', title: 'State Certification', desc: 'Issuance of tamper-proof digital credentials on the state ledger.', icon: Award, accent: '#10b981' },
+                { num: '04', title: 'Enterprise Placement', desc: 'Graduates matched directly to industrial tech corridors across Maharashtra.', icon: Briefcase, accent: '#c084fc' },
+                { num: '05', title: 'Employer Verification', desc: '1-click instant SHA-256 hash query with zero resume fraud.', icon: ShieldCheck, accent: '#f59e0b' },
+                { num: '06', title: '365-Day Retention', desc: 'Longitudinal wage growth and tenure milestone tracking.', icon: TrendingUp, accent: '#10b981' },
+                { num: '07', title: 'Policy Intelligence', desc: '36-district heatmap telemetry for sovereign workforce planning.', icon: Landmark, accent: '#06b6d4' },
+              ].map((item, idx) => {
+                const ItemIcon = item.icon;
+                return (
+                  <div
+                    key={idx}
+                    style={{
+                      position: 'relative',
+                      background: 'var(--bg-surface)',
+                      border: '1px solid var(--border)',
+                      borderRadius: 10,
+                      padding: '12px 14px',
+                      boxShadow: '0 2px 6px rgba(0,0,0,0.25)',
+                      textAlign: 'left',
+                    }}
+                  >
+                    {/* Node Circle on the Line */}
+                    <div
+                      style={{
+                        position: 'absolute',
+                        left: -30,
+                        top: 12,
+                        width: 26,
+                        height: 26,
+                        borderRadius: '50%',
+                        background: 'var(--bg)',
+                        border: `2px solid ${item.accent}`,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: 10,
+                        fontWeight: 800,
+                        color: item.accent,
+                        zIndex: 2,
+                      }}
+                    >
+                      {item.num}
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                      <ItemIcon size={14} color={item.accent} />
+                      <h4 style={{ fontSize: 13.5, fontWeight: 700, color: '#f8fafc', margin: 0 }}>
+                        {item.title}
+                      </h4>
+                    </div>
+                    <p style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.45, margin: 0 }}>
+                      {item.desc}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Desktop 7-Card Grid */}
           <div
+            className="desktop-only-block"
             style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
@@ -1426,97 +2054,70 @@ export default function LandingPage() {
             ].map((step, i) => {
               const IconComp = step.icon;
               return (
-                <div key={i} className="flip-card-container" style={{ minHeight: 330 }}>
-                  <div className="flip-card-inner">
-                    {/* ── Front Side ── */}
-                    <div className="flip-card-front card-shine" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: 18 }}>
-                      <div>
-                        {/* Compact Visual Thumbnail */}
-                        <div style={{ marginBottom: 12, borderRadius: 8, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.08)' }}>
-                          <ResponsiveImage
-                            src={step.image}
-                            alt={step.alt}
-                            aspectRatio="16 / 9"
-                            borderRadius={8}
-                            overlayGradient="subtle"
-                          />
-                        </div>
+                <div
+                  key={i}
+                  className="editorial-panel"
+                  style={{
+                    padding: 18,
+                    borderRadius: 10,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <div>
+                    {/* Compact Visual Thumbnail */}
+                    <div style={{ marginBottom: 12, borderRadius: 6, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.08)' }}>
+                      <ResponsiveImage
+                        src={step.image}
+                        alt={step.alt}
+                        aspectRatio="16 / 9"
+                        borderRadius={6}
+                        overlayGradient="subtle"
+                      />
+                    </div>
 
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                          <span className="font-display" style={{ fontSize: 24, fontWeight: 800, color: step.accent }}>
-                            {step.num}
-                          </span>
-                          <div
-                            style={{
-                              width: 32,
-                              height: 32,
-                              borderRadius: 8,
-                              background: 'rgba(255,255,255,0.03)',
-                              border: `1px solid ${step.accent}40`,
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              color: step.accent,
-                            }}
-                          >
-                            <IconComp size={16} />
-                          </div>
-                        </div>
-
-                        <h3 style={{ fontSize: 14.5, fontWeight: 700, color: '#f8fafc', margin: '0 0 6px' }}>
-                          {step.title}
-                        </h3>
-                        <p style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.45, margin: 0 }}>
-                          {step.desc}
-                        </p>
-                      </div>
-
-                      {/* Front footer hint */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                      <span style={{ fontSize: 10, fontWeight: 800, color: step.accent, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                        {step.phase}
+                      </span>
                       <div
                         style={{
+                          width: 28,
+                          height: 28,
+                          borderRadius: 6,
+                          background: 'rgba(255,255,255,0.03)',
+                          border: `1px solid ${step.accent}40`,
                           display: 'flex',
                           alignItems: 'center',
-                          gap: 6,
-                          paddingTop: 10,
-                          borderTop: '1px solid rgba(255,255,255,0.06)',
+                          justifyContent: 'center',
                           color: step.accent,
-                          fontSize: 10.5,
-                          fontWeight: 700,
-                          marginTop: 10,
                         }}
                       >
-                        <span style={{ fontSize: 12 }}>↻</span>
-                        <span>Hover to flip specifications</span>
+                        <IconComp size={14} />
                       </div>
                     </div>
 
-                    {/* ── Back Side (Revealed on 3D Flip) ── */}
-                    <div className="flip-card-back" style={{ padding: 18 }}>
-                      <div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-                          <span style={{ fontSize: 10, fontWeight: 800, color: step.accent, letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-                            {step.phase}
-                          </span>
-                          <span style={{ fontSize: 9.5, padding: '2px 6px', borderRadius: 4, background: 'rgba(16,185,129,0.15)', color: '#10b981', fontWeight: 800, border: '1px solid rgba(16,185,129,0.3)' }}>
-                            VERIFIED
-                          </span>
-                        </div>
+                    <h3 style={{ fontSize: 15, fontWeight: 800, color: '#f8fafc', margin: '0 0 6px' }}>
+                      {step.title}
+                    </h3>
+                    <p style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.45, margin: '0 0 10px' }}>
+                      {step.desc}
+                    </p>
 
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, margin: '12px 0' }}>
-                          {step.specs.map((spec, sIdx) => (
-                            <div key={sIdx} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11.5, color: '#f1f5f9' }}>
-                              <span style={{ color: step.accent, fontSize: 12 }}>▹</span>
-                              <span>{spec}</span>
-                            </div>
-                          ))}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 5, padding: '8px 0', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                      {step.specs.map((spec, sIdx) => (
+                        <div key={sIdx} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: 'var(--text-secondary)' }}>
+                          <span style={{ color: step.accent, fontSize: 10 }}>▹</span>
+                          <span>{spec}</span>
                         </div>
-                      </div>
-
-                      <div style={{ paddingTop: 10, borderTop: '1px solid rgba(255,255,255,0.08)', fontSize: 10.5, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 5 }}>
-                        <CheckCircle2 size={12} style={{ color: 'var(--success)', flexShrink: 0 }} />
-                        <span>{step.metric}</span>
-                      </div>
+                      ))}
                     </div>
+                  </div>
+
+                  <div style={{ paddingTop: 10, borderTop: '1px solid rgba(255,255,255,0.06)', fontSize: 11, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 5 }}>
+                    <CheckCircle2 size={12} style={{ color: 'var(--success)', flexShrink: 0 }} />
+                    <span>{step.metric}</span>
                   </div>
                 </div>
               );
@@ -1566,6 +2167,7 @@ export default function LandingPage() {
 
           {/* Role Tab Navigation Pills */}
           <div
+            className="mobile-role-scroll"
             style={{
               display: 'flex',
               justifyContent: 'center',
@@ -1590,7 +2192,8 @@ export default function LandingPage() {
                   type="button"
                   onClick={() => setActiveRoleTab(tab.id as any)}
                   style={{
-                    padding: '9px 18px',
+                    padding: '10px 18px',
+                    minHeight: 44,
                     borderRadius: 99,
                     fontSize: 13,
                     fontWeight: 700,
@@ -1613,10 +2216,10 @@ export default function LandingPage() {
           </div>
 
           {/* Active Role Card Feature Grid */}
-          <div className="card-accent" style={{ padding: 32, borderRadius: 20 }}>
+          <div className="card-accent" style={{ padding: 32, borderRadius: 10 }}>
             {activeRoleTab === 'student' && (
               <div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 24, alignItems: 'center', marginBottom: 28, borderBottom: '1px solid var(--border)', paddingBottom: 24 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: 24, alignItems: 'center', marginBottom: 28, borderBottom: '1px solid var(--border)', paddingBottom: 24 }}>
                   <div>
                     <span style={{ fontSize: 11, fontWeight: 800, color: '#10b981', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                       Registered Candidate Workspace
@@ -1671,7 +2274,7 @@ export default function LandingPage() {
                         href={feat.href}
                         style={{
                           padding: 18,
-                          borderRadius: 14,
+                          borderRadius: 8,
                           background: 'rgba(255,255,255,0.02)',
                           border: '1px solid var(--border)',
                           textDecoration: 'none',
@@ -1714,7 +2317,7 @@ export default function LandingPage() {
 
             {activeRoleTab === 'employer' && (
               <div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 24, alignItems: 'center', marginBottom: 28, borderBottom: '1px solid var(--border)', paddingBottom: 24 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: 24, alignItems: 'center', marginBottom: 28, borderBottom: '1px solid var(--border)', paddingBottom: 24 }}>
                   <div>
                     <span style={{ fontSize: 11, fontWeight: 800, color: '#C084FC', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                       Enterprise Recruiter Workspace
@@ -1767,7 +2370,7 @@ export default function LandingPage() {
                         href={feat.href}
                         style={{
                           padding: 18,
-                          borderRadius: 14,
+                          borderRadius: 8,
                           background: 'rgba(255,255,255,0.02)',
                           border: '1px solid var(--border)',
                           textDecoration: 'none',
@@ -1802,7 +2405,7 @@ export default function LandingPage() {
 
             {activeRoleTab === 'institute' && (
               <div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 24, alignItems: 'center', marginBottom: 28, borderBottom: '1px solid var(--border)', paddingBottom: 24 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: 24, alignItems: 'center', marginBottom: 28, borderBottom: '1px solid var(--border)', paddingBottom: 24 }}>
                   <div>
                     <span style={{ fontSize: 11, fontWeight: 800, color: '#60A5FA', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                       Vocational Training Partner Workspace
@@ -1855,7 +2458,7 @@ export default function LandingPage() {
                         href={feat.href}
                         style={{
                           padding: 18,
-                          borderRadius: 14,
+                          borderRadius: 8,
                           background: 'rgba(255,255,255,0.02)',
                           border: '1px solid var(--border)',
                           textDecoration: 'none',
@@ -1890,7 +2493,7 @@ export default function LandingPage() {
 
             {activeRoleTab === 'government' && (
               <div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 24, alignItems: 'center', marginBottom: 28, borderBottom: '1px solid var(--border)', paddingBottom: 24 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: 24, alignItems: 'center', marginBottom: 28, borderBottom: '1px solid var(--border)', paddingBottom: 24 }}>
                   <div>
                     <span style={{ fontSize: 11, fontWeight: 800, color: '#F59E0B', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                       State Policy & Governance Workspace
@@ -1943,7 +2546,7 @@ export default function LandingPage() {
                         href={feat.href}
                         style={{
                           padding: 18,
-                          borderRadius: 14,
+                          borderRadius: 8,
                           background: 'rgba(255,255,255,0.02)',
                           border: '1px solid var(--border)',
                           textDecoration: 'none',
@@ -1978,7 +2581,7 @@ export default function LandingPage() {
 
             {activeRoleTab === 'industry' && (
               <div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 24, alignItems: 'center', marginBottom: 28, borderBottom: '1px solid var(--border)', paddingBottom: 24 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: 24, alignItems: 'center', marginBottom: 28, borderBottom: '1px solid var(--border)', paddingBottom: 24 }}>
                   <div>
                     <span style={{ fontSize: 11, fontWeight: 800, color: '#EC4899', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                       Sector Skill Council (SSC) Workspace
@@ -2030,7 +2633,7 @@ export default function LandingPage() {
                         href={feat.href}
                         style={{
                           padding: 18,
-                          borderRadius: 14,
+                          borderRadius: 8,
                           background: 'rgba(255,255,255,0.02)',
                           border: '1px solid var(--border)',
                           textDecoration: 'none',
@@ -2065,7 +2668,7 @@ export default function LandingPage() {
 
             {activeRoleTab === 'admin' && (
               <div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 24, alignItems: 'center', marginBottom: 28, borderBottom: '1px solid var(--border)', paddingBottom: 24 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: 24, alignItems: 'center', marginBottom: 28, borderBottom: '1px solid var(--border)', paddingBottom: 24 }}>
                   <div>
                     <span style={{ fontSize: 11, fontWeight: 800, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                       System Governance & Audit Workspace
@@ -2118,7 +2721,7 @@ export default function LandingPage() {
                         href={feat.href}
                         style={{
                           padding: 18,
-                          borderRadius: 14,
+                          borderRadius: 8,
                           background: 'rgba(255,255,255,0.02)',
                           border: '1px solid var(--border)',
                           textDecoration: 'none',
@@ -2302,7 +2905,7 @@ export default function LandingPage() {
             className="card-accent"
             style={{
               padding: 36,
-              borderRadius: 18,
+              borderRadius: 10,
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
@@ -2335,7 +2938,7 @@ export default function LandingPage() {
             </div>
 
             {/* Passport Credential Seal Preview */}
-            <div style={{ padding: 20, background: 'var(--bg-surface)', borderRadius: 14, border: '1px solid var(--border)', maxWidth: 420, width: '100%' }}>
+            <div style={{ padding: 20, background: 'var(--bg-surface)', borderRadius: 8, border: '1px solid var(--border)', maxWidth: 420, width: '100%' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border)', paddingBottom: 10, marginBottom: 12 }}>
                 <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-primary)' }}>Digital Passport #SKP-7819</div>
                 <span style={{ fontSize: 10, color: '#10b981', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
@@ -2367,7 +2970,7 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 20, alignItems: 'stretch' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: 20, alignItems: 'stretch' }}>
             {/* Visual Trust Card */}
             <div className="card-elevated" style={{ borderRadius: 'var(--radius-lg)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
               <div style={{ height: 220, position: 'relative' }}>
@@ -2454,62 +3057,278 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── 12. Enterprise Footer ── */}
-      <footer style={{ padding: '50px 24px 30px', borderTop: '1px solid var(--border)', background: 'var(--bg-surface)' }}>
+      {/* ── 12. Institutional Enterprise Footer ── */}
+      <footer className="enterprise-footer">
         <div style={{ maxWidth: 1240, margin: '0 auto' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 30, marginBottom: 40 }}>
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-                <div style={{ width: 28, height: 28, borderRadius: 6, background: 'var(--gold)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 13, color: '#090a0f' }}>
-                  SK
-                </div>
-                <span className="font-display" style={{ fontWeight: 800, fontSize: 15, color: '#f8fafc' }}>
-                  SkillSense AI
+          {/* Top Telemetry & Verification Fast-Track Banner */}
+          <div className="footer-telemetry-banner">
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+                <span
+                  style={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: '50%',
+                    background: '#10b981',
+                    boxShadow: '0 0 10px #10b981',
+                    display: 'inline-block',
+                  }}
+                />
+                <span className="font-mono" style={{ fontSize: 11.5, fontWeight: 700, color: '#f8fafc', letterSpacing: '0.04em' }}>
+                  ALL SYSTEMS OPERATIONAL
                 </span>
               </div>
-              <p style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.5 }}>
-                Next-generation workforce intelligence and skill assessment platform. Developed by Team Quantum Coders.
+              <span style={{ color: 'rgba(255,255,255,0.15)' }}>|</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 14, fontSize: 11, color: '#94a3b8' }} className="font-mono">
+                <span>UPTIME: 99.98%</span>
+                <span>LATENCY: ~840MS</span>
+                <span>DATA RESIDENCY: MUMBAI/IN</span>
+                <span>DPDP 2023 COMPLIANT</span>
+              </div>
+            </div>
+
+            {/* Quick Public Credential Verification Shortcut */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+              <Link
+                href="/verify/demo-hash"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  padding: '6px 12px',
+                  borderRadius: 7,
+                  background: 'rgba(245,158,11,0.12)',
+                  border: '1px solid rgba(245,158,11,0.28)',
+                  color: 'var(--gold)',
+                  fontSize: 11.5,
+                  fontWeight: 700,
+                  textDecoration: 'none',
+                  letterSpacing: '0.02em',
+                }}
+              >
+                <ShieldCheck size={14} /> Verify Credential Hash <ArrowRight size={13} />
+              </Link>
+            </div>
+          </div>
+
+          {/* Main 5-Column Navigation Grid */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+              gap: 36,
+              marginBottom: 48,
+            }}
+          >
+            {/* Column 1: Platform & Institutional Authority */}
+            <div style={{ gridColumn: 'span 1' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 14 }}>
+                <div
+                  style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: 8,
+                    background: 'var(--gold)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontWeight: 900,
+                    fontSize: 14,
+                    color: '#090a0f',
+                    boxShadow: '0 0 16px rgba(245,158,11,0.25)',
+                  }}
+                >
+                  SK
+                </div>
+                <div>
+                  <span className="font-display" style={{ fontWeight: 800, fontSize: 16, color: '#f8fafc', display: 'block', lineHeight: 1.1 }}>
+                    SkillSense AI
+                  </span>
+                  <span className="font-mono" style={{ fontSize: 9, color: 'var(--gold)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                    GovTech & Enterprise Intelligence
+                  </span>
+                </div>
+              </div>
+
+              <p style={{ fontSize: 12.5, color: '#94a3b8', lineHeight: 1.6, margin: '0 0 18px' }}>
+                National workforce intelligence and cryptographic skill verification platform. Bridging higher education and enterprise hiring through deterministic competency analytics.
               </p>
-            </div>
 
-            <div>
-              <h5 style={{ fontSize: 12.5, fontWeight: 800, color: '#f8fafc', textTransform: 'uppercase', marginBottom: 12 }}>Product</h5>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, fontSize: 12.5 }}>
-                <Link href="/student/analyzer" style={{ color: 'var(--text-secondary)', textDecoration: 'none' }}>AI Skill Analyzer</Link>
-                <Link href="/student/career" style={{ color: 'var(--text-secondary)', textDecoration: 'none' }}>Career Predictor</Link>
-                <Link href="/student/assessment" style={{ color: 'var(--text-secondary)', textDecoration: 'none' }}>Diagnostic Quizzes</Link>
-                <Link href="/student/market" style={{ color: 'var(--text-secondary)', textDecoration: 'none' }}>Market Demand</Link>
+              {/* Compliance & Standards Micro-Badges */}
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                <span className="footer-cert-badge">
+                  <Landmark size={11} color="var(--gold)" /> NSQF Level 4–8
+                </span>
+                <span className="footer-cert-badge">
+                  <ShieldCheck size={11} color="#10b981" /> DPDP 2023
+                </span>
+                <span className="footer-cert-badge">
+                  <Lock size={11} color="#38bdf8" /> SHA-256 HMAC
+                </span>
+                <span className="footer-cert-badge">
+                  <Globe size={11} color="#a855f7" /> W3C Verifiable
+                </span>
               </div>
             </div>
 
-            <div>
-              <h5 style={{ fontSize: 12.5, fontWeight: 800, color: '#f8fafc', textTransform: 'uppercase', marginBottom: 12 }}>Workspaces</h5>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, fontSize: 12.5 }}>
-                <Link href="/student" style={{ color: 'var(--text-secondary)', textDecoration: 'none' }}>Student Cockpit</Link>
-                <Link href="/institute" style={{ color: 'var(--text-secondary)', textDecoration: 'none' }}>Institute Portal</Link>
-                <Link href="/industry" style={{ color: 'var(--text-secondary)', textDecoration: 'none' }}>Industry Talent Pool</Link>
-                <Link href="/government" style={{ color: 'var(--text-secondary)', textDecoration: 'none' }}>Governance Center</Link>
+            {/* Column 2: AI Intelligence Engines */}
+            <div className="footer-nav-col">
+              <h5>
+                <Brain size={13} color="var(--gold)" /> Intelligence Engines
+              </h5>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <Link href="/student/analyzer" className="footer-link">
+                  <span>AI Skill Analyzer</span>
+                  <ChevronRight size={11} className="footer-link-arrow" />
+                </Link>
+                <Link href="/student/career" className="footer-link">
+                  <span>Career Predictor & Wage Index</span>
+                  <ChevronRight size={11} className="footer-link-arrow" />
+                </Link>
+                <Link href="/student/assessment" className="footer-link">
+                  <span>Adaptive Diagnostic Assessments</span>
+                  <ChevronRight size={11} className="footer-link-arrow" />
+                </Link>
+                <Link href="/student/market" className="footer-link">
+                  <span>Real-Time Market Demand</span>
+                  <ChevronRight size={11} className="footer-link-arrow" />
+                </Link>
+                <Link href="/student/journey" className="footer-link">
+                  <span>Dynamic Upskilling Roadmap</span>
+                  <ChevronRight size={11} className="footer-link-arrow" />
+                </Link>
+                <Link href="/ai-health" className="footer-link">
+                  <span>Multi-Model AI Telemetry</span>
+                  <ChevronRight size={11} className="footer-link-arrow" />
+                </Link>
               </div>
             </div>
 
-            <div>
-              <h5 style={{ fontSize: 12.5, fontWeight: 800, color: '#f8fafc', textTransform: 'uppercase', marginBottom: 12 }}>Trust & Security</h5>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, fontSize: 12.5 }}>
-                <Link href="/ai-health" style={{ color: 'var(--text-secondary)', textDecoration: 'none' }}>AI Telemetry Status</Link>
-                <Link href="/student/passport" style={{ color: 'var(--text-secondary)', textDecoration: 'none' }}>Passport Ledger</Link>
-                <Link href="/admin/fairness" style={{ color: 'var(--text-secondary)', textDecoration: 'none' }}>Fairness Governance</Link>
+            {/* Column 3: Ecosystem Workspaces */}
+            <div className="footer-nav-col">
+              <h5>
+                <Building2 size={13} color="var(--gold)" /> Ecosystem Workspaces
+              </h5>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <Link href="/student" className="footer-link">
+                  <span>Student Career Cockpit</span>
+                  <ChevronRight size={11} className="footer-link-arrow" />
+                </Link>
+                <Link href="/institute" className="footer-link">
+                  <span>Training Institute Portal</span>
+                  <ChevronRight size={11} className="footer-link-arrow" />
+                </Link>
+                <Link href="/institute/roi" className="footer-link">
+                  <span>Training ROI & Placements</span>
+                  <ChevronRight size={11} className="footer-link-arrow" />
+                </Link>
+                <Link href="/industry/talent" className="footer-link">
+                  <span>Industry Verified Talent Pool</span>
+                  <ChevronRight size={11} className="footer-link-arrow" />
+                </Link>
+                <Link href="/government" className="footer-link">
+                  <span>District Governance Center</span>
+                  <ChevronRight size={11} className="footer-link-arrow" />
+                </Link>
+                <Link href="/government/fund-targeting" className="footer-link">
+                  <span>CSR & Skill Voucher Allocation</span>
+                  <ChevronRight size={11} className="footer-link-arrow" />
+                </Link>
+              </div>
+            </div>
+
+            {/* Column 4: Verification & Trust */}
+            <div className="footer-nav-col">
+              <h5>
+                <Lock size={13} color="var(--gold)" /> Trust & Verification
+              </h5>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <Link href="/student/passport" className="footer-link">
+                  <span>Cryptographic Skill Passport</span>
+                  <ChevronRight size={11} className="footer-link-arrow" />
+                </Link>
+                <Link href="/verify/sample-hash" className="footer-link">
+                  <span>Public Ledger Verifier</span>
+                  <ChevronRight size={11} className="footer-link-arrow" />
+                </Link>
+                <Link href="/admin/fairness" className="footer-link">
+                  <span>Fairness & Bias Governance</span>
+                  <ChevronRight size={11} className="footer-link-arrow" />
+                </Link>
+                <Link href="/admin/audit-logs" className="footer-link">
+                  <span>Tamper-Evident Audit Logs</span>
+                  <ChevronRight size={11} className="footer-link-arrow" />
+                </Link>
+                <Link href="/government/heatmap" className="footer-link">
+                  <span>District Workforce Heatmap</span>
+                  <ChevronRight size={11} className="footer-link-arrow" />
+                </Link>
+                <Link href="/student/consent" className="footer-link">
+                  <span>DPDP Data Consent Manager</span>
+                  <ChevronRight size={11} className="footer-link-arrow" />
+                </Link>
+              </div>
+            </div>
+
+            {/* Column 5: Institutional Governance & Team */}
+            <div className="footer-nav-col">
+              <h5>
+                <Terminal size={13} color="var(--gold)" /> Governance & Team
+              </h5>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <span className="footer-link" style={{ color: '#cbd5e1' }}>
+                  <span>Team Quantum Coders</span>
+                </span>
+                <Link href="/government/compliance" className="footer-link">
+                  <span>NSQF Compliance Matrix</span>
+                  <ChevronRight size={11} className="footer-link-arrow" />
+                </Link>
+                <Link href="/employer/validations" className="footer-link">
+                  <span>Employer Competency Attestation</span>
+                  <ChevronRight size={11} className="footer-link-arrow" />
+                </Link>
+                <Link href="/institute/upload" className="footer-link">
+                  <span>Curricula Ingestion Service</span>
+                  <ChevronRight size={11} className="footer-link-arrow" />
+                </Link>
+                <Link href="/settings/billing" className="footer-link">
+                  <span>Enterprise Licensing</span>
+                  <ChevronRight size={11} className="footer-link-arrow" />
+                </Link>
+                <span className="footer-link" style={{ color: '#64748b' }}>
+                  <span>Open Source Intelligence (MIT)</span>
+                </span>
               </div>
             </div>
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border)', paddingTop: 20, flexWrap: 'wrap', gap: 10 }}>
-            <div style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>
-              © {new Date().getFullYear()} SkillSense AI · Team Quantum Coders. All rights reserved.
+          {/* Bottom Legal, Sovereignty & Copyright Rail */}
+          <div className="footer-bottom-rail">
+            <div>
+              <div style={{ fontSize: 12, color: '#94a3b8', marginBottom: 3 }}>
+                © {new Date().getFullYear()} SkillSense AI · Developed by <strong style={{ color: '#f8fafc', fontWeight: 600 }}>Team Quantum Coders</strong>. All rights reserved.
+              </div>
+              <div className="font-mono" style={{ fontSize: 10.5, color: '#64748b', letterSpacing: '0.02em' }}>
+                Engineered for National Workforce Intelligence, Technical Competency Verification & Sovereign Data Privacy.
+              </div>
             </div>
-            <div style={{ display: 'flex', gap: 16, fontSize: 11.5, color: 'var(--text-muted)' }}>
-              <span>MIT License</span>
-              <span>NSQF Compliant</span>
-              <span>SHA-256 Verified</span>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: 20, flexWrap: 'wrap', fontSize: 12 }}>
+              <Link href="/student/consent" style={{ color: '#94a3b8', textDecoration: 'none', transition: 'color 0.2s' }}>
+                DPDP Privacy
+              </Link>
+              <span style={{ color: 'rgba(255,255,255,0.15)' }}>·</span>
+              <Link href="/admin/fairness" style={{ color: '#94a3b8', textDecoration: 'none', transition: 'color 0.2s' }}>
+                AI Fairness Policy
+              </Link>
+              <span style={{ color: 'rgba(255,255,255,0.15)' }}>·</span>
+              <Link href="/ai-health" style={{ color: '#94a3b8', textDecoration: 'none', transition: 'color 0.2s' }}>
+                System Status
+              </Link>
+              <span style={{ color: 'rgba(255,255,255,0.15)' }}>·</span>
+              <span className="font-mono" style={{ fontSize: 11, color: 'var(--gold)', background: 'rgba(245,158,11,0.08)', padding: '2px 8px', borderRadius: 4, border: '1px solid rgba(245,158,11,0.2)' }}>
+                ap-south-1 (Mumbai)
+              </span>
             </div>
           </div>
         </div>

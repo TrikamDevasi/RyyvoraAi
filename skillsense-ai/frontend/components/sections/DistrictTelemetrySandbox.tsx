@@ -158,14 +158,13 @@ export default function DistrictTelemetrySandbox() {
         </div>
 
         {/* Main Dual-Column Sandbox Grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: 24, alignItems: 'start' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 350px), 1fr))', gap: 24, alignItems: 'start' }}>
           {/* Left Column: Visual Regional Telemetry Map & Corridor Context */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
             {/* Map Container Card */}
             <div
-              className="card-elevated"
               style={{
-                borderRadius: 16,
+                borderRadius: 10,
                 overflow: 'hidden',
                 border: '1px solid var(--border)',
                 background: 'var(--bg-surface)',
@@ -184,7 +183,7 @@ export default function DistrictTelemetrySandbox() {
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#10b981', boxShadow: '0 0 10px #10b981' }} />
+                  <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#10b981' }} />
                   <span style={{ fontSize: 12, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '0.04em' }}>
                     MAHARASHTRA WORKFORCE TELEMETRY GRID
                   </span>
@@ -228,11 +227,11 @@ export default function DistrictTelemetrySandbox() {
 
             {/* Authentic Institutional Corridor Context Photo Card */}
             <div
-              className="card-linear"
               style={{
-                borderRadius: 14,
+                borderRadius: 10,
                 overflow: 'hidden',
                 border: '1px solid var(--border)',
+                background: 'var(--bg-surface)',
                 display: 'flex',
                 flexDirection: 'column',
               }}
@@ -271,10 +270,9 @@ export default function DistrictTelemetrySandbox() {
           <div
             style={{
               padding: 22,
-              borderRadius: 16,
+              borderRadius: 10,
               background: 'var(--bg-surface)',
               border: '1px solid var(--border)',
-              boxShadow: '0 10px 30px -4px rgba(0,0,0,0.5)',
               position: 'relative',
               overflow: 'hidden',
             }}
@@ -406,12 +404,12 @@ export default function DistrictTelemetrySandbox() {
               </div>
             </div>
 
-            {/* Telemetry Result Visual Dashboard Cards */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              {/* Card 1: Regional Cluster & Deficit */}
-              <div className="card-linear" style={{ padding: 18, borderRadius: 12 }}>
+            {/* Telemetry Result Visual Command Readout */}
+            <div style={{ display: 'flex', flexDirection: 'column', border: '1px solid var(--border)', borderRadius: 8, background: 'rgba(255,255,255,0.015)', overflow: 'hidden' }}>
+              {/* Section 1: Regional Talent Supply Gap */}
+              <div style={{ padding: '16px 18px', borderBottom: '1px solid var(--border)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                  <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+                  <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                     Regional Talent Supply Gap
                   </span>
                   <span
@@ -429,23 +427,23 @@ export default function DistrictTelemetrySandbox() {
                   </span>
                 </div>
 
-                <div className="font-display" style={{ fontSize: 24, fontWeight: 900, color: '#f8fafc' }}>
+                <div className="font-display" style={{ fontSize: 24, fontWeight: 900, color: '#f8fafc', fontVariantNumeric: 'tabular-nums' }}>
                   -{district.deficit}% Deficit
                 </div>
-                <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 2 }}>
+                <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 2 }}>
                   Hiring demand actively exceeds qualified talent supply in {district.name}.
                 </div>
 
                 {/* Progress bar visual */}
-                <div style={{ height: 6, width: '100%', background: 'rgba(255,255,255,0.06)', borderRadius: 99, marginTop: 12, overflow: 'hidden' }}>
-                  <div style={{ height: '100%', width: `${Math.min(100, district.deficit * 2.5)}%`, background: 'linear-gradient(90deg, #f59e0b, #ef4444)', borderRadius: 99 }} />
+                <div style={{ height: 4, width: '100%', background: 'rgba(255,255,255,0.06)', borderRadius: 2, marginTop: 12, overflow: 'hidden' }}>
+                  <div style={{ height: '100%', width: `${Math.min(100, district.deficit * 2.5)}%`, background: 'linear-gradient(90deg, #f59e0b, #ef4444)', borderRadius: 2 }} />
                 </div>
 
-                <div style={{ marginTop: 12, paddingTop: 10, borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                <div style={{ marginTop: 12, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                   <span style={{ fontSize: 10.5, fontWeight: 700, color: 'var(--text-muted)' }}>Top Missing Competencies:</span>
-                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 6 }}>
+                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                     {district.inDemandSkills.slice(0, 3).map((skill, sIdx) => (
-                      <span key={sIdx} style={{ fontSize: 10.5, background: 'rgba(255,255,255,0.04)', padding: '2px 7px', borderRadius: 4, color: '#cbd5e1' }}>
+                      <span key={sIdx} style={{ fontSize: 10.5, background: 'rgba(255,255,255,0.04)', padding: '2px 7px', borderRadius: 4, color: '#cbd5e1', border: '1px solid var(--border)' }}>
                         {skill}
                       </span>
                     ))}
@@ -453,10 +451,10 @@ export default function DistrictTelemetrySandbox() {
                 </div>
               </div>
 
-              {/* Card 2: Projected Salary & 3-Year Wage Curve */}
-              <div className="card-linear" style={{ padding: 18, borderRadius: 12 }}>
+              {/* Section 2: Projected Salary & 3-Year Wage Curve */}
+              <div style={{ padding: '16px 18px', borderBottom: '1px solid var(--border)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                  <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+                  <span style={{ fontSize: 11, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                     Wage Progression Curve
                   </span>
                   <span style={{ fontSize: 11, fontWeight: 800, color: '#10b981', display: 'flex', alignItems: 'center', gap: 4 }}>
@@ -464,10 +462,10 @@ export default function DistrictTelemetrySandbox() {
                   </span>
                 </div>
 
-                <div className="font-display" style={{ fontSize: 24, fontWeight: 900, color: 'var(--gold)' }}>
+                <div className="font-display" style={{ fontSize: 24, fontWeight: 900, color: 'var(--gold)', fontVariantNumeric: 'tabular-nums' }}>
                   ₹{estimatedWage} <span style={{ fontSize: 15, color: 'var(--text-muted)', fontWeight: 600 }}>→ ₹{estimated3YrWage} LPA</span>
                 </div>
-                <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 2 }}>
+                <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 2 }}>
                   Starting baseline at NSQF Level {selectedLevel} growing to Year 3 mastery.
                 </div>
 
@@ -492,24 +490,24 @@ export default function DistrictTelemetrySandbox() {
                 </div>
               </div>
 
-              {/* Card 3: Hiring Consortium & Action */}
-              <div className="card-linear" style={{ padding: 18, borderRadius: 12 }}>
-                <div style={{ fontSize: 11, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 8 }}>
+              {/* Section 3: Hiring Consortium & Action */}
+              <div style={{ padding: '16px 18px', background: 'rgba(255,255,255,0.01)' }}>
+                <div style={{ fontSize: 11, fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>
                   Active Regional Enterprise Employers
                 </div>
 
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 12 }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 14 }}>
                   {district.recruiters.map((emp, eIdx) => (
                     <span
                       key={eIdx}
                       style={{
                         fontSize: 11,
-                        fontWeight: 700,
-                        color: '#f8fafc',
-                        background: 'rgba(245,158,11,0.08)',
-                        border: '1px solid rgba(245,158,11,0.25)',
+                        fontWeight: 600,
+                        color: 'var(--text-secondary)',
+                        background: 'rgba(255,255,255,0.03)',
+                        border: '1px solid var(--border)',
                         padding: '3px 8px',
-                        borderRadius: 6,
+                        borderRadius: 4,
                       }}
                     >
                       {emp}
@@ -528,8 +526,7 @@ export default function DistrictTelemetrySandbox() {
                     alignItems: 'center',
                     justifyContent: 'center',
                     gap: 6,
-                    borderRadius: 8,
-                    marginTop: 8,
+                    borderRadius: 6,
                   }}
                 >
                   <Sparkles size={14} />

@@ -34,6 +34,7 @@ import { FadeIn } from '@/components/shared/FadeIn';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { AIBadge } from '@/components/ui/AIBadge';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { MetricStrip } from '@/components/dashboard/KPICard';
 import toast from 'react-hot-toast';
 
 export default function TraineeJourneyPage() {
@@ -161,11 +162,11 @@ export default function TraineeJourneyPage() {
       <FadeIn style={{ maxWidth: 1080, margin: '0 auto', paddingBottom: 60 }}>
         {/* ── Top Header Banner ── */}
         <div
-          className="card-accent"
+          className="editorial-panel"
           style={{
-            padding: 26,
-            borderRadius: 16,
-            marginBottom: 24,
+            padding: 24,
+            borderRadius: 10,
+            marginBottom: 20,
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
@@ -224,6 +225,7 @@ export default function TraineeJourneyPage() {
                 fontSize: 13,
                 fontWeight: 700,
                 cursor: 'pointer',
+                borderRadius: 6,
               }}
             >
               <Plus size={15} />
@@ -232,57 +234,27 @@ export default function TraineeJourneyPage() {
           </div>
         </div>
 
-        {/* ── Key Outcome Metrics Banner ── */}
-        {loading ? (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14, marginBottom: 24 }}>
-            {[0, 1, 2, 3].map((i) => (
-              <div key={i} className="card-linear" style={{ padding: '18px 20px', borderRadius: 12 }}>
-                <div style={{ height: 14, width: 100, background: 'rgba(255,255,255,0.06)', borderRadius: 4, marginBottom: 8 }} />
-                <div style={{ height: 28, width: 140, background: 'rgba(255,255,255,0.06)', borderRadius: 4, marginBottom: 6 }} />
-                <div style={{ height: 12, width: 120, background: 'rgba(255,255,255,0.04)', borderRadius: 4 }} />
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14, marginBottom: 24 }}>
-            {[
-              { label: 'Timeline Events', value: `${timeline.length}`, sub: timeline.length > 0 ? 'Milestones Recorded' : 'No events yet', color: '#60a5fa', icon: ShieldCheck },
-              { label: 'Pending Check-ins', value: `${pendingFollowUps.length}`, sub: pendingFollowUps.length > 0 ? 'Action Required' : 'All check-ins completed', color: pendingFollowUps.length > 0 ? 'var(--gold)' : '#10b981', icon: Clock },
-              { label: 'Latest Event', value: timeline.length > 0 ? timeline[0].eventType.replace(/_/g, ' ') : 'None', sub: timeline.length > 0 ? new Date(timeline[0].date).toLocaleDateString() : 'Start your journey', color: 'var(--gold)', icon: Milestone },
-              { label: 'Verification Status', value: timeline.filter((t) => t.verificationStatus === 'VERIFIED').length > 0 ? 'Verified' : 'Pending', sub: `${timeline.filter((t) => t.verificationStatus === 'VERIFIED').length} of ${timeline.length} events verified`, color: '#10b981', icon: CheckCircle2 },
-            ].map((card, idx) => {
-              const Icon = card.icon;
-              return (
-                <div key={idx} className="card-linear" style={{ padding: '18px 20px', borderRadius: 12 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                    <span style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                      {card.label}
-                    </span>
-                    <div style={{ padding: 6, borderRadius: 6, background: 'rgba(255,255,255,0.04)', color: card.color }}>
-                      <Icon size={16} />
-                    </div>
-                  </div>
-                  <div className="font-display" style={{ fontSize: 24, fontWeight: 800, color: card.color, textTransform: 'capitalize' }}>
-                    {card.value}
-                  </div>
-                  <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 2 }}>
-                    {card.sub}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
+        {/* ── Key Outcome Metrics Metric Strip ── */}
+        <div style={{ marginBottom: 20 }}>
+          <MetricStrip
+            items={[
+              { label: 'Timeline Events', value: `${timeline.length}`, subtext: timeline.length > 0 ? 'Milestones Recorded' : 'No events yet', color: '#60a5fa', icon: ShieldCheck },
+              { label: 'Pending Check-ins', value: `${pendingFollowUps.length}`, subtext: pendingFollowUps.length > 0 ? 'Action Required' : 'All check-ins completed', color: pendingFollowUps.length > 0 ? 'var(--gold)' : '#10b981', icon: Clock },
+              { label: 'Latest Event', value: timeline.length > 0 ? timeline[0].eventType.replace(/_/g, ' ') : 'None', subtext: timeline.length > 0 ? new Date(timeline[0].date).toLocaleDateString() : 'Start your journey', color: 'var(--gold)', icon: Milestone },
+              { label: 'Verification Status', value: timeline.filter((t) => t.verificationStatus === 'VERIFIED').length > 0 ? 'Verified' : 'Pending', subtext: `${timeline.filter((t) => t.verificationStatus === 'VERIFIED').length} of ${timeline.length} verified`, color: '#10b981', icon: CheckCircle2 },
+            ]}
+          />
+        </div>
 
         {/* ── Pending Verification Check-ins ── */}
         {pendingFollowUps.length > 0 && (
           <div
             style={{
-              padding: '16px 20px',
-              borderRadius: 12,
-              background: 'rgba(245,158,11,0.08)',
-              border: '1px solid rgba(245,158,11,0.3)',
-              marginBottom: 24,
+              padding: '14px 18px',
+              borderRadius: 8,
+              background: 'rgba(245,158,11,0.06)',
+              border: '1px solid rgba(245,158,11,0.25)',
+              marginBottom: 20,
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
@@ -296,7 +268,7 @@ export default function TraineeJourneyPage() {
                 <div style={{ fontSize: 13.5, fontWeight: 700, color: '#f8fafc' }}>
                   {pendingFollowUps[0].title || `Follow-up Check-in (${pendingFollowUps[0].scheduleDays}-day)`}
                 </div>
-                <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+                <div style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
                   State government longitudinal outcome verification due by {pendingFollowUps[0].dueDate}
                 </div>
               </div>
@@ -306,7 +278,7 @@ export default function TraineeJourneyPage() {
               type="button"
               onClick={() => setShowFollowUpModal(pendingFollowUps[0])}
               className="btn-gold"
-              style={{ padding: '7px 16px', fontSize: 12.5, fontWeight: 700, cursor: 'pointer' }}
+              style={{ padding: '7px 16px', fontSize: 12.5, fontWeight: 700, cursor: 'pointer', borderRadius: 6 }}
             >
               Complete Check-in →
             </button>
@@ -314,13 +286,13 @@ export default function TraineeJourneyPage() {
         )}
 
         {/* ── Chronological Outcome Journey Timeline ── */}
-        <div className="card-linear" style={{ padding: 26, borderRadius: 16 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, borderBottom: '1px solid var(--border)', paddingBottom: 14 }}>
+        <div style={{ padding: 24, borderRadius: 10, border: '1px solid var(--border)', background: 'var(--bg-surface)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, borderBottom: '1px solid var(--border)', paddingBottom: 14 }}>
             <div>
               <h2 className="font-display" style={{ fontSize: 17, fontWeight: 800, color: '#f8fafc', margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
                 <Milestone size={18} color="var(--gold)" /> Longitudinal Outcome Pathway
               </h2>
-              <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '4px 0 0' }}>
+              <p style={{ fontSize: 12, color: 'var(--text-secondary)', margin: '4px 0 0' }}>
                 Chronological sequence of verified educational, assessment, hiring, and wage events.
               </p>
             </div>
@@ -343,11 +315,11 @@ export default function TraineeJourneyPage() {
               <div
                 style={{
                   position: 'absolute',
-                  left: 19,
-                  top: 20,
-                  bottom: 20,
+                  left: 17,
+                  top: 18,
+                  bottom: 18,
                   width: 2,
-                  background: 'linear-gradient(180deg, var(--gold) 0%, rgba(245,158,11,0.2) 100%)',
+                  background: 'var(--border)',
                   zIndex: 0,
                 }}
               />
@@ -360,48 +332,45 @@ export default function TraineeJourneyPage() {
                     style={{
                       display: 'flex',
                       alignItems: 'flex-start',
-                      gap: 18,
-                      marginBottom: 26,
+                      gap: 16,
+                      marginBottom: 20,
                       position: 'relative',
                       zIndex: 1,
                     }}
                   >
-                    {/* Glowing Node Dot */}
+                    {/* Institutional Node Dot */}
                     <div
                       style={{
-                        width: 40,
-                        height: 40,
+                        width: 36,
+                        height: 36,
                         borderRadius: '50%',
                         background: 'var(--bg-surface)',
-                        border: `2px solid ${isVerified ? '#10b981' : 'var(--gold)'}`,
+                        border: `1.5px solid ${isVerified ? '#10b981' : 'var(--gold)'}`,
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
                         color: isVerified ? '#10b981' : 'var(--gold)',
-                        boxShadow: `0 0 12px ${isVerified ? 'rgba(16,185,129,0.3)' : 'rgba(245,158,11,0.3)'}`,
                         flexShrink: 0,
                       }}
                     >
-                      {isVerified ? <Check size={16} /> : <Clock size={16} />}
+                      {isVerified ? <Check size={15} /> : <Clock size={15} />}
                     </div>
 
-                    {/* Event Content Card */}
+                    {/* Event Content Panel */}
                     <div
                       style={{
                         flex: 1,
-                        padding: '16px 20px',
-                        background: 'rgba(255,255,255,0.02)',
-                        borderRadius: 12,
+                        padding: '14px 18px',
+                        background: 'rgba(255,255,255,0.015)',
+                        borderRadius: 8,
                         border: '1px solid var(--border)',
-                        transition: 'all 0.15s ease',
+                        transition: 'border-color 0.15s ease',
                       }}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.borderColor = 'var(--gold)';
-                        e.currentTarget.style.background = 'rgba(245,158,11,0.03)';
                       }}
                       onMouseLeave={(e) => {
                         e.currentTarget.style.borderColor = 'var(--border)';
-                        e.currentTarget.style.background = 'rgba(255,255,255,0.02)';
                       }}
                     >
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 10, marginBottom: 6 }}>

@@ -18,6 +18,7 @@ const nextConfig: NextConfig = {
         // skillsense-ai/package-lock.json (multiple-lockfile warning + wrong workspace root).
         root: path.resolve(__dirname),
     },
+    devIndicators: false,
 };
 
 export default nextConfig;

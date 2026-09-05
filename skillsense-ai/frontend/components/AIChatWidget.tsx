@@ -472,30 +472,11 @@ export default function AIChatWidget() {
         <button
           type="button"
           onClick={() => setOpen(true)}
-          aria-label="Open SkillSense Policy & Skill Copilot (Press Ctrl+K)"
-          style={{
-            position: 'fixed',
-            bottom: 20,
-            right: 20,
-            padding: '8px 14px',
-            borderRadius: 8,
-            background: 'var(--bg-surface)',
-            color: 'var(--text-primary)',
-            border: '1px solid var(--border)',
-            fontWeight: 650,
-            fontSize: 12.5,
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            boxShadow: 'var(--shadow-md)',
-            zIndex: 40,
-            transition: 'all 0.15s ease',
-          }}
+          aria-label="Open SkillSense Policy & Skill Copilot"
           className="ai-copilot-launcher hover:border-amber-500"
         >
-          <Bot size={15} color="var(--info, #06b6d4)" />
-          <span>Workforce Copilot</span>
+          <Bot size={16} color="var(--gold, #f59e0b)" />
+          <span className="copilot-label">Workforce Copilot</span>
           <kbd
             style={{
               fontSize: 10,

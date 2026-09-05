@@ -37,6 +37,7 @@ import {
 import { FadeIn } from '@/components/shared/FadeIn';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { AIBadge } from '@/components/ui/AIBadge';
+import { MetricStrip } from '@/components/dashboard/KPICard';
 import toast from 'react-hot-toast';
 
 const ResponsiveContainer = dynamic(
@@ -204,11 +205,11 @@ export default function EmployerPage() {
       <FadeIn style={{ maxWidth: 1200, margin: '0 auto', paddingBottom: 60 }}>
         {/* ── Top Header Banner ── */}
         <div
-          className="card-accent"
+          className="editorial-panel"
           style={{
             padding: 26,
-            borderRadius: 16,
-            marginBottom: 24,
+            borderRadius: 10,
+            marginBottom: 20,
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
@@ -258,45 +259,27 @@ export default function EmployerPage() {
             <Link
               href="/employer/placements"
               className="btn-gold"
-              style={{ fontSize: 13, padding: '9px 18px', display: 'flex', alignItems: 'center', gap: 6 }}
+              style={{ fontSize: 13, padding: '9px 18px', display: 'flex', alignItems: 'center', gap: 6, borderRadius: 6 }}
             >
               <Briefcase size={14} /> Post Placement Drive
             </Link>
           </div>
         </div>
 
-        {/* ── Recruiter KPI Scorecards ── */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14, marginBottom: 24 }}>
-          {[
-            { label: 'Pre-Assessed Candidates', value: '48,200+', sub: 'Verified across Maharashtra', color: 'var(--gold)', icon: Users },
-            { label: 'Avg Time-to-Hire', value: '9.4 Days', sub: '-62% vs Traditional Recruiting', color: 'var(--success)', icon: Zap },
-            { label: 'Ledger Verifications', value: '1,840 Passports', sub: 'Cryptographically Confirmed', color: 'var(--info)', icon: ShieldCheck },
-            { label: 'Placement Retention Rate', value: '91.8%', sub: '365d Industry Tenure Index', color: '#a855f7', icon: TrendingUp },
-          ].map((stat, idx) => {
-            const Icon = stat.icon;
-            return (
-              <div key={idx} className="card-kpi card-interactive" style={{ padding: '16px 18px', borderRadius: 'var(--radius-lg)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-                    {stat.label}
-                  </span>
-                  <div className="card-icon-container" style={{ width: 30, height: 30, color: stat.color }}>
-                    <Icon size={15} />
-                  </div>
-                </div>
-                <div className="font-display" style={{ fontSize: 22, fontWeight: 800, color: stat.color, letterSpacing: '-0.02em' }}>
-                  {stat.value}
-                </div>
-                <div style={{ fontSize: 11.5, color: 'var(--text-secondary)', marginTop: 3 }}>
-                  {stat.sub}
-                </div>
-              </div>
-            );
-          })}
+        {/* ── Recruiter KPI Executive Metric Strip ── */}
+        <div style={{ marginBottom: 20 }}>
+          <MetricStrip
+            items={[
+              { label: 'Pre-Assessed Candidates', value: '48,200+', subtext: 'Verified across Maharashtra', icon: Users, color: 'var(--gold)' },
+              { label: 'Avg Time-to-Hire', value: '9.4 Days', trend: { value: '-62% vs Traditional', direction: 'down' }, icon: Zap, color: 'var(--success)' },
+              { label: 'Ledger Verifications', value: '1,840 Passports', subtext: 'Cryptographically Confirmed', icon: ShieldCheck, color: 'var(--info)' },
+              { label: 'Placement Retention', value: '91.8%', subtext: '365d Industry Tenure Index', icon: TrendingUp, color: '#a855f7' },
+            ]}
+          />
         </div>
 
         {/* ── Instant Cryptographic Ledger Verification Utility ── */}
-        <div className="card-linear" style={{ padding: 22, borderRadius: 14, marginBottom: 24 }}>
+        <div style={{ padding: 20, borderRadius: 8, border: '1px solid var(--border)', background: 'var(--bg-surface)', marginBottom: 20 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
             <ShieldCheck size={18} color="var(--gold)" />
             <h3 className="font-display" style={{ fontSize: 15, fontWeight: 800, color: '#f8fafc', margin: 0 }}>
@@ -378,7 +361,7 @@ export default function EmployerPage() {
         </div>
 
         {/* ── Pre-Assessed Candidate Talent Pipeline ── */}
-        <div className="card-linear" style={{ padding: 24, borderRadius: 16, marginBottom: 24 }}>
+        <div style={{ padding: 22, borderRadius: 10, border: '1px solid var(--border)', background: 'var(--bg-surface)', marginBottom: 20 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18, flexWrap: 'wrap', gap: 12 }}>
             <div>
               <h2 className="font-display" style={{ fontSize: 17, fontWeight: 800, color: '#f8fafc', margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -439,82 +422,86 @@ export default function EmployerPage() {
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
-            {filteredCandidates.map((c) => (
+          {/* Structured Candidate Roster Rows */}
+          <div style={{ display: 'flex', flexDirection: 'column', border: '1px solid var(--border)', borderRadius: 8, overflow: 'hidden', background: 'rgba(255,255,255,0.01)' }}>
+            {filteredCandidates.map((c, idx) => (
               <div
                 key={c.id}
-                className="card-accent card-interactive card-3d"
                 style={{
-                  padding: 18,
-                  borderRadius: 'var(--radius-lg)',
+                  padding: '14px 18px',
+                  borderBottom: idx < filteredCandidates.length - 1 ? '1px solid var(--border)' : 'none',
                   display: 'flex',
-                  flexDirection: 'column',
+                  alignItems: 'center',
                   justifyContent: 'space-between',
+                  flexWrap: 'wrap',
                   gap: 14,
+                  background: idx % 2 === 1 ? 'rgba(255,255,255,0.015)' : 'transparent',
                 }}
               >
-                <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
-                    <div>
-                      <h3 className="font-display" style={{ fontSize: 15.5, fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
-                        {c.name}
-                      </h3>
-                      <div style={{ fontSize: 12, color: 'var(--gold)', fontWeight: 600 }}>{c.roleTitle}</div>
-                    </div>
-                    <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                      <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 6px', borderRadius: 4, background: 'rgba(59,130,246,0.12)', border: '1px solid rgba(59,130,246,0.3)', color: '#60a5fa' }}>
-                        Ready to Interview
-                      </span>
-                      <span style={{ fontSize: 10, fontWeight: 800, padding: '2px 6px', borderRadius: 4, background: 'var(--success-bg)', border: '1px solid var(--success-border)', color: 'var(--success)' }}>
-                        {c.nsqfLevel}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div style={{ display: 'flex', gap: 14, margin: '10px 0', fontSize: 11.5, color: 'var(--text-muted)', alignItems: 'center' }}>
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                      <MapPin size={12} style={{ color: 'var(--text-muted)' }} />
-                      <span>{c.location}</span>
+                {/* Col 1: Candidate Identity */}
+                <div style={{ minWidth: 200, flex: '1 1 200px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
+                    <h3 className="font-display" style={{ fontSize: 15, fontWeight: 800, color: '#f8fafc', margin: 0 }}>
+                      {c.name}
+                    </h3>
+                    <span style={{ fontSize: 10, fontWeight: 800, padding: '2px 6px', borderRadius: 4, background: 'var(--success-bg)', border: '1px solid var(--success-border)', color: 'var(--success)' }}>
+                      {c.nsqfLevel}
                     </span>
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                      <Zap size={12} style={{ color: 'var(--gold)' }} />
-                      <span>Score: <strong style={{ color: 'var(--success)' }}>{c.score}%</strong></span>
-                    </span>
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                      <FileCode size={12} style={{ color: 'var(--info)' }} />
-                      <span>Code Audit: <strong style={{ color: 'var(--gold)' }}>{c.githubScore}%</strong></span>
+                    <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 6px', borderRadius: 4, background: 'rgba(59,130,246,0.12)', border: '1px solid rgba(59,130,246,0.3)', color: '#60a5fa' }}>
+                      Ready
                     </span>
                   </div>
-
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginTop: 8 }}>
-                    {c.skills.map((s, idx) => (
-                      <span
-                        key={idx}
-                        style={{
-                          fontSize: 10.5,
-                          padding: '2px 7px',
-                          borderRadius: 4,
-                          background: 'var(--bg-surface-elevated)',
-                          color: 'var(--text-secondary)',
-                          border: '1px solid var(--border)',
-                          fontWeight: 500,
-                        }}
-                      >
-                        {s}
-                      </span>
-                    ))}
+                  <div style={{ fontSize: 12, color: 'var(--gold)', fontWeight: 600 }}>{c.roleTitle}</div>
+                  <div style={{ fontSize: 10.5, color: 'var(--text-muted)', fontFamily: 'monospace', marginTop: 2 }}>
+                    {c.hash}
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border-subtle)', paddingTop: 10 }}>
-                  <span style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: 'monospace' }}>
-                    {c.hash}
-                  </span>
+                {/* Col 2: Skills Badges */}
+                <div style={{ flex: '2 1 260px', display: 'flex', flexWrap: 'wrap', gap: 5 }}>
+                  {c.skills.map((s, sIdx) => (
+                    <span
+                      key={sIdx}
+                      style={{
+                        fontSize: 10.5,
+                        padding: '2px 7px',
+                        borderRadius: 4,
+                        background: 'rgba(255,255,255,0.03)',
+                        color: 'var(--text-secondary)',
+                        border: '1px solid var(--border)',
+                        fontWeight: 500,
+                      }}
+                    >
+                      {s}
+                    </span>
+                  ))}
+                </div>
+
+                {/* Col 3: Telemetry Scores & Location */}
+                <div style={{ minWidth: 160, display: 'flex', flexDirection: 'column', gap: 4, fontSize: 11.5 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 5, color: 'var(--text-secondary)' }}>
+                    <MapPin size={12} style={{ color: 'var(--text-muted)' }} />
+                    <span>{c.location}</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: 'var(--text-secondary)' }}>
+                      <Zap size={11} style={{ color: 'var(--gold)' }} />
+                      <span>Score: <strong style={{ color: 'var(--success)' }}>{c.score}%</strong></span>
+                    </span>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: 'var(--text-secondary)' }}>
+                      <FileCode size={11} style={{ color: 'var(--info)' }} />
+                      <span>Audit: <strong style={{ color: 'var(--gold)' }}>{c.githubScore}%</strong></span>
+                    </span>
+                  </div>
+                </div>
+
+                {/* Col 4: Action CTA */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <button
                     type="button"
                     onClick={() => handleScheduleInterview(c.name)}
                     className="btn-gold"
-                    style={{ fontSize: 11.5, padding: '5px 12px', display: 'flex', alignItems: 'center', gap: 4 }}
+                    style={{ fontSize: 11.5, padding: '6px 12px', display: 'flex', alignItems: 'center', gap: 4, borderRadius: 6 }}
                   >
                     <Send size={11} /> Request Interview
                   </button>
@@ -525,13 +512,13 @@ export default function EmployerPage() {
         </div>
 
         {/* ── Verified Placement Velocity Chart ── */}
-        <div className="card-linear" style={{ padding: 22, borderRadius: 16 }}>
+        <div style={{ padding: 22, borderRadius: 10, border: '1px solid var(--border)', background: 'var(--bg-surface)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
             <div>
               <h3 className="font-display" style={{ fontSize: 16, fontWeight: 800, color: '#f8fafc', margin: 0 }}>
                 Verified Placement & Onboarding Velocity
               </h3>
-              <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '2px 0 0' }}>
+              <p style={{ fontSize: 12, color: 'var(--text-secondary)', margin: '2px 0 0' }}>
                 Longitudinal monthly candidate hires validated across Maharashtra IT corridors.
               </p>
             </div>
@@ -548,7 +535,7 @@ export default function EmployerPage() {
                   contentStyle={{
                     background: '#0f111a',
                     border: '1px solid rgba(245,158,11,0.3)',
-                    borderRadius: 8,
+                    borderRadius: 6,
                     fontSize: 12,
                     color: '#fff',
                   }}

@@ -28,6 +28,7 @@ import {
   CheckCircle2,
   ArrowRight,
 } from 'lucide-react';
+import { MetricStrip } from '@/components/dashboard/KPICard';
 import toast from 'react-hot-toast';
 
 import {
@@ -656,87 +657,44 @@ export default function GovernmentMacroDashboardPage() {
         {/* ═══════════════════════════════════════════════════════════════════════ */}
         {activeTab === 'overview' && (
           <div>
-            {/* Top 4 Live KPI Metric Cards */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14, marginBottom: 14 }}>
-              {/* Card 1: Total Enrolled */}
-              <div className="card-kpi card-interactive" style={{ padding: '18px 20px', borderRadius: 'var(--radius-lg)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                  <span style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    Total Tracked Trainees
-                  </span>
-                  <div className="card-icon-container" style={{ width: 32, height: 32, background: 'var(--gold-muted)', border: '1px solid var(--gold-border)', color: 'var(--gold)' }}>
-                    <Users size={16} />
-                  </div>
-                </div>
-                <div className="font-display" style={{ fontSize: 26, fontWeight: 800, color: 'var(--gold)', letterSpacing: '-0.02em' }}>
-                  {totalTraineesDisplay}
-                </div>
-                <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 4 }}>
-                  {funnelBreakdown
-                    ? `${funnelBreakdown.certified.toLocaleString()} Certified (${funnelBreakdown.completed} Completed)`
-                    : 'Real-time state enrollment ledger'}
-                </div>
-              </div>
-
-              {/* Card 2: Placement / Transition Rate */}
-              <div className="card-kpi card-interactive" style={{ padding: '18px 20px', borderRadius: 'var(--radius-lg)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                  <span style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    State Transition Rate
-                  </span>
-                  <div className="card-icon-container" style={{ width: 32, height: 32, background: 'var(--success-bg)', border: '1px solid var(--success-border)', color: 'var(--success)' }}>
-                    <Briefcase size={16} />
-                  </div>
-                </div>
-                <div className="font-display" style={{ fontSize: 26, fontWeight: 800, color: 'var(--success)', letterSpacing: '-0.02em' }}>
-                  {placementRateDisplay}
-                </div>
-                <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 4 }}>
-                  {funnelBreakdown
-                    ? `${funnelBreakdown.placed.toLocaleString()} Placed / Transitioned`
-                    : 'No placement records'}
-                </div>
-              </div>
-
-              {/* Card 3: 90-Day Retention */}
-              <div className="card-kpi card-interactive" style={{ padding: '18px 20px', borderRadius: 'var(--radius-lg)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                  <span style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    90-Day Retention
-                  </span>
-                  <div className="card-icon-container" style={{ width: 32, height: 32, background: 'var(--info-bg)', border: '1px solid var(--info-border)', color: 'var(--info)' }}>
-                    <ShieldCheck size={16} />
-                  </div>
-                </div>
-                <div className="font-display" style={{ fontSize: 26, fontWeight: 800, color: 'var(--info)', letterSpacing: '-0.02em' }}>
-                  {retentionRateDisplay}
-                </div>
-                <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 4 }}>
-                  {funnelBreakdown
-                    ? `${funnelBreakdown.retained90d.toLocaleString()} Verified Retained at 90d`
-                    : 'Surveys pending response'}
-                </div>
-              </div>
-
-              {/* Card 4: Wage Growth */}
-              <div className="card-kpi card-interactive" style={{ padding: '18px 20px', borderRadius: 'var(--radius-lg)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                  <span style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    Median Salary Growth
-                  </span>
-                  <div className="card-icon-container" style={{ width: 32, height: 32, background: 'rgba(168,85,247,0.1)', border: '1px solid rgba(168,85,247,0.25)', color: '#a855f7' }}>
-                    <TrendingUp size={16} />
-                  </div>
-                </div>
-                <div className="font-display" style={{ fontSize: 26, fontWeight: 800, color: '#a855f7', letterSpacing: '-0.02em' }}>
-                  {wageGrowthDisplay}
-                </div>
-                <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 4 }}>
-                  {wageSummary && wageSummary.avgInitialSalary > 0
-                    ? `₹${wageSummary.avgInitialSalary.toLocaleString('en-IN')} → ₹${wageSummary.avgCurrentSalary.toLocaleString('en-IN')}/mo`
-                    : 'No verified compensation data'}
-                </div>
-              </div>
+            {/* Unified Sovereign Metric Strip */}
+            <div style={{ marginBottom: 16 }}>
+              <MetricStrip
+                items={[
+                  {
+                    label: 'Total Tracked Trainees',
+                    value: totalTraineesDisplay,
+                    subtitle: funnelBreakdown
+                      ? `${funnelBreakdown.certified.toLocaleString()} Certified (${funnelBreakdown.completed} Completed)`
+                      : 'Real-time state enrollment ledger',
+                    icon: <Users size={15} />,
+                  },
+                  {
+                    label: 'State Transition Rate',
+                    value: placementRateDisplay,
+                    subtitle: funnelBreakdown
+                      ? `${funnelBreakdown.placed.toLocaleString()} Placed / Transitioned`
+                      : 'No placement records',
+                    icon: <Briefcase size={15} />,
+                  },
+                  {
+                    label: '90-Day Retention',
+                    value: retentionRateDisplay,
+                    subtitle: funnelBreakdown
+                      ? `${funnelBreakdown.retained90d.toLocaleString()} Verified Retained at 90d`
+                      : 'Surveys pending response',
+                    icon: <ShieldCheck size={15} />,
+                  },
+                  {
+                    label: 'Median Salary Growth',
+                    value: wageGrowthDisplay,
+                    subtitle: wageSummary && wageSummary.avgInitialSalary > 0
+                      ? `₹${wageSummary.avgInitialSalary.toLocaleString('en-IN')} → ₹${wageSummary.avgCurrentSalary.toLocaleString('en-IN')}/mo`
+                      : 'No verified compensation data',
+                    icon: <TrendingUp size={15} />,
+                  },
+                ]}
+              />
             </div>
 
             {/* Granular Outcome Breakdown Bar */}
@@ -837,71 +795,80 @@ export default function GovernmentMacroDashboardPage() {
               </div>
             </div>
 
-            {/* Quick Action Navigation Cards */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 16 }}>
+            {/* Unified Exploration Surface (Divided Row Strip) */}
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+                background: 'var(--bg-surface)',
+                border: '1px solid var(--border-default)',
+                borderRadius: 8,
+                overflow: 'hidden',
+              }}
+            >
               <div
                 onClick={() => setActiveTab('districts')}
-                className="card-linear hover:border-gold"
-                style={{ padding: 20, borderRadius: 12, cursor: 'pointer', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 12 }}
+                style={{ padding: '18px 20px', cursor: 'pointer', borderRight: '1px solid var(--border-default)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 12, transition: 'background-color 0.15s ease' }}
+                className="hover:bg-[var(--bg-surface-elevated)]"
               >
                 <div>
-                  <div style={{ width: 34, height: 34, borderRadius: 8, background: 'rgba(245,158,11,0.1)', color: 'var(--gold)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 10 }}>
-                    <Building size={17} />
+                  <div style={{ width: 30, height: 30, borderRadius: 6, background: 'rgba(245,158,11,0.1)', color: 'var(--gold)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
+                    <Building size={15} />
                   </div>
-                  <h4 style={{ fontSize: 14.5, fontWeight: 700, color: '#f8fafc', margin: '0 0 4px' }}>
+                  <h4 style={{ fontSize: 13.5, fontWeight: 700, color: '#f8fafc', margin: '0 0 3px' }}>
                     District Telemetry & Pipeline
                   </h4>
-                  <p style={{ fontSize: 12, color: 'var(--text-secondary)', margin: 0, lineHeight: 1.4 }}>
+                  <p style={{ fontSize: 11.5, color: 'var(--text-secondary)', margin: 0, lineHeight: 1.4 }}>
                     Inspect individual district performance, 9-stage conversion funnels, and DPDP-protected metrics.
                   </p>
                 </div>
-                <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--gold)', display: 'flex', alignItems: 'center', gap: 4 }}>
+                <div style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--gold)', display: 'flex', alignItems: 'center', gap: 4 }}>
                   <span>Explore Districts</span>
-                  <ArrowRight size={13} />
+                  <ArrowRight size={12} />
                 </div>
               </div>
 
               <div
                 onClick={() => setActiveTab('wages')}
-                className="card-linear hover:border-gold"
-                style={{ padding: 20, borderRadius: 12, cursor: 'pointer', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 12 }}
+                style={{ padding: '18px 20px', cursor: 'pointer', borderRight: '1px solid var(--border-default)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 12, transition: 'background-color 0.15s ease' }}
+                className="hover:bg-[var(--bg-surface-elevated)]"
               >
                 <div>
-                  <div style={{ width: 34, height: 34, borderRadius: 8, background: 'rgba(168,85,247,0.1)', color: '#a855f7', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 10 }}>
-                    <TrendingUp size={17} />
+                  <div style={{ width: 30, height: 30, borderRadius: 6, background: 'rgba(168,85,247,0.1)', color: '#a855f7', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
+                    <TrendingUp size={15} />
                   </div>
-                  <h4 style={{ fontSize: 14.5, fontWeight: 700, color: '#f8fafc', margin: '0 0 4px' }}>
+                  <h4 style={{ fontSize: 13.5, fontWeight: 700, color: '#f8fafc', margin: '0 0 3px' }}>
                     Longitudinal Wage Analytics
                   </h4>
-                  <p style={{ fontSize: 12, color: 'var(--text-secondary)', margin: 0, lineHeight: 1.4 }}>
+                  <p style={{ fontSize: 11.5, color: 'var(--text-secondary)', margin: 0, lineHeight: 1.4 }}>
                     Track verified candidate wage curves from 30 days to 365 days across vocational cohorts.
                   </p>
                 </div>
-                <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--gold)', display: 'flex', alignItems: 'center', gap: 4 }}>
+                <div style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--gold)', display: 'flex', alignItems: 'center', gap: 4 }}>
                   <span>View Wage Curves</span>
-                  <ArrowRight size={13} />
+                  <ArrowRight size={12} />
                 </div>
               </div>
 
               <div
                 onClick={() => setActiveTab('copilot')}
-                className="card-linear hover:border-gold"
-                style={{ padding: 20, borderRadius: 12, cursor: 'pointer', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 12 }}
+                style={{ padding: '18px 20px', cursor: 'pointer', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 12, transition: 'background-color 0.15s ease' }}
+                className="hover:bg-[var(--bg-surface-elevated)]"
               >
                 <div>
-                  <div style={{ width: 34, height: 34, borderRadius: 8, background: 'rgba(16,185,129,0.1)', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 10 }}>
-                    <Bot size={17} />
+                  <div style={{ width: 30, height: 30, borderRadius: 6, background: 'rgba(16,185,129,0.1)', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
+                    <Bot size={15} />
                   </div>
-                  <h4 style={{ fontSize: 14.5, fontWeight: 700, color: '#f8fafc', margin: '0 0 4px' }}>
+                  <h4 style={{ fontSize: 13.5, fontWeight: 700, color: '#f8fafc', margin: '0 0 3px' }}>
                     AI Policy Directives
                   </h4>
-                  <p style={{ fontSize: 12, color: 'var(--text-secondary)', margin: 0, lineHeight: 1.4 }}>
+                  <p style={{ fontSize: 11.5, color: 'var(--text-secondary)', margin: 0, lineHeight: 1.4 }}>
                     Interact with grounded telemetry queries and evaluate {interventions.length} active policy interventions.
                   </p>
                 </div>
-                <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--gold)', display: 'flex', alignItems: 'center', gap: 4 }}>
+                <div style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--gold)', display: 'flex', alignItems: 'center', gap: 4 }}>
                   <span>Ask Policy Copilot</span>
-                  <ArrowRight size={13} />
+                  <ArrowRight size={12} />
                 </div>
               </div>
             </div>
@@ -1400,37 +1367,34 @@ export default function GovernmentMacroDashboardPage() {
                   No active policy directives registered in the state database.
                 </div>
               ) : (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 14 }}>
                   {interventions.map((iv, idx) => (
                     <div
                       key={idx}
-                      style={{
-                        padding: 18,
-                        background: 'rgba(255,255,255,0.02)',
-                        borderRadius: 12,
-                        border: '1px solid var(--border)',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'space-between',
-                        gap: 12,
-                      }}
+                      className="decision-brief"
                     >
-                      <div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                          <span style={{ fontSize: 10.5, fontWeight: 800, textTransform: 'uppercase', padding: '2px 8px', borderRadius: 4, background: 'rgba(245,158,11,0.12)', color: 'var(--gold)', border: '1px solid var(--gold-border)' }}>
-                            {iv.targetType}: {iv.targetName}
-                          </span>
-                          <span style={{ fontSize: 11, fontWeight: 800, color: '#10b981', fontFamily: 'monospace' }}>
-                            {Math.round(iv.confidence * 100)}% Confidence
-                          </span>
-                        </div>
-                        <h4 style={{ fontSize: 14, fontWeight: 700, color: '#f8fafc', margin: '0 0 6px' }}>{iv.title}</h4>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                        <span style={{ fontSize: 10, fontWeight: 800, textTransform: 'uppercase', padding: '2px 6px', borderRadius: 4, background: 'rgba(245,158,11,0.1)', color: 'var(--gold)', border: '1px solid rgba(245,158,11,0.2)' }}>
+                          {iv.targetType}: {iv.targetName}
+                        </span>
+                        <span style={{ fontSize: 11, fontWeight: 700, color: '#10b981', fontFamily: 'monospace' }}>
+                          {Math.round(iv.confidence * 100)}% Confidence
+                        </span>
+                      </div>
+
+                      <div style={{ marginBottom: 10 }}>
+                        <div className="decision-brief-label">Policy Title</div>
+                        <h4 style={{ fontSize: 13.5, fontWeight: 700, color: '#f8fafc', margin: 0 }}>{iv.title}</h4>
+                      </div>
+
+                      <div style={{ marginBottom: 10 }}>
+                        <div className="decision-brief-label">Evidence &amp; Telemetry</div>
                         <p style={{ fontSize: 12, color: '#cbd5e1', lineHeight: 1.5, margin: 0 }}>{iv.observation}</p>
                       </div>
 
-                      <div style={{ padding: 12, borderRadius: 8, background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.06)' }}>
-                        <div style={{ fontSize: 10.5, fontWeight: 800, textTransform: 'uppercase', color: 'var(--gold)', marginBottom: 2 }}>
-                          Recommended State Directive:
+                      <div style={{ padding: 10, borderRadius: 6, background: 'var(--bg-surface-elevated)', border: '1px solid var(--border-default)' }}>
+                        <div className="decision-brief-label" style={{ color: 'var(--gold)' }}>
+                          Recommended State Directive
                         </div>
                         <div style={{ fontSize: 12, color: '#f8fafc', lineHeight: 1.4 }}>{iv.recommendedAction}</div>
                       </div>
