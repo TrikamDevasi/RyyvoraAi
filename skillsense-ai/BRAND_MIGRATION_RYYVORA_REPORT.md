@@ -279,3 +279,67 @@ TOTAL UNINTENDED USER-FACING REFERENCES: 0
 1. **Production Deployment:** The codebase is in a deployable state with `npm run build` passing with code 0 and 18/18 frontend contract tests passing.
 2. **Domain Cutover:** When a custom domain (e.g. `ryyvora.ai`) is acquired, simply update `FRONTEND_URL` in `.env` and `sitemap.ts` without modifying backend business logic.
 3. **Session Continuity:** The dual-token resolution strategy (`ryyvora_token` with fallback to `skillsense_token`) ensures zero session invalidation for currently authenticated users.
+
+---
+
+## 22. Framer-to-React Landing Page Migration (Phase 2 — September 2026)
+
+### Overview
+A full Framer reference landing page was analyzed and migrated to native Next.js React components, replacing the legacy hero section in `frontend/app/page.tsx` with a premium cosmic design system inspired by the reference Framer site (`zainarts.framer.website`).
+
+### Components Created
+
+| Component | Path | Description |
+|-----------|------|-------------|
+| `FramerHero` | `frontend/components/landing/FramerHero.tsx` | Monumental cosmic hero with "RYYVORA AI" typographic treatment, animated floating bento cards (-8°/+7° tilts), atmospheric horizon planet arc, starfield overlay |
+| `FramerMarquee` | `frontend/components/landing/FramerMarquee.tsx` | Infinite-scroll ticker ribbon with 10 Ryyvora AI capability pills, mask-image fade edges, CSS keyframe animation |
+| `FramerBento` | `frontend/components/landing/FramerBento.tsx` | 12-column bento grid with interactive capability carousel (6 modules), profile card, mobile passport mockup, placement pulse banner, SLA speed card, wage uplift widget, and 2×2 standards grid |
+| `FramerPillars` | `frontend/components/landing/FramerPillars.tsx` | 4 editorial case-study panels with reversed alternating image/content layout, stage progression tags, metric callouts, and CTA links |
+| `FramerCTA` | `frontend/components/landing/FramerCTA.tsx` | Cosmic full-width CTA with monumental uppercase headline, gold→cyan gradient text, radial glow background, two primary action buttons |
+
+### Design System (globals.css additions)
+
+| CSS Class | Purpose |
+|-----------|---------|
+| `.cosmic-hero-canvas` | Section container with radial dark blue atmosphere |
+| `.cosmic-stars-overlay` | Static starfield via radial-gradient dot pattern |
+| `.cosmic-horizon-arc` | Elliptical planet horizon arc with cyan glow |
+| `.tilted-hero-card-left/right` | ±8°/7° tilted cards with hover spring physics |
+| `.bento-glass-card` | Glassmorphism dark panel with mouse-tracking shimmer |
+| `.marquee-wrapper` | Infinite scroll container with mask-image fade |
+| `.marquee-content` | `infiniteMarqueeScroll` CSS animation track |
+| `.marquee-pill` | Individual ticker item with hover state |
+| `.editorial-case-panel` | Pillar section glass container |
+| `.editorial-tag-pill` | White pill for primary feature tag |
+| `.editorial-tag-pill-dark` | Translucent pill for secondary tags |
+| `.editorial-arrow-link` | Gap-animating CTA link with gold hover |
+| `.bento-grid-12` | Pure CSS 12-column grid (no Tailwind dependency) |
+| `.bento-col-4/5/3` | Responsive bento columns (full-width mobile, 4/5/3 cols at 1024px+) |
+| `.pillar-layout-row` | Two-column alternating layout for editorial panels |
+| `.font-manrope`, `.font-outfit`, `.font-display` | Typography utility classes |
+
+### Assets Generated & Deployed
+
+All 6 reference images were wrong (showing third-party Framer template content — "Stellarsage Cards", "Q Bikes" etc.). All were replaced with Ryyvora AI-branded AI-generated product mockups:
+
+| Filename | Content |
+|----------|---------|
+| `skill-passport-mobile.png` | Mobile phone displaying Ryyvora AI Skill Passport with NSQF Level 6 badge, verified skills, SHA-256 seal, QR code |
+| `platform-telemetry-banner.png` | Laptop with district-level India heatmap, employment rate charts, retention metrics |
+| `employer-verification-mobile.png` | Laptop with Aarav Sharma candidate profile, 98.4% readiness score, INSTANTLY VERIFIED CTA |
+| `retention-telemetry.png` | Dashboard with 89.6% 12-month retention line graph vs 48% benchmark, wage growth bars |
+| `analytics-preview.png` | Full analytics dashboard: salary curves, wage heatmap, career milestones, +34.2% uplift |
+| `cockpit-laptop-preview.png` | State Governance Intelligence Cockpit with India map, district drill-down, policy alert panel |
+
+Asset path: `frontend/public/images/reference/`
+
+### Zero External Dependencies
+The migration has **zero dependency** on the original Framer site. All assets are served from `frontend/public/images/reference/` and all components are native Next.js/React with `framer-motion` (already a project dependency).
+
+### Git Commit
+```
+feat(landing): Framer-to-React migration complete — Ryyvora AI cosmic design system
+Commit: 6dc7065
+Files changed: 13 (+1,647 / -415)
+Pushed: main → TrikamDevasi/SkillSenseAi
+```
