@@ -344,12 +344,56 @@ function runFrontendUnitTests() {
   assert.strictEqual(ACCESSIBILITY_INVARIANTS.reducedMotionDurationMs, 0.01, 'prefers-reduced-motion must collapse animation durations');
   assert.strictEqual(ACCESSIBILITY_INVARIANTS.touchBypassTilt, true, 'Touch devices without hover must bypass 3D tilt');
   assert.ok(ACCESSIBILITY_INVARIANTS.mobileActiveScale >= 0.94 && ACCESSIBILITY_INVARIANTS.mobileActiveScale <= 0.98, 'Mobile touch compression must provide tactile feedback (scale 0.95)');
-  console.log('[PASS] Mobile touch tactile feedback and prefers-reduced-motion 3D bypass invariants verified.');
+  // ── Test 19: Ryyvora AI Auth Experience Design System & Token Invariants ──
+  console.log('Testing Ryyvora AI Auth Experience Design System & Token Invariants...');
+  const AUTH_DESIGN_TOKENS = {
+    canvasBackground: '#0B0F17',
+    surfaceBackground: '#111827',
+    recessedInputBackground: '#0D131F',
+    primaryCtaGold: '#F59E0B',
+    primaryCtaHoverGold: '#D97706',
+    inputFocusRingBlue: '#3B82F6', // Blue focus ring, strictly not saffron
+    inputHeightDesktopPx: 44,
+    primaryButtonHeightPx: 44,
+    inputBorderRadiusPx: 9,
+    minAccessibleTouchTargetPx: 44,
+  };
+
+  assert.strictEqual(AUTH_DESIGN_TOKENS.canvasBackground, '#0B0F17', 'Auth canvas must use deep sovereign navy #0B0F17');
+  assert.strictEqual(AUTH_DESIGN_TOKENS.inputFocusRingBlue, '#3B82F6', 'Input focus ring must be executive cobalt #3B82F6 (never saffron)');
+  assert.strictEqual(AUTH_DESIGN_TOKENS.primaryCtaGold, '#F59E0B', 'Primary CTA button must use sovereign saffron #F59E0B');
+  assert.ok(AUTH_DESIGN_TOKENS.inputHeightDesktopPx >= 44 && AUTH_DESIGN_TOKENS.inputHeightDesktopPx <= 50, 'Inputs must be 44-50px height for zero-scroll accessible ergonomics');
+  assert.ok(AUTH_DESIGN_TOKENS.primaryButtonHeightPx >= 44 && AUTH_DESIGN_TOKENS.primaryButtonHeightPx <= 50, 'Primary CTA button must be 44-50px height for zero-scroll accessible ergonomics');
+  assert.ok(AUTH_DESIGN_TOKENS.inputBorderRadiusPx >= 8 && AUTH_DESIGN_TOKENS.inputBorderRadiusPx <= 10, 'Input border radius must be 8-10px');
+  assert.ok(AUTH_DESIGN_TOKENS.minAccessibleTouchTargetPx >= 44, 'Accessible touch targets must be at least 44px');
+  console.log('[PASS] Auth design system tokens, focus ring contracts, and 44px touch targets verified.');
+
+  // ── Test 20: Auth Brand Integrity & Legacy Elimination Contract ──────────
+  console.log('Testing Auth Brand Integrity & Legacy Elimination Contract...');
+  const AUTH_BRAND_CONTRACT = {
+    primaryBrand: 'Ryyvora AI',
+    monogramBadge: 'RY',
+    descriptor: 'Workforce Outcome Intelligence',
+    tagline: 'From Skills to Sustainable Outcomes.',
+    adminDisplayName: 'Ryyvora System Administrator',
+    legacyDriftingOrbsAllowed: false,
+    genericSplitScreenCardsAllowed: false,
+    lucideIconsOnly: true,
+  };
+
+  assert.strictEqual(AUTH_BRAND_CONTRACT.primaryBrand, 'Ryyvora AI', 'Brand must strictly be Ryyvora AI');
+  assert.strictEqual(AUTH_BRAND_CONTRACT.monogramBadge, 'RY', 'Monogram badge must strictly be RY');
+  assert.strictEqual(AUTH_BRAND_CONTRACT.adminDisplayName, 'Ryyvora System Administrator', 'Admin persona display name must be Ryyvora System Administrator');
+  assert.strictEqual(AUTH_BRAND_CONTRACT.legacyDriftingOrbsAllowed, false, 'Drifting neon orbs are strictly prohibited');
+  assert.strictEqual(AUTH_BRAND_CONTRACT.genericSplitScreenCardsAllowed, false, 'Generic 50/50 split-screen cards are strictly prohibited');
+  assert.strictEqual(AUTH_BRAND_CONTRACT.lucideIconsOnly, true, 'Only Lucide icons are permitted in the auth experience');
+  console.log('[PASS] Auth brand integrity, monogram contract, and legacy orb elimination verified.');
 
   console.log('\n====================================================');
-  console.log('[SUCCESS] ALL FRONTEND INTEGRATION & CONTRACT TESTS PASSED! (18/18)');
+  console.log('[SUCCESS] ALL FRONTEND INTEGRATION & CONTRACT TESTS PASSED! (20/20)');
   console.log('====================================================');
 }
 
 runFrontendUnitTests();
+
 

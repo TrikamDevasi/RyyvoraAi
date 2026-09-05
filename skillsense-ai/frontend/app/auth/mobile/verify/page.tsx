@@ -1,17 +1,17 @@
 'use client';
 
-import { useState, useEffect, useRef, useTransition } from 'react';
+import React, { useState, useEffect, useRef, useTransition } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import {
-  Smartphone,
   ArrowRight,
-  RefreshCw,
   ArrowLeft,
   ShieldCheck,
-  AlertCircle,
+  CircleAlert,
+  Smartphone,
+  RefreshCw,
   Sparkles,
-  CheckCircle2,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import '../../auth.css';
@@ -27,14 +27,14 @@ const ROLE_DASHBOARD: Record<string, string> = {
 
 export default function MobileVerifyPage() {
   const router = useRouter();
-  const { mobileState, verifyMobileOtp, sendMobileOtp, setMobileState } = useAuthStore();
+  const { mobileState, verifyMobileOtp, sendMobileOtp } = useAuthStore();
   const [digits, setDigits] = useState<string[]>(['', '', '', '', '', '']);
   const [timer, setTimer] = useState<number>(60);
   const [canResend, setCanResend] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [resending, setResending] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [isPending, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
 
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -73,7 +73,7 @@ export default function MobileVerifyPage() {
 
   const handleDigitChange = (index: number, value: string) => {
     setError(null);
-    const char = value.slice(-1); // Take latest char typed
+    const char = value.slice(-1);
 
     if (!/^\d*$/.test(char)) return;
 
@@ -81,12 +81,12 @@ export default function MobileVerifyPage() {
     newDigits[index] = char;
     setDigits(newDigits);
 
-    // Auto-advance
+    // Auto-advance to next slot
     if (char && index < 5) {
       inputRefs.current[index + 1]?.focus();
     }
 
-    // If all 6 digits entered, auto-verify
+    // Auto-verify if all 6 digits are populated
     if (char && index === 5 && newDigits.every((d) => d !== '')) {
       submitOtp(newDigits.join(''));
     }
@@ -122,7 +122,7 @@ export default function MobileVerifyPage() {
   const submitOtp = async (otpCode: string) => {
     if (!mobileState?.phone) return;
     if (otpCode.length !== 6) {
-      setError('Please enter all 6 digits of the OTP.');
+      setError('Please enter all 6 digits of the verification code.');
       return;
     }
 
@@ -147,7 +147,6 @@ export default function MobileVerifyPage() {
       setLoading(false);
       const msg = err.response?.data?.message || err.message || 'Incorrect verification code. Please try again.';
       setError(msg);
-      // Reset inputs
       setDigits(['', '', '', '', '', '']);
       inputRefs.current[0]?.focus();
     }
@@ -165,7 +164,7 @@ export default function MobileVerifyPage() {
       setCanResend(false);
       setDigits(['', '', '', '', '', '']);
       inputRefs.current[0]?.focus();
-      toast.success('A new 6-digit verification code has been sent!');
+      toast.success('A new 6-digit verification code has been dispatched.');
     } catch (err: any) {
       const msg = err.response?.data?.message || err.message || 'Failed to resend code. Please try again.';
       setError(msg);
@@ -184,280 +183,195 @@ export default function MobileVerifyPage() {
 
   return (
     <div className="auth-page">
-      <div className="auth-bg-canvas">
-        <div className="auth-bg-orb auth-bg-orb--1" />
-        <div className="auth-bg-orb auth-bg-orb--2" />
-        <div className="auth-bg-orb auth-bg-orb--3" />
-        <div className="auth-bg-grid" />
-      </div>
+      {/* ── Top Bar ── */}
+      <header className="auth-top-bar">
+        <Link href="/" className="auth-brand-link" aria-label="Ryyvora AI Home">
+          <div className="auth-brand-monogram">RY</div>
+          <div className="auth-brand-meta">
+            <span className="auth-brand-name">
+              Ryyvora <span>AI</span>
+            </span>
+            <span className="auth-brand-descriptor">Workforce Outcome Intelligence</span>
+          </div>
+        </Link>
 
-      <div className="auth-card" style={{ maxWidth: 440 }}>
-        {/* ── BACK BUTTON ── */}
-        <button
-          type="button"
-          onClick={() => router.push('/auth')}
-          style={{
-            background: 'none',
-            border: 'none',
-            color: '#94a3b8',
-            cursor: 'pointer',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 6,
-            fontSize: 12.5,
-            fontWeight: 600,
-            marginBottom: 16,
-            padding: 0,
-            transition: 'color 0.15s ease',
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.color = '#f8fafc')}
-          onMouseLeave={(e) => (e.currentTarget.style.color = '#94a3b8')}
-        >
-          <ArrowLeft size={15} /> Change mobile number
-        </button>
+        <div className="auth-trust-signal">
+          <ShieldCheck size={14} color="#10B981" />
+          <span>Privacy-conscious workforce intelligence</span>
+          <span className="auth-trust-dot" />
+        </div>
+      </header>
 
-        {/* ── HEADER ── */}
-        <div className="auth-header" style={{ textAlign: 'center', marginBottom: 24 }}>
-          <div
+      {/* ── Main Auth Surface ── */}
+      <main className="auth-main-wrap">
+        <div className="auth-surface">
+          
+          {/* Back link */}
+          <button
+            type="button"
+            onClick={() => router.push('/auth')}
             style={{
-              width: 52,
-              height: 52,
-              borderRadius: 14,
-              background: 'rgba(245,158,11,0.12)',
-              border: '1px solid rgba(245,158,11,0.3)',
-              color: 'var(--gold, #f59e0b)',
+              background: 'none',
+              border: 'none',
+              color: 'var(--text-secondary, #94A3B8)',
+              cursor: 'pointer',
               display: 'inline-flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              marginBottom: 14,
+              gap: 6,
+              fontSize: 12.5,
+              fontWeight: 600,
+              padding: 0,
+              marginBottom: 16,
+              transition: 'color 150ms ease',
             }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-primary, #F8FAFC)')}
+            onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary, #94A3B8)')}
           >
-            <Smartphone size={26} />
-          </div>
+            <ArrowLeft size={14} /> Change mobile number
+          </button>
 
-          <h1 className="auth-title" style={{ fontSize: 23, fontWeight: 800, color: '#f8fafc', margin: 0 }}>
-            Verify Mobile Number
-          </h1>
-          <p className="auth-subtitle" style={{ fontSize: 13, color: '#94a3b8', marginTop: 6, lineHeight: 1.5 }}>
-            Enter the 6-digit verification code sent to{' '}
-            <strong style={{ color: '#f8fafc', fontWeight: 700 }}>
-              {mobileState?.maskedPhone || mobileState?.phone || 'your phone'}
-            </strong>
-          </p>
-        </div>
-
-        {/* ── DEV MODE SIMULATION BADGE ── */}
-        {mobileState?.devOtp && (
-          <div
-            style={{
-              marginBottom: 18,
-              padding: '8px 12px',
-              borderRadius: 8,
-              background: 'rgba(16,185,129,0.1)',
-              border: '1px solid rgba(16,185,129,0.25)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              fontSize: 12,
-              color: '#34d399',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <Sparkles size={14} />
-              <span>Dev Simulation OTP: <strong>{mobileState.devOtp}</strong></span>
+          {/* Header */}
+          <div className="auth-header">
+            <div className="auth-eyebrow">
+              <Smartphone size={12} />
+              <span>Mobile Verification</span>
             </div>
-            <button
-              type="button"
-              onClick={handleAutofillDevOtp}
-              style={{
-                background: 'rgba(16,185,129,0.2)',
-                border: '1px solid rgba(16,185,129,0.4)',
-                color: '#34d399',
-                fontSize: 11,
-                fontWeight: 700,
-                padding: '2px 8px',
-                borderRadius: 4,
-                cursor: 'pointer',
-              }}
-            >
-              Auto-Fill
-            </button>
-          </div>
-        )}
 
-        {/* ── 6-DIGIT OTP INPUTS ── */}
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            submitOtp(digits.join(''));
-          }}
-        >
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              gap: 8,
-              marginBottom: 20,
-            }}
-          >
-            {digits.map((digit, idx) => (
-              <input
-                key={idx}
-                ref={(el) => {
-                  inputRefs.current[idx] = el;
-                }}
-                type="text"
-                inputMode="numeric"
-                pattern="[0-9]*"
-                maxLength={1}
-                value={digit}
-                onChange={(e) => handleDigitChange(idx, e.target.value)}
-                onKeyDown={(e) => handleKeyDown(idx, e)}
-                onPaste={handlePaste}
-                disabled={loading}
-                style={{
-                  width: '100%',
-                  maxWidth: 52,
-                  height: 56,
-                  textAlign: 'center',
-                  fontSize: 22,
-                  fontWeight: 800,
-                  color: '#f8fafc',
-                  background: 'rgba(255,255,255,0.04)',
-                  border: digit ? '2px solid var(--gold, #f59e0b)' : '1px solid rgba(255,255,255,0.12)',
-                  borderRadius: 10,
-                  outline: 'none',
-                  transition: 'all 0.15s ease',
-                  boxShadow: digit ? '0 0 12px rgba(245,158,11,0.2)' : 'none',
-                }}
-                onFocus={(e) => {
-                  e.currentTarget.style.borderColor = 'var(--gold, #f59e0b)';
-                  e.currentTarget.style.background = 'rgba(245,158,11,0.06)';
-                }}
-                onBlur={(e) => {
-                  if (!digit) {
-                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)';
-                    e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
-                  }
-                }}
-              />
-            ))}
+            <h1 className="auth-title">Verify your mobile</h1>
+            <p className="auth-subtitle">
+              We sent a 6-digit verification code to{' '}
+              <strong style={{ color: 'var(--text-primary, #F8FAFC)' }}>
+                {mobileState?.maskedPhone || mobileState?.phone || 'your phone'}
+              </strong>
+            </p>
           </div>
 
-          {/* ── ERROR DISPLAY ── */}
-          {error && (
+          {/* Dev Simulation Badge (Subtle helper) */}
+          {mobileState?.devOtp && (
             <div
               style={{
-                color: '#f87171',
-                fontSize: 12,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 6,
-                background: 'rgba(239,68,68,0.1)',
+                marginBottom: 16,
                 padding: '8px 12px',
                 borderRadius: 8,
-                border: '1px solid rgba(239,68,68,0.2)',
-                marginBottom: 16,
+                background: 'rgba(16, 185, 129, 0.08)',
+                border: '1px solid rgba(16, 185, 129, 0.25)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                fontSize: 12,
+                color: '#34d399',
               }}
             >
-              <AlertCircle size={14} />
-              <span>{error}</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <Sparkles size={13} />
+                <span>Dev Test Code: <strong>{mobileState.devOtp}</strong></span>
+              </div>
+              <button
+                type="button"
+                onClick={handleAutofillDevOtp}
+                style={{
+                  background: 'rgba(16, 185, 129, 0.15)',
+                  border: '1px solid rgba(16, 185, 129, 0.35)',
+                  color: '#34d399',
+                  fontSize: 11,
+                  fontWeight: 700,
+                  padding: '2px 8px',
+                  borderRadius: 4,
+                  cursor: 'pointer',
+                }}
+              >
+                Auto-Fill
+              </button>
             </div>
           )}
 
-          {/* ── SUBMIT BUTTON ── */}
-          <button
-            type="submit"
-            className="auth-btn"
-            disabled={loading || digits.some((d) => !d)}
-            style={{
-              width: '100%',
-              padding: '12px',
-              borderRadius: 8,
-              background: digits.every((d) => d) ? 'var(--gold, #f59e0b)' : 'rgba(255,255,255,0.08)',
-              color: digits.every((d) => d) ? '#000' : '#64748b',
-              fontWeight: 800,
-              fontSize: 13.5,
-              border: 'none',
-              cursor: loading || digits.some((d) => !d) ? 'not-allowed' : 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 8,
-              marginBottom: 16,
-              transition: 'all 0.2s ease',
-            }}
-          >
-            {loading ? (
-              <span>Verifying code...</span>
-            ) : (
-              <>
-                <span>Verify & Continue</span>
-                <ArrowRight size={16} />
-              </>
-            )}
-          </button>
-        </form>
-
-        {/* ── RESEND TIMER ── */}
-        <div
-          style={{
-            textAlign: 'center',
-            fontSize: 12.5,
-            color: '#94a3b8',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 6,
-          }}
-        >
-          {canResend ? (
-            <button
-              type="button"
-              onClick={handleResend}
-              disabled={resending}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: 'var(--gold, #f59e0b)',
-                fontWeight: 700,
-                cursor: resending ? 'not-allowed' : 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 5,
-              }}
-            >
-              <RefreshCw size={13} className={resending ? 'animate-spin' : ''} />
-              <span>{resending ? 'Sending...' : 'Resend Code'}</span>
-            </button>
-          ) : (
-            <span>
-              Resend code in{' '}
-              <strong style={{ color: '#cbd5e1' }}>
-                00:{timer < 10 ? `0${timer}` : timer}
-              </strong>
-            </span>
+          {/* Error Alert */}
+          {error && (
+            <div className="auth-alert-error" role="alert" style={{ marginBottom: 16 }}>
+              <CircleAlert size={16} style={{ flexShrink: 0, marginTop: 1 }} />
+              <div>
+                <strong style={{ display: 'block', fontSize: 13, marginBottom: 2 }}>Verification failed</strong>
+                <span>{error}</span>
+              </div>
+            </div>
           )}
-        </div>
 
-        {/* ── FOOTER NOTICE ── */}
-        <div
-          style={{
-            marginTop: 22,
-            paddingTop: 16,
-            borderTop: '1px solid rgba(255,255,255,0.06)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 6,
-            fontSize: 11.5,
-            color: '#64748b',
-          }}
-        >
-          <ShieldCheck size={14} color="#10b981" />
-          <span>Encrypted 256-bit secure authorization</span>
+          {/* 6-Slot OTP Form */}
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              submitOtp(digits.join(''));
+            }}
+            className="auth-form"
+          >
+            <div className="auth-otp-row" onPaste={handlePaste}>
+              {digits.map((digit, idx) => (
+                <input
+                  key={idx}
+                  ref={(el) => {
+                    inputRefs.current[idx] = el;
+                  }}
+                  type="text"
+                  inputMode="numeric"
+                  autoComplete={idx === 0 ? 'one-time-code' : 'off'}
+                  maxLength={1}
+                  value={digit}
+                  onChange={(e) => handleDigitChange(idx, e.target.value)}
+                  onKeyDown={(e) => handleKeyDown(idx, e)}
+                  disabled={loading}
+                  className="auth-otp-slot"
+                  aria-label={`Digit ${idx + 1} of 6`}
+                />
+              ))}
+            </div>
+
+            <button
+              type="submit"
+              className="auth-btn-primary"
+              disabled={loading || digits.some((d) => d === '')}
+            >
+              {loading ? (
+                <span>Verifying code...</span>
+              ) : (
+                <>
+                  <span>Verify Code & Continue</span>
+                  <ArrowRight size={16} />
+                </>
+              )}
+            </button>
+          </form>
+
+          {/* Resend Cooldown Section */}
+          <div style={{ marginTop: 20, textAlign: 'center', fontSize: 12.5, color: 'var(--text-secondary, #94A3B8)' }}>
+            {canResend ? (
+              <button
+                type="button"
+                onClick={handleResend}
+                disabled={resending}
+                className="auth-link-gold"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
+              >
+                <RefreshCw size={12} className={resending ? 'animate-spin' : ''} />
+                <span>{resending ? 'Sending new code...' : 'Resend verification code'}</span>
+              </button>
+            ) : (
+              <span>
+                Didn't receive it? Resend in{' '}
+                <strong style={{ color: 'var(--text-primary, #F8FAFC)' }}>{timer}s</strong>
+              </span>
+            )}
+          </div>
+
+          {/* DPDP Legal Note */}
+          <div className="auth-legal-text">
+            <span>
+              Your phone number is authenticated in accordance with{' '}
+              <Link href="/privacy">DPDP consent frameworks</Link>.
+            </span>
+          </div>
+
         </div>
-      </div>
+      </main>
     </div>
   );
 }

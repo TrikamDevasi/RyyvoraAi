@@ -55,6 +55,15 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
 
     const { name, email, password, role } = parsed.data;
 
+    if (role === 'admin') {
+      res.status(400).json({
+        success: false,
+        data: null,
+        message: 'Public self-registration as admin is not permitted.',
+      });
+      return;
+    }
+
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       res.status(409).json({

@@ -35,6 +35,7 @@ import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { AIBadge } from '@/components/ui/AIBadge';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { MetricStrip } from '@/components/dashboard/KPICard';
+import { SectionHeader } from '@/components/ui/SectionHeader';
 import toast from 'react-hot-toast';
 
 export default function TraineeJourneyPage() {
@@ -160,59 +161,13 @@ export default function TraineeJourneyPage() {
   return (
     <ErrorBoundary>
       <FadeIn style={{ maxWidth: 1080, margin: '0 auto', paddingBottom: 60 }}>
-        {/* ── Top Header Banner ── */}
-        <div
-          className="editorial-panel"
-          style={{
-            padding: 24,
-            borderRadius: 10,
-            marginBottom: 20,
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: 16,
-            position: 'relative',
-            overflow: 'hidden',
-          }}
-        >
-          {/* Subtle Aspirational Workforce Image Vignette */}
-          <div
-            style={{
-              position: 'absolute',
-              right: 0,
-              top: 0,
-              bottom: 0,
-              width: '36%',
-              minWidth: 240,
-              opacity: 0.16,
-              pointerEvents: 'none',
-              maskImage: 'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.8) 35%, rgba(0,0,0,1) 100%)',
-              WebkitMaskImage: 'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.8) 35%, rgba(0,0,0,1) 100%)',
-            }}
-            aria-hidden="true"
-          >
-            <img
-              src="/images/students/employment-journey.jpg"
-              alt=""
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-            />
-          </div>
-
-          <div style={{ flex: '1 1 500px', position: 'relative', zIndex: 1 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, flexWrap: 'wrap' }}>
-              <AIBadge type="nsqf" label="NSQF LEVEL 5 CAREER JOURNEY" />
-              <AIBadge type="verified" label="LONGITUDINAL TELEMETRY VERIFIED" />
-            </div>
-            <h1 className="font-display" style={{ fontSize: 26, fontWeight: 800, color: '#f8fafc', margin: 0, letterSpacing: '-0.02em' }}>
-              Trainee Longitudinal Skilling & <span style={{ color: 'var(--gold)' }}>Outcome Journey</span>
-            </h1>
-            <p style={{ color: 'var(--text-secondary)', fontSize: 13.5, marginTop: 6, lineHeight: 1.5, maxWidth: 680 }}>
-              Verifiable career milestones tracking your trajectory from enrollment to diagnostic assessment, campus hiring, 90-day retention, and long-term salary progression.
-            </p>
-          </div>
-
-          <div style={{ display: 'flex', gap: 10 }}>
+        {/* ── Section Header ── */}
+        <SectionHeader
+          breadcrumbs={[{ label: 'Career Cockpit', href: '/student' }, { label: 'Longitudinal Journey' }]}
+          badge={<AIBadge type="nsqf" label="NSQF LEVEL 5 CAREER JOURNEY" />}
+          title="Trainee Longitudinal Skilling & Outcome Journey"
+          description="Verifiable career milestones tracking your trajectory from enrollment to diagnostic assessment, campus hiring, 90-day retention, and long-term salary progression."
+          actions={
             <button
               type="button"
               onClick={() => setShowSelfReportModal(true)}
@@ -221,18 +176,17 @@ export default function TraineeJourneyPage() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: 6,
-                padding: '9px 18px',
+                padding: '8px 16px',
                 fontSize: 13,
                 fontWeight: 700,
                 cursor: 'pointer',
-                borderRadius: 6,
               }}
             >
-              <Plus size={15} />
+              <Plus size={14} />
               <span>Report Milestone</span>
             </button>
-          </div>
-        </div>
+          }
+        />
 
         {/* ── Key Outcome Metrics Metric Strip ── */}
         <div style={{ marginBottom: 20 }}>

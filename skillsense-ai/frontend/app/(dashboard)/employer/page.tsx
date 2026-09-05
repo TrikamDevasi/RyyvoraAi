@@ -4,11 +4,11 @@ import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import {
-  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
+  Bar,
 } from 'recharts';
 import api from '@/lib/api';
 import {
@@ -19,25 +19,25 @@ import {
   Building2,
   Briefcase,
   TrendingUp,
-  Download,
-  Filter,
-  ExternalLink,
   Award,
-  Sparkles,
-  QrCode,
-  Lock,
-  Plus,
-  ArrowUpRight,
-  Send,
   Zap,
   AlertCircle,
   MapPin,
   FileCode,
+  FileCheck2,
+  ArrowRight,
+  Clock3,
+  ExternalLink,
+  Filter,
+  Check,
 } from 'lucide-react';
 import { FadeIn } from '@/components/shared/FadeIn';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { AIBadge } from '@/components/ui/AIBadge';
 import { MetricStrip } from '@/components/dashboard/KPICard';
+import { SectionHeader } from '@/components/ui/SectionHeader';
+import { AnalyticsPanel } from '@/components/ui/AnalyticsPanel';
+import { InsightPanel } from '@/components/ui/InsightPanel';
 import toast from 'react-hot-toast';
 
 const ResponsiveContainer = dynamic(
@@ -132,6 +132,7 @@ export default function EmployerPage() {
     message: '',
   });
   const [chartData, setChartData] = useState(DEFAULT_PLACEMENT_TRENDS);
+  const [verifyLoading, setVerifyLoading] = useState(false);
 
   useEffect(() => {
     api
@@ -145,8 +146,6 @@ export default function EmployerPage() {
         // Fallback to default placement trends
       });
   }, []);
-
-  const [verifyLoading, setVerifyLoading] = useState(false);
 
   const handleVerifyLedgerHash = async () => {
     if (!verifyHashInput.trim()) {
@@ -202,69 +201,32 @@ export default function EmployerPage() {
 
   return (
     <ErrorBoundary>
-      <FadeIn style={{ maxWidth: 1200, margin: '0 auto', paddingBottom: 60 }}>
-        {/* ── Top Header Banner ── */}
-        <div
-          className="editorial-panel"
-          style={{
-            padding: 26,
-            borderRadius: 10,
-            marginBottom: 20,
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: 16,
-            position: 'relative',
-            overflow: 'hidden',
-          }}
-        >
-          {/* Subtle Industrial Employer Workforce Image Vignette */}
-          <div
-            style={{
-              position: 'absolute',
-              right: 0,
-              top: 0,
-              bottom: 0,
-              width: '36%',
-              minWidth: 240,
-              opacity: 0.16,
-              pointerEvents: 'none',
-              maskImage: 'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.8) 35%, rgba(0,0,0,1) 100%)',
-              WebkitMaskImage: 'linear-gradient(to right, transparent 0%, rgba(0,0,0,0.8) 35%, rgba(0,0,0,1) 100%)',
-            }}
-            aria-hidden="true"
-          >
-            <img
-              src="/images/employers/industrial-employer.jpg"
-              alt=""
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-            />
-          </div>
-
-          <div style={{ position: 'relative', zIndex: 1 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, flexWrap: 'wrap' }}>
-              <AIBadge type="nsqf" label="ENTERPRISE TALENT SUITE" />
-              <AIBadge type="verified" label="NSQF PRE-ASSESSED COHORTS" />
+      <FadeIn style={{ maxWidth: 1240, margin: '0 auto', paddingBottom: 60 }}>
+        {/* ── Section Header ── */}
+        <SectionHeader
+          breadcrumbs={[{ label: 'Outcomes' }, { label: 'Employer Cockpit' }]}
+          badge={<AIBadge type="nsqf" label="ENTERPRISE TALENT SUITE" />}
+          title="Employer Hiring & Talent Validation Cockpit"
+          description="Direct access to pre-screened technical graduates backed by cryptographic SHA-256 Skill Passports, live GitHub diagnostic audits, and 80% reduced time-to-hire."
+          actions={
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+              <Link
+                href="/employer/validations"
+                className="btn-secondary"
+                style={{ fontSize: 13, padding: '8px 16px', display: 'flex', alignItems: 'center', gap: 6 }}
+              >
+                <ShieldCheck size={14} /> Verification Queue
+              </Link>
+              <Link
+                href="/employer/placements"
+                className="btn-gold"
+                style={{ fontSize: 13, padding: '8px 16px', display: 'flex', alignItems: 'center', gap: 6 }}
+              >
+                <Briefcase size={14} /> Post Placement Drive
+              </Link>
             </div>
-            <h1 className="font-display" style={{ fontSize: 26, fontWeight: 800, color: '#f8fafc', margin: 0 }}>
-              Employer Hiring & <span style={{ color: 'var(--gold)' }}>Talent Validation Cockpit</span>
-            </h1>
-            <p style={{ color: 'var(--text-secondary)', fontSize: 13.5, marginTop: 4, maxWidth: 680 }}>
-              Direct access to pre-screened technical graduates backed by cryptographic SHA-256 Skill Passports, live GitHub diagnostic audits, and 80% reduced time-to-hire.
-            </p>
-          </div>
-
-          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-            <Link
-              href="/employer/placements"
-              className="btn-gold"
-              style={{ fontSize: 13, padding: '9px 18px', display: 'flex', alignItems: 'center', gap: 6, borderRadius: 6 }}
-            >
-              <Briefcase size={14} /> Post Placement Drive
-            </Link>
-          </div>
-        </div>
+          }
+        />
 
         {/* ── Recruiter KPI Executive Metric Strip ── */}
         <div style={{ marginBottom: 20 }}>
@@ -278,18 +240,123 @@ export default function EmployerPage() {
           />
         </div>
 
-        {/* ── Instant Cryptographic Ledger Verification Utility ── */}
-        <div style={{ padding: 20, borderRadius: 8, border: '1px solid var(--border)', background: 'var(--bg-surface)', marginBottom: 20 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-            <ShieldCheck size={18} color="var(--gold)" />
-            <h3 className="font-display" style={{ fontSize: 15, fontWeight: 800, color: '#f8fafc', margin: 0 }}>
-              Quick Candidate Verification
-            </h3>
+        {/* ── 4-Stage Outcome Verification Stepper Banner ── */}
+        <div
+          style={{
+            background: 'var(--bg-surface)',
+            border: '1px solid var(--border)',
+            borderRadius: 10,
+            padding: '18px 22px',
+            marginBottom: 20,
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10, marginBottom: 14 }}>
+            <div>
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', color: 'var(--gold)', textTransform: 'uppercase' }}>
+                Outcome Verification Framework
+              </div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)' }}>
+                4-Stage Cryptographic Hiring & Employment Attestation Pipeline
+              </div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--text-muted)' }}>
+              <ShieldCheck size={14} color="var(--success)" />
+              <span>Tamper-Proof SHA-256 Ledger</span>
+            </div>
           </div>
-          <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', margin: '0 0 14px' }}>
-            Enter a candidate's Skill Passport code or ledger hash to confirm NSQF credential authenticity and verified test scores.
-          </p>
 
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+              gap: 12,
+            }}
+          >
+            {[
+              {
+                step: '01',
+                title: 'Trainee Claim',
+                desc: 'Graduate submits credential dossier and GitHub repository benchmark.',
+                status: 'Complete',
+                icon: FileCheck2,
+                color: 'var(--info)',
+              },
+              {
+                step: '02',
+                title: 'Diagnostic Review',
+                desc: 'NSQF Level 5/6 rubric assessment and plagiarism audit performed.',
+                status: 'Verified',
+                icon: ShieldCheck,
+                color: 'var(--success)',
+              },
+              {
+                step: '03',
+                title: 'Employer Validation',
+                desc: 'Offer letter confirmation & 90-day retention attestation by HR.',
+                status: 'In Progress',
+                icon: Building2,
+                color: 'var(--gold)',
+              },
+              {
+                step: '04',
+                title: 'State Ledger Seal',
+                desc: 'Cryptographic hash anchored to Maharashtra outcome repository.',
+                status: 'Sealed',
+                icon: Award,
+                color: '#a855f7',
+              },
+            ].map((s, idx) => {
+              const Icon = s.icon;
+              return (
+                <div
+                  key={s.step}
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.02)',
+                    border: '1px solid var(--border-subtle)',
+                    borderRadius: 8,
+                    padding: '12px 14px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 6,
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: 11, fontFamily: 'monospace', fontWeight: 800, color: s.color }}>
+                      STAGE {s.step}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: 10,
+                        fontWeight: 700,
+                        padding: '1px 6px',
+                        borderRadius: 4,
+                        background: 'rgba(255, 255, 255, 0.05)',
+                        color: 'var(--text-secondary)',
+                      }}
+                    >
+                      {s.status}
+                    </span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <Icon size={16} color={s.color} />
+                    <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>{s.title}</span>
+                  </div>
+                  <div style={{ fontSize: 11.5, color: 'var(--text-secondary)', lineHeight: 1.4 }}>
+                    {s.desc}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ── Instant Cryptographic Ledger Verification Utility ── */}
+        <AnalyticsPanel
+          eyebrow="CRYPTOGRAPHIC LEDGER VALIDATOR"
+          title="Instant Skill Passport & Credential Verification"
+          description="Enter a candidate's Skill Passport hash or trainee code to confirm NSQF credential authenticity and verified rubric test scores directly from the state ledger."
+          style={{ marginBottom: 20 }}
+        >
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
             <input
               type="text"
@@ -298,7 +365,7 @@ export default function EmployerPage() {
               placeholder="Enter candidate verification hash (e.g. 0x9e7a...4b12)"
               style={{
                 flex: 1,
-                minWidth: 260,
+                minWidth: 280,
                 padding: '10px 14px',
                 borderRadius: 8,
                 background: 'var(--bg-input, #0f111a)',
@@ -315,7 +382,7 @@ export default function EmployerPage() {
               className="btn-gold"
               style={{ fontSize: 13, padding: '10px 20px', display: 'flex', alignItems: 'center', gap: 6, opacity: verifyLoading ? 0.6 : 1 }}
             >
-              <ShieldCheck size={15} /> {verifyLoading ? 'Verifying...' : 'Verify Candidate'}
+              <ShieldCheck size={15} /> {verifyLoading ? 'Verifying...' : 'Verify Hash'}
             </button>
           </div>
 
@@ -358,28 +425,22 @@ export default function EmployerPage() {
               <span>{verifyResult.message}</span>
             </div>
           )}
-        </div>
+        </AnalyticsPanel>
 
         {/* ── Pre-Assessed Candidate Talent Pipeline ── */}
-        <div style={{ padding: 22, borderRadius: 10, border: '1px solid var(--border)', background: 'var(--bg-surface)', marginBottom: 20 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18, flexWrap: 'wrap', gap: 12 }}>
-            <div>
-              <h2 className="font-display" style={{ fontSize: 17, fontWeight: 800, color: '#f8fafc', margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
-                <Users size={18} color="var(--gold)" /> Pre-Assessed Candidates
-              </h2>
-              <p style={{ fontSize: 12.5, color: 'var(--text-secondary)', margin: '2px 0 0' }}>
-                Graduates evaluated by diagnostic assessments and ready for immediate interview.
-              </p>
-            </div>
-
-            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
+        <AnalyticsPanel
+          eyebrow="PRE-ASSESSED TALENT PIPELINE"
+          title="Verified Technical Graduates"
+          description="NSQF certified graduates evaluated through proctored diagnostic assessments and verified GitHub codebases, ready for immediate hire."
+          action={
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
               <div style={{ position: 'relative', minWidth: 200 }}>
                 <Search size={14} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search by name, role or skill..."
+                  placeholder="Filter by name, role or skill..."
                   style={{
                     padding: '6px 10px 6px 30px',
                     borderRadius: 6,
@@ -392,9 +453,9 @@ export default function EmployerPage() {
                 />
               </div>
 
-              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
                 {[
-                  { id: 'ALL', label: 'All Tracks' },
+                  { id: 'ALL', label: 'All' },
                   { id: 'FULLSTACK', label: 'Full-Stack' },
                   { id: 'AI', label: 'AI & ML' },
                   { id: 'CLOUD', label: 'Cloud' },
@@ -405,9 +466,9 @@ export default function EmployerPage() {
                     type="button"
                     onClick={() => setSelectedTrack(t.id)}
                     style={{
-                      padding: '5px 12px',
+                      padding: '5px 10px',
                       borderRadius: 6,
-                      fontSize: 11.5,
+                      fontSize: 11,
                       fontWeight: 700,
                       background: selectedTrack === t.id ? 'var(--gold)' : 'rgba(255,255,255,0.03)',
                       border: `1px solid ${selectedTrack === t.id ? 'var(--gold)' : 'var(--border)'}`,
@@ -420,111 +481,127 @@ export default function EmployerPage() {
                 ))}
               </div>
             </div>
-          </div>
-
-          {/* Structured Candidate Roster Rows */}
-          <div style={{ display: 'flex', flexDirection: 'column', border: '1px solid var(--border)', borderRadius: 8, overflow: 'hidden', background: 'rgba(255,255,255,0.01)' }}>
-            {filteredCandidates.map((c, idx) => (
-              <div
-                key={c.id}
-                style={{
-                  padding: '14px 18px',
-                  borderBottom: idx < filteredCandidates.length - 1 ? '1px solid var(--border)' : 'none',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  flexWrap: 'wrap',
-                  gap: 14,
-                  background: idx % 2 === 1 ? 'rgba(255,255,255,0.015)' : 'transparent',
-                }}
-              >
-                {/* Col 1: Candidate Identity */}
-                <div style={{ minWidth: 200, flex: '1 1 200px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
-                    <h3 className="font-display" style={{ fontSize: 15, fontWeight: 800, color: '#f8fafc', margin: 0 }}>
-                      {c.name}
-                    </h3>
-                    <span style={{ fontSize: 10, fontWeight: 800, padding: '2px 6px', borderRadius: 4, background: 'var(--success-bg)', border: '1px solid var(--success-border)', color: 'var(--success)' }}>
-                      {c.nsqfLevel}
-                    </span>
-                    <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 6px', borderRadius: 4, background: 'rgba(59,130,246,0.12)', border: '1px solid rgba(59,130,246,0.3)', color: '#60a5fa' }}>
-                      Ready
-                    </span>
-                  </div>
-                  <div style={{ fontSize: 12, color: 'var(--gold)', fontWeight: 600 }}>{c.roleTitle}</div>
-                  <div style={{ fontSize: 10.5, color: 'var(--text-muted)', fontFamily: 'monospace', marginTop: 2 }}>
-                    {c.hash}
-                  </div>
-                </div>
-
-                {/* Col 2: Skills Badges */}
-                <div style={{ flex: '2 1 260px', display: 'flex', flexWrap: 'wrap', gap: 5 }}>
-                  {c.skills.map((s, sIdx) => (
-                    <span
-                      key={sIdx}
-                      style={{
-                        fontSize: 10.5,
-                        padding: '2px 7px',
-                        borderRadius: 4,
-                        background: 'rgba(255,255,255,0.03)',
-                        color: 'var(--text-secondary)',
-                        border: '1px solid var(--border)',
-                        fontWeight: 500,
-                      }}
-                    >
-                      {s}
-                    </span>
-                  ))}
-                </div>
-
-                {/* Col 3: Telemetry Scores & Location */}
-                <div style={{ minWidth: 160, display: 'flex', flexDirection: 'column', gap: 4, fontSize: 11.5 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 5, color: 'var(--text-secondary)' }}>
-                    <MapPin size={12} style={{ color: 'var(--text-muted)' }} />
-                    <span>{c.location}</span>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: 'var(--text-secondary)' }}>
-                      <Zap size={11} style={{ color: 'var(--gold)' }} />
-                      <span>Score: <strong style={{ color: 'var(--success)' }}>{c.score}%</strong></span>
-                    </span>
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: 'var(--text-secondary)' }}>
-                      <FileCode size={11} style={{ color: 'var(--info)' }} />
-                      <span>Audit: <strong style={{ color: 'var(--gold)' }}>{c.githubScore}%</strong></span>
-                    </span>
-                  </div>
-                </div>
-
-                {/* Col 4: Action CTA */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <button
-                    type="button"
-                    onClick={() => handleScheduleInterview(c.name)}
-                    className="btn-gold"
-                    style={{ fontSize: 11.5, padding: '6px 12px', display: 'flex', alignItems: 'center', gap: 4, borderRadius: 6 }}
-                  >
-                    <Send size={11} /> Request Interview
-                  </button>
-                </div>
+          }
+          style={{ marginBottom: 20 }}
+          noPadding
+        >
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            {filteredCandidates.length === 0 ? (
+              <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)', fontSize: 13 }}>
+                No candidate records match the active criteria.
               </div>
-            ))}
+            ) : (
+              filteredCandidates.map((c, idx) => (
+                <div
+                  key={c.id}
+                  style={{
+                    padding: '14px 18px',
+                    borderBottom: idx < filteredCandidates.length - 1 ? '1px solid var(--border-subtle)' : 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    flexWrap: 'wrap',
+                    gap: 14,
+                    background: idx % 2 === 1 ? 'rgba(255,255,255,0.015)' : 'transparent',
+                    transition: 'background-color 150ms ease',
+                  }}
+                >
+                  {/* Col 1: Candidate Identity */}
+                  <div style={{ minWidth: 220, flex: '1 1 220px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
+                      <span style={{ fontSize: 14, fontWeight: 800, color: '#f8fafc' }}>
+                        {c.name}
+                      </span>
+                      <span style={{ fontSize: 10, fontWeight: 800, padding: '2px 6px', borderRadius: 4, background: 'var(--success-bg)', border: '1px solid var(--success-border)', color: 'var(--success)' }}>
+                        {c.nsqfLevel}
+                      </span>
+                      <span style={{ fontSize: 10, fontWeight: 700, padding: '2px 6px', borderRadius: 4, background: 'rgba(59,130,246,0.12)', border: '1px solid rgba(59,130,246,0.3)', color: '#60a5fa' }}>
+                        Ready
+                      </span>
+                    </div>
+                    <div style={{ fontSize: 12, color: 'var(--gold)', fontWeight: 600 }}>{c.roleTitle}</div>
+                    <div style={{ fontSize: 10.5, color: 'var(--text-muted)', fontFamily: 'monospace', marginTop: 2 }}>
+                      {c.hash}
+                    </div>
+                  </div>
+
+                  {/* Col 2: Skills Badges */}
+                  <div style={{ flex: '2 1 240px', display: 'flex', flexWrap: 'wrap', gap: 5 }}>
+                    {c.skills.map((s, sIdx) => (
+                      <span
+                        key={sIdx}
+                        style={{
+                          fontSize: 10.5,
+                          padding: '2px 7px',
+                          borderRadius: 4,
+                          background: 'rgba(255,255,255,0.03)',
+                          color: 'var(--text-secondary)',
+                          border: '1px solid var(--border)',
+                          fontWeight: 500,
+                        }}
+                      >
+                        {s}
+                      </span>
+                    ))}
+                  </div>
+
+                  {/* Col 3: Telemetry Scores & Location */}
+                  <div style={{ minWidth: 160, display: 'flex', flexDirection: 'column', gap: 4, fontSize: 11.5 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 5, color: 'var(--text-secondary)' }}>
+                      <MapPin size={12} style={{ color: 'var(--text-muted)' }} />
+                      <span>{c.location}</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: 'var(--text-secondary)' }}>
+                        <Zap size={11} style={{ color: 'var(--gold)' }} />
+                        <span>Score: <strong style={{ color: 'var(--success)' }}>{c.score}%</strong></span>
+                      </span>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: 'var(--text-secondary)' }}>
+                        <FileCode size={11} style={{ color: 'var(--info)' }} />
+                        <span>Audit: <strong style={{ color: 'var(--gold)' }}>{c.githubScore}%</strong></span>
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Col 4: Action CTA */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <button
+                      type="button"
+                      onClick={() => handleScheduleInterview(c.name)}
+                      className="btn-gold"
+                      style={{ fontSize: 11.5, padding: '6px 14px', display: 'flex', alignItems: 'center', gap: 4, borderRadius: 6 }}
+                    >
+                      <Briefcase size={12} /> Schedule Interview
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
-        </div>
+        </AnalyticsPanel>
+
+        {/* ── Policy / Recruiter Insight Panel ── */}
+        <InsightPanel
+          title="High Placement Velocity in Pune & Mumbai Technology Corridors"
+          signalType="POSITIVE"
+          evidence={[
+            { label: 'Cloud & AI Turnaround', value: '3.2x Faster' },
+            { label: 'Median Offer Baseline', value: '₹6.8 LPA' },
+            { label: 'Retention at 90 Days', value: '94.2%' },
+          ]}
+          recommendation="Candidates holding NSQF Level 6 certification with verified GitHub repositories demonstrate an 89% lower offer rejection rate. Prioritize batch interviews for upcoming March 2026 graduation cohorts."
+          actionText="Review Batch Allocations"
+          onAction={() => toast.success('Redirecting to batch allocation matrix...')}
+          style={{ marginBottom: 20 }}
+        />
 
         {/* ── Verified Placement Velocity Chart ── */}
-        <div style={{ padding: 22, borderRadius: 10, border: '1px solid var(--border)', background: 'var(--bg-surface)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-            <div>
-              <h3 className="font-display" style={{ fontSize: 16, fontWeight: 800, color: '#f8fafc', margin: 0 }}>
-                Verified Placement & Onboarding Velocity
-              </h3>
-              <p style={{ fontSize: 12, color: 'var(--text-secondary)', margin: '2px 0 0' }}>
-                Longitudinal monthly candidate hires validated across Maharashtra IT corridors.
-              </p>
-            </div>
-            <span style={{ fontSize: 11.5, fontWeight: 700, color: '#10b981' }}>+41% YoY Growth</span>
-          </div>
-
+        <AnalyticsPanel
+          eyebrow="LONGITUDINAL TELEMETRY"
+          title="Verified Placement & Onboarding Velocity"
+          description="Longitudinal monthly candidate hires validated across Maharashtra IT corridors with +41% YoY growth."
+          action={<span style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--success)' }}>+41% YoY Growth</span>}
+        >
           <div style={{ height: 260, width: '100%' }}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartData}>
@@ -544,7 +621,7 @@ export default function EmployerPage() {
               </BarChart>
             </ResponsiveContainer>
           </div>
-        </div>
+        </AnalyticsPanel>
       </FadeIn>
     </ErrorBoundary>
   );

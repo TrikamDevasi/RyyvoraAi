@@ -7,11 +7,14 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { FadeIn } from '@/components/shared/FadeIn';
 import { AIBadge } from '@/components/ui/AIBadge';
+import { MetricStrip } from '@/components/dashboard/KPICard';
+import { SectionHeader } from '@/components/ui/SectionHeader';
+import { AnalyticsPanel } from '@/components/ui/AnalyticsPanel';
+import { InsightPanel } from '@/components/ui/InsightPanel';
 import {
   Award,
   ShieldCheck,
   CheckCircle2,
-  Sparkles,
   RefreshCw,
   QrCode,
   Download,
@@ -20,6 +23,8 @@ import {
   Users,
   Check,
   Building,
+  FileCheck2,
+  Lock,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -72,110 +77,158 @@ export default function PassportPage() {
       }
     : null;
 
+  const handleSharePassport = () => {
+    if (activeStudent?.passportHash) {
+      navigator.clipboard.writeText(
+        `${window.location.origin}/verify/${encodeURIComponent(activeStudent.passportHash)}`
+      );
+      toast.success('Public verification link copied to clipboard!');
+    } else {
+      toast.error('Passport not yet sealed on state ledger.');
+    }
+  };
+
   return (
     <ErrorBoundary>
-      <FadeIn style={{ maxWidth: 1060, margin: '0 auto', paddingBottom: 60 }}>
-        {/* ── Page Header Banner ── */}
-        <div
-          className="card-accent"
-          style={{
-            padding: 26,
-            borderRadius: 16,
-            marginBottom: 24,
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: 16,
-          }}
-        >
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, flexWrap: 'wrap' }}>
-              <AIBadge type="nsqf" label="NSQF DIGITAL WORKFORCE LEDGER" />
-              <AIBadge type="verified" label="DECENTRALIZED CRYPTOGRAPHIC PASSPORT" />
-            </div>
-            <h1 className="font-display" style={{ fontSize: 26, fontWeight: 800, color: '#f8fafc', margin: 0 }}>
-              Official Verified <span style={{ color: 'var(--gold)' }}>Skill Passport</span>
-            </h1>
-            <p style={{ color: 'var(--text-secondary)', fontSize: 13.5, marginTop: 4, maxWidth: 680 }}>
-              Tamper-proof, cryptographically signed workforce credential proving candidate competencies, real-time diagnostic performance, and employer verifications.
-            </p>
-          </div>
-        </div>
+      <FadeIn style={{ maxWidth: 1100, margin: '0 auto', paddingBottom: 60 }}>
+        {/* ── Section Header ── */}
+        <SectionHeader
+          breadcrumbs={[{ label: 'Career Cockpit', href: '/student' }, { label: 'Skill Passport Dossier' }]}
+          badge={<AIBadge type="nsqf" label="NSQF DIGITAL WORKFORCE LEDGER" />}
+          title="Official Verified Skill Passport"
+          description="Tamper-proof, cryptographically signed workforce credential proving candidate competencies, real-time diagnostic performance, and employer attestation."
+          actions={
+            activeStudent && (
+              <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  onClick={handleSharePassport}
+                  className="btn-secondary"
+                  style={{ fontSize: 13, padding: '8px 16px', display: 'flex', alignItems: 'center', gap: 6 }}
+                >
+                  <Share2 size={14} /> Share Ledger Link
+                </button>
+              </div>
+            )
+          }
+        />
 
         {/* ── Loading State ── */}
         {loading && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14 }}>
-            {[0, 1, 2, 3].map((i) => (
-              <div key={i} className="card-linear" style={{ padding: '16px 18px', borderRadius: 12 }}>
-                <div style={{ height: 14, width: 100, background: 'rgba(255,255,255,0.06)', borderRadius: 4, marginBottom: 12 }} />
-                <div style={{ height: 24, width: 120, background: 'rgba(255,255,255,0.06)', borderRadius: 4 }} />
-              </div>
-            ))}
+          <div
+            style={{
+              padding: 40,
+              borderRadius: 10,
+              background: 'var(--bg-surface)',
+              border: '1px solid var(--border)',
+              textAlign: 'center',
+              marginBottom: 20,
+            }}
+          >
+            <RefreshCw size={24} style={{ color: 'var(--gold)', animation: 'spin 1.5s linear infinite', marginBottom: 10 }} />
+            <p style={{ fontSize: 13, color: 'var(--text-secondary)', margin: 0 }}>
+              Querying distributed state ledger for cryptographic signature...
+            </p>
           </div>
         )}
 
         {/* ── Error / Empty State ── */}
         {!loading && (error || !activeStudent) && (
-          <div className="card-linear" style={{ padding: 40, borderRadius: 16, textAlign: 'center' }}>
+          <div
+            style={{
+              padding: 40,
+              borderRadius: 10,
+              background: 'var(--bg-surface)',
+              border: '1px solid var(--border)',
+              textAlign: 'center',
+              marginBottom: 20,
+            }}
+          >
             <Award size={36} style={{ color: 'var(--gold)', marginBottom: 12 }} />
-            <h2 className="font-display" style={{ fontSize: 20, fontWeight: 800, color: '#f8fafc', margin: '0 0 8px' }}>
-              {error ? 'Unable to Load Passport' : 'No Skill Passport Yet'}
+            <h2 className="font-display" style={{ fontSize: 18, fontWeight: 800, color: '#f8fafc', margin: '0 0 8px' }}>
+              {error ? 'Unable to Load Passport' : 'No Skill Passport Generated Yet'}
             </h2>
-            <p style={{ fontSize: 13.5, color: 'var(--text-secondary)', maxWidth: 520, margin: '0 auto 16px', lineHeight: 1.6 }}>
+            <p style={{ fontSize: 13, color: 'var(--text-secondary)', maxWidth: 480, margin: '0 auto 16px', lineHeight: 1.6 }}>
               {error
-                ? 'We could not retrieve your passport. Check your connection and try again.'
-                : 'Complete assessments and skill diagnostic evaluations to generate your cryptographically sealed skill passport.'}
+                ? 'We could not retrieve your passport from the ledger node. Check your connection and try again.'
+                : 'Complete diagnostic assessments and skill evaluations to generate your cryptographically sealed skill passport.'}
             </p>
-            <button onClick={loadProfile} className="btn-gold" style={{ fontSize: 13, padding: '9px 20px', cursor: 'pointer' }}>
+            <button onClick={loadProfile} className="btn-gold" style={{ fontSize: 13, padding: '8px 20px', cursor: 'pointer' }}>
               <RefreshCw size={14} /> Retry
             </button>
           </div>
         )}
 
         {!loading && !error && activeStudent && (
-        <>
-        {/* ── Key Trust Badges ── */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14, marginBottom: 24 }}>
-          {[
-            { label: 'Issuing Authority', value: 'Govt of Maharashtra', sub: 'MSDE & NSQF Certified', icon: Building, color: 'var(--gold)' },
-            { label: 'Ledger Status', value: activeStudent.passportHash ? 'Immutable Signature' : 'Not Sealed', sub: activeStudent.passportHash ? 'SHA-256 HMAC Seal' : 'Complete assessment to seal', icon: ShieldCheck, color: '#10b981' },
-            { label: 'Assessed Competencies', value: `${activeStudent.skills.length} Technical Modules`, sub: 'Real-time AI Evaluated', icon: Award, color: '#60a5fa' },
-            { label: 'Composite Score', value: `${activeStudent.overallScore}% Overall`, sub: `Tier: NSQF Level ${activeStudent.nsqfLevel}`, icon: Sparkles, color: '#a855f7' },
-          ].map((stat, idx) => {
-            const Icon = stat.icon;
-            return (
-              <div key={idx} className="card-linear" style={{ padding: '16px 18px', borderRadius: 12 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
-                    {stat.label}
-                  </span>
-                  <div style={{ padding: 6, borderRadius: 6, background: 'rgba(255,255,255,0.04)', color: stat.color }}>
-                    <Icon size={15} />
-                  </div>
-                </div>
-                <div className="font-display" style={{ fontSize: 18, fontWeight: 800, color: stat.color }}>
-                  {stat.value}
-                </div>
-                <div style={{ fontSize: 11.5, color: 'var(--text-secondary)', marginTop: 2 }}>
-                  {stat.sub}
-                </div>
-              </div>
-            );
-          })}
-        </div>
+          <>
+            {/* ── Executive Metric Strip (Replacing 4 standalone cards) ── */}
+            <div style={{ marginBottom: 20 }}>
+              <MetricStrip
+                items={[
+                  {
+                    label: 'Issuing Authority',
+                    value: 'Govt of MH',
+                    subtext: 'MSDE & NSQF Certified',
+                    icon: Building,
+                    color: 'var(--gold)',
+                  },
+                  {
+                    label: 'Ledger Status',
+                    value: activeStudent.passportHash ? 'Immutable HMAC' : 'Pending Seal',
+                    subtext: activeStudent.passportHash ? 'SHA-256 Ledger Anchor' : 'Complete test to seal',
+                    icon: ShieldCheck,
+                    color: 'var(--success)',
+                  },
+                  {
+                    label: 'Assessed Competencies',
+                    value: `${activeStudent.skills.length} Modules`,
+                    subtext: 'Proctored Diagnostics',
+                    icon: Award,
+                    color: 'var(--info)',
+                  },
+                  {
+                    label: 'Composite Score',
+                    value: `${activeStudent.overallScore}%`,
+                    subtext: `Tier: NSQF Level ${activeStudent.nsqfLevel}`,
+                    icon: FileCheck2,
+                    color: '#a855f7',
+                  },
+                ]}
+              />
+            </div>
 
-        {/* ── Skill Passport Interactive Component ── */}
-        {activeStudent.skills.length > 0 ? (
-          <SkillPassport student={activeStudent as any} />
-        ) : (
-          <div className="card-linear" style={{ padding: 28, borderRadius: 14, textAlign: 'center' }}>
-            <p style={{ fontSize: 13.5, color: 'var(--text-secondary)', margin: 0 }}>
-              No assessed competencies available yet. Take an assessment to populate your passport.
-            </p>
-          </div>
-        )}
-        </>
+            {/* ── Skill Passport Interactive Dossier ── */}
+            {activeStudent.skills.length > 0 ? (
+              <div style={{ marginBottom: 20 }}>
+                <SkillPassport student={activeStudent as any} />
+              </div>
+            ) : (
+              <AnalyticsPanel
+                eyebrow="PASSPORT READINESS"
+                title="Awaiting Assessment Telemetry"
+                description="Your passport will render here with cryptographically verified badges once competencies are assessed."
+                style={{ marginBottom: 20 }}
+              >
+                <p style={{ fontSize: 13, color: 'var(--text-secondary)', margin: 0 }}>
+                  No assessed competencies available yet. Complete a technical test in the assessment module to populate your passport.
+                </p>
+              </AnalyticsPanel>
+            )}
+
+            {/* ── Verification Policy Insight ── */}
+            <InsightPanel
+              title="DPDP Act 2023 & NCVET Sovereign Attestation"
+              signalType="POSITIVE"
+              evidence={[
+                { label: 'Integrity Protocol', value: 'SHA-256 HMAC' },
+                { label: 'Verification Type', value: 'Decentralized Proof' },
+                { label: 'Employer Acceptance', value: 'Universal NCVET' },
+              ]}
+              recommendation="This passport is cryptographically signed and verifiable by any registered enterprise recruiter without sharing unredacted personal identifiers."
+              actionText="Copy Public Verification Link"
+              onAction={handleSharePassport}
+            />
+          </>
         )}
       </FadeIn>
     </ErrorBoundary>

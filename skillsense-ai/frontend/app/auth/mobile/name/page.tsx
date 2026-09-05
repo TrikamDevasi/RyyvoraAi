@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuthStore, UserRole } from '@/store/authStore';
 import {
@@ -12,9 +13,8 @@ import {
   Factory,
   ArrowRight,
   ShieldCheck,
-  Sparkles,
-  AlertCircle,
   CheckCircle2,
+  CircleAlert,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import '../../auth.css';
@@ -23,35 +23,35 @@ const AVAILABLE_ROLES: { key: UserRole; label: string; desc: string; icon: any; 
   {
     key: 'student',
     label: 'Student / Trainee',
-    desc: 'NSQF Skill Passport & career pathways',
+    desc: 'Skill Passport & Career Outcomes',
     icon: GraduationCap,
     badge: 'Candidate',
   },
   {
     key: 'employer',
     label: 'Employer / Recruiter',
-    desc: 'Verified talent pipeline & hiring',
+    desc: 'Verified Talent & Direct Hiring',
     icon: Briefcase,
     badge: 'Corporate',
   },
   {
     key: 'institute',
     label: 'Training Institute',
-    desc: 'Curriculum delivery & placement metrics',
+    desc: 'Cohort Metrics & Placement ROI',
     icon: Building2,
     badge: 'Academia',
   },
   {
     key: 'government',
     label: 'Govt / Policy Official',
-    desc: 'Regional skilling heatmaps & analytics',
+    desc: 'District Heatmaps & Policy Analytics',
     icon: Globe,
     badge: 'National',
   },
   {
     key: 'industry',
     label: 'Industry Association',
-    desc: 'Sector Skill demand forecasting',
+    desc: 'Labor Demand & Sector Foresight',
     icon: Factory,
     badge: 'Ecosystem',
   },
@@ -118,238 +118,176 @@ export default function MobileNamePage() {
 
   return (
     <div className="auth-page">
-      <div className="auth-bg-canvas">
-        <div className="auth-bg-orb auth-bg-orb--1" />
-        <div className="auth-bg-orb auth-bg-orb--2" />
-        <div className="auth-bg-orb auth-bg-orb--3" />
-        <div className="auth-bg-grid" />
-      </div>
+      {/* ── Top Bar ── */}
+      <header className="auth-top-bar">
+        <Link href="/" className="auth-brand-link" aria-label="Ryyvora AI Home">
+          <div className="auth-brand-monogram">RY</div>
+          <div className="auth-brand-meta">
+            <span className="auth-brand-name">
+              Ryyvora <span>AI</span>
+            </span>
+            <span className="auth-brand-descriptor">Workforce Outcome Intelligence</span>
+          </div>
+        </Link>
 
-      <div className="auth-card" style={{ maxWidth: 480 }}>
-        {/* ── HEADER ── */}
-        <div className="auth-header" style={{ textAlign: 'center', marginBottom: 22 }}>
-          <div
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 6,
-              background: 'rgba(16,185,129,0.12)',
-              border: '1px solid rgba(16,185,129,0.3)',
-              padding: '4px 12px',
-              borderRadius: 99,
-              marginBottom: 12,
-            }}
-          >
-            <CheckCircle2 size={13} color="#10b981" />
-            <span
+        <div className="auth-trust-signal">
+          <ShieldCheck size={14} color="#10B981" />
+          <span>Privacy-conscious workforce intelligence</span>
+          <span className="auth-trust-dot" />
+        </div>
+      </header>
+
+      {/* ── Main Auth Surface ── */}
+      <main className="auth-main-wrap">
+        <div className="auth-surface" style={{ maxWidth: 480 }}>
+          
+          {/* Header */}
+          <div className="auth-header">
+            <div
+              className="auth-eyebrow"
               style={{
-                fontSize: 11,
-                fontWeight: 800,
-                color: '#10b981',
-                letterSpacing: '0.04em',
-                textTransform: 'uppercase',
+                background: 'rgba(16, 185, 129, 0.10)',
+                borderColor: 'rgba(16, 185, 129, 0.28)',
+                color: '#34d399',
               }}
             >
-              Number Verified · {mobileState?.maskedPhone || mobileState?.phone}
-            </span>
-          </div>
-
-          <h1 className="auth-title" style={{ fontSize: 24, fontWeight: 800, color: '#f8fafc', margin: 0 }}>
-            Complete Your Profile
-          </h1>
-          <p className="auth-subtitle" style={{ fontSize: 13, color: '#94a3b8', marginTop: 4 }}>
-            Enter your name and select your stakeholder role to customize your workspace
-          </p>
-        </div>
-
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          {/* ── FULL NAME INPUT ── */}
-          <div className="auth-field">
-            <label className="auth-field-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span>Full Legal Name</span>
-              <span style={{ fontSize: 11, color: '#64748b', fontWeight: 500 }}>e.g. Pooja Patil</span>
-            </label>
-            <div className="auth-input-wrap">
-              <User className="auth-input-icon" size={17} />
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => {
-                  setName(e.target.value);
-                  if (error) setError(null);
-                }}
-                placeholder="Enter your full name"
-                className="auth-input"
-                autoFocus
-                required
-                disabled={loading}
-                style={{ fontSize: 14 }}
-              />
+              <CheckCircle2 size={12} />
+              <span>Mobile Verified</span>
             </div>
+
+            <h1 className="auth-title">Welcome to Ryyvora AI</h1>
+            <p className="auth-subtitle">
+              What is your name? Set up your verified workforce profile to continue to your workspace.
+            </p>
           </div>
 
-          {/* ── ROLE SELECTOR ── */}
-          <div className="auth-field">
-            <label className="auth-field-label">Choose Your Platform Role</label>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 4 }}>
-              {AVAILABLE_ROLES.map(({ key, label, desc, icon: Icon, badge }) => {
-                const isSelected = selectedRole === key;
-                return (
-                  <div
+          {/* Error Alert */}
+          {error && (
+            <div className="auth-alert-error" role="alert" style={{ marginBottom: 16 }}>
+              <CircleAlert size={16} style={{ flexShrink: 0, marginTop: 1 }} />
+              <div>
+                <strong style={{ display: 'block', fontSize: 13, marginBottom: 2 }}>Profile setup failed</strong>
+                <span>{error}</span>
+              </div>
+            </div>
+          )}
+
+          {/* Setup Form */}
+          <form onSubmit={handleSubmit} className="auth-form" noValidate>
+            <div className="auth-field">
+              <label htmlFor="mobile-user-name" className="auth-label">
+                Full name
+              </label>
+              <div className="auth-input-container">
+                <div className="auth-icon-slot">
+                  <User size={17} />
+                </div>
+                <input
+                  id="mobile-user-name"
+                  type="text"
+                  name="name"
+                  autoComplete="name"
+                  value={name}
+                  onChange={(e) => {
+                    setName(e.target.value);
+                    if (error) setError(null);
+                  }}
+                  placeholder="e.g. Aarav Sharma"
+                  className="auth-text-input"
+                  required
+                  autoFocus
+                />
+              </div>
+            </div>
+
+            <div className="auth-field">
+              <label className="auth-label">Select your platform role</label>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 2 }}>
+                {AVAILABLE_ROLES.map(({ key, label, desc, icon: Icon, badge }) => (
+                  <button
                     key={key}
+                    type="button"
                     onClick={() => setSelectedRole(key)}
                     style={{
                       display: 'flex',
                       alignItems: 'center',
-                      gap: 12,
+                      justifyContent: 'space-between',
                       padding: '10px 14px',
-                      borderRadius: 10,
-                      background: isSelected ? 'rgba(245,158,11,0.12)' : 'rgba(255,255,255,0.02)',
-                      border: `1px solid ${isSelected ? 'var(--gold, #f59e0b)' : 'rgba(255,255,255,0.08)'}`,
+                      borderRadius: 8,
+                      background: selectedRole === key ? 'rgba(245, 158, 11, 0.12)' : 'rgba(255, 255, 255, 0.03)',
+                      border: `1px solid ${selectedRole === key ? 'var(--brand-gold, #F59E0B)' : 'rgba(255, 255, 255, 0.08)'}`,
                       cursor: 'pointer',
-                      transition: 'all 0.15s ease',
+                      textAlign: 'left',
+                      transition: 'all 150ms ease',
                     }}
                   >
-                    <div
-                      style={{
-                        padding: 7,
-                        borderRadius: 8,
-                        background: isSelected ? 'rgba(245,158,11,0.2)' : 'rgba(255,255,255,0.04)',
-                        color: isSelected ? 'var(--gold, #f59e0b)' : '#94a3b8',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}
-                    >
-                      <Icon size={17} />
-                    </div>
-
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <span
-                          style={{
-                            fontSize: 13,
-                            fontWeight: 700,
-                            color: isSelected ? '#f8fafc' : '#cbd5e1',
-                          }}
-                        >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <div
+                        style={{
+                          width: 30,
+                          height: 30,
+                          borderRadius: 6,
+                          background: selectedRole === key ? 'var(--brand-gold, #F59E0B)' : 'rgba(255, 255, 255, 0.06)',
+                          color: selectedRole === key ? '#090A0F' : 'var(--text-secondary, #94A3B8)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexShrink: 0,
+                        }}
+                      >
+                        <Icon size={16} />
+                      </div>
+                      <div>
+                        <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary, #F8FAFC)', display: 'block' }}>
                           {label}
                         </span>
-                        <span
-                          style={{
-                            fontSize: 10,
-                            fontWeight: 800,
-                            color: isSelected ? 'var(--gold, #f59e0b)' : '#64748b',
-                            background: isSelected ? 'rgba(245,158,11,0.18)' : 'rgba(255,255,255,0.04)',
-                            padding: '1px 6px',
-                            borderRadius: 4,
-                          }}
-                        >
-                          {badge}
+                        <span style={{ fontSize: 11, color: 'var(--text-muted, #64748B)' }}>
+                          {desc}
                         </span>
                       </div>
-                      <div style={{ fontSize: 11, color: '#64748b', marginTop: 2 }}>{desc}</div>
                     </div>
-
-                    <div
+                    <span
                       style={{
-                        width: 16,
-                        height: 16,
-                        borderRadius: 99,
-                        border: `2px solid ${isSelected ? 'var(--gold, #f59e0b)' : 'rgba(255,255,255,0.2)'}`,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
+                        fontSize: 10,
+                        fontWeight: 700,
+                        color: selectedRole === key ? 'var(--brand-gold, #F59E0B)' : 'var(--text-muted, #64748B)',
+                        fontFamily: 'var(--font-mono, monospace)',
                       }}
                     >
-                      {isSelected && (
-                        <div
-                          style={{
-                            width: 8,
-                            height: 8,
-                            borderRadius: 99,
-                            background: 'var(--gold, #f59e0b)',
-                          }}
-                        />
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
+                      {badge}
+                    </span>
+                  </button>
+                ))}
+              </div>
             </div>
+
+            <button
+              type="submit"
+              className="auth-btn-primary"
+              disabled={loading || name.trim().length < 2}
+            >
+              {loading ? (
+                <span>Configuring your workspace...</span>
+              ) : (
+                <>
+                  <span>Complete Setup & Continue</span>
+                  <ArrowRight size={16} />
+                </>
+              )}
+            </button>
+          </form>
+
+          {/* DPDP Legal Note */}
+          <div className="auth-legal-text">
+            <span>
+              By continuing, you agree to Ryyvora AI's{' '}
+              <Link href="/privacy">Privacy Policy</Link> and{' '}
+              <Link href="/terms">Terms of Service</Link>.
+            </span>
           </div>
 
-          {/* ── ERROR MESSAGE ── */}
-          {error && (
-            <div
-              style={{
-                color: '#f87171',
-                fontSize: 12,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 6,
-                background: 'rgba(239,68,68,0.1)',
-                padding: '8px 12px',
-                borderRadius: 8,
-                border: '1px solid rgba(239,68,68,0.2)',
-              }}
-            >
-              <AlertCircle size={14} />
-              <span>{error}</span>
-            </div>
-          )}
-
-          {/* ── SUBMIT BUTTON ── */}
-          <button
-            type="submit"
-            className="auth-btn"
-            disabled={loading || !name.trim()}
-            style={{
-              padding: '12px',
-              borderRadius: 8,
-              background: name.trim() ? 'var(--gold, #f59e0b)' : 'rgba(255,255,255,0.08)',
-              color: name.trim() ? '#000' : '#64748b',
-              fontWeight: 800,
-              fontSize: 13.5,
-              border: 'none',
-              cursor: loading || !name.trim() ? 'not-allowed' : 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 8,
-              marginTop: 4,
-              transition: 'all 0.2s ease',
-            }}
-          >
-            {loading ? (
-              <span>Provisioning your profile...</span>
-            ) : (
-              <>
-                <span>Complete Setup & Launch Dashboard</span>
-                <ArrowRight size={16} />
-              </>
-            )}
-          </button>
-        </form>
-
-        {/* ── FOOTER ── */}
-        <div
-          style={{
-            marginTop: 20,
-            paddingTop: 14,
-            borderTop: '1px solid rgba(255,255,255,0.06)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 6,
-            fontSize: 11.5,
-            color: '#64748b',
-          }}
-        >
-          <ShieldCheck size={14} color="#10b981" />
-          <span>Profile cryptographically tied to verified mobile credential</span>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

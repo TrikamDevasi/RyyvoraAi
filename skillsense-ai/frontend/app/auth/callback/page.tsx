@@ -52,27 +52,46 @@ function OAuthSpinner({ label }: { label: string }) {
         alignItems: 'center',
         justifyContent: 'center',
         minHeight: '100vh',
-        background: '#08060f',
-        gap: 20,
+        background: '#0B0F17',
+        gap: 18,
+        fontFamily: 'var(--font-inter, sans-serif)',
       }}
     >
       <div
         style={{
-          width: 56,
-          height: 56,
-          border: '3px solid rgba(212,168,67,0.15)',
-          borderTop: '3px solid #D4A843',
+          width: 36,
+          height: 36,
+          borderRadius: 8,
+          background: '#F59E0B',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontFamily: 'var(--font-outfit, sans-serif)',
+          fontWeight: 900,
+          fontSize: 14,
+          color: '#090A0F',
+          boxShadow: '0 0 20px rgba(245, 158, 11, 0.3)',
+        }}
+      >
+        RY
+      </div>
+      <div
+        style={{
+          width: 48,
+          height: 48,
+          border: '3px solid rgba(245, 158, 11, 0.18)',
+          borderTopColor: '#F59E0B',
           borderRadius: '50%',
           animation: 'spin 0.8s linear infinite',
         }}
       />
       <p
         style={{
-          fontSize: 14,
-          color: 'rgba(212,168,67,0.85)',
+          fontSize: 13.5,
+          color: '#cbd5e1',
           margin: 0,
-          fontFamily: 'Inter, sans-serif',
-          fontWeight: 500,
+          fontWeight: 600,
+          letterSpacing: '-0.01em',
         }}
       >
         {label}

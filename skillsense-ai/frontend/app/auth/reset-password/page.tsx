@@ -1,6 +1,9 @@
 'use client';
-import { useState, useEffect, Suspense } from 'react';
+
+import React, { useState, useEffect, Suspense } from 'react';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { Lock, Eye, EyeOff, ArrowRight, ArrowLeft, ShieldCheck, CheckCircle2, CircleAlert, KeyRound } from 'lucide-react';
 import '../auth.css';
 
 function ResetPasswordForm() {
@@ -17,24 +20,36 @@ function ResetPasswordForm() {
   const token = searchParams.get('token');
 
   useEffect(() => {
-    if (!token) { setVerifying(false); return; }
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/reset-password/${token}`)
-      .then(r => r.json())
-      .then(d => { setTokenValid(d.valid); setVerifying(false); })
+    if (!token) {
+      setVerifying(false);
+      return;
+    }
+    fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1'}/auth/reset-password/${token}`)
+      .then((r) => r.json())
+      .then((d) => {
+        setTokenValid(Boolean(d.valid));
+        setVerifying(false);
+      })
       .catch(() => setVerifying(false));
   }, [token]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password !== confirmPassword)
-      return setError('Passwords do not match');
-    if (password.length < 8)
-      return setError('Password must be at least 8 characters');
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+    if (password.length < 8) {
+      setError('Password must contain at least 8 characters');
+      return;
+    }
+
     setLoading(true);
     setError('');
+
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/auth/reset-password/${token}`,
+        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1'}/auth/reset-password/${token}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -46,88 +61,162 @@ function ResetPasswordForm() {
       setDone(true);
       setTimeout(() => router.push('/auth'), 3000);
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message || 'Failed to reset password');
     } finally {
       setLoading(false);
     }
   };
 
-  if (verifying) return (
-    <div style={{ textAlign: 'center', padding: '20px 0' }}>
-       <div className="auth-spinner" style={{ margin: '0 auto 12px', width: '24px', height: '24px' }} />
-       <p className="auth-subtitle">Verifying reset link...</p>
-    </div>
-  );
-
-  if (!tokenValid) return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '12px', padding: '16px 0' }}>
-      <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+  if (verifying) {
+    return (
+      <div style={{ textAlign: 'center', padding: '32px 0' }}>
+        <p className="auth-subtitle">Verifying security token...</p>
       </div>
-      <h2 className="auth-title" style={{ marginBottom: 0 }}>Link Expired</h2>
-      <p className="auth-subtitle">This reset link is invalid or has expired. Please request a new one.</p>
-      <button onClick={() => router.push('/auth/forgot-password')} className="auth-btn" style={{ marginTop: '12px' }}>Request new link</button>
-    </div>
-  );
+    );
+  }
 
-  if (done) return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '12px', padding: '16px 0' }}>
-      <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', animation: 'pulse 2s infinite' }}>
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+  if (!tokenValid) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 14, padding: '16px 0' }}>
+        <div
+          style={{
+            width: 52,
+            height: 52,
+            borderRadius: '50%',
+            background: 'rgba(239,68,68,0.1)',
+            border: '1px solid rgba(239,68,68,0.25)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#f87171',
+          }}
+        >
+          <CircleAlert size={26} />
+        </div>
+        <h2 className="auth-title" style={{ fontSize: 20 }}>Link Expired or Invalid</h2>
+        <p className="auth-subtitle" style={{ margin: 0 }}>
+          This password reset token has expired or is invalid. Please request a new recovery link.
+        </p>
+        <button
+          type="button"
+          onClick={() => router.push('/auth/forgot-password')}
+          className="auth-btn-primary"
+          style={{ marginTop: 8 }}
+        >
+          <span>Request New Link</span>
+          <ArrowRight size={15} />
+        </button>
       </div>
-      <h2 className="auth-title" style={{ marginBottom: 0 }}>Password Reset!</h2>
-      <p className="auth-subtitle">Redirecting to sign in page in 3 seconds...</p>
-    </div>
-  );
+    );
+  }
+
+  if (done) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 14, padding: '16px 0' }}>
+        <div
+          style={{
+            width: 52,
+            height: 52,
+            borderRadius: '50%',
+            background: 'rgba(16, 185, 129, 0.12)',
+            border: '1px solid rgba(16, 185, 129, 0.3)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#34d399',
+          }}
+        >
+          <CheckCircle2 size={26} />
+        </div>
+        <h2 className="auth-title" style={{ fontSize: 20 }}>Password Reset Successfully</h2>
+        <p className="auth-subtitle" style={{ margin: 0 }}>
+          Your credentials have been updated. Redirecting to sign in page in 3 seconds...
+        </p>
+      </div>
+    );
+  }
 
   return (
     <>
-      <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-        <h1 className="auth-title" style={{ marginBottom: '6px' }}>Create New Password</h1>
-        <p className="auth-subtitle">Must be at least 8 characters</p>
+      <div className="auth-header">
+        <div className="auth-eyebrow">
+          <KeyRound size={12} />
+          <span>Credential Security</span>
+        </div>
+        <h1 className="auth-title">Create New Password</h1>
+        <p className="auth-subtitle">Must contain at least 8 characters</p>
       </div>
 
       {error && (
-        <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: '12px', padding: '10px 14px', marginBottom: '16px', fontSize: '13px', color: '#f87171', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ width: '6px', height: '6px', background: '#f87171', borderRadius: '50%' }} />
-          {error}
+        <div className="auth-alert-error" role="alert" style={{ marginBottom: 16 }}>
+          <CircleAlert size={16} style={{ flexShrink: 0, marginTop: 1 }} />
+          <div>
+            <strong style={{ display: 'block', fontSize: 13, marginBottom: 2 }}>Reset error</strong>
+            <span>{error}</span>
+          </div>
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="auth-form">
+      <form onSubmit={handleSubmit} className="auth-form" noValidate>
         <div className="auth-field">
-          <label className="auth-field-label">New Password</label>
-          <div className="auth-input-wrap">
-            <svg className="auth-input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-            <input type={showPass ? 'text' : 'password'} value={password}
-              onChange={e => setPassword(e.target.value)} required placeholder="Min. 8 characters"
-              className="auth-input" />
-            <button type="button" onClick={() => setShowPass(!showPass)} className="auth-eye-btn">
-              {showPass ? <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 19c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg> : <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>}
+          <label htmlFor="new-password" className="auth-label">
+            New password
+          </label>
+          <div className="auth-input-container">
+            <div className="auth-icon-slot">
+              <Lock size={17} />
+            </div>
+            <input
+              id="new-password"
+              type={showPass ? 'text' : 'password'}
+              name="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              className="auth-text-input"
+              style={{ paddingRight: 44 }}
+              required
+              autoFocus
+            />
+            <button
+              type="button"
+              className="auth-password-toggle"
+              onClick={() => setShowPass(!showPass)}
+              aria-label={showPass ? 'Hide password' : 'Show password'}
+            >
+              {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
           </div>
         </div>
 
         <div className="auth-field">
-          <label className="auth-field-label">Confirm Password</label>
-          <div className="auth-input-wrap">
-            <svg className="auth-input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-            <input type="password" value={confirmPassword}
-              onChange={e => setConfirmPassword(e.target.value)} required placeholder="Repeat password"
-              className="auth-input" />
+          <label htmlFor="confirm-new-password" className="auth-label">
+            Confirm password
+          </label>
+          <div className="auth-input-container">
+            <div className="auth-icon-slot">
+              <Lock size={17} />
+            </div>
+            <input
+              id="confirm-new-password"
+              type={showPass ? 'text' : 'password'}
+              name="confirmPassword"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="••••••••"
+              className="auth-text-input"
+              required
+            />
           </div>
         </div>
 
-        <button type="submit" disabled={loading} className="auth-btn" style={{ marginTop: '8px' }}>
+        <button type="submit" className="auth-btn-primary" disabled={loading}>
           {loading ? (
-            <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <div className="auth-spinner" />
-              Resetting...
-            </span>
+            <span>Updating password...</span>
           ) : (
             <>
-              <span>Reset Password</span>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              <span>Save New Password</span>
+              <ArrowRight size={16} />
             </>
           )}
         </button>
@@ -137,37 +226,63 @@ function ResetPasswordForm() {
 }
 
 export default function ResetPasswordPage() {
-  return (
-    <>
-      <div className="auth-bg-canvas" aria-hidden="true">
-        <div className="auth-bg-orb auth-bg-orb--1" />
-        <div className="auth-bg-orb auth-bg-orb--2" />
-        <div className="auth-bg-orb auth-bg-orb--3" />
-        <div className="auth-bg-orb auth-bg-orb--4" />
-        <div className="auth-bg-grid" />
-      </div>
+  const router = useRouter();
 
-      <main className="auth-page">
-        <div className="auth-card" style={{ maxWidth: '420px' }}>
-          <div className="auth-logo">
-            <img src="/logo.png" alt="Ryyvora AI" />
-            <p className="auth-tagline" style={{ color: 'rgba(156,163,175,0.5)' }}>
-              Workforce Outcome Intelligence
-            </p>
+  return (
+    <div className="auth-page">
+      {/* ── Top Bar ── */}
+      <header className="auth-top-bar">
+        <Link href="/" className="auth-brand-link" aria-label="Ryyvora AI Home">
+          <div className="auth-brand-monogram">RY</div>
+          <div className="auth-brand-meta">
+            <span className="auth-brand-name">
+              Ryyvora <span>AI</span>
+            </span>
+            <span className="auth-brand-descriptor">Workforce Outcome Intelligence</span>
           </div>
-          
-          <Suspense fallback={<div style={{ textAlign: 'center' }}><div className="auth-spinner" style={{ margin: '0 auto' }} /></div>}>
+        </Link>
+
+        <div className="auth-trust-signal">
+          <ShieldCheck size={14} color="#10B981" />
+          <span>Privacy-conscious workforce intelligence</span>
+          <span className="auth-trust-dot" />
+        </div>
+      </header>
+
+      {/* ── Main Auth Surface ── */}
+      <main className="auth-main-wrap">
+        <div className="auth-surface">
+          <Suspense
+            fallback={
+              <div style={{ textAlign: 'center', padding: '32px 0' }}>
+                <p className="auth-subtitle">Loading reset form...</p>
+              </div>
+            }
+          >
             <ResetPasswordForm />
           </Suspense>
+
+          {/* Footer Back Link */}
+          <div className="auth-footer-nav" style={{ marginTop: 24 }}>
+            <button
+              type="button"
+              onClick={() => router.push('/auth')}
+              className="auth-link-gold"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
+            >
+              <ArrowLeft size={14} /> Back to Sign In
+            </button>
+          </div>
+
+          {/* DPDP Legal Note */}
+          <div className="auth-legal-text">
+            <span>
+              Protected under Ryyvora AI's{' '}
+              <Link href="/privacy">Privacy Policy</Link> and data consent safeguards.
+            </span>
+          </div>
         </div>
       </main>
-
-      <style jsx global>{`
-        @keyframes pulse {
-          0%, 100% { box-shadow: 0 0 24px rgba(245,158,11,0.2); }
-          50% { box-shadow: 0 0 40px rgba(245,158,11,0.4); }
-        }
-      `}</style>
-    </>
+    </div>
   );
 }
