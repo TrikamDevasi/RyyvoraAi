@@ -60,6 +60,7 @@ import FramerBento from '@/components/landing/FramerBento';
 import FramerMarquee from '@/components/landing/FramerMarquee';
 import FramerPillars from '@/components/landing/FramerPillars';
 import FramerCTA from '@/components/landing/FramerCTA';
+import BrandLogo from '@/components/shared/BrandLogo';
 
 function DynamicBidirectionalCounter({
   target,
@@ -214,33 +215,8 @@ export default function LandingPage() {
         <div className="landing-header-glass">
           <div className="landing-navbar">
             {/* Logo */}
-            <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', flexShrink: 0 }}>
-              <div
-                style={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: 8,
-                  background: 'var(--gold, #f59e0b)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontWeight: 900,
-                  fontSize: 14,
-                  color: '#090a0f',
-                  flexShrink: 0,
-                  boxShadow: '0 0 16px rgba(245,158,11,0.25)',
-                }}
-              >
-                RY
-              </div>
-              <div style={{ flexShrink: 0 }}>
-                <span className="font-display" style={{ fontSize: 16, fontWeight: 800, color: '#f8fafc', letterSpacing: '-0.02em', display: 'block', lineHeight: 1.1, whiteSpace: 'nowrap' }}>
-                  Ryyvora <span style={{ color: 'var(--gold, #f59e0b)' }}>AI</span>
-                </span>
-                <span className="font-mono" style={{ fontSize: 8.5, color: 'var(--gold)', letterSpacing: '0.06em', textTransform: 'uppercase', whiteSpace: 'nowrap', display: 'block' }}>
-                  Workforce Intelligence
-                </span>
-              </div>
+            <Link href="/" aria-label="Ryyvora AI home" style={{ display: 'inline-flex', alignItems: 'center', textDecoration: 'none', flexShrink: 0 }}>
+              <BrandLogo variant="full" size="md" withTagline />
             </Link>
 
             {/* Desktop Navigation Links with Dropdowns */}

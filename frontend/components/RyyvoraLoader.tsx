@@ -10,6 +10,7 @@ import {
   TrendingUp,
   Sparkles,
 } from 'lucide-react';
+import { RyyvoraMark } from '@/components/shared/BrandLogo';
 
 interface DataNode {
   id: string;
@@ -172,7 +173,7 @@ export default function RyyvoraLoader({ children }: { children?: React.ReactNode
             pointerEvents: isExiting ? 'none' : 'all',
           }}
         >
-          <img src="/logo.png" alt="Ryyvora AI" style={{ width: 90, height: 90, objectFit: 'contain' }} />
+          <RyyvoraMark size={84} theme="dark" />
           <p style={{ marginTop: 24, color: '#f8fafc', fontSize: 14, fontFamily: 'var(--font-space-grotesk, sans-serif)' }}>
             {STATUS_MESSAGES[statusIndex]}
           </p>
@@ -333,11 +334,7 @@ export default function RyyvoraLoader({ children }: { children?: React.ReactNode
           {/* Central Logo & Breathing Pod */}
           <div className={`ss-logo-pod ${converged ? 'ss-logo-pulse' : ''}`}>
             <div className="ss-logo-aura" />
-            <img
-              src="/logo.png"
-              alt="Ryyvora AI"
-              className="ss-logo-img"
-            />
+            <RyyvoraMark size={58} theme="dark" className="ss-logo-img" />
           </div>
 
           {/* HTML Data Source Badges Orbiting around Logo */}

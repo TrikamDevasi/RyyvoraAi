@@ -12,6 +12,7 @@ import {
   ChevronRight,
   ArrowRight,
 } from 'lucide-react';
+import BrandLogo from '@/components/shared/BrandLogo';
 
 export default function PublicFooter() {
   return (
@@ -78,32 +79,8 @@ export default function PublicFooter() {
         >
           {/* Column 1: Brand */}
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 9, marginBottom: 14 }}>
-              <div
-                style={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: 8,
-                  background: 'var(--gold, #f59e0b)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontWeight: 900,
-                  fontSize: 14,
-                  color: '#090a0f',
-                  boxShadow: '0 0 16px rgba(245,158,11,0.25)',
-                }}
-              >
-                RY
-              </div>
-              <div>
-                <span className="font-display" style={{ fontWeight: 800, fontSize: 16, color: '#f8fafc', display: 'block', lineHeight: 1.1 }}>
-                  Ryyvora AI
-                </span>
-                <span className="font-mono" style={{ fontSize: 9, color: 'var(--gold, #f59e0b)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-                  Workforce Outcome Intelligence
-                </span>
-              </div>
+            <div style={{ marginBottom: 14 }}>
+              <BrandLogo variant="full" size="md" withTagline />
             </div>
 
             <p style={{ fontSize: 12.5, color: '#94a3b8', lineHeight: 1.6, margin: '0 0 18px' }}>

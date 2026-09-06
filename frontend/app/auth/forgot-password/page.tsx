@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Mail, ArrowLeft, ArrowRight, ShieldCheck, KeyRound, CheckCircle2, CircleAlert } from 'lucide-react';
 import { useApi } from '@/hooks/useApi';
 import toast from 'react-hot-toast';
+import { RyyvoraMark } from '@/components/shared/BrandLogo';
 import '../auth.css';
 
 export default function ForgotPasswordPage() {
@@ -38,7 +39,9 @@ export default function ForgotPasswordPage() {
       {/* ── Top Bar ── */}
       <header className="auth-top-bar">
         <Link href="/" className="auth-brand-link" aria-label="Ryyvora AI Home">
-          <div className="auth-brand-monogram">RY</div>
+          <div className="auth-brand-monogram">
+            <RyyvoraMark size={28} />
+          </div>
           <div className="auth-brand-meta">
             <span className="auth-brand-name">
               Ryyvora <span>AI</span>

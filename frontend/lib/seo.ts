@@ -8,7 +8,7 @@ export const SITE_CONFIG = {
   description:
     'Ryyvora AI is the sovereign workforce outcome intelligence platform connecting skills training, employer verification, retention analytics, and wage progression.',
   url: (process.env.NEXT_PUBLIC_SITE_URL || 'https://ryyvora.com').replace(/\/$/, ''),
-  ogImage: '/images/landing/hero-workforce-ecosystem.jpg',
+  ogImage: '/brand/ryyvora-og.png',
   tagline: 'From Skills to Sustainable Outcomes.',
   descriptor: 'Workforce Outcome Intelligence',
   locale: 'en_IN',

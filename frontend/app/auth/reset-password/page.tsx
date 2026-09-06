@@ -4,6 +4,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Lock, Eye, EyeOff, ArrowRight, ArrowLeft, ShieldCheck, CheckCircle2, CircleAlert, KeyRound } from 'lucide-react';
+import { RyyvoraMark } from '@/components/shared/BrandLogo';
 import '../auth.css';
 
 function ResetPasswordForm() {
@@ -233,7 +234,9 @@ export default function ResetPasswordPage() {
       {/* ── Top Bar ── */}
       <header className="auth-top-bar">
         <Link href="/" className="auth-brand-link" aria-label="Ryyvora AI Home">
-          <div className="auth-brand-monogram">RY</div>
+          <div className="auth-brand-monogram">
+            <RyyvoraMark size={28} />
+          </div>
           <div className="auth-brand-meta">
             <span className="auth-brand-name">
               Ryyvora <span>AI</span>

@@ -59,6 +59,17 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Ryyvora AI Team" }],
   manifest: "/manifest.json",
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/brand/app-icons/icon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/brand/app-icons/icon-16.png", sizes: "16x16", type: "image/png" },
+    ],
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
   alternates: {
     canonical: SITE_CONFIG.url,
   },
@@ -72,7 +83,7 @@ export const metadata: Metadata = {
       "Ryyvora AI connects training, certification, employment, verification, retention and workforce outcomes into one intelligence platform.",
     images: [
       {
-        url: `${SITE_CONFIG.url}/images/landing/hero-workforce-ecosystem.jpg`,
+        url: `${SITE_CONFIG.url}/brand/ryyvora-og.png`,
         width: 1200,
         height: 630,
         alt: "Ryyvora AI — Workforce Outcome Intelligence",
@@ -83,7 +94,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Ryyvora AI | Workforce Outcome Intelligence",
     description: "From Skills to Sustainable Outcomes. Enterprise & Government Workforce Outcome Intelligence.",
-    images: [`${SITE_CONFIG.url}/images/landing/hero-workforce-ecosystem.jpg`],
+    images: [`${SITE_CONFIG.url}/brand/ryyvora-og.png`],
   },
   appleWebApp: {
     capable: true,

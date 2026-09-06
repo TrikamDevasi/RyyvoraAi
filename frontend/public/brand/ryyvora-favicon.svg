@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" width="100%" height="100%">
+  <style>
+    .ryyvora-pillar { fill: #F59E0B; }
+    .ryyvora-loop   { fill: #F59E0B; }
+    .ryyvora-vector { fill: #FBBF24; }
+    @media (prefers-color-scheme: light) {
+      .ryyvora-pillar { fill: #0F172A; }
+      .ryyvora-loop   { fill: #0F172A; }
+      .ryyvora-vector { fill: #D97706; }
+    }
+  </style>
+  <rect class="ryyvora-pillar" x="10" y="8" width="11" height="48" rx="4" />
+  <path class="ryyvora-loop" d="M 21 8 H 39 C 47.28 8 54 14.72 54 23 C 54 31.28 47.28 38 39 38 H 21 V 28 H 38 C 40.76 28 43 25.76 43 23 C 43 20.24 40.76 18 38 18 H 21 Z" />
+  <path class="ryyvora-vector" d="M 26 35 C 28.5 32 32 32 34.5 34.5 L 51 51 C 53.5 53.5 53.5 56 50.5 56 H 42.5 C 40.5 56 38.5 55 37 53.5 L 26 42.5 C 24 40.5 24 37 26 35 Z" />
+</svg>

@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { Lock, Eye, EyeOff, ArrowRight, ArrowLeft, Loader2, CheckCircle2, XCircle } from 'lucide-react';
 import { useApi } from '@/hooks/useApi';
 import toast from 'react-hot-toast';
+import BrandLogo from '@/components/shared/BrandLogo';
 import '../../auth.css';
 
 export default function ResetPasswordPage() {
@@ -69,9 +70,8 @@ export default function ResetPasswordPage() {
 
             <div className="auth-card">
                 <div className="auth-header">
-                    <div className="auth-logo">
-                        <img src="/logo.png" alt="Ryyvora AI" />
-                        <p className="auth-tagline">Workforce Outcome Intelligence</p>
+                    <div className="auth-logo" style={{ display: 'flex', justifyContent: 'center', marginBottom: 12 }}>
+                        <BrandLogo variant="full" size="lg" withTagline />
                     </div>
                     <h1 className="auth-title">Reset Password</h1>
                     <p className="auth-subtitle">

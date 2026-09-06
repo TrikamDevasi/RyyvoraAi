@@ -14,6 +14,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { RyyvoraMark } from '@/components/shared/BrandLogo';
 import '../../auth.css';
 
 const ROLE_DASHBOARD: Record<string, string> = {
@@ -186,7 +187,9 @@ export default function MobileVerifyPage() {
       {/* ── Top Bar ── */}
       <header className="auth-top-bar">
         <Link href="/" className="auth-brand-link" aria-label="Ryyvora AI Home">
-          <div className="auth-brand-monogram">RY</div>
+          <div className="auth-brand-monogram">
+            <RyyvoraMark size={28} />
+          </div>
           <div className="auth-brand-meta">
             <span className="auth-brand-name">
               Ryyvora <span>AI</span>

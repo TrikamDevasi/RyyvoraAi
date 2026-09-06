@@ -38,6 +38,7 @@ import { FeatureTipsGuideModal } from '@/components/shared/FeatureTipsGuide';
 import ThemeToggle from '@/components/shared/ThemeToggle';
 import NotificationDropdown from '@/components/dashboard/NotificationDropdown';
 import UserProfileDropdown from '@/components/dashboard/UserProfileDropdown';
+import BrandLogo from '@/components/shared/BrandLogo';
 import MobileBottomNav from '@/components/layout/MobileBottomNav';
 
 function VerificationBanner() {
@@ -203,32 +204,24 @@ export default function DashboardShell({ children }: { children: React.ReactNode
                 justifyContent: sidebarCollapsed ? 'center' : 'space-between',
               }}
             >
-              <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
-                <div
-                  style={{
-                    width: 32,
-                    height: 32,
-                    borderRadius: 8,
-                    background: 'linear-gradient(135deg, #f59e0b, #d97706)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontWeight: 900,
-                    fontSize: 13,
-                    color: '#090a0f',
-                    flexShrink: 0,
-                    boxShadow: '0 2px 10px rgba(245,158,11,0.25)',
-                  }}
-                >
-                  RY
-                </div>
-                {!sidebarCollapsed && (
-                  <div>
-                    <span className="font-display" style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
-                      Ryyvora <span style={{ color: 'var(--gold)' }}>AI</span>
-                    </span>
-                    <div style={{ fontSize: 9.5, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>
-                      {role} Intelligence
+              <Link
+                href="/"
+                aria-label="Ryyvora AI Dashboard Home"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 10,
+                  textDecoration: 'none',
+                  minWidth: 0,
+                }}
+              >
+                {sidebarCollapsed ? (
+                  <BrandLogo variant="mark" size="md" />
+                ) : (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+                    <BrandLogo variant="full" size="md" />
+                    <div style={{ fontSize: 9.5, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', borderLeft: '1px solid var(--border)', paddingLeft: 8, whiteSpace: 'nowrap' }}>
+                      {role}
                     </div>
                   </div>
                 )}
@@ -492,47 +485,16 @@ export default function DashboardShell({ children }: { children: React.ReactNode
             <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0, minWidth: 175 }}>
               <Link
                 href="/"
+                aria-label="Ryyvora AI Dashboard Home"
                 style={{
-                  display: 'inline-flex',
+                  display: 'flex',
                   alignItems: 'center',
-                  gap: 10,
                   textDecoration: 'none',
+                  flexShrink: 0,
                   whiteSpace: 'nowrap',
                 }}
               >
-                <div
-                  style={{
-                    width: 34,
-                    height: 34,
-                    borderRadius: 8,
-                    background: 'linear-gradient(135deg, #f59e0b, #d97706)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontWeight: 900,
-                    fontSize: 14,
-                    color: '#090a0f',
-                    boxShadow: '0 2px 8px rgba(245,158,11,0.25)',
-                    flexShrink: 0,
-                  }}
-                >
-                  RY
-                </div>
-                <span
-                  className="font-display"
-                  style={{
-                    fontSize: 16,
-                    fontWeight: 800,
-                    color: 'var(--text-primary)',
-                    letterSpacing: '-0.02em',
-                    whiteSpace: 'nowrap',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 4,
-                  }}
-                >
-                  Ryyvora <span style={{ color: 'var(--gold)' }}>AI</span>
-                </span>
+                <BrandLogo variant="full" size="md" />
               </Link>
             </div>
 
@@ -665,27 +627,8 @@ export default function DashboardShell({ children }: { children: React.ReactNode
             </button>
 
             {/* Mobile Logo Brand */}
-            <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 7, flexShrink: 0, whiteSpace: 'nowrap' }} className="md:hidden">
-              <div
-                style={{
-                  width: 28,
-                  height: 28,
-                  borderRadius: 7,
-                  background: 'linear-gradient(135deg, #f59e0b, #d97706)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontWeight: 900,
-                  fontSize: 12,
-                  color: '#090a0f',
-                  flexShrink: 0,
-                }}
-              >
-                RY
-              </div>
-              <span className="font-display" style={{ fontSize: 14, fontWeight: 800, color: 'var(--text-primary)', whiteSpace: 'nowrap' }}>
-                Ryyvora <span style={{ color: 'var(--gold)' }}>AI</span>
-              </span>
+            <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', flexShrink: 0, whiteSpace: 'nowrap' }} className="md:hidden">
+              <BrandLogo variant="compact" size="sm" />
             </div>
 
             {/* Desktop Breadcrumbs in Sidebar mode */}
