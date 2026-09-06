@@ -1,0 +1,33 @@
+User-agent: *
+Allow: /
+Allow: /about
+Allow: /how-it-works
+Allow: /for-government
+Allow: /for-employers
+Allow: /for-training-providers
+Allow: /for-trainees
+Allow: /workforce-analytics
+Allow: /employer-verification
+Allow: /skill-passport
+Allow: /policy-intelligence
+Allow: /dpdp-trust
+Allow: /pricing
+Allow: /faq
+Allow: /contact
+Allow: /auth
+
+Disallow: /admin/
+Disallow: /student/
+Disallow: /employer/
+Disallow: /government/
+Disallow: /industry/
+Disallow: /institute/
+Disallow: /profile/
+Disallow: /settings/
+Disallow: /ai-health
+Disallow: /exam
+Disallow: /api/
+Disallow: /*?*
+
+Sitemap: https://ryyvora.com/sitemap.xml
+Host: https://ryyvora.com

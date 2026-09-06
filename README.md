@@ -177,17 +177,53 @@ npm run dev
 
 ---
 
+## 🚀 Monorepo Quick Start (Local Development)
+
+### 1. Prerequisites
+- **Node.js**: v20+ installed
+- **MongoDB**: Active connection string or local MongoDB on `mongodb://localhost:27017/skillsense`
+- **Redis**: Local or cloud instance (`REDIS_URL`)
+
+### 2. Install Dependencies
+```bash
+npm run install:all
+```
+
+### 3. Run Development Servers
+```bash
+# Starts both frontend (port 5173) and backend (port 5000) concurrently
+npm run dev
+```
+
+### 4. Build & Verify
+```bash
+# Run both test suites (Backend 11/11, Frontend 20/20, SEO 15/15)
+npm test
+
+# Run production builds (Next.js Turbopack + TypeScript compiler)
+npm run build
+```
+
+---
+
 ## 🧪 Automated Testing & Verification
 
-Run the full automated test suite verifying all 11 test layers:
+Run the full automated test suite verifying all 11 backend test layers and 20 frontend verification contracts:
 ```bash
-npm --prefix backend test
+# Backend Test Suite
+npm run test:backend
+
+# Frontend Test Suite
+npm run test:frontend
+
+# Technical SEO Verification (15 Indexable Routes)
+npm run test:seo
 ```
 
-### Test Suite Execution Output
+### Backend Test Suite Execution Output
 ```
 ====================================================
-🚀 SkillSense AI Backend Automated Test Runner
+🚀 Ryyvora AI Backend Automated Test Runner
 ====================================================
   ✅ AI Provider hierarchy registered (Groq, OpenAI, Gemini, Perplexity)
   ✅ Markdown code fence extraction & stripping passed
@@ -224,7 +260,7 @@ npm --prefix backend test
 
 ## 🔑 Pre-Seeded Hackathon Demo Credentials
 
-For quick evaluation, pre-seeded accounts for each role are available in the [Demo Guide](file:///c:/Users/trika/Documents/skillsense/TEAM_QUANTUM_CODERS-SU-/skillsense-ai/docs/DEMO_GUIDE.md) or can be accessed via the **Instant Role Switcher** on the sign-in screen:
+For quick evaluation, pre-seeded accounts for each role are available in the [Demo Guide](file:///c:/Users/trika/Documents/skillsense/TEAM_QUANTUM_CODERS-SU-/docs/product/DEMO_GUIDE.md) or can be accessed via the **Instant Role Switcher** on the sign-in screen:
 
 | Role | Email | Password | Access Scope |
 | :--- | :--- | :--- | :--- |
@@ -237,17 +273,58 @@ For quick evaluation, pre-seeded accounts for each role are available in the [De
 
 ---
 
+## 📂 Repository Architecture
+
+```
+/
+├── frontend/                                # Next.js 16.1 App Router Frontend
+│   ├── app/                                 # Routes, layouts, 15 SEO public routes
+│   │   └── (dashboard)/                     # Protected cockpits (gov, student, emp, inst, admin, industry)
+│   ├── components/                          # Shared UI, charts, landing, layout, three.js
+│   ├── public/                              # Brand assets, high-res photography, manifest
+│   ├── scripts/                             # testFrontend.ts (20/20 tests), verifySeo.ts
+│   └── package.json                         # ryyvora-ai-frontend
+│
+├── backend/                                 # Express.js 5 API + Multi-Provider AI
+│   ├── src/
+│   │   ├── controllers/                     # HTTP controllers
+│   │   ├── services/                        # Business logic, outcome engines, AI mesh (Groq LPU)
+│   │   ├── models/                          # Mongoose models & indices
+│   │   ├── routes/                          # REST route definitions
+│   │   └── middleware/                      # Auth, RBAC, Rate-limit, Error handling
+│   ├── tests/                               # 13 Automated test suites (11/11 tests pass)
+│   └── package.json                         # ryyvora-ai-backend
+│
+├── docs/                                    # Documentation Hub
+│   ├── architecture/                        # REPOSITORY_STRUCTURE.md
+│   ├── api/                                 # API_CONTRACTS.md
+│   ├── product/                             # DEMO_GUIDE.md, SIH_REQUIREMENT_MATRIX.md
+│   ├── design/                              # IMAGE_SOURCES.md
+│   ├── audits/                              # 20 Preserved audit and remediation reports
+│   └── references/                          # Isolated Framer design reference assets
+│
+├── scripts/                                 # Master verification scripts
+├── .github/workflows/                       # Active CI/CD production deployment workflow
+├── package.json                             # Root monorepo orchestration
+├── CONTRIBUTING.md                          # Contribution and branching guidelines
+└── README.md                                # Master Platform Specification
+```
+
+---
+
 ## 📑 Comprehensive Documentation Index
 
-All in-depth architecture reports, SIH compliance audits, and engineering notes are maintained in **[`skillsense-ai/docs/`](file:///c:/Users/trika/Documents/skillsense/TEAM_QUANTUM_CODERS-SU-/skillsense-ai/docs/README.md)**:
+All in-depth architecture reports, SIH compliance audits, and engineering notes are maintained in **[`docs/`](file:///c:/Users/trika/Documents/skillsense/TEAM_QUANTUM_CODERS-SU-/docs/README.md)**:
 
-1. **[Real AI Implementation Report](file:///c:/Users/trika/Documents/skillsense/TEAM_QUANTUM_CODERS-SU-/skillsense-ai/docs/RYYVORA_AI_IMPLEMENTATION_REPORT.md)**: Zero mock certification, Groq setup, sub-second latency, and Phase 9 DPDP safeguards.
-2. **[Product-Wide Design System Report](file:///c:/Users/trika/Documents/skillsense/TEAM_QUANTUM_CODERS-SU-/skillsense-ai/docs/RYVORA_PRODUCT_WIDE_UI_UPGRADE_REPORT.md)**: Enterprise design language upgrade across all persona cockpits.
-3. **[Brand Migration Report](file:///c:/Users/trika/Documents/skillsense/TEAM_QUANTUM_CODERS-SU-/skillsense-ai/docs/BRAND_MIGRATION_RYYVORA_REPORT.md)**: Positioning Ryyvora AI for SIH26135.
-4. **[Authentication Experience Report](file:///c:/Users/trika/Documents/skillsense/TEAM_QUANTUM_CODERS-SU-/skillsense-ai/docs/SIGNIN_UI_REDESIGN_REPORT.md)**: Sign-in redesign with live tickers and role switchers.
-5. **[Mobile UX Redesign Report](file:///c:/Users/trika/Documents/skillsense/TEAM_QUANTUM_CODERS-SU-/skillsense-ai/docs/MOBILE_UX_REDESIGN_REPORT.md)**: Mobile viewport optimization and zero-scroll containerization.
-6. **[SIH Requirement Traceability Matrix](file:///c:/Users/trika/Documents/skillsense/TEAM_QUANTUM_CODERS-SU-/skillsense-ai/docs/SIH_REQUIREMENT_MATRIX.md)**: Mapping platform features to ministry criteria.
-7. **[Complete Documentation Index](file:///c:/Users/trika/Documents/skillsense/TEAM_QUANTUM_CODERS-SU-/skillsense-ai/docs/README.md)**: Index of all 25 documentation and audit files.
+1. **[Repository Structure Architecture](file:///c:/Users/trika/Documents/skillsense/TEAM_QUANTUM_CODERS-SU-/docs/architecture/REPOSITORY_STRUCTURE.md)**: Master blueprint, folder responsibilities, and data flow.
+2. **[API Contracts](file:///c:/Users/trika/Documents/skillsense/TEAM_QUANTUM_CODERS-SU-/docs/api/API_CONTRACTS.md)**: Complete REST API schemas and payloads.
+3. **[Real AI Implementation Report](file:///c:/Users/trika/Documents/skillsense/TEAM_QUANTUM_CODERS-SU-/docs/audits/RYYVORA_AI_IMPLEMENTATION_REPORT.md)**: Zero mock certification, Groq setup, sub-second latency, and Phase 9 DPDP safeguards.
+4. **[Product-Wide Design System Report](file:///c:/Users/trika/Documents/skillsense/TEAM_QUANTUM_CODERS-SU-/docs/audits/RYVORA_PRODUCT_WIDE_UI_UPGRADE_REPORT.md)**: Enterprise design language upgrade across all persona cockpits.
+5. **[Brand Migration Report](file:///c:/Users/trika/Documents/skillsense/TEAM_QUANTUM_CODERS-SU-/docs/audits/BRAND_MIGRATION_RYYVORA_REPORT.md)**: Positioning Ryyvora AI for SIH26135.
+6. **[Authentication Experience Report](file:///c:/Users/trika/Documents/skillsense/TEAM_QUANTUM_CODERS-SU-/docs/audits/SIGNIN_UI_REDESIGN_REPORT.md)**: Sign-in redesign with live tickers and role switchers.
+7. **[Mobile UX Redesign Report](file:///c:/Users/trika/Documents/skillsense/TEAM_QUANTUM_CODERS-SU-/docs/audits/MOBILE_UX_REDESIGN_REPORT.md)**: Mobile viewport optimization and zero-scroll containerization.
+8. **[SIH Requirement Traceability Matrix](file:///c:/Users/trika/Documents/skillsense/TEAM_QUANTUM_CODERS-SU-/docs/product/SIH_REQUIREMENT_MATRIX.md)**: Mapping platform features to ministry criteria.
+9. **[Complete Documentation Hub](file:///c:/Users/trika/Documents/skillsense/TEAM_QUANTUM_CODERS-SU-/docs/README.md)**: Full master index of all documentation and audit files.
 
 ---
 

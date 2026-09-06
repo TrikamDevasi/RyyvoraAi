@@ -46,3 +46,6 @@ next-env.d.ts
 *.log
 dist/
 build/
+build_output*
+.vercel/
+
