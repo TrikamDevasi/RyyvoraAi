@@ -29,6 +29,9 @@ const outfit = Outfit({
   display: "swap",
 });
 
+import { SITE_CONFIG } from "../lib/seo";
+import { OrganizationJsonLd, WebSiteJsonLd } from "../components/seo/JsonLd";
+
 export const viewport: Viewport = {
   themeColor: "#F59E0B",
   width: "device-width",
@@ -38,7 +41,11 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Ryyvora AI | Workforce Outcome Intelligence",
+  metadataBase: new URL(SITE_CONFIG.url),
+  title: {
+    default: "Workforce Outcome Intelligence | Ryyvora AI",
+    template: "%s | Ryyvora AI",
+  },
   description:
     "Ryyvora AI connects training, certification, employment, verification, retention and workforce outcomes into one intelligence platform.",
   keywords: [
@@ -52,17 +59,20 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Ryyvora AI Team" }],
   manifest: "/manifest.json",
+  alternates: {
+    canonical: SITE_CONFIG.url,
+  },
   openGraph: {
     type: "website",
     locale: "en_IN",
     siteName: "Ryyvora AI",
-    url: "https://skillsense-ai.vercel.app",
+    url: SITE_CONFIG.url,
     title: "Ryyvora AI | Workforce Outcome Intelligence",
     description:
       "Ryyvora AI connects training, certification, employment, verification, retention and workforce outcomes into one intelligence platform.",
     images: [
       {
-        url: "https://skillsense-ai.vercel.app/og-image.png",
+        url: `${SITE_CONFIG.url}/images/landing/hero-workforce-ecosystem.jpg`,
         width: 1200,
         height: 630,
         alt: "Ryyvora AI — Workforce Outcome Intelligence",
@@ -73,7 +83,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Ryyvora AI | Workforce Outcome Intelligence",
     description: "From Skills to Sustainable Outcomes. Enterprise & Government Workforce Outcome Intelligence.",
-    images: ["https://skillsense-ai.vercel.app/og-image.png"],
+    images: [`${SITE_CONFIG.url}/images/landing/hero-workforce-ecosystem.jpg`],
   },
   appleWebApp: {
     capable: true,
@@ -89,6 +99,8 @@ export default function RootLayout({
     <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable} ${manrope.variable} ${outfit.variable}`} suppressHydrationWarning>
       <head>
         <ThemeScript />
+        <OrganizationJsonLd />
+        <WebSiteJsonLd />
       </head>
       <body className="antialiased font-sans" suppressHydrationWarning>
         <SplashScreen>{children}</SplashScreen>

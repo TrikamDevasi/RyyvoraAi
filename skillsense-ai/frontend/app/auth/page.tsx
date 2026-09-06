@@ -54,6 +54,34 @@ const DEMO_ACCOUNTS: Record<UserRole, { name: string; email: string; role: UserR
   admin: { name: 'Ryyvora System Administrator', email: 'admin@skillsense.demo', role: 'admin', defaultRoute: '/admin' },
 };
 
+/**
+ * Validates and sanitizes redirect destinations to prevent open redirect vulnerabilities.
+ * Only allows safe, relative internal paths starting with a single '/' and rejects protocols/cross-origins.
+ */
+function getSafeRedirect(redirectParam: string | null, fallback: string): string {
+  if (!redirectParam) return fallback;
+  const trimmed = redirectParam.trim();
+  if (
+    !trimmed.startsWith('/') ||
+    trimmed.startsWith('//') ||
+    trimmed.startsWith('/\\') ||
+    trimmed.includes('\\') ||
+    trimmed.toLowerCase().startsWith('/javascript:') ||
+    trimmed.toLowerCase().startsWith('/data:')
+  ) {
+    return fallback;
+  }
+  try {
+    const parsed = new URL(trimmed, 'https://ryyvora.local');
+    if (parsed.origin !== 'https://ryyvora.local') {
+      return fallback;
+    }
+    return parsed.pathname + (parsed.search || '');
+  } catch {
+    return fallback;
+  }
+}
+
 export default function AuthPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -122,7 +150,8 @@ export default function AuthPage() {
       await login(email.trim(), password);
       const user = useAuthStore.getState().user;
       const role = (user?.role || 'student').toLowerCase();
-      const destination = ROLE_DASHBOARD[role] || `/${role}`;
+      const fallback = ROLE_DASHBOARD[role] || `/${role}`;
+      const destination = getSafeRedirect(searchParams.get('redirect'), fallback);
       toast.success('Signed in successfully!');
       window.location.replace(destination);
     } catch (err: any) {
@@ -164,7 +193,8 @@ export default function AuthPage() {
     setLoading(true);
     try {
       await register(name.trim(), email.trim(), password, selectedRole);
-      const destination = ROLE_DASHBOARD[selectedRole] || `/${selectedRole}`;
+      const fallback = ROLE_DASHBOARD[selectedRole] || `/${selectedRole}`;
+      const destination = getSafeRedirect(searchParams.get('redirect'), fallback);
       toast.success('Account created successfully!');
       window.location.replace(destination);
     } catch (err: any) {
@@ -222,7 +252,8 @@ export default function AuthPage() {
     };
     const demoToken = `demo_token_${role}_${Date.now()}`;
     setAuth(demoUser, demoToken);
-    router.push(demo.defaultRoute);
+    const destination = getSafeRedirect(searchParams.get('redirect'), demo.defaultRoute);
+    router.push(destination);
   };
 
   return (

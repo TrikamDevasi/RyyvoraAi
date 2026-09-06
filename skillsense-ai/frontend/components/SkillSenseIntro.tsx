@@ -704,7 +704,8 @@ export default function SkillSenseIntro({ children }: { children?: React.ReactNo
             willChange: 'transform, opacity, filter',
           }}
         >
-          <h1
+          <div
+            role="presentation"
             className="font-display"
             style={{
               fontSize: 'clamp(44px, 8vw, 104px)',
@@ -735,7 +736,7 @@ export default function SkillSenseIntro({ children }: { children?: React.ReactNo
             >
               AI
             </span>
-          </h1>
+          </div>
         </div>
 
         {/* Keyboard accessibility / Skip indicator */}

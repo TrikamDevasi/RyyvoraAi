@@ -200,7 +200,7 @@ export default function LandingPage() {
               </span>
               <span style={{ color: 'rgba(255,255,255,0.15)' }} className="hidden sm:inline">|</span>
               <Link
-                href="/verify/demo-hash"
+                href="/employer-verification"
                 style={{ color: 'var(--gold)', textDecoration: 'none', fontWeight: 700, fontSize: 11, display: 'inline-flex', alignItems: 'center', gap: 4 }}
                 className="font-mono"
               >
@@ -251,107 +251,107 @@ export default function LandingPage() {
                   Workspaces <ChevronDown size={13} style={{ opacity: 0.7 }} />
                 </button>
                 <div className="nav-dropdown-menu">
-                  <Link href="/student" className="nav-dropdown-item">
+                  <Link href="/for-trainees" className="nav-dropdown-item">
                     <div className="nav-dropdown-icon">
                       <GraduationCap size={15} />
                     </div>
                     <div>
-                      <div className="nav-dropdown-title" style={{ fontSize: 13, fontWeight: 700, color: '#f8fafc' }}>Student Cockpit</div>
-                      <div style={{ fontSize: 11, color: '#94a3b8' }}>Portfolio, passport & milestone journey</div>
+                      <div className="nav-dropdown-title" style={{ fontSize: 13, fontWeight: 700, color: '#f8fafc' }}>Trainee & Student Hub</div>
+                      <div style={{ fontSize: 11, color: '#94a3b8' }}>Portfolio, verifiable passport & career mobility</div>
                     </div>
                   </Link>
-                  <Link href="/institute" className="nav-dropdown-item">
+                  <Link href="/for-training-providers" className="nav-dropdown-item">
                     <div className="nav-dropdown-icon">
                       <School size={15} />
                     </div>
                     <div>
-                      <div className="nav-dropdown-title" style={{ fontSize: 13, fontWeight: 700, color: '#f8fafc' }}>Institute Portal</div>
-                      <div style={{ fontSize: 11, color: '#94a3b8' }}>Accreditation, cohort ROI & placement analytics</div>
+                      <div className="nav-dropdown-title" style={{ fontSize: 13, fontWeight: 700, color: '#f8fafc' }}>Training Providers</div>
+                      <div style={{ fontSize: 11, color: '#94a3b8' }}>Accreditation, cohort ROI & placement tracking</div>
                     </div>
                   </Link>
-                  <Link href="/industry" className="nav-dropdown-item">
+                  <Link href="/for-employers" className="nav-dropdown-item">
                     <div className="nav-dropdown-icon">
                       <Briefcase size={15} />
                     </div>
                     <div>
-                      <div className="nav-dropdown-title" style={{ fontSize: 13, fontWeight: 700, color: '#f8fafc' }}>Industry Talent Pool</div>
-                      <div style={{ fontSize: 11, color: '#94a3b8' }}>Verified candidates with zero resume fraud</div>
+                      <div className="nav-dropdown-title" style={{ fontSize: 13, fontWeight: 700, color: '#f8fafc' }}>Employer Intelligence</div>
+                      <div style={{ fontSize: 11, color: '#94a3b8' }}>Verified candidates with zero credential fraud</div>
                     </div>
                   </Link>
-                  <Link href="/government" className="nav-dropdown-item">
+                  <Link href="/for-government" className="nav-dropdown-item">
                     <div className="nav-dropdown-icon">
                       <Landmark size={15} />
                     </div>
                     <div>
-                      <div className="nav-dropdown-title" style={{ fontSize: 13, fontWeight: 700, color: '#f8fafc' }}>Governance Center</div>
+                      <div className="nav-dropdown-title" style={{ fontSize: 13, fontWeight: 700, color: '#f8fafc' }}>Government & Policy</div>
                       <div style={{ fontSize: 11, color: '#94a3b8' }}>District skill heatmaps & policy analytics</div>
                     </div>
                   </Link>
                 </div>
               </div>
 
-              {/* Dropdown 2: AI Engines */}
+              {/* Dropdown 2: AI Engines & Solutions */}
               <div className="nav-item-dropdown">
                 <button className="nav-link-pill" style={{ background: 'transparent', border: 'none', cursor: 'pointer', whiteSpace: 'nowrap' }}>
-                  AI Engines <ChevronDown size={13} style={{ opacity: 0.7 }} />
+                  Engines <ChevronDown size={13} style={{ opacity: 0.7 }} />
                 </button>
                 <div className="nav-dropdown-menu">
-                  <Link href="/student/analyzer" className="nav-dropdown-item">
-                    <div className="nav-dropdown-icon">
-                      <Brain size={15} />
-                    </div>
-                    <div>
-                      <div className="nav-dropdown-title" style={{ fontSize: 13, fontWeight: 700, color: '#f8fafc' }}>AI Skill Analyzer</div>
-                      <div style={{ fontSize: 11, color: '#94a3b8' }}>Multi-modal GitHub code & resume diagnostics</div>
-                    </div>
-                  </Link>
-                  <Link href="/student/career" className="nav-dropdown-item">
-                    <div className="nav-dropdown-icon">
-                      <Compass size={15} />
-                    </div>
-                    <div>
-                      <div className="nav-dropdown-title" style={{ fontSize: 13, fontWeight: 700, color: '#f8fafc' }}>Career Predictor</div>
-                      <div style={{ fontSize: 11, color: '#94a3b8' }}>Live INR compensation & market affinity</div>
-                    </div>
-                  </Link>
-                  <Link href="/student/assessment" className="nav-dropdown-item">
-                    <div className="nav-dropdown-icon">
-                      <FileCheck size={15} />
-                    </div>
-                    <div>
-                      <div className="nav-dropdown-title" style={{ fontSize: 13, fontWeight: 700, color: '#f8fafc' }}>Diagnostic Quizzes</div>
-                      <div style={{ fontSize: 11, color: '#94a3b8' }}>Adaptive NSQF-calibrated testing</div>
-                    </div>
-                  </Link>
-                  <Link href="/student/market" className="nav-dropdown-item">
+                  <Link href="/workforce-analytics" className="nav-dropdown-item">
                     <div className="nav-dropdown-icon">
                       <BarChart3 size={15} />
                     </div>
                     <div>
-                      <div className="nav-dropdown-title" style={{ fontSize: 13, fontWeight: 700, color: '#f8fafc' }}>Market Demand Radar</div>
-                      <div style={{ fontSize: 11, color: '#94a3b8' }}>Macro hiring trends & skill shortages</div>
+                      <div className="nav-dropdown-title" style={{ fontSize: 13, fontWeight: 700, color: '#f8fafc' }}>Workforce Analytics</div>
+                      <div style={{ fontSize: 11, color: '#94a3b8' }}>Macro hiring trends & longitudinal retention</div>
+                    </div>
+                  </Link>
+                  <Link href="/skill-passport" className="nav-dropdown-item">
+                    <div className="nav-dropdown-icon">
+                      <FileCheck size={15} />
+                    </div>
+                    <div>
+                      <div className="nav-dropdown-title" style={{ fontSize: 13, fontWeight: 700, color: '#f8fafc' }}>Skill Passport</div>
+                      <div style={{ fontSize: 11, color: '#94a3b8' }}>W3C Verifiable Credentials & SHA-256 HMAC</div>
+                    </div>
+                  </Link>
+                  <Link href="/employer-verification" className="nav-dropdown-item">
+                    <div className="nav-dropdown-icon">
+                      <ShieldCheck size={15} />
+                    </div>
+                    <div>
+                      <div className="nav-dropdown-title" style={{ fontSize: 13, fontWeight: 700, color: '#f8fafc' }}>Employer Verification</div>
+                      <div style={{ fontSize: 11, color: '#94a3b8' }}>Instant cryptographic credential verification</div>
+                    </div>
+                  </Link>
+                  <Link href="/policy-intelligence" className="nav-dropdown-item">
+                    <div className="nav-dropdown-icon">
+                      <Brain size={15} />
+                    </div>
+                    <div>
+                      <div className="nav-dropdown-title" style={{ fontSize: 13, fontWeight: 700, color: '#f8fafc' }}>Policy Intelligence</div>
+                      <div style={{ fontSize: 11, color: '#94a3b8' }}>District skilling heatmaps & voucher targeting</div>
                     </div>
                   </Link>
                 </div>
               </div>
 
               {/* Direct Links */}
-              <a href="#how-it-works" className="nav-link-pill" style={{ whiteSpace: 'nowrap' }}>How It Works</a>
-              <a href="#passport" className="nav-link-pill" style={{ display: 'inline-flex', alignItems: 'center', gap: 5, whiteSpace: 'nowrap' }}>
+              <Link href="/how-it-works" className="nav-link-pill" style={{ whiteSpace: 'nowrap' }}>How It Works</Link>
+              <Link href="/skill-passport" className="nav-link-pill" style={{ display: 'inline-flex', alignItems: 'center', gap: 5, whiteSpace: 'nowrap' }}>
                 <span>Skill Passport</span>
                 <span style={{ fontSize: 9.5, fontWeight: 700, padding: '1px 5px', borderRadius: 4, background: 'rgba(16,185,129,0.12)', color: '#10b981', border: '1px solid rgba(16,185,129,0.25)', whiteSpace: 'nowrap' }}>
                   SHA-256
                 </span>
-              </a>
-              <a href="#pricing" className="nav-link-pill" style={{ whiteSpace: 'nowrap' }}>Pricing</a>
-              <a href="#faq" className="nav-link-pill" style={{ whiteSpace: 'nowrap' }}>FAQ</a>
-              <a href="#trust" className="nav-link-pill" style={{ whiteSpace: 'nowrap' }}>DPDP Trust</a>
+              </Link>
+              <Link href="/pricing" className="nav-link-pill" style={{ whiteSpace: 'nowrap' }}>Pricing</Link>
+              <Link href="/faq" className="nav-link-pill" style={{ whiteSpace: 'nowrap' }}>FAQ</Link>
+              <Link href="/dpdp-trust" className="nav-link-pill" style={{ whiteSpace: 'nowrap' }}>DPDP Trust</Link>
             </div>
 
             {/* Auth Actions, Fast Verifier & Theme Toggle */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
               {/* Quick Verifier Action (Desktop only) */}
-              <Link href="/verify/demo-hash" className="nav-verify-btn" style={{ whiteSpace: 'nowrap' }}>
+              <Link href="/employer-verification" className="nav-verify-btn" style={{ whiteSpace: 'nowrap' }}>
                 <ShieldCheck size={14} /> Verify Hash
               </Link>
 
@@ -368,11 +368,11 @@ export default function LandingPage() {
               </Link>
 
               <Link
-                href="/student/analyzer"
+                href="/for-trainees"
                 className="btn-gold landing-header-cta"
                 style={{ fontSize: 12.5, fontWeight: 700, padding: '7px 16px', borderRadius: 7, display: 'inline-flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap' }}
               >
-                <BarChart3 size={13} /> Analyze Skills <ArrowRight size={13} />
+                <BarChart3 size={13} /> Explore Platform <ArrowRight size={13} />
               </Link>
 
               {/* Mobile Menu Hamburger Toggle (Minimum 44x44px touch target) */}
@@ -2687,7 +2687,7 @@ export default function LandingPage() {
             {/* Quick Public Credential Verification Shortcut */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
               <Link
-                href="/verify/demo-hash"
+                href="/employer-verification"
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
@@ -2768,128 +2768,121 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Column 2: AI Intelligence Engines */}
+            {/* Column 2: Stakeholder Solutions */}
+            <div className="footer-nav-col">
+              <h5>
+                <Building2 size={13} color="var(--gold)" /> Stakeholder Solutions
+              </h5>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <Link href="/for-government" className="footer-link">
+                  <span>Government Policy Intelligence</span>
+                  <ChevronRight size={11} className="footer-link-arrow" />
+                </Link>
+                <Link href="/for-employers" className="footer-link">
+                  <span>Employer Outcome Verification</span>
+                  <ChevronRight size={11} className="footer-link-arrow" />
+                </Link>
+                <Link href="/for-training-providers" className="footer-link">
+                  <span>Training Provider ROI & Placements</span>
+                  <ChevronRight size={11} className="footer-link-arrow" />
+                </Link>
+                <Link href="/for-trainees" className="footer-link">
+                  <span>Trainee Skill Passport & Mobility</span>
+                  <ChevronRight size={11} className="footer-link-arrow" />
+                </Link>
+                <Link href="/pricing" className="footer-link">
+                  <span>Institutional Pricing Plans</span>
+                  <ChevronRight size={11} className="footer-link-arrow" />
+                </Link>
+                <Link href="/how-it-works" className="footer-link">
+                  <span>Outcome Lifecycle Architecture</span>
+                  <ChevronRight size={11} className="footer-link-arrow" />
+                </Link>
+              </div>
+            </div>
+
+            {/* Column 3: Intelligence Engines */}
             <div className="footer-nav-col">
               <h5>
                 <Brain size={13} color="var(--gold)" /> Intelligence Engines
               </h5>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                <Link href="/student/analyzer" className="footer-link">
-                  <span>AI Skill Analyzer</span>
+                <Link href="/workforce-analytics" className="footer-link">
+                  <span>Workforce & Retention Analytics</span>
                   <ChevronRight size={11} className="footer-link-arrow" />
                 </Link>
-                <Link href="/student/career" className="footer-link">
-                  <span>Career Predictor & Wage Index</span>
+                <Link href="/skill-passport" className="footer-link">
+                  <span>Verifiable Skill Passport</span>
                   <ChevronRight size={11} className="footer-link-arrow" />
                 </Link>
-                <Link href="/student/assessment" className="footer-link">
-                  <span>Adaptive Diagnostic Assessments</span>
+                <Link href="/employer-verification" className="footer-link">
+                  <span>Employer Verification Portal</span>
                   <ChevronRight size={11} className="footer-link-arrow" />
                 </Link>
-                <Link href="/student/market" className="footer-link">
-                  <span>Real-Time Market Demand</span>
+                <Link href="/policy-intelligence" className="footer-link">
+                  <span>Policy Intelligence & Heatmaps</span>
                   <ChevronRight size={11} className="footer-link-arrow" />
                 </Link>
-                <Link href="/student/journey" className="footer-link">
-                  <span>Dynamic Upskilling Roadmap</span>
-                  <ChevronRight size={11} className="footer-link-arrow" />
-                </Link>
-                <Link href="/ai-health" className="footer-link">
-                  <span>Multi-Model AI Telemetry</span>
+                <Link href="/dpdp-trust" className="footer-link">
+                  <span>Sovereign Data Governance</span>
                   <ChevronRight size={11} className="footer-link-arrow" />
                 </Link>
               </div>
             </div>
 
-            {/* Column 3: Ecosystem Workspaces */}
+            {/* Column 4: Trust & Verification */}
             <div className="footer-nav-col">
               <h5>
-                <Building2 size={13} color="var(--gold)" /> Ecosystem Workspaces
+                <Lock size={13} color="var(--gold)" /> Trust & Standards
               </h5>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                <Link href="/student" className="footer-link">
-                  <span>Student Career Cockpit</span>
-                  <ChevronRight size={11} className="footer-link-arrow" />
-                </Link>
-                <Link href="/institute" className="footer-link">
-                  <span>Training Institute Portal</span>
-                  <ChevronRight size={11} className="footer-link-arrow" />
-                </Link>
-                <Link href="/institute/roi" className="footer-link">
-                  <span>Training ROI & Placements</span>
-                  <ChevronRight size={11} className="footer-link-arrow" />
-                </Link>
-                <Link href="/industry/talent" className="footer-link">
-                  <span>Industry Verified Talent Pool</span>
-                  <ChevronRight size={11} className="footer-link-arrow" />
-                </Link>
-                <Link href="/government" className="footer-link">
-                  <span>District Governance Center</span>
-                  <ChevronRight size={11} className="footer-link-arrow" />
-                </Link>
-                <Link href="/government/fund-targeting" className="footer-link">
-                  <span>CSR & Skill Voucher Allocation</span>
-                  <ChevronRight size={11} className="footer-link-arrow" />
-                </Link>
-              </div>
-            </div>
-
-            {/* Column 4: Verification & Trust */}
-            <div className="footer-nav-col">
-              <h5>
-                <Lock size={13} color="var(--gold)" /> Trust & Verification
-              </h5>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                <Link href="/student/passport" className="footer-link">
-                  <span>Cryptographic Skill Passport</span>
-                  <ChevronRight size={11} className="footer-link-arrow" />
-                </Link>
-                <Link href="/verify/sample-hash" className="footer-link">
+                <Link href="/employer-verification" className="footer-link">
                   <span>Public Ledger Verifier</span>
                   <ChevronRight size={11} className="footer-link-arrow" />
                 </Link>
-                <Link href="/admin/fairness" className="footer-link">
-                  <span>Fairness & Bias Governance</span>
+                <Link href="/dpdp-trust" className="footer-link">
+                  <span>DPDP Act 2023 Compliance</span>
                   <ChevronRight size={11} className="footer-link-arrow" />
                 </Link>
-                <Link href="/admin/audit-logs" className="footer-link">
-                  <span>Tamper-Evident Audit Logs</span>
+                <Link href="/skill-passport" className="footer-link">
+                  <span>W3C Verifiable Credentials</span>
                   <ChevronRight size={11} className="footer-link-arrow" />
                 </Link>
-                <Link href="/government/heatmap" className="footer-link">
-                  <span>District Workforce Heatmap</span>
+                <Link href="/for-government" className="footer-link">
+                  <span>NSQF Level 4–8 Matrix</span>
                   <ChevronRight size={11} className="footer-link-arrow" />
                 </Link>
-                <Link href="/student/consent" className="footer-link">
-                  <span>DPDP Data Consent Manager</span>
+                <Link href="/about" className="footer-link">
+                  <span>Tamper-Evident HMAC Proofs</span>
                   <ChevronRight size={11} className="footer-link-arrow" />
                 </Link>
               </div>
             </div>
 
-            {/* Column 5: Institutional Governance & Team */}
+            {/* Column 5: Company & Resources */}
             <div className="footer-nav-col">
               <h5>
-                <Terminal size={13} color="var(--gold)" /> Governance & Team
+                <Terminal size={13} color="var(--gold)" /> Company & Support
               </h5>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                <span className="footer-link" style={{ color: '#cbd5e1' }}>
-                  <span>Team Quantum Coders</span>
-                </span>
-                <Link href="/government/compliance" className="footer-link">
-                  <span>NSQF Compliance Matrix</span>
+                <Link href="/about" className="footer-link">
+                  <span>About Ryyvora AI</span>
                   <ChevronRight size={11} className="footer-link-arrow" />
                 </Link>
-                <Link href="/employer/validations" className="footer-link">
-                  <span>Employer Competency Attestation</span>
+                <Link href="/pricing" className="footer-link">
+                  <span>Pricing & Licensing</span>
                   <ChevronRight size={11} className="footer-link-arrow" />
                 </Link>
-                <Link href="/institute/upload" className="footer-link">
-                  <span>Curricula Ingestion Service</span>
+                <Link href="/faq" className="footer-link">
+                  <span>Knowledge Base & FAQ</span>
                   <ChevronRight size={11} className="footer-link-arrow" />
                 </Link>
-                <Link href="/settings/billing" className="footer-link">
-                  <span>Enterprise Licensing</span>
+                <Link href="/contact" className="footer-link">
+                  <span>Institutional Consultation</span>
+                  <ChevronRight size={11} className="footer-link-arrow" />
+                </Link>
+                <Link href="/auth" className="footer-link">
+                  <span>Sign In to Workspace</span>
                   <ChevronRight size={11} className="footer-link-arrow" />
                 </Link>
                 <span className="footer-link" style={{ color: '#64748b' }}>

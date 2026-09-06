@@ -95,14 +95,14 @@ export default function FramerHero() {
           The Intelligence of
         </motion.div>
 
-        {/* Monumental Headline: "RYYVORA AI" */}
+        {/* Monumental Headline: "RYYVORA AI" + Semantic H1: Workforce Outcome Intelligence */}
         <motion.div
           initial={{ opacity: 0, scale: 0.94 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
           style={{ textAlign: 'center', position: 'relative', marginBottom: 20 }}
         >
-          <h1
+          <div
             className="font-display font-outfit"
             style={{
               fontSize: 'clamp(52px, 11vw, 148px)',
@@ -119,6 +119,23 @@ export default function FramerHero() {
             }}
           >
             RYYVORA <span style={{ background: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>AI</span>
+          </div>
+          <h1
+            className="font-manrope"
+            style={{
+              fontSize: 'clamp(20px, 3.2vw, 36px)',
+              fontWeight: 800,
+              color: 'var(--gold, #f59e0b)',
+              letterSpacing: '-0.02em',
+              margin: '14px auto 0',
+              maxWidth: 820,
+              textTransform: 'none',
+              background: 'linear-gradient(135deg, #fef08a 0%, #f59e0b 50%, #d97706 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}
+          >
+            Workforce Outcome Intelligence
           </h1>
         </motion.div>
 

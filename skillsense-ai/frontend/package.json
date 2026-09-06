@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "npx ts-node --transpile-only scripts/testFrontend.ts"
+    "test": "npx ts-node --transpile-only scripts/testFrontend.ts",
+    "test:seo": "npx ts-node --transpile-only scripts/verifySeo.ts"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.70.0",
