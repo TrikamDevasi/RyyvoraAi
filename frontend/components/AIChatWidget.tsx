@@ -612,6 +612,7 @@ export default function AIChatWidget() {
                   {/* Assistant Avatar */}
                   {isAssistant && (
                     <div
+                      className="ai-copilot-avatar"
                       style={{
                         width: 28,
                         height: 28,
@@ -621,7 +622,7 @@ export default function AIChatWidget() {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        color: '#f59e0b',
+                        color: 'var(--brand-gold, #f59e0b)',
                         flexShrink: 0,
                         marginTop: 2,
                       }}
@@ -640,6 +641,7 @@ export default function AIChatWidget() {
                   >
                     {/* Chat Bubble */}
                     <div
+                      className={isAssistant ? (m.isError ? 'ai-copilot-error-bubble' : 'ai-copilot-assistant-bubble') : 'ai-copilot-user-bubble'}
                       style={{
                         padding: isAssistant ? '12px 16px' : '10px 15px',
                         borderRadius: isAssistant ? '4px 14px 14px 14px' : '14px 14px 4px 14px',
@@ -686,7 +688,7 @@ export default function AIChatWidget() {
                             alignItems: 'center',
                             marginTop: 10,
                             paddingTop: 6,
-                            borderTop: '1px solid rgba(255,255,255,0.06)',
+                            borderTop: '1px solid var(--border-subtle, rgba(255,255,255,0.06))',
                           }}
                         >
                           <button
@@ -697,17 +699,16 @@ export default function AIChatWidget() {
                               display: 'inline-flex',
                               alignItems: 'center',
                               gap: 4,
-                              background: 'rgba(255,255,255,0.04)',
-                              border: '1px solid rgba(255,255,255,0.08)',
+                              background: 'var(--bg-surface-elevated, rgba(255,255,255,0.04))',
+                              border: '1px solid var(--border)',
                               borderRadius: 6,
                               padding: '3px 8px',
-                              color: copiedId === m.id ? '#10b981' : '#94a3b8',
+                              color: copiedId === m.id ? 'var(--success, #10b981)' : 'var(--text-muted, #94a3b8)',
                               fontSize: 10.5,
                               fontWeight: 500,
                               cursor: 'pointer',
                               transition: 'all 0.15s ease',
                             }}
-                            className="hover:text-white hover:bg-white/10"
                           >
                             {copiedId === m.id ? <Check size={12} /> : <Copy size={12} />}
                             <span>{copiedId === m.id ? 'Copied' : 'Copy'}</span>
@@ -736,12 +737,13 @@ export default function AIChatWidget() {
                             key={idx}
                             type="button"
                             onClick={() => sendMessage(s)}
+                            className="ai-copilot-suggestion-chip"
                             style={{
                               padding: '4px 10px',
                               borderRadius: 99,
-                              background: 'rgba(245,158,11,0.06)',
-                              border: '1px solid rgba(245,158,11,0.2)',
-                              color: 'var(--gold)',
+                              background: 'var(--gold-muted, rgba(245,158,11,0.06))',
+                              border: '1px solid var(--gold-border, rgba(245,158,11,0.2))',
+                              color: 'var(--brand-gold, var(--gold))',
                               fontSize: 11,
                               fontWeight: 600,
                               cursor: 'pointer',
@@ -801,13 +803,14 @@ export default function AIChatWidget() {
               type="submit"
               disabled={!input.trim() || loading}
               aria-label="Send message to Copilot"
+              className="ai-copilot-send-btn"
               style={{
                 width: 34,
                 height: 34,
                 borderRadius: 8,
-                background: input.trim() && !loading ? 'var(--gold)' : 'rgba(255,255,255,0.06)',
-                color: input.trim() && !loading ? '#090a0f' : 'var(--text-muted)',
-                border: 'none',
+                background: input.trim() && !loading ? 'var(--brand-gold, var(--gold))' : 'var(--bg-surface-subtle)',
+                color: input.trim() && !loading ? '#ffffff' : 'var(--text-muted)',
+                border: '1px solid var(--border)',
                 cursor: input.trim() && !loading ? 'pointer' : 'not-allowed',
                 display: 'flex',
                 alignItems: 'center',

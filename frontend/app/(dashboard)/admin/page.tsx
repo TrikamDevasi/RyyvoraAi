@@ -76,11 +76,11 @@ const DEFAULT_INQUIRIES: IndustryInquiry[] = [
 ];
 
 const ROLE_COLORS: Record<string, { bg: string; color: string }> = {
-  Student: { bg: 'rgba(245,158,11,0.12)', color: 'var(--gold)' },
-  Institute: { bg: 'rgba(168,85,247,0.12)', color: '#c084fc' },
-  Industry: { bg: 'rgba(16,185,129,0.12)', color: '#10b981' },
-  Government: { bg: 'rgba(239,68,68,0.12)', color: '#f87171' },
-  Admin: { bg: 'rgba(96,165,250,0.12)', color: '#60a5fa' },
+  Student: { bg: 'var(--gold-muted, rgba(245,158,11,0.12))', color: 'var(--brand-gold, var(--gold))' },
+  Institute: { bg: 'rgba(147,51,234,0.12)', color: 'var(--purple, #9333ea)' },
+  Industry: { bg: 'rgba(16,185,129,0.12)', color: 'var(--success, #16a34a)' },
+  Government: { bg: 'rgba(239,68,68,0.12)', color: 'var(--error, #dc2626)' },
+  Admin: { bg: 'var(--info-surface, rgba(37,99,235,0.12))', color: 'var(--info, #2563eb)' },
 };
 
 export default function AdminPage() {

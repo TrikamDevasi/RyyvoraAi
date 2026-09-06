@@ -38,6 +38,7 @@ import { AIBadge } from '@/components/ui/AIBadge';
 import { MetricStrip } from '@/components/dashboard/KPICard';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { AnalyticsPanel } from '@/components/ui/AnalyticsPanel';
+import { useChartTheme } from '@/lib/chartColors';
 import { InsightPanel } from '@/components/ui/InsightPanel';
 import { DataTable, ColumnDef } from '@/components/ui/DataTable';
 import toast from 'react-hot-toast';
@@ -66,6 +67,7 @@ interface ProgramRow {
 
 export default function InstitutePage() {
   const { user } = useAuth();
+  const chartTheme = useChartTheme();
   const [dashboard, setDashboard] = useState<InstituteDashboard | null>(null);
   const [placementTrend, setPlacementTrend] = useState<PlacementTrendPoint[]>([]);
   const [loading, setLoading] = useState(true);
@@ -411,19 +413,19 @@ export default function InstitutePage() {
                             <stop offset="95%" stopColor="var(--gold)" stopOpacity={0.0} />
                           </linearGradient>
                         </defs>
-                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-                        <XAxis dataKey="month" stroke="#64748b" tick={{ fontSize: 11 }} />
-                        <YAxis stroke="#64748b" tick={{ fontSize: 11 }} />
+                        <CartesianGrid strokeDasharray="3 3" stroke={chartTheme.grid.stroke} />
+                        <XAxis dataKey="month" stroke={chartTheme.axis.tick} tick={{ fontSize: 11 }} />
+                        <YAxis stroke={chartTheme.axis.tick} tick={{ fontSize: 11 }} />
                         <Tooltip
                           contentStyle={{
-                            background: '#0f111a',
-                            border: '1px solid rgba(245,158,11,0.3)',
+                            background: chartTheme.tooltip.background,
+                            border: `1px solid ${chartTheme.tooltip.border}`,
                             borderRadius: 6,
                             fontSize: 12,
-                            color: '#fff',
+                            color: chartTheme.tooltip.text,
                           }}
                         />
-                        <Area type="monotone" dataKey="placed" stroke="var(--gold)" fill="url(#instGrad)" strokeWidth={2} />
+                        <Area type="monotone" dataKey="placed" stroke={chartTheme.series.primary} fill="url(#instGrad)" strokeWidth={2} />
                       </AreaChart>
                     </ResponsiveContainer>
                   </div>

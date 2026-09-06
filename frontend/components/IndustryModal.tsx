@@ -55,9 +55,9 @@ export default function IndustryModal({ isOpen, onClose, selectedPlan }: Industr
 
     const inputStyle: React.CSSProperties = {
         width: '100%', padding: '10px 14px', borderRadius: 10,
-        background: 'rgba(212,168,67,0.04)',
-        border: '1px solid rgba(212,168,67,0.12)',
-        color: '#fff', fontSize: 13, outline: 'none',
+        background: 'var(--bg-input, rgba(212,168,67,0.04))',
+        border: '1px solid var(--border-strong, rgba(212,168,67,0.12))',
+        color: 'var(--text-primary, #fff)', fontSize: 13, outline: 'none',
         fontFamily: "'Space Grotesk', sans-serif",
     };
 
@@ -65,7 +65,7 @@ export default function IndustryModal({ isOpen, onClose, selectedPlan }: Industr
         <div
             style={{
                 position: 'fixed', inset: 0, zIndex: 99999,
-                background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)',
+                background: 'rgba(15, 23, 42, 0.45)', backdropFilter: 'blur(8px)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 animation: 'fadeIn 0.3s ease',
             }}
@@ -73,9 +73,11 @@ export default function IndustryModal({ isOpen, onClose, selectedPlan }: Industr
         >
             <div
                 style={{
-                    background: '#111', border: `1px solid rgba(212,168,67,0.2)`,
+                    background: 'var(--bg-surface, #111)',
+                    border: '1px solid var(--border, rgba(212,168,67,0.2))',
                     borderRadius: 20, padding: '32px', maxWidth: 520, width: '90%',
                     maxHeight: '90vh', overflowY: 'auto',
+                    boxShadow: 'var(--shadow-xl, 0 20px 40px -15px rgba(0,0,0,0.5))',
                 }}
                 onClick={e => e.stopPropagation()}
             >
@@ -93,11 +95,11 @@ export default function IndustryModal({ isOpen, onClose, selectedPlan }: Industr
                                 <polyline points="22 4 12 14.01 9 11.01" />
                             </svg>
                         </div>
-                        <h3 className="font-display" style={{ fontSize: 20, fontWeight: 800, color: '#fff', marginBottom: 8 }}>
+                        <h3 className="font-display" style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-primary, #fff)', marginBottom: 8 }}>
                             Thank You!
                         </h3>
-                        <p style={{ color: '#94a3b8', fontSize: 14, marginBottom: 6 }}>
-                            Your inquiry for the <strong style={{ color: GOLD }}>{selectedPlan}</strong> plan has been received.
+                        <p style={{ color: 'var(--text-secondary, #94a3b8)', fontSize: 14, marginBottom: 6 }}>
+                            Your inquiry for the <strong style={{ color: 'var(--brand-gold, ' + GOLD + ')' }}>{selectedPlan}</strong> plan has been received.
                         </p>
                         <p style={{ color: '#22c55e', fontSize: 13, fontWeight: 600, marginBottom: 24 }}>
                             We&apos;ll contact you within 24 hours!
@@ -111,15 +113,15 @@ export default function IndustryModal({ isOpen, onClose, selectedPlan }: Industr
                     <>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
                             <div>
-                                <h3 className="font-display" style={{ fontSize: 18, fontWeight: 800, color: '#fff' }}>
+                                <h3 className="font-display" style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-primary, #fff)' }}>
                                     Get Industry Access
                                 </h3>
-                                <p style={{ color: '#64748b', fontSize: 12, marginTop: 4 }}>
+                                <p style={{ color: 'var(--text-muted, #64748b)', fontSize: 12, marginTop: 4 }}>
                                     Tell us about your organization
                                 </p>
                             </div>
                             <button onClick={handleClose} style={{
-                                background: 'none', border: 'none', color: '#475569',
+                                background: 'none', border: 'none', color: 'var(--text-muted, #475569)',
                                 fontSize: 20, cursor: 'pointer', padding: '4px',
                             }}>×</button>
                         </div>
@@ -127,7 +129,7 @@ export default function IndustryModal({ isOpen, onClose, selectedPlan }: Industr
                         <form onSubmit={handleSubmit}>
                             <div style={{ display: 'grid', gap: 14 }}>
                                 <div>
-                                    <label style={{ fontSize: 12, color: '#64748b', display: 'block', marginBottom: 6 }}>Company Name *</label>
+                                    <label style={{ fontSize: 12, color: 'var(--text-secondary, #64748b)', display: 'block', marginBottom: 6 }}>Company Name *</label>
                                     <input
                                         value={form.company} onChange={e => setForm(p => ({ ...p, company: e.target.value }))}
                                         required style={inputStyle} placeholder="e.g., TCS, Infosys"
@@ -135,7 +137,7 @@ export default function IndustryModal({ isOpen, onClose, selectedPlan }: Industr
                                 </div>
 
                                 <div>
-                                    <label style={{ fontSize: 12, color: '#64748b', display: 'block', marginBottom: 6 }}>Contact Name *</label>
+                                    <label style={{ fontSize: 12, color: 'var(--text-secondary, #64748b)', display: 'block', marginBottom: 6 }}>Contact Name *</label>
                                     <input
                                         value={form.contactName} onChange={e => setForm(p => ({ ...p, contactName: e.target.value }))}
                                         required style={inputStyle} placeholder="Your full name"
@@ -144,7 +146,7 @@ export default function IndustryModal({ isOpen, onClose, selectedPlan }: Industr
 
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
                                     <div>
-                                        <label style={{ fontSize: 12, color: '#64748b', display: 'block', marginBottom: 6 }}>Work Email *</label>
+                                        <label style={{ fontSize: 12, color: 'var(--text-secondary, #64748b)', display: 'block', marginBottom: 6 }}>Work Email *</label>
                                         <input
                                             type="email" value={form.email}
                                             onChange={e => setForm(p => ({ ...p, email: e.target.value }))}
@@ -152,7 +154,7 @@ export default function IndustryModal({ isOpen, onClose, selectedPlan }: Industr
                                         />
                                     </div>
                                     <div>
-                                        <label style={{ fontSize: 12, color: '#64748b', display: 'block', marginBottom: 6 }}>Phone</label>
+                                        <label style={{ fontSize: 12, color: 'var(--text-secondary, #64748b)', display: 'block', marginBottom: 6 }}>Phone</label>
                                         <input
                                             value={form.phone} onChange={e => setForm(p => ({ ...p, phone: e.target.value }))}
                                             style={inputStyle} placeholder="+91 XXXXX XXXXX"
@@ -162,37 +164,37 @@ export default function IndustryModal({ isOpen, onClose, selectedPlan }: Industr
 
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
                                     <div>
-                                        <label style={{ fontSize: 12, color: '#64748b', display: 'block', marginBottom: 6 }}>Team Size *</label>
+                                        <label style={{ fontSize: 12, color: 'var(--text-secondary, #64748b)', display: 'block', marginBottom: 6 }}>Team Size *</label>
                                         <select
                                             value={form.teamSize} onChange={e => setForm(p => ({ ...p, teamSize: e.target.value }))}
                                             required
                                             style={{ ...inputStyle, cursor: 'pointer' }}
                                         >
-                                            <option value="" style={{ background: '#111' }}>Select size</option>
-                                            <option value="1-10" style={{ background: '#111' }}>1-10</option>
-                                            <option value="11-50" style={{ background: '#111' }}>11-50</option>
-                                            <option value="51-200" style={{ background: '#111' }}>51-200</option>
-                                            <option value="201-1000" style={{ background: '#111' }}>201-1000</option>
-                                            <option value="1000+" style={{ background: '#111' }}>1000+</option>
+                                            <option value="" style={{ background: 'var(--bg-surface)', color: 'var(--text-primary)' }}>Select size</option>
+                                            <option value="1-10" style={{ background: 'var(--bg-surface)', color: 'var(--text-primary)' }}>1-10</option>
+                                            <option value="11-50" style={{ background: 'var(--bg-surface)', color: 'var(--text-primary)' }}>11-50</option>
+                                            <option value="51-200" style={{ background: 'var(--bg-surface)', color: 'var(--text-primary)' }}>51-200</option>
+                                            <option value="201-1000" style={{ background: 'var(--bg-surface)', color: 'var(--text-primary)' }}>201-1000</option>
+                                            <option value="1000+" style={{ background: 'var(--bg-surface)', color: 'var(--text-primary)' }}>1000+</option>
                                         </select>
                                     </div>
                                     <div>
-                                        <label style={{ fontSize: 12, color: '#64748b', display: 'block', marginBottom: 6 }}>Selected Plan</label>
+                                        <label style={{ fontSize: 12, color: 'var(--text-secondary, #64748b)', display: 'block', marginBottom: 6 }}>Selected Plan</label>
                                         <div style={{
                                             ...inputStyle, display: 'flex', alignItems: 'center', gap: 8,
-                                            background: 'rgba(212,168,67,0.06)',
+                                            background: 'var(--gold-muted, rgba(212,168,67,0.06))',
                                         }}>
                                             <span style={{
                                                 fontSize: 9, fontWeight: 700, padding: '2px 8px', borderRadius: 99,
                                                 background: `linear-gradient(135deg, ${GOLD}, ${GOLD_L})`, color: '#08060f',
                                             }}>PLAN</span>
-                                            <span style={{ color: GOLD, fontWeight: 600 }}>{selectedPlan}</span>
+                                            <span style={{ color: 'var(--brand-gold, ' + GOLD + ')', fontWeight: 600 }}>{selectedPlan}</span>
                                         </div>
                                     </div>
                                 </div>
 
                                 <div>
-                                    <label style={{ fontSize: 12, color: '#64748b', display: 'block', marginBottom: 6 }}>Message (optional)</label>
+                                    <label style={{ fontSize: 12, color: 'var(--text-secondary, #64748b)', display: 'block', marginBottom: 6 }}>Message (optional)</label>
                                     <textarea
                                         value={form.message} onChange={e => setForm(p => ({ ...p, message: e.target.value }))}
                                         rows={3} style={{ ...inputStyle, resize: 'vertical' }}

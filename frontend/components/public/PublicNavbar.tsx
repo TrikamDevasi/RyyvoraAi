@@ -77,8 +77,8 @@ export default function PublicNavbar() {
                     <GraduationCap size={15} />
                   </div>
                   <div>
-                    <div className="nav-dropdown-title" style={{ fontSize: 13, fontWeight: 700, color: '#f8fafc' }}>Trainee & Student Hub</div>
-                    <div style={{ fontSize: 11, color: '#94a3b8' }}>Portfolio, verifiable passport & career mobility</div>
+                    <div className="nav-dropdown-title" style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>Trainee & Student Hub</div>
+                    <div className="nav-dropdown-desc" style={{ fontSize: 11, color: 'var(--text-muted)' }}>Portfolio, verifiable passport & career mobility</div>
                   </div>
                 </Link>
                 <Link href="/for-training-providers" className="nav-dropdown-item">
@@ -86,8 +86,8 @@ export default function PublicNavbar() {
                     <School size={15} />
                   </div>
                   <div>
-                    <div className="nav-dropdown-title" style={{ fontSize: 13, fontWeight: 700, color: '#f8fafc' }}>Training Providers</div>
-                    <div style={{ fontSize: 11, color: '#94a3b8' }}>Accreditation, cohort ROI & placement tracking</div>
+                    <div className="nav-dropdown-title" style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>Training Providers</div>
+                    <div className="nav-dropdown-desc" style={{ fontSize: 11, color: 'var(--text-muted)' }}>Accreditation, cohort ROI & placement tracking</div>
                   </div>
                 </Link>
                 <Link href="/for-employers" className="nav-dropdown-item">
@@ -95,8 +95,8 @@ export default function PublicNavbar() {
                     <Briefcase size={15} />
                   </div>
                   <div>
-                    <div className="nav-dropdown-title" style={{ fontSize: 13, fontWeight: 700, color: '#f8fafc' }}>Employer Intelligence</div>
-                    <div style={{ fontSize: 11, color: '#94a3b8' }}>Verified candidates with zero credential fraud</div>
+                    <div className="nav-dropdown-title" style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>Employer Intelligence</div>
+                    <div className="nav-dropdown-desc" style={{ fontSize: 11, color: 'var(--text-muted)' }}>Verified candidates with zero credential fraud</div>
                   </div>
                 </Link>
                 <Link href="/for-government" className="nav-dropdown-item">
@@ -104,8 +104,8 @@ export default function PublicNavbar() {
                     <Landmark size={15} />
                   </div>
                   <div>
-                    <div className="nav-dropdown-title" style={{ fontSize: 13, fontWeight: 700, color: '#f8fafc' }}>Government & Policy</div>
-                    <div style={{ fontSize: 11, color: '#94a3b8' }}>District skill heatmaps & policy analytics</div>
+                    <div className="nav-dropdown-title" style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>Government & Policy</div>
+                    <div className="nav-dropdown-desc" style={{ fontSize: 11, color: 'var(--text-muted)' }}>District skill heatmaps & policy analytics</div>
                   </div>
                 </Link>
               </div>
@@ -122,8 +122,8 @@ export default function PublicNavbar() {
                     <BarChart3 size={15} />
                   </div>
                   <div>
-                    <div className="nav-dropdown-title" style={{ fontSize: 13, fontWeight: 700, color: '#f8fafc' }}>Workforce Analytics</div>
-                    <div style={{ fontSize: 11, color: '#94a3b8' }}>Macro hiring trends & longitudinal retention</div>
+                    <div className="nav-dropdown-title" style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>Workforce Analytics</div>
+                    <div className="nav-dropdown-desc" style={{ fontSize: 11, color: 'var(--text-muted)' }}>Macro hiring trends & longitudinal retention</div>
                   </div>
                 </Link>
                 <Link href="/skill-passport" className="nav-dropdown-item">
@@ -131,8 +131,8 @@ export default function PublicNavbar() {
                     <FileCheck size={15} />
                   </div>
                   <div>
-                    <div className="nav-dropdown-title" style={{ fontSize: 13, fontWeight: 700, color: '#f8fafc' }}>Skill Passport</div>
-                    <div style={{ fontSize: 11, color: '#94a3b8' }}>W3C Verifiable Credentials & SHA-256 HMAC</div>
+                    <div className="nav-dropdown-title" style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>Skill Passport</div>
+                    <div className="nav-dropdown-desc" style={{ fontSize: 11, color: 'var(--text-muted)' }}>W3C Verifiable Credentials & SHA-256 HMAC</div>
                   </div>
                 </Link>
                 <Link href="/employer-verification" className="nav-dropdown-item">
@@ -140,8 +140,8 @@ export default function PublicNavbar() {
                     <ShieldCheck size={15} />
                   </div>
                   <div>
-                    <div className="nav-dropdown-title" style={{ fontSize: 13, fontWeight: 700, color: '#f8fafc' }}>Employer Verification</div>
-                    <div style={{ fontSize: 11, color: '#94a3b8' }}>Instant cryptographic credential verification</div>
+                    <div className="nav-dropdown-title" style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>Employer Verification</div>
+                    <div className="nav-dropdown-desc" style={{ fontSize: 11, color: 'var(--text-muted)' }}>Instant cryptographic credential verification</div>
                   </div>
                 </Link>
                 <Link href="/policy-intelligence" className="nav-dropdown-item">
@@ -149,8 +149,8 @@ export default function PublicNavbar() {
                     <Brain size={15} />
                   </div>
                   <div>
-                    <div className="nav-dropdown-title" style={{ fontSize: 13, fontWeight: 700, color: '#f8fafc' }}>Policy Intelligence</div>
-                    <div style={{ fontSize: 11, color: '#94a3b8' }}>District skilling heatmaps & voucher targeting</div>
+                    <div className="nav-dropdown-title" style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>Policy Intelligence</div>
+                    <div className="nav-dropdown-desc" style={{ fontSize: 11, color: 'var(--text-muted)' }}>District skilling heatmaps & voucher targeting</div>
                   </div>
                 </Link>
               </div>

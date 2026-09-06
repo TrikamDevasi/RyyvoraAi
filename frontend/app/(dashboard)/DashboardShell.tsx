@@ -303,6 +303,7 @@ export default function DashboardShell({ children }: { children: React.ReactNode
                             color: active ? 'var(--text-primary)' : 'var(--text-secondary)',
                             background: active ? 'var(--bg-surface-elevated)' : 'transparent',
                             border: active ? '1px solid var(--border-default)' : '1px solid transparent',
+                            borderLeft: active ? '3px solid var(--brand-gold)' : '3px solid transparent',
                             textDecoration: 'none',
                             transition: 'all 0.15s ease',
                           }}
@@ -531,6 +532,7 @@ export default function DashboardShell({ children }: { children: React.ReactNode
                       color: active ? 'var(--text-primary)' : 'var(--text-secondary)',
                       background: active ? 'var(--bg-surface-elevated)' : 'transparent',
                       border: active ? '1px solid var(--border-default)' : '1px solid transparent',
+                      borderBottom: active ? '2px solid var(--brand-gold)' : '2px solid transparent',
                       textDecoration: 'none',
                       whiteSpace: 'nowrap',
                       flexShrink: 0,

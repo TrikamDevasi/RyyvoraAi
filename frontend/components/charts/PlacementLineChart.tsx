@@ -12,13 +12,11 @@ import {
     Dot,
 } from 'recharts';
 import type { PlacementData } from '../../types/charts';
-import { CHART_THEMES } from '../../lib/chartColors';
+import { useChartTheme } from '../../lib/chartColors';
 
 interface Props {
     data: PlacementData[];
 }
-
-const theme = CHART_THEMES.dark;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const CustomTooltip = ({ active, payload, label }: any) => {
@@ -27,7 +25,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
         return (
             <div style={{
                 background: 'var(--bg-surface, #111827)',
-                border: '1px solid var(--border-default, rgba(255,255,255,0.10))',
+                border: '1px solid var(--border-strong, rgba(255,255,255,0.12))',
                 borderRadius: '8px',
                 padding: '12px 14px',
                 boxShadow: 'var(--shadow-md)',
@@ -69,24 +67,26 @@ const CustomTooltip = ({ active, payload, label }: any) => {
     return null;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const GoldDot = (props: any) => {
-    const { cx, cy } = props;
-    return <Dot cx={cx} cy={cy} r={3.5} fill={theme.series.primary} stroke={theme.tooltip.background} strokeWidth={2} />;
-};
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const GoldActiveDot = (props: any) => {
-    const { cx, cy } = props;
-    return (
-        <g>
-            <circle cx={cx} cy={cy} r={6} fill={theme.series.primary} />
-            <circle cx={cx} cy={cy} r={2.5} fill="#FFFFFF" />
-        </g>
-    );
-};
-
 export default function PlacementLineChart({ data }: Props) {
+    const theme = useChartTheme();
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const GoldDot = (props: any) => {
+        const { cx, cy } = props;
+        return <Dot cx={cx} cy={cy} r={3.5} fill={theme.series.primary} stroke={theme.tooltip.background} strokeWidth={2} />;
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const GoldActiveDot = (props: any) => {
+        const { cx, cy } = props;
+        return (
+            <g>
+                <circle cx={cx} cy={cy} r={6} fill={theme.series.primary} />
+                <circle cx={cx} cy={cy} r={2.5} fill="#FFFFFF" />
+            </g>
+        );
+    };
+
     return (
         <div style={{ width: '100%', height: 300 }}>
             <ResponsiveContainer width="100%" height="100%">

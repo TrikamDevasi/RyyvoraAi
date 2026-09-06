@@ -153,10 +153,10 @@ const DEFAULT_ALLOCATIONS: AllocationItem[] = [
 ];
 
 const PRIORITY_BADGES: Record<string, { bg: string; color: string }> = {
-  CRITICAL: { bg: 'rgba(239,68,68,0.12)', color: '#ef4444' },
-  HIGH: { bg: 'rgba(245,158,11,0.12)', color: '#f59e0b' },
-  MEDIUM: { bg: 'rgba(96,165,250,0.12)', color: '#60a5fa' },
-  OPTIMIZED: { bg: 'rgba(16,185,129,0.12)', color: '#10b981' },
+  CRITICAL: { bg: 'rgba(239,68,68,0.12)', color: 'var(--error, #ef4444)' },
+  HIGH: { bg: 'var(--gold-muted, rgba(245,158,11,0.12))', color: 'var(--brand-gold, #f59e0b)' },
+  MEDIUM: { bg: 'var(--info-surface, rgba(37,99,235,0.12))', color: 'var(--info, #2563eb)' },
+  OPTIMIZED: { bg: 'rgba(16,185,129,0.12)', color: 'var(--success, #10b981)' },
 };
 
 export default function FundTargetingPage() {
@@ -240,7 +240,7 @@ export default function FundTargetingPage() {
               <AIBadge type="nsqf" label="STATE SKILLING BUDGET COCKPIT" />
               <AIBadge type="verified" label="NEURAL ROI OPTIMIZER" />
             </div>
-            <h1 className="font-display" style={{ fontSize: 26, fontWeight: 800, color: '#f8fafc', margin: 0 }}>
+            <h1 className="font-display" style={{ fontSize: 26, fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
               State Skilling Fund <span style={{ color: 'var(--gold)' }}>Targeting & Allocation</span>
             </h1>
             <p style={{ color: 'var(--text-secondary)', fontSize: 13.5, marginTop: 4, maxWidth: 680 }}>
@@ -275,7 +275,7 @@ export default function FundTargetingPage() {
                   <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
                     {stat.label}
                   </span>
-                  <div style={{ padding: 6, borderRadius: 6, background: 'rgba(255,255,255,0.04)', color: stat.color }}>
+                  <div style={{ padding: 6, borderRadius: 6, background: 'var(--bg-surface-elevated)', color: stat.color }}>
                     <Icon size={16} />
                   </div>
                 </div>
@@ -294,7 +294,7 @@ export default function FundTargetingPage() {
         <div className="card-linear" style={{ padding: 24, borderRadius: 16, marginBottom: 24 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 12 }}>
             <div>
-              <h2 className="font-display" style={{ fontSize: 16, fontWeight: 800, color: '#f8fafc', margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
+              <h2 className="font-display" style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-primary)', margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
                 <Sliders size={17} color="var(--gold)" /> Neural Budget Optimization Simulator
               </h2>
               <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '2px 0 0' }}>
@@ -350,7 +350,7 @@ export default function FundTargetingPage() {
         <div className="card-linear" style={{ padding: 24, borderRadius: 16 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18, flexWrap: 'wrap', gap: 12 }}>
             <div>
-              <h3 className="font-display" style={{ fontSize: 16, fontWeight: 800, color: '#f8fafc', margin: 0 }}>
+              <h3 className="font-display" style={{ fontSize: 16, fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
                 District Skilling Subsidy Allocations
               </h3>
               <p style={{ fontSize: 12, color: 'var(--text-muted)', margin: '2px 0 0' }}>
@@ -371,7 +371,7 @@ export default function FundTargetingPage() {
                   borderRadius: 8,
                   background: 'var(--bg-input, #0f111a)',
                   border: '1px solid var(--border)',
-                  color: '#fff',
+                  color: 'var(--text-primary)',
                   fontSize: 12.5,
                 }}
               />
@@ -400,23 +400,23 @@ export default function FundTargetingPage() {
                   return (
                     <tr
                       key={item.id}
-                      style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}
-                      className="hover:bg-white/5"
+                      style={{ borderBottom: '1px solid var(--border)' }}
+                      className="hover:bg-black/5 dark:hover:bg-white/5"
                     >
                       <td style={{ padding: '12px' }}>
-                        <div style={{ fontWeight: 700, color: '#f8fafc' }}>{item.district}</div>
+                        <div style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{item.district}</div>
                         <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{item.division}</div>
                       </td>
                       <td style={{ padding: '12px', color: 'var(--text-secondary)' }}>
                         {item.beneficiaries.toLocaleString('en-IN')}
                       </td>
-                      <td style={{ padding: '12px', fontWeight: 700, color: item.gapScore >= 75 ? '#ef4444' : 'var(--gold)' }}>
+                      <td style={{ padding: '12px', fontWeight: 700, color: item.gapScore >= 75 ? 'var(--error, #ef4444)' : 'var(--gold)' }}>
                         {item.gapScore}/100
                       </td>
-                      <td style={{ padding: '12px', color: '#cbd5e1' }}>
+                      <td style={{ padding: '12px', color: 'var(--text-secondary)' }}>
                         ₹{item.recommendedFundingCr} Cr
                       </td>
-                      <td style={{ padding: '12px', fontWeight: 800, color: '#10b981' }}>
+                      <td style={{ padding: '12px', fontWeight: 800, color: 'var(--success, #10b981)' }}>
                         ₹{item.approvedFundingCr} Cr
                       </td>
                       <td style={{ padding: '12px', color: 'var(--gold)', fontWeight: 700 }}>

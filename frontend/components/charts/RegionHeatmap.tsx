@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react';
 import type { RegionData } from '../../types/charts';
-import { getScoreTierColor } from '../../lib/chartColors';
+import { useChartTheme, getScoreTierColor } from '../../lib/chartColors';
+import { useThemeStore } from '../../store/themeStore';
 
 interface RegionHeatmapProps {
     data: RegionData[];
@@ -43,6 +44,8 @@ const STATE_POSITIONS: Record<string, { x: number; y: number }> = {
 
 export default function RegionHeatmap({ data }: RegionHeatmapProps) {
     const [tooltip, setTooltip] = useState<RegionData | null>(null);
+    const theme = useChartTheme();
+    const isDark = useThemeStore((s) => s.theme) !== 'light';
 
     return (
         <div style={{ width: '100%' }}>
@@ -52,9 +55,9 @@ export default function RegionHeatmap({ data }: RegionHeatmapProps) {
                     position: 'relative',
                     width: '100%',
                     paddingBottom: '90%',
-                    background: 'var(--bg-surface-elevated, #1A2234)',
+                    background: 'var(--bg-surface-elevated, #F1F5F9)',
                     borderRadius: 10,
-                    border: '1px solid var(--border-default, rgba(255,255,255,0.10))',
+                    border: '1px solid var(--border-default, #E2E8F0)',
                     overflow: 'hidden',
                 }}
             >
@@ -72,15 +75,15 @@ export default function RegionHeatmap({ data }: RegionHeatmapProps) {
                         <path
                             d="M30,10 Q45,5 65,10 Q85,20 88,35 Q82,55 70,70 Q55,85 40,80 Q25,78 20,65 Q12,50 18,35 Q22,20 30,10Z"
                             fill="none"
-                            stroke="var(--border-subtle, rgba(255,255,255,0.06))"
-                            strokeWidth="0.6"
+                            stroke={isDark ? "rgba(255,255,255,0.08)" : "rgba(15,23,42,0.12)"}
+                            strokeWidth="0.8"
                         />
 
                         {/* State dots */}
                         {data.map((region) => {
                             const pos = STATE_POSITIONS[region.state];
                             if (!pos) return null;
-                            const tierColor = getScoreTierColor(region.skillScore, true);
+                            const tierColor = getScoreTierColor(region.skillScore, isDark);
                             return (
                                 <g key={region.state}>
                                     <circle
@@ -88,8 +91,8 @@ export default function RegionHeatmap({ data }: RegionHeatmapProps) {
                                         cy={pos.y}
                                         r={3.2}
                                         fill={tierColor}
-                                        stroke="rgba(0,0,0,0.5)"
-                                        strokeWidth={0.5}
+                                        stroke={isDark ? "rgba(0,0,0,0.5)" : "#FFFFFF"}
+                                        strokeWidth={0.8}
                                         style={{ cursor: 'pointer', transition: 'transform 0.15s ease' }}
                                         onMouseEnter={() => setTooltip(region)}
                                         onMouseLeave={() => setTooltip(null)}
@@ -98,10 +101,10 @@ export default function RegionHeatmap({ data }: RegionHeatmapProps) {
                                         x={pos.x}
                                         y={pos.y + 5.2}
                                         textAnchor="middle"
-                                        fill="var(--text-muted, #94A3B8)"
+                                        fill={theme.axis.tick}
                                         fontSize="2.1"
                                         pointerEvents="none"
-                                        style={{ fontFamily: 'inherit', fontWeight: 500 }}
+                                        style={{ fontFamily: 'inherit', fontWeight: 600 }}
                                     >
                                         {region.state.split(' ')[0].slice(0, 6)}
                                     </text>
@@ -117,8 +120,8 @@ export default function RegionHeatmap({ data }: RegionHeatmapProps) {
                                 position: 'absolute',
                                 bottom: 16,
                                 left: 16,
-                                background: 'var(--bg-surface, #111827)',
-                                border: '1px solid var(--border-default, rgba(255,255,255,0.10))',
+                                background: 'var(--bg-surface, #FFFFFF)',
+                                border: '1px solid var(--border-strong, #CBD5E1)',
                                 borderRadius: '8px',
                                 padding: '12px 14px',
                                 boxShadow: 'var(--shadow-md)',
@@ -127,26 +130,26 @@ export default function RegionHeatmap({ data }: RegionHeatmapProps) {
                                 pointerEvents: 'none',
                             }}
                         >
-                            <p style={{ color: 'var(--brand-gold, #F59E0B)', fontWeight: 700, fontSize: '13.5px', marginBottom: '8px' }}>
+                            <p style={{ color: 'var(--brand-gold, #D97706)', fontWeight: 700, fontSize: '13.5px', marginBottom: '8px' }}>
                                 {tooltip.state}
                             </p>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                <p style={{ color: 'var(--text-primary, #F8FAFC)', fontSize: '12.5px', margin: 0 }}>
-                                    Skill Score: <span style={{ color: getScoreTierColor(tooltip.skillScore, true), fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{tooltip.skillScore}%</span>
+                                <p style={{ color: 'var(--text-primary, #0F172A)', fontSize: '12.5px', margin: 0 }}>
+                                    Skill Score: <span style={{ color: getScoreTierColor(tooltip.skillScore, isDark), fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{tooltip.skillScore}%</span>
                                 </p>
-                                <p style={{ color: 'var(--text-primary, #F8FAFC)', fontSize: '12.5px', margin: 0 }}>
-                                    Placement Rate: <span style={{ color: 'var(--text-primary, #F8FAFC)', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>{tooltip.placementRate}%</span>
+                                <p style={{ color: 'var(--text-primary, #0F172A)', fontSize: '12.5px', margin: 0 }}>
+                                    Placement Rate: <span style={{ color: 'var(--text-primary, #0F172A)', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>{tooltip.placementRate}%</span>
                                 </p>
-                                <p style={{ color: 'var(--text-primary, #F8FAFC)', fontSize: '12.5px', margin: 0 }}>
-                                    Candidates: <span style={{ color: 'var(--text-primary, #F8FAFC)', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>{tooltip.studentCount.toLocaleString('en-IN')}</span>
+                                <p style={{ color: 'var(--text-primary, #0F172A)', fontSize: '12.5px', margin: 0 }}>
+                                    Candidates: <span style={{ color: 'var(--text-primary, #0F172A)', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>{tooltip.studentCount.toLocaleString('en-IN')}</span>
                                 </p>
                                 {tooltip.criticalGaps.length > 0 && (
                                     <p style={{ 
-                                        color: 'var(--error, #EF4444)', 
+                                        color: 'var(--error, #B91C1C)', 
                                         fontSize: '11.5px', 
                                         marginTop: '6px',
                                         paddingTop: '6px',
-                                        borderTop: '1px solid var(--border-subtle, rgba(255,255,255,0.06))',
+                                        borderTop: '1px solid var(--border-subtle, #F1F5F9)',
                                         fontWeight: 600 
                                     }}>
                                         Deficit: {tooltip.criticalGaps.join(', ')}
@@ -161,11 +164,11 @@ export default function RegionHeatmap({ data }: RegionHeatmapProps) {
             {/* Strict 5-Tier Color Legend */}
             <div style={{ display: 'flex', gap: 14, marginTop: 12, flexWrap: 'wrap', alignItems: 'center' }}>
                 {[
-                    { label: '≥85% Surplus', color: '#10B981' },
-                    { label: '75–84% Strong', color: '#06B6D4' },
-                    { label: '65–74% Equilibrium', color: '#F59E0B' },
-                    { label: '50–64% Deficit', color: '#F97316' },
-                    { label: '<50% Critical', color: '#EF4444' },
+                    { label: '≥85% Surplus', color: theme.tiers.surplus },
+                    { label: '75–84% Strong', color: theme.tiers.strong },
+                    { label: '65–74% Equilibrium', color: theme.tiers.equilibrium },
+                    { label: '50–64% Deficit', color: theme.tiers.deficit },
+                    { label: '<50% Critical', color: theme.tiers.critical },
                 ].map((item) => (
                     <div key={item.label} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                         <span
@@ -176,7 +179,7 @@ export default function RegionHeatmap({ data }: RegionHeatmapProps) {
                                 background: item.color,
                             }}
                         />
-                        <span style={{ color: 'var(--text-secondary, #94A3B8)', fontSize: 11, fontWeight: 500 }}>{item.label}</span>
+                        <span style={{ color: 'var(--text-secondary, #64748B)', fontSize: 11, fontWeight: 500 }}>{item.label}</span>
                     </div>
                 ))}
             </div>

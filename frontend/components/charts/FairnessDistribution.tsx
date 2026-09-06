@@ -12,13 +12,11 @@ import {
     ReferenceLine,
 } from 'recharts';
 import type { FairnessMetrics } from '../../types/charts';
-import { CHART_THEMES } from '../../lib/chartColors';
+import { useChartTheme } from '../../lib/chartColors';
 
 interface Props {
     data: FairnessMetrics;
 }
-
-const theme = CHART_THEMES.dark;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const CustomTooltip = ({ active, payload, label }: any) => {
@@ -27,21 +25,21 @@ const CustomTooltip = ({ active, payload, label }: any) => {
         return (
             <div style={{
                 background: 'var(--bg-surface, #111827)',
-                border: '1px solid var(--border-default, rgba(255,255,255,0.10))',
+                border: '1px solid var(--border-strong, rgba(255,255,255,0.12))',
                 borderRadius: '8px',
                 padding: '10px 14px',
                 boxShadow: 'var(--shadow-md)',
                 minWidth: '180px'
             }}>
                 <p style={{
-                    color: 'var(--brand-gold, #F59E0B)',
+                    color: 'var(--brand-gold, #D97706)',
                     fontWeight: 700,
                     fontSize: '12.5px',
                     marginBottom: '6px'
                 }}>{label}</p>
                 {payload.map((p: any, i: number) => (
                     <p key={i} style={{
-                        color: 'var(--text-primary, #F8FAFC)',
+                        color: 'var(--text-primary, #0F172A)',
                         fontSize: '12px',
                         margin: '2px 0'
                     }}>
@@ -50,7 +48,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
                 ))}
                 {payload.length === 2 && (
                     <p style={{
-                        color: gap > 10 ? 'var(--error, #EF4444)' : gap > 5 ? 'var(--warning, #EAB308)' : 'var(--success, #10B981)',
+                        color: gap > 10 ? 'var(--error, #B91C1C)' : gap > 5 ? 'var(--warning, #B45309)' : 'var(--success, #047857)',
                         fontSize: 11.5,
                         marginTop: 8,
                         borderTop: '1px solid var(--border-subtle, rgba(255,255,255,0.06))',
@@ -68,6 +66,8 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 export default function FairnessDistribution({ data }: Props) {
+    const theme = useChartTheme();
+
     const chartData = [
         { category: 'Male', score: data.genderGap.male, group: 'Gender' },
         { category: 'Female', score: data.genderGap.female, group: 'Gender' },

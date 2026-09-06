@@ -40,6 +40,7 @@ import { MetricStrip } from '@/components/dashboard/KPICard';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { AnalyticsPanel } from '@/components/ui/AnalyticsPanel';
 import { InsightPanel } from '@/components/ui/InsightPanel';
+import { useChartTheme } from '@/lib/chartColors';
 import toast from 'react-hot-toast';
 
 const ResponsiveContainer = dynamic(
@@ -152,6 +153,7 @@ const JOB_REQUISITIONS = [
 ];
 
 export default function EmployerPage() {
+  const chartTheme = useChartTheme();
   const [candidates, setCandidates] = useState<Candidate[]>(PRE_SCREENED_CANDIDATES);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTrack, setSelectedTrack] = useState('ALL');
@@ -757,19 +759,19 @@ export default function EmployerPage() {
           <div style={{ height: 260, width: '100%' }}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-                <XAxis dataKey="month" stroke="#64748b" tick={{ fontSize: 11 }} />
-                <YAxis stroke="#64748b" tick={{ fontSize: 11 }} />
+                <CartesianGrid strokeDasharray="3 3" stroke={chartTheme.grid.stroke} />
+                <XAxis dataKey="month" stroke={chartTheme.axis.tick} tick={{ fontSize: 11 }} />
+                <YAxis stroke={chartTheme.axis.tick} tick={{ fontSize: 11 }} />
                 <Tooltip
                   contentStyle={{
-                    background: '#0f111a',
-                    border: '1px solid rgba(245,158,11,0.3)',
+                    background: chartTheme.tooltip.background,
+                    border: `1px solid ${chartTheme.tooltip.border}`,
                     borderRadius: 6,
                     fontSize: 12,
-                    color: '#fff',
+                    color: chartTheme.tooltip.text,
                   }}
                 />
-                <Bar dataKey="hires" fill="var(--gold)" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="hires" fill={chartTheme.series.primary} radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>

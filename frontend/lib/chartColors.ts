@@ -1,3 +1,5 @@
+import { useThemeStore } from '../store/themeStore';
+
 /**
  * Centralized Chart Color Architecture for Ryyvora AI
  * Sovereign Institutional Government + Enterprise Analytics Design System
@@ -10,7 +12,7 @@ export interface ChartThemeConfig {
     primary: string;      // #F59E0B / #D97706 - Brand / Primary metric
     benchmark: string;    // #3B82F6 / #2563EB - Comparative benchmark / Institutional Navy-Blue
     telemetry: string;    // #06B6D4 / #0E7490 - AI forecast / Telemetry projection
-    baseline: string;     // #94A3B8 / #64748B - Neutral baseline / Reference line
+    baseline: string;     // #64748B / #64748B - Neutral baseline / Reference line
     positive: string;     // #10B981 / #047857 - Verified positive / Placement success
     warning: string;      // #EAB308 / #B45309 - Attention required
     critical: string;     // #EF4444 / #B91C1C - Severe deficit / Critical gap
@@ -76,7 +78,7 @@ export const CHART_THEMES: { dark: ChartThemeConfig; light: ChartThemeConfig } =
       primary: '#D97706',
       benchmark: '#2563EB',
       telemetry: '#0E7490',
-      baseline: '#94A3B8',
+      baseline: '#64748B',
       positive: '#047857',
       warning: '#B45309',
       critical: '#B91C1C',
@@ -93,7 +95,7 @@ export const CHART_THEMES: { dark: ChartThemeConfig; light: ChartThemeConfig } =
       strokeDasharray: '3 3',
     },
     axis: {
-      tick: '#64748B',
+      tick: '#475569',
       label: '#334155',
     },
     tooltip: {
@@ -110,6 +112,14 @@ export const CHART_THEMES: { dark: ChartThemeConfig; light: ChartThemeConfig } =
  */
 export function getChartTheme(isDark = true): ChartThemeConfig {
   return isDark ? CHART_THEMES.dark : CHART_THEMES.light;
+}
+
+/**
+ * Reactive hook that provides the current chart theme based on theme store.
+ */
+export function useChartTheme(): ChartThemeConfig {
+  const theme = useThemeStore((s) => s.theme);
+  return theme === 'light' ? CHART_THEMES.light : CHART_THEMES.dark;
 }
 
 /**

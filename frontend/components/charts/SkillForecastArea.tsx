@@ -12,14 +12,12 @@ import {
     ReferenceLine,
 } from 'recharts';
 import type { ForecastEntry } from '../../types/charts';
-import { CHART_THEMES } from '../../lib/chartColors';
+import { useChartTheme } from '../../lib/chartColors';
 
 interface Props {
     data: ForecastEntry[];
     currentMonthIndex?: number; // index where forecast starts
 }
-
-const theme = CHART_THEMES.dark;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const CustomTooltip = ({ active, payload, label }: any) => {
@@ -27,24 +25,24 @@ const CustomTooltip = ({ active, payload, label }: any) => {
         return (
             <div style={{
                 background: 'var(--bg-surface, #111827)',
-                border: '1px solid var(--border-default, rgba(255,255,255,0.10))',
+                border: '1px solid var(--border-strong, rgba(255,255,255,0.12))',
                 borderRadius: '8px',
                 padding: '10px 14px',
                 boxShadow: 'var(--shadow-md)',
                 minWidth: '160px'
             }}>
                 <p style={{
-                    color: 'var(--brand-gold, #F59E0B)',
+                    color: 'var(--brand-gold, #D97706)',
                     fontWeight: 700,
                     fontSize: '13px',
                     marginBottom: '6px'
                 }}>{label}</p>
                 {payload.map((p: any, i: number) => {
                     const isActual = p.name === 'actual';
-                    const color = isActual ? 'var(--brand-gold, #F59E0B)' : 'var(--info, #06B6D4)';
+                    const color = isActual ? 'var(--brand-gold, #D97706)' : 'var(--info, #0E7490)';
                     return (
                         <p key={i} style={{
-                            color: 'var(--text-primary, #F8FAFC)',
+                            color: 'var(--text-primary, #0F172A)',
                             fontSize: '12.5px',
                             margin: '3px 0'
                         }}>
@@ -59,6 +57,8 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 export default function SkillForecastArea({ data, currentMonthIndex }: Props) {
+    const theme = useChartTheme();
+
     // Determine split index — first entry with only forecast (no actual)
     const splitIdx =
         currentMonthIndex ??

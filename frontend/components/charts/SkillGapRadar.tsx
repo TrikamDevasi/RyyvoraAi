@@ -12,13 +12,11 @@ import {
   Legend,
 } from 'recharts';
 import type { SkillGapAnalysis } from '../../types/charts';
-import { CHART_THEMES } from '../../lib/chartColors';
+import { useChartTheme } from '../../lib/chartColors';
 
 interface Props {
   data: SkillGapAnalysis[];
 }
-
-const theme = CHART_THEMES.dark;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const CustomTooltip = ({ active, payload, label }: any) => {
@@ -27,7 +25,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
       <div
         style={{
           background: 'var(--bg-surface, #111827)',
-          border: '1px solid var(--border-default, rgba(255,255,255,0.10))',
+          border: '1px solid var(--border-strong, rgba(255,255,255,0.12))',
           borderRadius: 8,
           padding: '10px 14px',
           boxShadow: 'var(--shadow-md)',
@@ -36,7 +34,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
       >
         <p
           style={{
-            color: 'var(--brand-gold, #F59E0B)',
+            color: 'var(--brand-gold, #D97706)',
             fontWeight: 700,
             fontSize: 12.5,
             marginBottom: 6,
@@ -48,7 +46,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
           <p
             key={i}
             style={{
-              color: entry.name === 'My Level' ? 'var(--brand-gold, #F59E0B)' : 'var(--brand-navy-light, #3B82F6)',
+              color: entry.name === 'My Level' ? 'var(--brand-gold, #D97706)' : 'var(--brand-navy-light, #2563EB)',
               margin: '2px 0',
               fontSize: 12,
               fontWeight: 500,
@@ -64,6 +62,8 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 export default function SkillGapRadar({ data }: Props) {
+  const theme = useChartTheme();
+
   if (!data || data.length === 0) {
     return (
       <div
@@ -102,20 +102,20 @@ export default function SkillGapRadar({ data }: Props) {
     <div style={{ width: '100%', height: 320, minHeight: 280, position: 'relative' }}>
       <ResponsiveContainer width="100%" height="100%">
         <RadarChart data={formattedData} margin={{ top: 10, right: 20, bottom: 10, left: 20 }}>
-          <PolarGrid stroke="var(--border-subtle, rgba(255,255,255,0.06))" />
+          <PolarGrid stroke={theme.grid.stroke} />
           <PolarAngleAxis
             dataKey="shortSkill"
-            tick={{ fill: 'var(--text-secondary, #94A3B8)', fontSize: 11, fontWeight: 600 }}
+            tick={{ fill: theme.axis.label, fontSize: 11, fontWeight: 600 }}
           />
           <PolarRadiusAxis
             angle={90}
             domain={[0, 100]}
-            tick={{ fill: 'var(--text-muted, #64748B)', fontSize: 9.5 }}
+            tick={{ fill: theme.axis.tick, fontSize: 9.5 }}
             axisLine={false}
           />
           <Tooltip content={<CustomTooltip />} />
           <Legend
-            wrapperStyle={{ fontSize: 12, paddingTop: 8, color: 'var(--text-secondary, #94A3B8)' }}
+            wrapperStyle={{ fontSize: 12, paddingTop: 8, color: theme.axis.label }}
             iconType="circle"
           />
           <Radar
