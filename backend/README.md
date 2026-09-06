@@ -1,6 +1,6 @@
-# ⚙️ SkillSense AI — Microservices Backend
+# ⚙️ Ryyvora AI — Microservices Backend
 
-Express + TypeScript RESTful microservices backend powering **SkillSense AI**, the verifiable longitudinal skilling and outcome intelligence platform.
+Express + TypeScript RESTful microservices backend powering **Ryyvora AI**, the verifiable longitudinal skilling and outcome intelligence platform.
 
 [![Node.js](https://img.shields.io/badge/Node.js-20+-43853D?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
 [![Express](https://img.shields.io/badge/Express-5.x-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)

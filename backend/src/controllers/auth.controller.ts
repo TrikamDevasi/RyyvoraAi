@@ -22,22 +22,20 @@ const loginSchema = z.object({
 });
 
 // Helper to set auth cookies (token + role for Edge proxy & frontend state)
+// Sets both ryyvora_* and legacy skillsense_* cookies for zero-downtime dual-brand compatibility
 const setAuthCookie = (res: Response, token: string, role?: string) => {
-  res.cookie('skillsense_token', token, {
+  const cookieOpts = {
     httpOnly: false,
     secure: env.NODE_ENV === 'production',
-    sameSite: 'lax',
+    sameSite: 'lax' as const,
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     path: '/',
-  });
+  };
+  res.cookie('ryyvora_token', token, cookieOpts);
+  res.cookie('skillsense_token', token, cookieOpts);
   if (role) {
-    res.cookie('skillsense_role', role, {
-      httpOnly: false,
-      secure: env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-      path: '/',
-    });
+    res.cookie('ryyvora_role', role, cookieOpts);
+    res.cookie('skillsense_role', role, cookieOpts);
   }
 };
 
@@ -311,6 +309,8 @@ export const refreshTokens = async (req: Request, res: Response) => {
 };
 
 export const logout = async (req: Request, res: Response) => {
+  res.clearCookie('ryyvora_token', { path: '/' });
+  res.clearCookie('ryyvora_role', { path: '/' });
   res.clearCookie('skillsense_token', { path: '/' });
   res.clearCookie('skillsense_role', { path: '/' });
   res.status(200).json({ success: true, message: 'Logged out successfully' });

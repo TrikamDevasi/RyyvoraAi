@@ -1,5 +1,5 @@
 /**
- * SkillSense AI — SaaS Plan Definitions (Server-Side Source of Truth)
+ * Ryyvora AI — SaaS Plan Definitions (Server-Side Source of Truth)
  *
  * IMPORTANT: This is the ONLY authoritative source for plan prices and limits.
  * The frontend NEVER dictates a price. The backend always reads from here.
@@ -61,7 +61,7 @@ export const PLANS: Record<PlanId, PlanDefinition> = {
   free: {
     id: 'free',
     name: 'Free',
-    description: 'For individuals evaluating SkillSense AI.',
+    description: 'For individuals evaluating Ryyvora AI.',
     pricing: {
       monthly: 0,
       yearly: 0,

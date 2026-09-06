@@ -101,7 +101,7 @@ export const chat = async (req: Request, res: Response): Promise<void> => {
   }
 
   // Load student profile context if user is logged in
-  let studentContext = context || 'Student on SkillSense AI platform';
+  let studentContext = context || 'Student on Ryyvora AI platform';
   if (userId !== 'anon') {
     try {
       const student = await Student.findOne({ userId }).populate('skills.skillId', 'name');

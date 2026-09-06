@@ -1,6 +1,6 @@
 // backend/src/data/branches.data.ts
 /**
- * SkillSense AI — Centralized Branch Registry & Real Branch-Specific Data
+ * Ryyvora AI — Centralized Branch Registry & Real Branch-Specific Data
  * Covers all engineering & academic disciplines with authentic real-world data:
  * - Real core subjects & modules
  * - NSQF-aligned industry skills & demand scores

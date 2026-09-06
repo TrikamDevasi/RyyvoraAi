@@ -323,7 +323,7 @@ export const verifyPublicPassport = async (req: Request, res: Response, next: Ne
             name: student.userId?.name || 'Verified Student',
             enrollmentNumber: student.enrollmentNumber || `SKP-${student._id.toString().slice(-6).toUpperCase()}`,
             program: student.program || 'Vocational Engineering',
-            institution: 'SkillSense National Training Institute',
+            institution: 'Ryyvora National Training Institute',
             state: student.state || 'Karnataka',
             nsqfLevel: student.nsqfLevel || 4,
             overallScore: student.overallScore || 78,

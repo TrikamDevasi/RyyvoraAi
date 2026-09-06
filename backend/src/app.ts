@@ -64,6 +64,9 @@ const allowedOrigins = [
   'http://127.0.0.1:3000',
   'http://127.0.0.1:3001',
   'http://127.0.0.1:5173',
+  'https://ryyvora.com',
+  'https://www.ryyvora.com',
+  'https://ryyvora-ai.vercel.app',
   'https://skillsense-ai.vercel.app',
   'https://skillsense.vercel.app',
   ...env.CORS_ORIGIN.split(',').map(o => o.trim()),
@@ -116,7 +119,7 @@ app.use(generalLimiter);
 
 // ── Root Route ──────────────────────────────────────────────────────────────
 app.get('/', (_req, res) => {
-  res.status(200).json({ success: true, message: 'SkillSense Backend API is running.' });
+  res.status(200).json({ success: true, message: 'Ryyvora AI Backend API is running.' });
 });
 
 // ── Health Check ───────────────────────────────────────────────────────────

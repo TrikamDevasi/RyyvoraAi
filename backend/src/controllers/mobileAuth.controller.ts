@@ -18,22 +18,20 @@ import logger from '../utils/logger';
 const REGISTRATION_TOKEN_SECRET = env.JWT_SECRET || 'skillsense_mobile_reg_secret_2026';
 
 // Helper to set auth cookies (same as auth.controller.ts)
+// Sets both ryyvora_* and legacy skillsense_* cookies for zero-downtime dual-brand compatibility
 const setAuthCookie = (res: Response, token: string, role?: string) => {
-  res.cookie('skillsense_token', token, {
+  const cookieOpts = {
     httpOnly: false,
     secure: env.NODE_ENV === 'production',
-    sameSite: 'lax',
+    sameSite: 'lax' as const,
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     path: '/',
-  });
+  };
+  res.cookie('ryyvora_token', token, cookieOpts);
+  res.cookie('skillsense_token', token, cookieOpts);
   if (role) {
-    res.cookie('skillsense_role', role, {
-      httpOnly: false,
-      secure: env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-      path: '/',
-    });
+    res.cookie('ryyvora_role', role, cookieOpts);
+    res.cookie('skillsense_role', role, cookieOpts);
   }
 };
 
