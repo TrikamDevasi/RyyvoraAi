@@ -305,18 +305,18 @@ export default function EmployerPage() {
           title="Employer Hiring & Talent Validation Cockpit"
           description="Direct access to pre-screened technical graduates backed by cryptographic SHA-256 Skill Passports, live GitHub diagnostic audits, and 80% reduced time-to-hire."
           actions={
-            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', width: '100%' }}>
               <Link
                 href="/employer/validations"
                 className="btn-secondary"
-                style={{ fontSize: 13, padding: '8px 16px', display: 'flex', alignItems: 'center', gap: 6 }}
+                style={{ fontSize: 13, padding: '8px 16px', display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'center' }}
               >
                 <ShieldCheck size={14} /> Verification Queue
               </Link>
               <Link
                 href="/employer/placements"
                 className="btn-gold"
-                style={{ fontSize: 13, padding: '8px 16px', display: 'flex', alignItems: 'center', gap: 6 }}
+                style={{ fontSize: 13, padding: '8px 16px', display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'center' }}
               >
                 <Briefcase size={14} /> Post Placement Drive
               </Link>
@@ -461,7 +461,7 @@ export default function EmployerPage() {
               placeholder="Enter candidate verification hash (e.g. 0x9e7a...4b12)"
               style={{
                 flex: 1,
-                minWidth: 280,
+                minWidth: 'min(100%, 260px)',
                 padding: '10px 14px',
                 borderRadius: 8,
                 background: 'var(--bg-input, #0f111a)',

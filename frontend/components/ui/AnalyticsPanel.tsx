@@ -53,7 +53,7 @@ export function AnalyticsPanel({
             gap: 10,
           }}
         >
-          <div>
+          <div style={{ minWidth: 0, flex: '1 1 auto' }}>
             {eyebrow && (
               <div
                 style={{
@@ -68,7 +68,7 @@ export function AnalyticsPanel({
                 {eyebrow}
               </div>
             )}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
               {typeof title === 'string' ? (
                 <h3
                   className="font-display"
@@ -101,7 +101,7 @@ export function AnalyticsPanel({
             )}
           </div>
 
-          {action && <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>{action}</div>}
+          {action && <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>{action}</div>}
         </div>
       )}
 

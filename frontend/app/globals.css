@@ -1250,6 +1250,88 @@ tbody tr {
   .lg\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
 }
 
+/* ── Section Header Responsive Architecture ── */
+.section-header {
+  width: 100%;
+}
+
+.section-header-main {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 14px !important;
+  width: 100% !important;
+}
+
+@media (min-width: 640px) {
+  .section-header-main {
+    flex-direction: row !important;
+    align-items: flex-start !important;
+    justify-content: space-between !important;
+    gap: 16px !important;
+  }
+}
+
+.section-header-content {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  width: 100% !important;
+}
+
+.section-header-title-row {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  flex-wrap: wrap !important;
+  margin-bottom: 6px !important;
+}
+
+.section-header-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  flex-shrink: 0 !important;
+}
+
+.section-header-actions {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  flex-wrap: wrap !important;
+  width: 100% !important;
+}
+
+@media (min-width: 640px) {
+  .section-header-actions {
+    width: auto !important;
+    flex-shrink: 0 !important;
+    justify-content: flex-end !important;
+  }
+}
+
+@media (max-width: 639px) {
+  .section-header-actions {
+    margin-top: 2px;
+  }
+  .section-header-actions > * {
+    width: 100% !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+  .section-header-actions .btn-secondary,
+  .section-header-actions .btn-gold,
+  .section-header-actions .btn-primary,
+  .section-header-actions .btn-outline,
+  .section-header-actions button,
+  .section-header-actions a {
+    flex: 1 1 140px !important;
+    min-width: 130px !important;
+    justify-content: center !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+  }
+}
+
 /* ── Employer Page Mobile Fixes & Mobile Content Offset ── */
 .dashboard-main-content {
   padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px)) !important;

@@ -79,16 +79,33 @@ export function SectionHeader({
 
       {/* Main Title & Action Row */}
       <div
+        className="section-header-main"
         style={{
           display: 'flex',
           alignItems: 'flex-start',
           justifyContent: 'space-between',
           flexWrap: 'wrap',
-          gap: 12,
+          gap: 14,
         }}
       >
-        <div style={{ minWidth: 0, flex: 1 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 4 }}>
+        <div
+          className="section-header-content"
+          style={{
+            minWidth: 0,
+            flex: '1 1 auto',
+            width: '100%',
+          }}
+        >
+          <div
+            className="section-header-title-row"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              flexWrap: 'wrap',
+              marginBottom: 6,
+            }}
+          >
             <h1
               className="font-display"
               style={{
@@ -96,13 +113,13 @@ export function SectionHeader({
                 fontWeight: 800,
                 color: 'var(--text-primary, #F8FAFC)',
                 margin: 0,
-                lineHeight: 1.2,
+                lineHeight: 1.25,
                 letterSpacing: '-0.02em',
               }}
             >
               {title}
             </h1>
-            {badge}
+            {badge && <div className="section-header-badge" style={{ display: 'inline-flex', flexShrink: 0 }}>{badge}</div>}
           </div>
 
           {description && (
@@ -111,7 +128,7 @@ export function SectionHeader({
                 fontSize: 13,
                 color: 'var(--text-secondary, #94A3B8)',
                 margin: 0,
-                lineHeight: 1.45,
+                lineHeight: 1.5,
                 maxWidth: 780,
               }}
             >
@@ -121,7 +138,15 @@ export function SectionHeader({
         </div>
 
         {actions && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0, flexWrap: 'wrap' }}>
+          <div
+            className="section-header-actions"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              flexWrap: 'wrap',
+            }}
+          >
             {actions}
           </div>
         )}

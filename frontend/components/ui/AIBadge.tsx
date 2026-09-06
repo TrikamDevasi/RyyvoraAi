@@ -25,6 +25,8 @@ export function AIBadge({ type = 'ai', label }: AIBadgeProps) {
           borderRadius: 'var(--radius-sm, 6px)',
           letterSpacing: '0.03em',
           textTransform: 'uppercase',
+          whiteSpace: 'nowrap',
+          flexShrink: 0,
         }}
       >
         <AlertCircle size={12} />
@@ -49,6 +51,8 @@ export function AIBadge({ type = 'ai', label }: AIBadgeProps) {
           borderRadius: 'var(--radius-sm, 6px)',
           letterSpacing: '0.03em',
           textTransform: 'uppercase',
+          whiteSpace: 'nowrap',
+          flexShrink: 0,
         }}
       >
         <ShieldCheck size={12} />
@@ -72,6 +76,8 @@ export function AIBadge({ type = 'ai', label }: AIBadgeProps) {
           fontWeight: 700,
           borderRadius: 'var(--radius-sm, 6px)',
           letterSpacing: '0.03em',
+          whiteSpace: 'nowrap',
+          flexShrink: 0,
         }}
       >
         <span style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--info, #06b6d4)' }} />
@@ -96,6 +102,8 @@ export function AIBadge({ type = 'ai', label }: AIBadgeProps) {
           borderRadius: 'var(--radius-sm, 6px)',
           letterSpacing: '0.03em',
           textTransform: 'uppercase',
+          whiteSpace: 'nowrap',
+          flexShrink: 0,
         }}
       >
         <Activity size={12} />
@@ -120,6 +128,8 @@ export function AIBadge({ type = 'ai', label }: AIBadgeProps) {
         borderRadius: 'var(--radius-sm, 6px)',
         letterSpacing: '0.03em',
         textTransform: 'uppercase',
+        whiteSpace: 'nowrap',
+        flexShrink: 0,
       }}
     >
       <Sparkles size={11} />
