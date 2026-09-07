@@ -1,6 +1,6 @@
-# SkillSense AI — Photographic & Visual Asset Inventory (`IMAGE_SOURCES.md`)
+# Ryyvora AI — Photographic & Visual Asset Inventory (`IMAGE_SOURCES.md`)
 
-This document catalogs every visual asset, photograph, and technical illustration across the **SkillSense AI** platform. In accordance with platform design principles, all photography is grounded in authentic Indian workforce, education, and institutional governance contexts (Maharashtra industrial clusters, ITIs, polytechnics, MIDCs, Hinjawadi tech parks, and Mantralaya policy chambers).
+This document catalogs every visual asset, photograph, and technical illustration across the **Ryyvora AI** platform. In accordance with platform design principles, all photography is grounded in authentic Indian workforce, education, and institutional governance contexts (Maharashtra industrial clusters, ITIs, polytechnics, MIDCs, Hinjawadi tech parks, and Mantralaya policy chambers).
 
 ---
 

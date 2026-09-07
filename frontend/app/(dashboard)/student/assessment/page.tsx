@@ -252,8 +252,9 @@ export default function AssessmentPage() {
     } catch {
       // Save locally
       try {
-        const history = JSON.parse(localStorage.getItem('skillsense_assessments') || '[]');
+        const history = JSON.parse(localStorage.getItem('ryyvora_assessments') || localStorage.getItem('skillsense_assessments') || '[]');
         history.push({ ...calculatedResult, topic: selectedTopic, branch: activeBranch.code, date: new Date().toISOString() });
+        localStorage.setItem('ryyvora_assessments', JSON.stringify(history));
         localStorage.setItem('skillsense_assessments', JSON.stringify(history));
       } catch {}
     }

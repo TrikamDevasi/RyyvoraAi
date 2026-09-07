@@ -101,34 +101,31 @@ Every trainee credential and assessment rubric is cryptographically sealed:
 
 ## 📁 Repository & Monorepo Structure
 
+## 📁 Repository & Monorepo Structure
+
 ```
-TEAM_QUANTUM_CODERS-SU-/
-├── README.md                          # Master Project README (You are here)
-└── skillsense-ai/                     # Production Monorepo Root
-    ├── docs/                          # Master Documentation & Audits Directory (25 Files)
-    │   ├── README.md                  # Comprehensive Documentation Index
-    │   ├── RYYVORA_AI_IMPLEMENTATION_REPORT.md # 100% Real AI Implementation Certification
-    │   ├── RYVORA_PRODUCT_WIDE_UI_UPGRADE_REPORT.md # Cross-Dashboard Design Refactor
-    │   ├── BRAND_MIGRATION_RYYVORA_REPORT.md   # Brand Evolution & Positioning
-    │   ├── SIGNIN_UI_REDESIGN_REPORT.md       # Enterprise Auth Experience Report
-    │   ├── MOBILE_UX_REDESIGN_REPORT.md       # Mobile Viewport & Zero-Scroll Audit
-    │   ├── FINAL_SIH_READINESS_REPORT.md      # SIH26135 Hackathon Readiness
-    │   ├── DEMO_GUIDE.md                      # Evaluator 6-Role Demo Script & Credentials
-    │   └── API_CONTRACTS.md                   # Complete Microservices REST Specification
-    │
-    ├── frontend/                      # Next.js 16.1.6 App Router (Turbopack)
-    │   ├── app/                       # Dashboard Workspaces (Government, Student, Employer, Institute)
-    │   ├── components/                # Institutional Navy & Saffron Component Library
-    │   └── lib/                       # API Axios Client & Branch Catalogs
-    │
-    └── backend/                       # Express 5 + TypeScript Microservices Engine
-        ├── src/
-        │   ├── controllers/           # Business Logic, Outcome Funnels & AI Handlers
-        │   ├── models/                # Mongoose Models (Students, Claims, Audits, Policies)
-        │   ├── routes/                # Express API Routes (v1)
-        │   ├── services/              # AI Provider Mesh, HMAC Passport Ledger, DPDP Center
-        │   └── middleware/            # Role RBAC, Rate Limiting, OWASP Security Headers
-        └── tests/                     # Automated Test Suites (11/11 Test Suites Passing)
+ryyvora-ai/                            # Production Monorepo Root
+├── docs/                              # Master Documentation & Audits Directory
+│   ├── README.md                      # Comprehensive Documentation Index
+│   ├── architecture/                  # REPOSITORY_STRUCTURE.md
+│   ├── api/                           # API_CONTRACTS.md
+│   ├── product/                       # DEMO_GUIDE.md, SIH_REQUIREMENT_MATRIX.md
+│   ├── design/                        # IMAGE_SOURCES.md, RYYVORA_BRAND_ASSETS.md
+│   └── audits/                        # 26 Preserved audit, security & cleanup reports
+│
+├── frontend/                          # Next.js 16.1.6 App Router (Turbopack)
+│   ├── app/                           # Dashboard Workspaces (Government, Student, Employer, Institute)
+│   ├── components/                    # Institutional Navy & Saffron Component Library
+│   └── lib/                           # API Axios Client & Branch Catalogs
+│
+└── backend/                           # Express 5 + TypeScript Microservices Engine
+    ├── src/
+    │   ├── controllers/               # Business Logic, Outcome Funnels & AI Handlers
+    │   ├── models/                    # Mongoose Models (Students, Claims, Audits, Policies)
+    │   ├── routes/                    # Express API Routes (v1)
+    │   ├── services/                  # AI Provider Mesh, HMAC Passport Ledger, DPDP Center
+    │   └── middleware/                # Role RBAC, Rate Limiting, OWASP Security Headers
+    └── tests/                         # Automated Test Suites (11/11 Test Suites Passing)
 ```
 
 ---
@@ -142,12 +139,12 @@ TEAM_QUANTUM_CODERS-SU-/
 
 ### 1. Clone & Navigate
 ```bash
-git clone https://github.com/TrikamDevasi/SkillSenseAi.git
-cd SkillSenseAi/skillsense-ai
+git clone https://github.com/TrikamDevasi/RyyvoraAi.git
+cd RyyvoraAi
 ```
 
 ### 2. Configure Environment Variables
-- **Backend (`skillsense-ai/backend/.env`)**:
+- **Backend (`backend/.env`)**:
   ```env
   PORT=5000
   NODE_ENV=development
@@ -156,19 +153,18 @@ cd SkillSenseAi/skillsense-ai
   GROQ_API_KEY=your_groq_api_key_here
   GEMINI_API_KEY=your_gemini_api_key_here
   ```
-- **Frontend (`skillsense-ai/frontend/.env.local`)**:
+- **Frontend (`frontend/.env.local`)**:
   ```env
   NEXT_PUBLIC_API_URL=http://localhost:5000/api/v1
   ```
 
 ### 3. Install Dependencies
 ```bash
-npm --prefix backend install
-npm --prefix frontend install
+npm install
 ```
 
 ### 4. Run Development Servers
-From the `skillsense-ai` directory, launch both servers concurrently:
+From the root directory, launch both servers concurrently:
 ```bash
 npm run dev
 ```

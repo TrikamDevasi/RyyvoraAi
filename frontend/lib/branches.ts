@@ -1683,13 +1683,14 @@ export const BRANCH_REGISTRY: Record<string, BranchData> = {
 
 export function getSavedBranchId(): string | null {
   if (typeof window !== 'undefined') {
-    return localStorage.getItem('skillsense_active_branch');
+    return localStorage.getItem('ryyvora_active_branch') || localStorage.getItem('skillsense_active_branch');
   }
   return null;
 }
 
 export function saveBranchId(branchId: string): void {
   if (typeof window !== 'undefined') {
+    localStorage.setItem('ryyvora_active_branch', branchId);
     localStorage.setItem('skillsense_active_branch', branchId);
   }
 }

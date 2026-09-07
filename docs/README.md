@@ -6,7 +6,15 @@ Welcome to the **Ryyvora AI (Workforce Outcome Intelligence)** master documentat
 
 ## 📑 Documentation Index
 
-### 1. 🏗️ Architecture & Technical Specifications
+### 1. 📜 Project Evolution & Historical Chronicle
+- **[PROJECT_EVOLUTION_TIMELINE.md](./history/PROJECT_EVOLUTION_TIMELINE.md)**  
+  Exhaustive 18-section chronological timeline, evidence matrix, technical failure logs, and Git provenance tracking the complete evolution from hackathon inception to current state.
+- **[PROJECT_EVOLUTION_TIMELINE.mermaid.md](./history/PROJECT_EVOLUTION_TIMELINE.mermaid.md)**  
+  Visual evolution flowcharts, chronological timeline diagrams, architecture comparison graphs, and multi-provider AI fallback pipelines.
+- **[PROJECT_EVOLUTION_ONE_PAGE.md](./history/PROJECT_EVOLUTION_ONE_PAGE.md)**  
+  Concise 1-page executive summary and verbal pitch reference for SIH evaluators, viva presentations, and team walkthroughs.
+
+### 2. 🏗️ Architecture & Technical Specifications
 - **[REPOSITORY_STRUCTURE.md](./architecture/REPOSITORY_STRUCTURE.md)**  
   Master repository architecture: directory roles, component taxonomy, state management, security boundaries, and CI/CD pipelines.
 
@@ -27,6 +35,12 @@ Welcome to the **Ryyvora AI (Workforce Outcome Intelligence)** master documentat
   Brand asset catalog, SVG monograms, logo marks, typography scales, and favicon assets.
 
 ### 5. 🔍 Audits, Security & Implementation Reports
+- **[CODE_CLEANUP_FINAL_REPORT.md](./audits/CODE_CLEANUP_FINAL_REPORT.md)**  
+  Final verified production code cleanup report: 70 files removed, 3,648 source LOC cleaned, 296 npm packages eliminated, and Code Quality Score elevated to 93.5/100 (Grade A).
+- **[CODE_CLEANUP_PLAN.md](./audits/CODE_CLEANUP_PLAN.md)**  
+  Forensic production cleanup plan with risk matrix, file inventory, and gate checks.
+- **[CODE_QUALITY_AND_BLOAT_AUDIT.md](./audits/CODE_QUALITY_AND_BLOAT_AUDIT.md)**  
+  Full-scale code quality, dead code, and bloat audit across frontend, backend, dependencies, duplicated question registries, and asset directories with Top 20 prioritized cleanup roadmap.
 - **[SECURITY_HARDENING_REPORT.md](./audits/SECURITY_HARDENING_REPORT.md)**  
   Full-stack security audit and hardening report: privilege escalation prevention, OAuth open redirect defense, httpOnly cookie enforcement, AI route protection, prompt injection defense, and Next.js Edge proxy RBAC.
 - **[LANDING_TEST_ACCESS_REMOVAL_REPORT.md](./audits/LANDING_TEST_ACCESS_REMOVAL_REPORT.md)**  

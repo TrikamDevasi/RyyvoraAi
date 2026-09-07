@@ -1,6 +1,6 @@
-# 🤝 SkillSense AI Contribution Guidelines
+# 🤝 Ryyvora AI Contribution Guidelines
 
-This document establishes the official engineering workflow for **SkillSense AI** to ensure code quality, proper contributor attribution, and seamless continuous deployment on our **Vercel Hobby** infrastructure.
+This document establishes the official engineering workflow for **Ryyvora AI** to ensure code quality, proper contributor attribution, and seamless continuous deployment on our **Vercel Hobby** infrastructure.
 
 ---
 
@@ -69,7 +69,7 @@ git push -u origin feature/<feature-name>
 ```
 
 ### 6. Open a Pull Request (PR)
-1. Go to the GitHub repository: `https://github.com/TrikamDevasi/SkillSenseAi`
+1. Go to the GitHub repository: `https://github.com/TrikamDevasi/RyyvoraAi`
 2. Click **Compare & pull request**.
 3. Select base: `main` ◄ compare: `feature/<feature-name>`.
 4. Provide a clear summary of changes, tested scenarios, and screenshots/recordings if UI was modified.
