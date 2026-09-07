@@ -477,7 +477,7 @@ export default function LandingPage() {
                 {/* Group 3: Actions */}
                 <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
                   <Link
-                    href="/student/analyzer"
+                    href="/for-trainees"
                     onClick={() => setMobileMenuOpen(false)}
                     className="btn-gold"
                     style={{
@@ -492,12 +492,12 @@ export default function LandingPage() {
                       textDecoration: 'none',
                     }}
                   >
-                    <BarChart3 size={16} /> Analyze Skills Now <ArrowRight size={15} />
+                    <BarChart3 size={16} /> Explore the Platform <ArrowRight size={15} />
                   </Link>
 
                   <div style={{ display: 'flex', gap: 8 }}>
                     <Link
-                      href="/verify/demo-hash"
+                      href="/employer-verification"
                       onClick={() => setMobileMenuOpen(false)}
                       className="btn-secondary"
                       style={{
@@ -984,8 +984,8 @@ export default function LandingPage() {
                   <strong style={{ color: '#f8fafc' }}>HOW:</strong> Powered by Groq Llama-3.3-70b with safe JSON repair and NSQF taxonomy mapping.
                 </p>
               </div>
-              <Link href="/student/analyzer" style={{ fontSize: 12, fontWeight: 700, color: 'var(--gold)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4, paddingTop: 10, borderTop: '1px solid var(--border)' }}>
-                Test Skill Analyzer <ChevronRight size={13} />
+              <Link href="/for-trainees" style={{ fontSize: 12, fontWeight: 700, color: 'var(--gold)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4, paddingTop: 10, borderTop: '1px solid var(--border)' }}>
+                Explore Skill Diagnostics <ChevronRight size={13} />
               </Link>
             </div>
 
@@ -1037,8 +1037,8 @@ export default function LandingPage() {
                   <strong style={{ color: '#f8fafc' }}>HOW:</strong> Calculates mathematical compatibility scores and transparent INR model estimates.
                 </p>
               </div>
-              <Link href="/student/career" style={{ fontSize: 12, fontWeight: 700, color: '#60a5fa', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4, paddingTop: 10, borderTop: '1px solid var(--border)' }}>
-                Explore Career Paths <ChevronRight size={13} />
+              <Link href="/for-trainees" style={{ fontSize: 12, fontWeight: 700, color: '#60a5fa', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4, paddingTop: 10, borderTop: '1px solid var(--border)' }}>
+                Explore Career Pathways <ChevronRight size={13} />
               </Link>
             </div>
 
@@ -1090,8 +1090,8 @@ export default function LandingPage() {
                   <strong style={{ color: '#f8fafc' }}>HOW:</strong> Generates priority-tagged deficiencies and phase-by-phase timeline roadmaps.
                 </p>
               </div>
-              <Link href="/student" style={{ fontSize: 12, fontWeight: 700, color: '#ef4444', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4, paddingTop: 10, borderTop: '1px solid var(--border)' }}>
-                View Gap Roadmap <ChevronRight size={13} />
+              <Link href="/for-trainees" style={{ fontSize: 12, fontWeight: 700, color: '#ef4444', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4, paddingTop: 10, borderTop: '1px solid var(--border)' }}>
+                Explore Gap Roadmaps <ChevronRight size={13} />
               </Link>
             </div>
 
@@ -1143,8 +1143,8 @@ export default function LandingPage() {
                   <strong style={{ color: '#f8fafc' }}>HOW:</strong> SHA-256 HMAC digest computed over student scores and NSQF certification tier.
                 </p>
               </div>
-              <Link href="/student/passport" style={{ fontSize: 12, fontWeight: 700, color: '#10b981', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4, paddingTop: 10, borderTop: '1px solid var(--border)' }}>
-                Inspect Passport <ChevronRight size={13} />
+              <Link href="/skill-passport" style={{ fontSize: 12, fontWeight: 700, color: '#10b981', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4, paddingTop: 10, borderTop: '1px solid var(--border)' }}>
+                Explore Verifiable Passport <ChevronRight size={13} />
               </Link>
             </div>
 
@@ -1196,8 +1196,8 @@ export default function LandingPage() {
                   <strong style={{ color: '#f8fafc' }}>HOW:</strong> Dynamic question synthesis, automated grading, and instant passport ledger sync.
                 </p>
               </div>
-              <Link href="/student/assessment" style={{ fontSize: 12, fontWeight: 700, color: 'var(--gold)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4, paddingTop: 10, borderTop: '1px solid var(--border)' }}>
-                Take Diagnostic Quiz <ChevronRight size={13} />
+              <Link href="/for-trainees" style={{ fontSize: 12, fontWeight: 700, color: 'var(--gold)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4, paddingTop: 10, borderTop: '1px solid var(--border)' }}>
+                Explore Adaptive Assessments <ChevronRight size={13} />
               </Link>
             </div>
 
@@ -1249,8 +1249,8 @@ export default function LandingPage() {
                   <strong style={{ color: '#f8fafc' }}>HOW:</strong> Injects live student NSQF competencies into prompts with SSE typewriter streaming.
                 </p>
               </div>
-              <Link href="/student" style={{ fontSize: 12, fontWeight: 700, color: '#c084fc', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4, paddingTop: 10, borderTop: '1px solid var(--border)' }}>
-                Chat with Copilot <ChevronRight size={13} />
+              <Link href="/for-trainees" style={{ fontSize: 12, fontWeight: 700, color: '#c084fc', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4, paddingTop: 10, borderTop: '1px solid var(--border)' }}>
+                Explore AI Mentorship <ChevronRight size={13} />
               </Link>
             </div>
           </div>
@@ -1261,7 +1261,7 @@ export default function LandingPage() {
       <section id="showcase" style={{ padding: '80px 24px' }}>
         <div style={{ maxWidth: 1140, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 36 }}>
-            <AIBadge type="live" label="INTERACTIVE DEMONSTRATION" />
+            <AIBadge type="live" label="PRODUCT ARCHITECTURE SHOWCASE" />
             <h2 className="font-display" style={{ fontSize: 'clamp(26px, 3.5vw, 38px)', fontWeight: 800, color: '#f8fafc', margin: '8px 0 10px' }}>
               Explore the Platform in Action
             </h2>
@@ -1808,11 +1808,11 @@ export default function LandingPage() {
                       Empowering learners with AI skill auditing, timed NSQF diagnostic quizzes, tamper-proof passports, and personalized wage progression trajectories.
                     </p>
                     <Link
-                      href="/student"
+                      href="/for-trainees"
                       className="btn-gold"
                       style={{ fontSize: 13, padding: '10px 22px', display: 'inline-flex', alignItems: 'center', gap: 8 }}
                     >
-                      <span>Launch Student Cockpit</span>
+                      <span>Explore Trainee Platform</span>
                       <ArrowRight size={15} />
                     </Link>
                   </div>
@@ -1837,12 +1837,12 @@ export default function LandingPage() {
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
                   {[
-                    { title: 'Multi-Modal Code & GitHub Analyzer', desc: 'Scan live GitHub repos, paste source code, or upload resumes for 6-axis NSQF radar evaluation.', href: '/student/analyzer', icon: Code, badge: 'Neural AI' },
-                    { title: 'AI Diagnostic Timed Quizzes', desc: 'Proctored evaluations across 8 technical domains with instant concept explanations and score seals.', href: '/student/assessment', icon: Zap, badge: 'Proctored' },
-                    { title: 'Cryptographic Skill Passport', desc: 'Tamper-proof digital credentials backed by SHA-256 ledger signatures and public QR validation.', href: '/student/passport', icon: ShieldCheck, badge: 'SHA-256' },
-                    { title: 'Predictive Career & Wage Roadmap', desc: 'Forecast 3-year salary growth curve (₹7.8L → ₹18.0L) and discover target skill gap bridges.', href: '/student/career', icon: TrendingUp, badge: 'Predictive' },
-                    { title: 'Longitudinal Outcome Journey', desc: 'Log verified milestones from enrollment to campus hiring, 30d/90d retention, and promotions.', href: '/student/journey', icon: Milestone, badge: 'Tracking' },
-                    { title: 'DPDP Act 2023 Consent Center', desc: 'Sovereign control to toggle specific data processing purposes and export private data in JSON.', href: '/student/consent', icon: Lock, badge: 'DPDP Compliant' },
+                    { title: 'Multi-Modal Code & GitHub Analyzer', desc: 'Scan live GitHub repos, paste source code, or upload resumes for 6-axis NSQF radar evaluation.', href: '/for-trainees', icon: Code, badge: 'Neural AI' },
+                    { title: 'AI Diagnostic Timed Quizzes', desc: 'Proctored evaluations across 8 technical domains with instant concept explanations and score seals.', href: '/for-trainees', icon: Zap, badge: 'Proctored' },
+                    { title: 'Cryptographic Skill Passport', desc: 'Tamper-proof digital credentials backed by SHA-256 ledger signatures and public QR validation.', href: '/skill-passport', icon: ShieldCheck, badge: 'SHA-256' },
+                    { title: 'Predictive Career & Wage Roadmap', desc: 'Forecast 3-year salary growth curve (₹7.8L → ₹18.0L) and discover target skill gap bridges.', href: '/for-trainees', icon: TrendingUp, badge: 'Predictive' },
+                    { title: 'Longitudinal Outcome Journey', desc: 'Log verified milestones from enrollment to campus hiring, 30d/90d retention, and promotions.', href: '/for-trainees', icon: Milestone, badge: 'Tracking' },
+                    { title: 'DPDP Act 2023 Consent Center', desc: 'Sovereign control to toggle specific data processing purposes and export private data in JSON.', href: '/dpdp-trust', icon: Lock, badge: 'DPDP Compliant' },
                   ].map((feat, idx) => {
                     const Icon = feat.icon;
                     return (
@@ -1882,7 +1882,7 @@ export default function LandingPage() {
                           <p style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5, margin: 0 }}>{feat.desc}</p>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 700, color: 'var(--gold)', marginTop: 14 }}>
-                          <span>Access Feature</span>
+                          <span>Explore Solution</span>
                           <ChevronRight size={13} />
                         </div>
                       </Link>
@@ -1906,11 +1906,11 @@ export default function LandingPage() {
                       Streamline hiring with instant cryptographic credential verification, pre-assessed candidate talent pools, and automated 30d/90d retention telemetry.
                     </p>
                     <Link
-                      href="/employer"
+                      href="/for-employers"
                       className="btn-gold"
                       style={{ fontSize: 13, padding: '10px 22px', display: 'inline-flex', alignItems: 'center', gap: 8 }}
                     >
-                      <span>Launch Employer Suite</span>
+                      <span>Explore Employer Suite</span>
                       <ArrowRight size={15} />
                     </Link>
                   </div>
@@ -1935,10 +1935,10 @@ export default function LandingPage() {
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
                   {[
-                    { title: '1-Click SHA-256 Hash Verification', desc: 'Instantly validate candidate passport authenticity directly against the state ledger to eliminate resume fraud.', href: '/employer/validations', icon: ShieldCheck, badge: 'Anti-Fraud' },
-                    { title: 'Pre-Assessed Candidate Search', desc: 'Filter verified talent by NSQF certification tier, technical score percentiles, and regional district availability.', href: '/employer/candidates', icon: Users, badge: 'Verified Pool' },
-                    { title: 'Direct Job Postings & Hiring Drives', desc: 'Publish open tech requisitions with automated skill match scoring against registered state candidates.', href: '/employer/post-job', icon: Briefcase, badge: 'Fast Track' },
-                    { title: 'Retention & Verification Ledger', desc: 'Confirm employee onboarding and 90-day retention to earn enterprise compliance badges and government incentives.', href: '/employer/validations', icon: Award, badge: 'Retention' },
+                    { title: '1-Click SHA-256 Hash Verification', desc: 'Instantly validate candidate passport authenticity directly against the state ledger to eliminate resume fraud.', href: '/employer-verification', icon: ShieldCheck, badge: 'Anti-Fraud' },
+                    { title: 'Pre-Assessed Candidate Search', desc: 'Filter verified talent by NSQF certification tier, technical score percentiles, and regional district availability.', href: '/for-employers', icon: Users, badge: 'Verified Pool' },
+                    { title: 'Direct Job Postings & Hiring Drives', desc: 'Publish open tech requisitions with automated skill match scoring against registered state candidates.', href: '/for-employers', icon: Briefcase, badge: 'Fast Track' },
+                    { title: 'Retention & Verification Ledger', desc: 'Confirm employee onboarding and 90-day retention to earn enterprise compliance badges and government incentives.', href: '/employer-verification', icon: Award, badge: 'Retention' },
                   ].map((feat, idx) => {
                     const Icon = feat.icon;
                     return (
@@ -1970,7 +1970,7 @@ export default function LandingPage() {
                           <p style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5, margin: 0 }}>{feat.desc}</p>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 700, color: 'var(--gold)', marginTop: 14 }}>
-                          <span>Access Feature</span>
+                          <span>Explore Solution</span>
                           <ChevronRight size={13} />
                         </div>
                       </Link>
@@ -1994,11 +1994,11 @@ export default function LandingPage() {
                       Monitor cohort skill mastery, pinpoint curriculum deficiencies vs industry demand, and track longitudinal graduate placement outcomes.
                     </p>
                     <Link
-                      href="/institute"
+                      href="/for-training-providers"
                       className="btn-gold"
                       style={{ fontSize: 13, padding: '10px 22px', display: 'inline-flex', alignItems: 'center', gap: 8 }}
                     >
-                      <span>Launch Institute Portal</span>
+                      <span>Explore Provider Intelligence</span>
                       <ArrowRight size={15} />
                     </Link>
                   </div>
@@ -2023,10 +2023,10 @@ export default function LandingPage() {
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
                   {[
-                    { title: 'Batch Competency Matrix', desc: 'Real-time telemetry on student test participation, average NSQF tier attainments, and pass percentages.', href: '/institute/cohorts', icon: Layers, badge: 'Real-Time' },
-                    { title: 'Curriculum Skill Gap Auditing', desc: 'Identify which modules (e.g. Next.js vs Docker vs Microservices) lag behind current enterprise hiring requirements.', href: '/institute/curriculum', icon: Target, badge: 'Optimization' },
-                    { title: 'Graduate Placement Ledger', desc: 'Track verified job placements, average starting packages (LPA), and long-term 365-day retention metrics.', href: '/institute/analytics', icon: TrendingUp, badge: 'ROI Auditing' },
-                    { title: 'Automated Credential Minting', desc: 'Issue cryptographically signed NSQF course completion certificates linked to the state skill registry.', href: '/institute/credentials', icon: FileCheck, badge: 'Ledger Signed' },
+                    { title: 'Batch Competency Matrix', desc: 'Real-time telemetry on student test participation, average NSQF tier attainments, and pass percentages.', href: '/for-training-providers', icon: Layers, badge: 'Real-Time' },
+                    { title: 'Curriculum Skill Gap Auditing', desc: 'Identify which modules (e.g. Next.js vs Docker vs Microservices) lag behind current enterprise hiring requirements.', href: '/for-training-providers', icon: Target, badge: 'Optimization' },
+                    { title: 'Graduate Placement Ledger', desc: 'Track verified job placements, average starting packages (LPA), and long-term 365-day retention metrics.', href: '/for-training-providers', icon: TrendingUp, badge: 'ROI Auditing' },
+                    { title: 'Automated Credential Minting', desc: 'Issue cryptographically signed NSQF course completion certificates linked to the state skill registry.', href: '/for-training-providers', icon: FileCheck, badge: 'Ledger Signed' },
                   ].map((feat, idx) => {
                     const Icon = feat.icon;
                     return (
@@ -2058,7 +2058,7 @@ export default function LandingPage() {
                           <p style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5, margin: 0 }}>{feat.desc}</p>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 700, color: 'var(--gold)', marginTop: 14 }}>
-                          <span>Access Feature</span>
+                          <span>Explore Solution</span>
                           <ChevronRight size={13} />
                         </div>
                       </Link>
@@ -2082,11 +2082,11 @@ export default function LandingPage() {
                       Macro workforce analytics, 9-stage longitudinal outcome pipelines, grounded AI policy copilots, and district-level economic ROI monitoring.
                     </p>
                     <Link
-                      href="/government"
+                      href="/for-government"
                       className="btn-gold"
                       style={{ fontSize: 13, padding: '10px 22px', display: 'inline-flex', alignItems: 'center', gap: 8 }}
                     >
-                      <span>Launch Government Cockpit</span>
+                      <span>Explore Policy Cockpit</span>
                       <ArrowRight size={15} />
                     </Link>
                   </div>
@@ -2111,10 +2111,10 @@ export default function LandingPage() {
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
                   {[
-                    { title: '9-Stage Conversion Pipeline', desc: 'Track student conversion from Enrolled to Certified, Placed, 30d, 90d, 180d, and 365d Long-term Retention.', href: '/government', icon: Layers, badge: 'Longitudinal' },
-                    { title: 'Grounded AI Policy Copilot', desc: 'Query natural language policy recommendations backed by real-time district evidence and budget metrics.', href: '/government', icon: Bot, badge: 'AI Copilot' },
-                    { title: 'District Drill-Down Intelligence', desc: 'Compare employment metrics across all 36 Maharashtra districts (Pune, Mumbai, Nagpur, Nashik, etc.).', href: '/government', icon: Landmark, badge: '36 Districts' },
-                    { title: 'Macro Wage Progression Curves', desc: 'Monitor wage growth trajectories from ₹26k baseline to ₹49k/mo at Month 24 to optimize funding allocations.', href: '/government', icon: TrendingUp, badge: 'Wage Growth' },
+                    { title: '9-Stage Conversion Pipeline', desc: 'Track student conversion from Enrolled to Certified, Placed, 30d, 90d, 180d, and 365d Long-term Retention.', href: '/for-government', icon: Layers, badge: 'Longitudinal' },
+                    { title: 'Grounded AI Policy Copilot', desc: 'Query natural language policy recommendations backed by real-time district evidence and budget metrics.', href: '/policy-intelligence', icon: Bot, badge: 'AI Copilot' },
+                    { title: 'District Drill-Down Intelligence', desc: 'Compare employment metrics across all 36 Maharashtra districts (Pune, Mumbai, Nagpur, Nashik, etc.).', href: '/for-government', icon: Landmark, badge: '36 Districts' },
+                    { title: 'Macro Wage Progression Curves', desc: 'Monitor wage growth trajectories from ₹26k baseline to ₹49k/mo at Month 24 to optimize funding allocations.', href: '/workforce-analytics', icon: TrendingUp, badge: 'Wage Growth' },
                   ].map((feat, idx) => {
                     const Icon = feat.icon;
                     return (
@@ -2146,7 +2146,7 @@ export default function LandingPage() {
                           <p style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5, margin: 0 }}>{feat.desc}</p>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 700, color: 'var(--gold)', marginTop: 14 }}>
-                          <span>Access Feature</span>
+                          <span>Explore Solution</span>
                           <ChevronRight size={13} />
                         </div>
                       </Link>
@@ -2170,11 +2170,11 @@ export default function LandingPage() {
                       Calibrate National Occupational Standards (NOS), forecast emerging tech surges (GenAI, Cloud), and map regional talent availability heatmaps.
                     </p>
                     <Link
-                      href="/industry"
+                      href="/workforce-analytics"
                       className="btn-gold"
                       style={{ fontSize: 13, padding: '10px 22px', display: 'inline-flex', alignItems: 'center', gap: 8 }}
                     >
-                      <span>Launch Industry Suite</span>
+                      <span>Explore Industry Analytics</span>
                       <ArrowRight size={15} />
                     </Link>
                   </div>
@@ -2199,9 +2199,9 @@ export default function LandingPage() {
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
                   {[
-                    { title: 'Skill Demand vs Supply Radar', desc: 'Detect real-time hiring demand spikes across Indian IT corridors vs active training batch supply.', href: '/industry/demand-matrix', icon: BarChart3, badge: 'Real-Time' },
-                    { title: 'National Occupational Standards (NOS)', desc: 'Align qualification packs with modern industry workflows and micro-credential prerequisites.', href: '/industry/standards', icon: Target, badge: 'NOS Calibrated' },
-                    { title: 'Regional Talent Heatmaps', desc: 'Identify surplus vs deficit technical skill regions across Maharashtra to guide corporate CSR & hiring.', href: '/industry/heatmaps', icon: Landmark, badge: 'Geo Spatial' },
+                    { title: 'Skill Demand vs Supply Radar', desc: 'Detect real-time hiring demand spikes across Indian IT corridors vs active training batch supply.', href: '/workforce-analytics', icon: BarChart3, badge: 'Real-Time' },
+                    { title: 'National Occupational Standards (NOS)', desc: 'Align qualification packs with modern industry workflows and micro-credential prerequisites.', href: '/policy-intelligence', icon: Target, badge: 'NOS Calibrated' },
+                    { title: 'Regional Talent Heatmaps', desc: 'Identify surplus vs deficit technical skill regions across Maharashtra to guide corporate CSR & hiring.', href: '/policy-intelligence', icon: Landmark, badge: 'Geo Spatial' },
                   ].map((feat, idx) => {
                     const Icon = feat.icon;
                     return (
@@ -2233,7 +2233,7 @@ export default function LandingPage() {
                           <p style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5, margin: 0 }}>{feat.desc}</p>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 700, color: 'var(--gold)', marginTop: 14 }}>
-                          <span>Access Feature</span>
+                          <span>Explore Solution</span>
                           <ChevronRight size={13} />
                         </div>
                       </Link>
@@ -2257,11 +2257,11 @@ export default function LandingPage() {
                       Manage decentralized ledger integrity, audit algorithmic fairness models, monitor LLM telemetry, and oversee DPDP compliance.
                     </p>
                     <Link
-                      href="/admin"
+                      href="/auth"
                       className="btn-gold"
                       style={{ fontSize: 13, padding: '10px 22px', display: 'inline-flex', alignItems: 'center', gap: 8 }}
                     >
-                      <span>Launch Admin Center</span>
+                      <span>Sign In to Admin Center</span>
                       <ArrowRight size={15} />
                     </Link>
                   </div>
@@ -2286,9 +2286,9 @@ export default function LandingPage() {
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
                   {[
-                    { title: 'Algorithmic Fairness & Bias Auditing', desc: 'Continuous demographic parity monitoring enforcing the 80% (4/5ths) rule across gender and rural cohorts.', href: '/admin/fairness', icon: ShieldCheck, badge: 'Fairness Engine' },
-                    { title: 'Decentralized Ledger Audit Trail', desc: 'Inspect HMAC SHA-256 passport minting logs and external employer verification requests in real-time.', href: '/admin/ledger', icon: Database, badge: 'Immutable' },
-                    { title: 'Role & User Access Control (RBAC)', desc: 'Manage permissions, API rate limit quotas, and enterprise partner verification credentials.', href: '/admin/users', icon: Users, badge: 'RBAC' },
+                    { title: 'Algorithmic Fairness & Bias Auditing', desc: 'Continuous demographic parity monitoring enforcing the 80% (4/5ths) rule across gender and rural cohorts.', href: '/dpdp-trust', icon: ShieldCheck, badge: 'Fairness Engine' },
+                    { title: 'Decentralized Ledger Audit Trail', desc: 'Inspect HMAC SHA-256 passport minting logs and external employer verification requests in real-time.', href: '/employer-verification', icon: Database, badge: 'Immutable' },
+                    { title: 'Role & User Access Control (RBAC)', desc: 'Manage permissions, API rate limit quotas, and enterprise partner verification credentials.', href: '/auth', icon: Users, badge: 'RBAC' },
                     { title: 'System Health & LLM Telemetry', desc: 'Real-time monitoring of inference latency, model fallback availability, and server cluster uptimes.', href: '/ai-health', icon: Zap, badge: 'Telemetry' },
                   ].map((feat, idx) => {
                     const Icon = feat.icon;
@@ -2321,7 +2321,7 @@ export default function LandingPage() {
                           <p style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.5, margin: 0 }}>{feat.desc}</p>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 700, color: 'var(--gold)', marginTop: 14 }}>
-                          <span>Access Feature</span>
+                          <span>Explore Solution</span>
                           <ChevronRight size={13} />
                         </div>
                       </Link>
@@ -2496,7 +2496,7 @@ export default function LandingPage() {
               </p>
 
               <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-                <Link href="/student/passport" className="btn-gold" style={{ fontSize: 13, padding: '9px 20px' }}>
+                <Link href="/skill-passport" className="btn-gold" style={{ fontSize: 13, padding: '9px 20px' }}>
                   Explore Skill Passport
                 </Link>
                 <button
@@ -2621,11 +2621,11 @@ export default function LandingPage() {
           </p>
 
           <Link
-            href="/student/analyzer"
+            href="/for-trainees"
             className="btn-gold"
             style={{ fontSize: 14.5, padding: '13px 36px', boxShadow: 'var(--shadow-sm)' }}
           >
-            <BarChart3 size={16} /> Start Free Skill Analysis <ArrowRight size={15} />
+            <BarChart3 size={16} /> Explore Trainee Intelligence <ArrowRight size={15} />
           </Link>
         </div>
       </section>
@@ -2880,11 +2880,11 @@ export default function LandingPage() {
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 20, flexWrap: 'wrap', fontSize: 12 }}>
-              <Link href="/student/consent" style={{ color: '#94a3b8', textDecoration: 'none', transition: 'color 0.2s' }}>
+              <Link href="/dpdp-trust" style={{ color: '#94a3b8', textDecoration: 'none', transition: 'color 0.2s' }}>
                 DPDP Privacy
               </Link>
               <span style={{ color: 'rgba(255,255,255,0.15)' }}>·</span>
-              <Link href="/admin/fairness" style={{ color: '#94a3b8', textDecoration: 'none', transition: 'color 0.2s' }}>
+              <Link href="/dpdp-trust" style={{ color: '#94a3b8', textDecoration: 'none', transition: 'color 0.2s' }}>
                 AI Fairness Policy
               </Link>
               <span style={{ color: 'rgba(255,255,255,0.15)' }}>·</span>

@@ -1,125 +1,92 @@
-# SkillSense AI — Official Evaluator Demonstration & Click-Through Guide
-**Smart India Hackathon 2024 / 2026 — Problem Statement SIH26135**
-*Theme: "Difficulties in tracking employment outcomes, skill gaps, and the impact of skilling initiatives."*
+# Ryyvora AI — Evaluator & Demo Access Guide (SIH Testing)
+
+This guide is intended for SIH evaluators, hackathon judges, QA engineers, and authorized development teams who need to evaluate the full capabilities of **Ryyvora AI** across all 6 stakeholder personas.
+
+> **Security Notice**:
+> In accordance with national cyber-defense and DPDP Act 2023 principles, all public landing page demo bypasses, mock token generators, and unauthenticated dashboard launch buttons have been completely eliminated. Access to real stakeholder workspaces is strictly enforced through authenticated sessions via `/auth`.
 
 ---
 
-## 1. Quick Start & Evaluation Credentials
+## 1. Quick Start: Seeding Test Data
 
-All roles are pre-seeded with rich longitudinal data across 9 Maharashtra districts (125 trainees, longitudinal milestone timelines, 30d/90d/180d/365d follow-ups, and SHA-256 verifiable Skill Passports).
+To populate MongoDB with complete longitudinal test cohorts, verifiable NSQF competency records, and 6 pre-configured stakeholder accounts:
 
-### Pre-Configured Demo Credentials (Password: `Demo@1234` for all):
-| Role | Demo Email | Persona & Entity | Key Capability to Inspect |
-| :--- | :--- | :--- | :--- |
-| **Trainee / Student** | `trainee@skillsense.demo` | **Aarav Deshmukh** (MSSDS Trainee) | Longitudinal Career Journey, Self-Report, SHA-256 Passport |
-| **Employer** | `employer@skillsense.demo` | **Tata Consultancy Services (TCS)** | Placement Claims Queue, Verify/Reject Claims, IDOR Guard |
-| **Training Institute**| `provider@skillsense.demo`| **MSSDS Pune Regional Center** | 120 Trainee Roster, Enroll Student, Grade Capstone, Dynamic ROI |
-| **Government** | `government@skillsense.demo`| **Maharashtra Skilling Directorate** | 9-District Macro Telemetry, Retention Curves, AI Policy Copilot |
-| **Industry / SSC** | `employer@skillsense.demo` | **Sector Skill Council Intelligence Lead** | Hiring Demand Signals, Campus Recruitment Directory |
-| **System Admin** | `admin@skillsense.demo` | **SkillSense Chief Administrator** | Four-Fifths Fairness Audit, Tamper-Proof Audit Trail |
-
-> **One-Click Instant Login:** On the `/auth` login screen, click any of the **"One-Click Demo Personas"** buttons (Student, Employer, Institute, Government, Admin) to immediately sign in without typing passwords.
-
----
-
-## 2. Recommended 5-Minute Evaluator Journey
-
-### Step 1: Trainee Longitudinal Journey & Cryptographic Passport (2 minutes)
-1. Navigate to `/auth` and click **"Demo Student"** (signs in as `trainee@skillsense.demo`).
-2. Visit **Longitudinal Journey** (`/student/journey`):
-   - Observe the 5 verified milestone stages: *Enrolled* -> *Certified (NSQF Level 5)* -> *Placed at TCS* -> *90-Day Retention Verified* -> *365-Day Continuous Employment*.
-   - Notice the confidence scores and cryptographic ledger hashes.
-3. Visit **Verifiable Skill Passport** (`/student/passport`):
-   - View the state-certified digital credential with QR code and cryptographic hash `0x8f4c2e91...`.
-   - Click **"Verify Authenticity"** (`/verify/0x8f4c2e91b5a3d76e48c10927fa118239cb72e01a`) to observe client-side and server-side SHA-256 verification passing with 100% integrity.
-4. Visit **Employment Self-Report** (`/student/profile` or `/student/journey`):
-   - Submit a placement self-report entering employer as `"Tata Consultancy Services"`.
-   - The backend `outcomeService.resolveEmployerId` normalizes the name and automatically links the claim to TCS's verification queue.
-
----
-
-### Step 2: Employer Verification & Claims Ledger (1.5 minutes)
-1. Logout and click **"Demo Employer"** (signs in as `employer@skillsense.demo` — Tata Consultancy Services).
-2. Visit **Placement Validations** (`/employer/validations`):
-   - Notice the **PENDING CLAIMS** queue populated with seeded TCS trainees and new self-reports.
-   - Click **"Verify Employment"**: verify starting salary, employment type, and add verification notes.
-   - Click submit: observe the status transition to `VERIFIED`, confidence updating to `0.96`, and a formal milestone added to the trainee's longitudinal timeline.
-   - Switch to the **"VERIFIED"** tab to see historical confirmed placements.
-   - *Security Check:* Notice that claims from other companies (e.g. Infosys, Bajaj Auto) are strictly hidden via tenant isolation (`query.employerId = user._id`).
-
----
-
-### Step 3: Government Directorate Macro Telemetry & AI Policy Copilot (1.5 minutes)
-1. Logout and click **"Demo Government"** (signs in as `government@skillsense.demo` — Maharashtra Skilling Directorate).
-2. Visit **Macro Analytics & Heatmap** (`/government` and `/government/heatmap`):
-   - View the 9-stage longitudinal funnel across Maharashtra districts: Enrolled (125) -> Trained -> Certified -> Placed -> 30d -> 90d -> 180d -> 365d -> Retained (100%).
-   - Observe district wage progression curves and retention charts.
-   - Notice the **DPDP Privacy Guard**: districts with small samples (< 5 trainees) are automatically protected to prevent trainee re-identification.
-3. Visit **AI Policy Copilot** (`/government` widget):
-   - Ask: *"Which district has the highest 90-day retention rate and what are the primary attrition factors?"*
-   - Observe the response: grounded strictly in MongoDB evidence with cited database metrics, zero hallucinated facts, and clear policy recommendations.
-
----
-
-### Step 4: Training Institute Management, Capstone Grading & Dynamic ROI (1 minute)
-1. Logout and click **"Demo Institute"** (signs in as `provider@skillsense.demo` — MSSDS Pune Regional Center).
-2. Visit **Student Roster** (`/institute/students`):
-   - View the 120 enrolled students with enrollment numbers, programs, and NSQF levels.
-   - Click **"Enroll Candidate"**: fill in candidate name, email, program, and NSQF level.
-   - Click submit: candidate is enrolled and a verifiable SHA-256 Skill Passport is generated instantly.
-3. Visit **Project Evaluations** (`/institute/evaluations`):
-   - Click **"Evaluate Trainee Project"**: select an enrolled student, choose project category (*Full-Stack Capstone Project*).
-   - Adjust the **4-Axis NCVET Rubric sliders**: Practical Implementation, Domain Knowledge, Code Quality, Viva Presentation.
-   - Click submit: evaluation is recorded on the ledger, candidate score is updated, and verifiable credential is re-certified.
-4. Visit **Institutional ROI** (`/institute/roi`):
-   - Observe the dynamic longitudinal ROI multipliers calculated from real placed wages versus state standard training costs (₹25,000 unit cost norm).
-   - Notice the **Statistical Safeguard**: cohorts with insufficient placement data (< 3 placed) display an explicit `"Insufficient Data (N < 3 Placed)"` badge rather than fabricating numbers.
-   - Use the **Interactive Cohort Fiscal Yield Simulator** to model prospective batch sizes, wage rates, and projected economic multipliers.
-
----
-
-### Step 5: SaaS Demo Billing & Administration (30 seconds)
-1. Visit **Settings > Billing & Subscription** (`/settings/billing`):
-   - Notice the active subscription loaded directly from the backend `DemoBillingProvider`.
-   - Click **"Change Plan"** to upgrade to Growth or Enterprise. The backend executes the plan transition, stores state in MongoDB `subscriptions`, and enforces server-side feature entitlements.
-2. Logout and click **"Demo Admin"** (`admin@skillsense.demo`):
-   - Visit **Fairness & Disparate Impact** (`/admin/fairness`): inspect the 80% Four-Fifths disparate impact audit comparing gender and district placement parity.
-   - Visit **Audit Logs** (`/admin/audit-logs`): inspect the immutable audit trail recording all verification actions, evaluations, and logins.
-
----
-
-## 3. Automated Test Verification
-
-Evaluators can execute the automated test suites in terminal:
-
-### Backend Automated Test Runner (11 Suites):
 ```bash
-cd backend
-npm test
+# In the root repository directory
+npm run seed:db
 ```
-**Output:**
-- `runAuthTests` (Registration, login, password hashing, JWT validation)
-- `runAuthorizationTests` (Role-based access control across 6 roles)
-- `runFairnessTests` (Four-fifths disparate impact calculation)
-- `runAITests` (Multi-provider fallback, Zod schema validation, honest rate-limit handling)
-- `runOutcomeTests` (Macro funnel, wage progression curve, retention calculation)
-- `runEmployerVerificationTests` (Claims isolation, IDOR guards, transition integrity)
-- `runPolicyCopilotTests` (Database grounding, prompt injection resistance)
-- `runBillingTests` (Entitlement limits, checkout schema, demo billing provider)
-- `runSecurityTests` (Rate limiting, CORS allowlist, helmet headers, no client secrets)
-- `runInstituteE2ETests` (Student enrollment, project evaluations, dynamic ROI guards)
-- `runIntegrationTests` (Express HTTP route integration, mass assignment protection)
-- **Result: 11/11 PASSED (100%)**
 
-### Frontend Automated Test Runner (5 Suites):
-```bash
-cd frontend
-npm test
-```
-**Output:**
-- Institute ID priority and null-safety resolver
-- Demo credentials alignment with MongoDB seeder
-- Billing tier pricing and annual discount invariants
-- Dynamic ROI sample size threshold guards ($N < 5$, placed $< 3$)
-- Cryptographic Skill Passport hash format structure
-- **Result: 5/5 PASSED (100%)**
+This populates:
+- 6 Role Accounts (Aarav Deshmukh, TCS Corporate, MSSDS Pune, Maharashtra Directorate, SSC Intelligence, System Admin)
+- 40+ Student skill passports with SHA-256 HMAC cryptographic signatures
+- Real longitudinal employment outcome records spanning 9 lifecycle stages
+- Regional district telemetry for Maharashtra skilling centers
+
+---
+
+## 2. Authorized Evaluator Credentials
+
+All 6 stakeholder accounts share a standardized, memorable evaluation password:
+
+| Stakeholder Persona | Email Address | Password | Landing Workspace | Key Capabilities to Test |
+| :--- | :--- | :--- | :--- | :--- |
+| **Student / Trainee** | `trainee@skillsense.demo` | `DemoPassword123!` | `/student` | Cryptographic Skill Passport, NSQF Level 5 Analyzer, AI Career Copilot, Placement Submissions |
+| **Corporate Employer** | `employer@skillsense.demo` | `DemoPassword123!` | `/employer` | Cryptographic Ledger Verifier, Fraud-Proof Candidate Matching, Placement Verifications |
+| **Training Provider / Institute** | `provider@skillsense.demo` | `DemoPassword123!` | `/institute` | Cohort Longitudinal Outcomes, Dynamic ROI Engine, Batch Assessment & Credential Minting |
+| **Government / Directorate** | `government@skillsense.demo` | `DemoPassword123!` | `/government` | District Skill Gap Heatmaps, Macro Outcome Funnels, Policy Intelligence Copilot |
+| **Sector Skill Council / Industry** | `industry@skillsense.demo` | `DemoPassword123!` | `/industry` | Labor Demand Forecasting, Regional Hiring Benchmarks, Emerging Skill Cluster Telemetry |
+| **Platform Administrator** | `admin@skillsense.demo` | `DemoPassword123!` | `/admin` | Algorithmic Fairness Engine, Demographic Parity Auditing, System Governance, Audit Logs |
+
+---
+
+## 3. How to Access the Workspaces
+
+1. Navigate to the official sign-in page: **[`/auth`](http://localhost:3000/auth)**.
+2. Select **Email & Password** sign-in tab.
+3. Enter the evaluation email and password from the table above.
+4. Click **Sign In to Workspace**.
+5. The system automatically verifies your credentials against the backend API, sets secure HTTP-only cookies, and routes you to the authoritative role dashboard.
+
+### Testing Role-Based Access Control (RBAC):
+- If you sign in as a **Student** (`trainee@skillsense.demo`) and manually attempt to browse to `/admin` or `/employer`, the **Next.js Edge Proxy** will intercept your request and redirect you back to `/student`.
+- Attempting to bypass route guards with forged client-side tokens will result in immediate termination of the session and redirection to `/auth`.
+
+---
+
+## 4. Mobile Phone OTP Evaluation Flow
+
+You can also test passwordless mobile OTP authentication:
+
+1. Navigate to **[`/auth?method=mobile`](http://localhost:3000/auth?method=mobile)**.
+2. Enter any 10-digit Indian mobile number (e.g. `9876543210`).
+3. In development environments (`NODE_ENV=development`), the terminal console logs the generated 6-digit OTP code, and the response data includes the test code helper.
+4. Enter the 6-digit code on `/auth/mobile/verify` to complete authentication.
+
+---
+
+## 5. Public Product & Architectural Showcases
+
+Public visitors and non-authenticated evaluators can explore the platform through official public architecture pages without entering protected environments:
+
+| Public Page | URL | Purpose |
+| :--- | :--- | :--- |
+| **Public Landing Page** | `/` | Product overview, live telemetry status, and NSQF Level 4–8 compliance |
+| **Trainee Product Hub** | `/for-trainees` | Overview of verifiable skill portfolios and career mobility tools |
+| **Employer Solutions Hub** | `/for-employers` | Cryptographic verification and credential fraud prevention overview |
+| **Training Provider Hub** | `/for-training-providers` | Longitudinal placement tracking and dynamic ROI methodology |
+| **Government Policy Hub** | `/for-government` | Macro skilling analytics and district allocation architecture |
+| **Workforce Analytics** | `/workforce-analytics` | Macro outcome metrics and retention intelligence overview |
+| **Cryptographic Skill Passport** | `/skill-passport` | W3C verifiable credential specifications and SHA-256 HMAC proofs |
+| **Public Ledger Verifier** | `/employer-verification` | Public credential hash verification tool (rate-limited) |
+| **DPDP Compliance & Trust** | `/dpdp-trust` | DPDP Act 2023 compliance, data residency, and algorithmic fairness audit |
+
+---
+
+## 6. Environment Flags for Staging Deployments
+
+| Variable | Recommended Production | Description |
+| :--- | :--- | :--- |
+| `NODE_ENV` | `production` | Enables strict HTTPS cookies, hides dev OTPs, and prevents mock auth bypasses. |
+| `DEMO_MODE` | `false` | When set to `false`, `/api/v1/auth/demo-login` returns `404 Not Found`. |
+| `JWT_SECRET` | *(32+ char high-entropy secret)* | Required in production. Weak/default keys will cause backend startup failure. |
+| `CORS_ORIGIN` | `https://ryyvora.ai,https://www.ryyvora.ai` | Strict allowlist of authorized frontend web clients. |

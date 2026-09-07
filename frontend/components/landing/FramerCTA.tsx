@@ -132,7 +132,7 @@ export default function FramerCTA() {
         >
           <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
             <Link
-              href="/exam"
+              href="/auth"
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -148,13 +148,13 @@ export default function FramerCTA() {
                 transition: 'box-shadow 0.2s ease',
               }}
             >
-              Start Skill Assessment <ArrowRight size={17} />
+              Sign In to Workspace <ArrowRight size={17} />
             </Link>
           </motion.div>
 
           <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
             <Link
-              href="/admin/governance"
+              href="/for-government"
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -179,7 +179,7 @@ export default function FramerCTA() {
                 e.currentTarget.style.background = 'rgba(17, 24, 39, 0.85)';
               }}
             >
-              <Landmark size={17} style={{ color: '#06b6d4' }} /> State Mission Cockpit
+              <Landmark size={17} style={{ color: '#06b6d4' }} /> Explore for Government
             </Link>
           </motion.div>
         </motion.div>

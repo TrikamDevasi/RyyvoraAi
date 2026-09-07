@@ -260,16 +260,16 @@ npm run test:seo
 
 ## 🔑 Pre-Seeded Hackathon Demo Credentials
 
-For quick evaluation, pre-seeded accounts for each role are available in the [Demo Guide](file:///c:/Users/trika/Documents/skillsense/TEAM_QUANTUM_CODERS-SU-/docs/product/DEMO_GUIDE.md) or can be accessed via the **Instant Role Switcher** on the sign-in screen:
+For quick evaluation, pre-seeded accounts for each role are available in the [Demo Guide](./docs/product/DEMO_GUIDE.md) and can be accessed via the standard sign-in interface at [`/auth`](http://localhost:3000/auth):
 
-| Role | Email | Password | Access Scope |
-| :--- | :--- | :--- | :--- |
-| **Government** | `govt@skillsense.gov.in` | `GovtPass@2026` | Statewide Heatmap, Fund Allocation, Macro Funnels |
-| **Employer** | `recruiter@tcs.com` | `EmployerPass@2026` | Candidate Validation, SHA-256 Ledger Audit, Batch Hires |
-| **Institute** | `dean@coep.ac.in` | `InstitutePass@2026` | Student Cohort Management, Rubric Scoring, Dynamic ROI |
-| **Student** | `rahul.sharma@gmail.com` | `StudentPass@2026` | Skill Passports, Diagnostic Assessments, Wage Milestones |
-| **Industry** | `director@nasscom.in` | `IndustryPass@2026` | Skill Deficit Radars, NSQF Standards Alignment |
-| **Admin** | `admin@skillsense.gov.in` | `AdminPass@2026` | Algorithmic Fairness, Ledger Audit Trails, User Management |
+| Role | Email | Password | Landing Workspace | Access Scope |
+| :--- | :--- | :--- | :--- | :--- |
+| **Student / Trainee** | `trainee@skillsense.demo` | `DemoPassword123!` | `/student` | Cryptographic Skill Passport, NSQF Level 5 Analyzer, AI Career Copilot |
+| **Corporate Employer** | `employer@skillsense.demo` | `DemoPassword123!` | `/employer` | Cryptographic Ledger Verifier, Fraud-Proof Candidate Matching |
+| **Training Provider / Institute** | `provider@skillsense.demo` | `DemoPassword123!` | `/institute` | Cohort Longitudinal Outcomes, Dynamic ROI Engine, Batch Assessment |
+| **Government / Directorate** | `government@skillsense.demo` | `DemoPassword123!` | `/government` | District Skill Gap Heatmaps, Macro Outcome Funnels, Policy Copilot |
+| **Sector Skill Council / Industry** | `industry@skillsense.demo` | `DemoPassword123!` | `/industry` | Labor Demand Forecasting, Regional Hiring Benchmarks |
+| **Platform Administrator** | `admin@skillsense.demo` | `DemoPassword123!` | `/admin` | Algorithmic Fairness Engine, Demographic Parity, Audit Logs |
 
 ---
 
@@ -282,7 +282,7 @@ For quick evaluation, pre-seeded accounts for each role are available in the [De
 │   │   └── (dashboard)/                     # Protected cockpits (gov, student, emp, inst, admin, industry)
 │   ├── components/                          # Shared UI, charts, landing, layout, three.js
 │   ├── public/                              # Brand assets, high-res photography, manifest
-│   ├── scripts/                             # testFrontend.ts (20/20 tests), verifySeo.ts
+│   ├── scripts/                             # testFrontend.ts (23/23 tests), verifySeo.ts
 │   └── package.json                         # ryyvora-ai-frontend
 │
 ├── backend/                                 # Express.js 5 API + Multi-Provider AI
@@ -292,15 +292,15 @@ For quick evaluation, pre-seeded accounts for each role are available in the [De
 │   │   ├── models/                          # Mongoose models & indices
 │   │   ├── routes/                          # REST route definitions
 │   │   └── middleware/                      # Auth, RBAC, Rate-limit, Error handling
-│   ├── tests/                               # 13 Automated test suites (11/11 tests pass)
+│   ├── tests/                               # 14 Automated test suites (11/11 backend tests pass)
 │   └── package.json                         # ryyvora-ai-backend
 │
 ├── docs/                                    # Documentation Hub
 │   ├── architecture/                        # REPOSITORY_STRUCTURE.md
 │   ├── api/                                 # API_CONTRACTS.md
 │   ├── product/                             # DEMO_GUIDE.md, SIH_REQUIREMENT_MATRIX.md
-│   ├── design/                              # IMAGE_SOURCES.md
-│   ├── audits/                              # 20 Preserved audit and remediation reports
+│   ├── design/                              # IMAGE_SOURCES.md, RYYVORA_BRAND_ASSETS.md
+│   ├── audits/                              # 25 Preserved audit, security and remediation reports
 │   └── references/                          # Isolated Framer design reference assets
 │
 ├── scripts/                                 # Master verification scripts
@@ -314,17 +314,20 @@ For quick evaluation, pre-seeded accounts for each role are available in the [De
 
 ## 📑 Comprehensive Documentation Index
 
-All in-depth architecture reports, SIH compliance audits, and engineering notes are maintained in **[`docs/`](file:///c:/Users/trika/Documents/skillsense/TEAM_QUANTUM_CODERS-SU-/docs/README.md)**:
+All in-depth architecture reports, SIH compliance audits, and engineering notes are maintained in **[`docs/`](./docs/README.md)**:
 
-1. **[Repository Structure Architecture](file:///c:/Users/trika/Documents/skillsense/TEAM_QUANTUM_CODERS-SU-/docs/architecture/REPOSITORY_STRUCTURE.md)**: Master blueprint, folder responsibilities, and data flow.
-2. **[API Contracts](file:///c:/Users/trika/Documents/skillsense/TEAM_QUANTUM_CODERS-SU-/docs/api/API_CONTRACTS.md)**: Complete REST API schemas and payloads.
-3. **[Real AI Implementation Report](file:///c:/Users/trika/Documents/skillsense/TEAM_QUANTUM_CODERS-SU-/docs/audits/RYYVORA_AI_IMPLEMENTATION_REPORT.md)**: Zero mock certification, Groq setup, sub-second latency, and Phase 9 DPDP safeguards.
-4. **[Product-Wide Design System Report](file:///c:/Users/trika/Documents/skillsense/TEAM_QUANTUM_CODERS-SU-/docs/audits/RYVORA_PRODUCT_WIDE_UI_UPGRADE_REPORT.md)**: Enterprise design language upgrade across all persona cockpits.
-5. **[Brand Migration Report](file:///c:/Users/trika/Documents/skillsense/TEAM_QUANTUM_CODERS-SU-/docs/audits/BRAND_MIGRATION_RYYVORA_REPORT.md)**: Positioning Ryyvora AI for SIH26135.
-6. **[Authentication Experience Report](file:///c:/Users/trika/Documents/skillsense/TEAM_QUANTUM_CODERS-SU-/docs/audits/SIGNIN_UI_REDESIGN_REPORT.md)**: Sign-in redesign with live tickers and role switchers.
-7. **[Mobile UX Redesign Report](file:///c:/Users/trika/Documents/skillsense/TEAM_QUANTUM_CODERS-SU-/docs/audits/MOBILE_UX_REDESIGN_REPORT.md)**: Mobile viewport optimization and zero-scroll containerization.
-8. **[SIH Requirement Traceability Matrix](file:///c:/Users/trika/Documents/skillsense/TEAM_QUANTUM_CODERS-SU-/docs/product/SIH_REQUIREMENT_MATRIX.md)**: Mapping platform features to ministry criteria.
-9. **[Complete Documentation Hub](file:///c:/Users/trika/Documents/skillsense/TEAM_QUANTUM_CODERS-SU-/docs/README.md)**: Full master index of all documentation and audit files.
+1. **[Repository Structure Architecture](./docs/architecture/REPOSITORY_STRUCTURE.md)**: Master blueprint, folder responsibilities, and data flow.
+2. **[API Contracts](./docs/api/API_CONTRACTS.md)**: Complete REST API schemas and payloads.
+3. **[Security Hardening Report](./docs/audits/SECURITY_HARDENING_REPORT.md)**: Full-stack security audit, privilege escalation prevention, OAuth open redirect defense, and Next.js Edge proxy RBAC.
+4. **[Landing Page Test Access Removal Report](./docs/audits/LANDING_TEST_ACCESS_REMOVAL_REPORT.md)**: Elimination of direct demo access, mock client tokens, and establishment of clean informational routing.
+5. **[Evaluator Demo Guide](./docs/product/DEMO_GUIDE.md)**: Complete evaluator instructions, seed commands, and authorized credentials.
+6. **[Real AI Implementation Report](./docs/audits/RYYVORA_AI_IMPLEMENTATION_REPORT.md)**: Zero mock certification, Groq setup, sub-second latency, and Phase 9 DPDP safeguards.
+7. **[Product-Wide Design System Report](./docs/audits/RYVORA_PRODUCT_WIDE_UI_UPGRADE_REPORT.md)**: Enterprise design language upgrade across all persona cockpits.
+8. **[Brand Migration Report](./docs/audits/BRAND_MIGRATION_RYYVORA_REPORT.md)**: Positioning Ryyvora AI for SIH26135.
+9. **[Authentication Experience Report](./docs/audits/SIGNIN_UI_REDESIGN_REPORT.md)**: Sign-in redesign with live telemetry stats and cryptographic verification badge.
+10. **[Mobile UX Redesign Report](./docs/audits/MOBILE_UX_REDESIGN_REPORT.md)**: Mobile viewport optimization and zero-scroll containerization.
+11. **[SIH Requirement Traceability Matrix](./docs/product/SIH_REQUIREMENT_MATRIX.md)**: Mapping platform features to ministry criteria.
+12. **[Complete Documentation Hub](./docs/README.md)**: Full master index of all documentation and audit files.
 
 ---
 

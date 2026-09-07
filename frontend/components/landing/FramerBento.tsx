@@ -232,10 +232,10 @@ export default function FramerBento() {
               {/* Stakeholder Pill Icons */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
                 {[
-                  { href: '/admin/governance', icon: <Landmark size={17} />, title: 'Government Cockpit' },
-                  { href: '/employer', icon: <Building2 size={17} />, title: 'Employer Portal' },
-                  { href: '/student', icon: <GraduationCap size={17} />, title: 'Trainee Journey' },
-                  { href: '/verify/demo-hash', icon: <ShieldCheck size={17} />, title: 'Public Verifier' },
+                  { href: '/for-government', icon: <Landmark size={17} />, title: 'Government Solutions' },
+                  { href: '/for-employers', icon: <Building2 size={17} />, title: 'Employer Intelligence' },
+                  { href: '/for-trainees', icon: <GraduationCap size={17} />, title: 'Trainee Hub' },
+                  { href: '/employer-verification', icon: <ShieldCheck size={17} />, title: 'Public Verifier' },
                 ].map(({ href, icon, title }) => (
                   <Link
                     key={href}
@@ -319,7 +319,7 @@ export default function FramerBento() {
               </div>
 
               <Link
-                href="/student"
+                href="/for-trainees"
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
@@ -331,7 +331,7 @@ export default function FramerBento() {
                   textDecoration: 'none',
                 }}
               >
-                Launch Trainee Passport <ArrowRight size={14} />
+                Explore Trainee Passport <ArrowRight size={14} />
               </Link>
             </motion.div>
           </motion.div>
@@ -577,7 +577,7 @@ export default function FramerBento() {
                 Zero forged resumes. Instant cryptographic validation backed by employer cryptographic seals.
               </p>
               <Link
-                href="/employer"
+                href="/for-employers"
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
@@ -589,7 +589,7 @@ export default function FramerBento() {
                   textDecoration: 'none',
                 }}
               >
-                Employer Portal <ArrowRight size={13} />
+                Employer Verification <ArrowRight size={13} />
               </Link>
             </motion.div>
 

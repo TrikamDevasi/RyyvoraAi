@@ -18,7 +18,6 @@ import {
   Globe,
   Factory,
   Settings,
-  Zap,
   ShieldCheck,
   CircleAlert,
   Smartphone,
@@ -46,14 +45,6 @@ const ROLE_DASHBOARD: Record<string, string> = {
   admin: '/admin',
 };
 
-const DEMO_ACCOUNTS: Record<UserRole, { name: string; email: string; role: UserRole; defaultRoute: string }> = {
-  student: { name: 'Aarav Deshmukh', email: 'trainee@skillsense.demo', role: 'student', defaultRoute: '/student' },
-  employer: { name: 'Tata Consultancy Services (TCS)', email: 'employer@skillsense.demo', role: 'employer', defaultRoute: '/employer' },
-  institute: { name: 'MSSDS Pune Regional Training Center', email: 'provider@skillsense.demo', role: 'institute', defaultRoute: '/institute' },
-  government: { name: 'Maharashtra Skilling Directorate', email: 'government@skillsense.demo', role: 'government', defaultRoute: '/government' },
-  industry: { name: 'Sector Skill Council Intelligence Lead', email: 'industry@skillsense.demo', role: 'industry', defaultRoute: '/industry' },
-  admin: { name: 'Ryyvora System Administrator', email: 'admin@skillsense.demo', role: 'admin', defaultRoute: '/admin' },
-};
 
 /**
  * Validates and sanitizes redirect destinations to prevent open redirect vulnerabilities.
@@ -88,7 +79,7 @@ export default function AuthPage() {
   const searchParams = useSearchParams();
   const { login, register, setAuth, sendMobileOtp } = useAuthStore();
 
-  const [activeTab, setActiveTab] = useState<'signin' | 'signup' | 'demo'>('signin');
+  const [activeTab, setActiveTab] = useState<'signin' | 'signup'>('signin');
   const [authMethod, setAuthMethod] = useState<'email' | 'mobile'>('email');
   const [mobilePhone, setMobilePhone] = useState('');
   const [mobileLoading, setMobileLoading] = useState(false);
@@ -114,8 +105,6 @@ export default function AuthPage() {
     const tabParam = searchParams.get('tab');
     if (tabParam === 'signup') {
       setActiveTab('signup');
-    } else if (tabParam === 'demo') {
-      setActiveTab('demo');
     }
   }, [searchParams]);
 
@@ -240,22 +229,6 @@ export default function AuthPage() {
     }
   };
 
-  const handleInstantDemoLogin = (role: UserRole) => {
-    const demo = DEMO_ACCOUNTS[role];
-    const demoUser = {
-      _id: `demo_${role}_001`,
-      id: `demo_${role}_001`,
-      name: demo.name,
-      email: demo.email,
-      role,
-      isVerified: true,
-      authProvider: 'local' as const,
-    };
-    const demoToken = `demo_token_${role}_${Date.now()}`;
-    setAuth(demoUser, demoToken);
-    const destination = getSafeRedirect(searchParams.get('redirect'), demo.defaultRoute);
-    router.push(destination);
-  };
 
   return (
     <div className="auth-page">
@@ -334,9 +307,7 @@ export default function AuthPage() {
               <div className="auth-eyebrow">
                 <ShieldCheck size={11} />
                 <span>
-                  {activeTab === 'demo'
-                    ? '1-Click Interactive Access'
-                    : activeTab === 'signup'
+                  {activeTab === 'signup'
                     ? 'Institutional Onboarding'
                     : 'Enterprise Authentication'}
                 </span>
@@ -345,13 +316,11 @@ export default function AuthPage() {
               <h1 className="auth-title">
                 {activeTab === 'signin' && 'Welcome back'}
                 {activeTab === 'signup' && 'Create Verified Account'}
-                {activeTab === 'demo' && 'Instant Demo Portals'}
               </h1>
 
               <p className="auth-subtitle">
                 {activeTab === 'signin' && 'Sign in to continue to your sovereign workspace.'}
                 {activeTab === 'signup' && 'Join the national workforce outcome intelligence ecosystem.'}
-                {activeTab === 'demo' && 'Select any stakeholder role to preview interactive dashboards:'}
               </p>
             </div>
 
@@ -560,19 +529,6 @@ export default function AuthPage() {
                   <span>Continue with Google</span>
                 </button>
 
-                {/* Compact Demo Portals Trigger */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setActiveTab('demo');
-                    setError(null);
-                  }}
-                  className="auth-demo-trigger-compact"
-                  aria-label="Preview instant demo portals"
-                >
-                  <Zap size={12} />
-                  <span>Instant Demo Portals (6 Personas)</span>
-                </button>
 
                 {/* Footer Switch */}
                 <div className="auth-footer-nav">
@@ -741,57 +697,6 @@ export default function AuthPage() {
               </>
             )}
 
-            {/* ── Mode 3: Instant Demo Portals (Zero-Scroll 6-Persona Grid) ── */}
-            {activeTab === 'demo' && (
-              <div>
-                <div className="auth-demo-grid">
-                  {ROLES.map(({ key, label, desc, icon: Icon, badge }) => (
-                    <button
-                      key={key}
-                      type="button"
-                      onClick={() => handleInstantDemoLogin(key)}
-                      className="auth-demo-role-btn"
-                    >
-                      <div className="auth-demo-role-icon">
-                        <Icon size={14} />
-                      </div>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <span className="auth-demo-role-title">{label}</span>
-                          <span className="auth-demo-role-badge">{badge}</span>
-                        </div>
-                        <span
-                          style={{
-                            fontSize: 9.5,
-                            color: 'var(--text-muted, #64748B)',
-                            display: 'block',
-                            marginTop: 1,
-                            whiteSpace: 'nowrap',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                          }}
-                        >
-                          {desc}
-                        </span>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setActiveTab('signin');
-                    setError(null);
-                  }}
-                  className="auth-btn-secondary"
-                  style={{ marginTop: 6 }}
-                >
-                  <ArrowLeft size={14} />
-                  <span>Return to Standard Sign In</span>
-                </button>
-              </div>
-            )}
 
             {/* ── Legal & DPDP Compliance Footnote ── */}
             <div className="auth-legal-text">

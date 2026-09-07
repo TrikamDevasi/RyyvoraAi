@@ -241,44 +241,16 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   demoLogin: async (role: UserRole) => {
     set({ loading: true, error: null });
     try {
-      const response = await api.post('/auth/demo-login', { role }, { timeout: 600 });
+      const response = await api.post('/auth/demo-login', { role });
       const { user, token } = response.data.data;
       setTokens(token, user.role);
       persistUser(user);
       set({ user, accessToken: token, loading: false, isAuthenticated: true });
       return user;
-    } catch {
-      // If backend is unreachable, activate seamless persistent local demo session
-      const demoNames: Record<UserRole, string> = {
-        student: 'Aarav Deshmukh',
-        employer: 'Tata Consultancy Services (TCS)',
-        institute: 'MSSDS Pune Regional Training Center',
-        government: 'Maharashtra Skilling Directorate',
-        industry: 'Sector Skill Council Intelligence Lead',
-        admin: 'System Admin',
-      };
-      const demoEmails: Record<UserRole, string> = {
-        student: 'trainee@skillsense.demo',
-        employer: 'employer@skillsense.demo',
-        institute: 'provider@skillsense.demo',
-        government: 'government@skillsense.demo',
-        industry: 'industry@skillsense.demo',
-        admin: 'admin@skillsense.demo',
-      };
-      const demoUser: AuthUser = {
-        _id: `demo_${role}_001`,
-        id: `demo_${role}_001`,
-        name: demoNames[role] || 'Demo User',
-        email: demoEmails[role] || `${role}.demo@skillsense.demo`,
-        role,
-        isVerified: true,
-        authProvider: 'local',
-      };
-      const demoToken = `demo_token_${role}_${Date.now()}`;
-      setTokens(demoToken, role);
-      persistUser(demoUser);
-      set({ user: demoUser, accessToken: demoToken, loading: false, isAuthenticated: true });
-      return demoUser;
+    } catch (err: any) {
+      const message = err.response?.data?.message || 'Demo login is unavailable.';
+      set({ loading: false, error: message });
+      throw new Error(message);
     }
   },
 
@@ -288,16 +260,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       : null;
 
     if (!token || get().loading) return;
-
-    const isDemo = token.startsWith('demo_') || token.includes('demo');
-    if (isDemo) {
-      const storedUser = getStoredUser();
-      if (storedUser) {
-        setTokens(token, storedUser.role);
-        set({ user: storedUser, accessToken: token, loading: false, isAuthenticated: true });
-        return;
-      }
-    }
 
     set({ loading: true });
     try {
@@ -309,13 +271,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       set({ user, accessToken: token, loading: false, isAuthenticated: true });
     } catch {
-      const storedUser = getStoredUser();
-      if (storedUser && isDemo) {
-        set({ user: storedUser, accessToken: token, loading: false, isAuthenticated: true });
-      } else {
-        removeTokens();
-        set({ user: null, accessToken: null, loading: false, isAuthenticated: false });
-      }
+      removeTokens();
+      set({ user: null, accessToken: null, loading: false, isAuthenticated: false });
     }
   },
 

@@ -32,31 +32,11 @@ router.post('/assess-skill/evaluate', optionalProtect, aiLimiter, evaluateSkill)
 router.post('/policy-copilot', protect, requireRole('government', 'admin'), aiLimiter, policyCopilot);
 router.get('/interventions', getPolicyInterventions);
 
-// Employer Candidate Match: strictly checks role (industry, employer, admin)
-router.post('/match-candidate', optionalProtect, (req, res, next) => {
-  if (req.user && !['industry', 'employer', 'admin'].includes(req.user.role)) {
-    res.status(403).json({
-      success: false,
-      data: null,
-      message: `Forbidden. Role '${req.user.role}' is not authorized to run candidate matching.`,
-    });
-    return;
-  }
-  next();
-}, aiLimiter, matchCandidate);
+// Employer Candidate Match: strictly requires authenticated industry, employer, or admin user
+router.post('/match-candidate', protect, requireRole('industry', 'employer', 'admin'), aiLimiter, matchCandidate);
 
-// Institute Cohort & Curriculum Analysis: strictly checks role (institute, admin, government)
-router.post('/cohort-analysis', optionalProtect, (req, res, next) => {
-  if (req.user && !['institute', 'admin', 'government'].includes(req.user.role)) {
-    res.status(403).json({
-      success: false,
-      data: null,
-      message: `Forbidden. Role '${req.user.role}' is not authorized to run cohort analytics.`,
-    });
-    return;
-  }
-  next();
-}, aiLimiter, cohortAnalysis);
+// Institute Cohort & Curriculum Analysis: strictly requires authenticated institute, admin, or government user
+router.post('/cohort-analysis', protect, requireRole('institute', 'admin', 'government'), aiLimiter, cohortAnalysis);
 
 // Protected AI Routes
 router.use(protect);

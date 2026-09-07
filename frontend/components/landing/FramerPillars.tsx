@@ -18,8 +18,8 @@ const PILLARS = [
     description:
       'Replaces subjective paper resumes with deep AI-driven competency mapping. Trainees complete real-world scenario challenges that benchmark their capabilities directly against National Skill Qualification Framework (NSQF Level 4–8) standards.',
     tags: ['AI Skill Diagnostics', 'NSQF Level 4–8', 'Adaptive Assessment', 'Skill Gap Heatmap', 'Career Matching'],
-    ctaText: 'Explore Trainee Journey',
-    ctaLink: '/student',
+    ctaText: 'Explore Trainee Platform',
+    ctaLink: '/for-trainees',
     image: '/images/reference/platform-telemetry-banner.png',
     bgColor: 'linear-gradient(150deg, rgba(30, 58, 138, 0.4) 0%, rgba(15, 23, 42, 0.9) 100%)',
     borderColor: 'rgba(59, 130, 246, 0.25)',
@@ -37,8 +37,8 @@ const PILLARS = [
     description:
       'Enterprise talent acquisition teams verify candidate capabilities instantly via cryptographic SHA-256 seals. Eliminates weeks of background checking and guarantees candidates possess verified, hands-on job readiness before day one.',
     tags: ['Instant Verification', 'Zero Credential Fraud', 'SLA Hiring', 'Enterprise Portal', 'DPDP Compliant'],
-    ctaText: 'Launch Employer Portal',
-    ctaLink: '/employer',
+    ctaText: 'Explore Employer Verification',
+    ctaLink: '/for-employers',
     image: '/images/reference/employer-verification-mobile.png',
     bgColor: 'linear-gradient(150deg, rgba(88, 28, 135, 0.4) 0%, rgba(15, 23, 42, 0.9) 100%)',
     borderColor: 'rgba(168, 85, 247, 0.25)',
@@ -56,11 +56,11 @@ const PILLARS = [
     description:
       'Traditional schemes celebrate initial job placement then lose visibility. Ryyvora tracks sustained career outcomes at 3-month, 6-month, and 12-month intervals with verified salary increments, employer satisfaction, and economic mobility telemetry.',
     tags: ['12-Month Retention', 'Wage Progression', 'EPFO Verification', 'Livelihood ROI', 'Longitudinal Tracking'],
-    ctaText: 'Inspect Outcome Telemetry',
-    ctaLink: '/verify/demo-hash',
+    ctaText: 'Inspect Workforce Telemetry',
+    ctaLink: '/workforce-analytics',
     image: '/images/reference/retention-telemetry.png',
     bgColor: 'linear-gradient(150deg, rgba(6, 95, 70, 0.4) 0%, rgba(15, 23, 42, 0.9) 100%)',
-    borderColor: 'rgba(16, 185, 129, 0.25)',
+    borderColor: 'rgba(168, 85, 129, 0.25)',
     reversed: false,
     stats: [
       { label: '12-Month Retention', value: '89.6%' },
@@ -75,8 +75,8 @@ const PILLARS = [
     description:
       'Governments access live district-level heatmaps, scheme expenditure ROI dashboards, and automated policy intervention triggers. Transforms passive reporting into proactive, data-driven workforce policy reform.',
     tags: ['District Heatmaps', 'Scheme ROI', 'Policy Interventions', 'Real-Time Analytics', 'National Coverage'],
-    ctaText: 'Enter Governance Cockpit',
-    ctaLink: '/admin/governance',
+    ctaText: 'Explore Policy Intelligence',
+    ctaLink: '/for-government',
     image: '/images/reference/cockpit-laptop-preview.png',
     bgColor: 'linear-gradient(150deg, rgba(120, 53, 15, 0.4) 0%, rgba(15, 23, 42, 0.9) 100%)',
     borderColor: 'rgba(245, 158, 11, 0.25)',

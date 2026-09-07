@@ -5,11 +5,12 @@ import {
   verifyPublicPassport,
 } from '../controllers/verification.controller';
 import { protect, requireRole } from '../middleware/auth.middleware';
+import { verificationLimiter } from '../middleware/rateLimit.middleware';
 
 const router = Router();
 
-// Public cryptographic ledger verification (no auth required)
-router.get('/public/:hash', verifyPublicPassport);
+// Public cryptographic ledger verification (rate limited)
+router.get('/public/:hash', verificationLimiter, verifyPublicPassport);
 
 // Employer authenticated routes
 router.get('/pending', protect, requireRole('employer', 'admin', 'government'), getPendingVerifications);

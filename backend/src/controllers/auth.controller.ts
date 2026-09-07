@@ -24,18 +24,25 @@ const loginSchema = z.object({
 // Helper to set auth cookies (token + role for Edge proxy & frontend state)
 // Sets both ryyvora_* and legacy skillsense_* cookies for zero-downtime dual-brand compatibility
 const setAuthCookie = (res: Response, token: string, role?: string) => {
-  const cookieOpts = {
-    httpOnly: false,
+  const tokenOpts = {
+    httpOnly: true, // HARDENED: Prevent malicious JavaScript token theft via XSS
     secure: env.NODE_ENV === 'production',
     sameSite: 'lax' as const,
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     path: '/',
   };
-  res.cookie('ryyvora_token', token, cookieOpts);
-  res.cookie('skillsense_token', token, cookieOpts);
+  res.cookie('ryyvora_token', token, tokenOpts);
+  res.cookie('skillsense_token', token, tokenOpts);
   if (role) {
-    res.cookie('ryyvora_role', role, cookieOpts);
-    res.cookie('skillsense_role', role, cookieOpts);
+    const roleOpts = {
+      httpOnly: false,
+      secure: env.NODE_ENV === 'production',
+      sameSite: 'lax' as const,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: '/',
+    };
+    res.cookie('ryyvora_role', role, roleOpts);
+    res.cookie('skillsense_role', role, roleOpts);
   }
 };
 
@@ -349,7 +356,8 @@ export const forgotPassword = async (req: Request, res: Response) => {
 
     const user = await User.findOne({ email: String(email).toLowerCase() });
     if (!user) {
-      res.status(404).json({ success: false, message: 'No account found with this email' });
+      // Prevent user enumeration attacks: return generic success message even if email is not found
+      res.json({ success: true, message: 'If that email is registered, password reset instructions have been sent.' });
       return;
     }
 
@@ -367,7 +375,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
       }
     }
 
-    res.json({ success: true, message: 'Password reset link sent to your email' });
+    res.json({ success: true, message: 'If that email is registered, password reset instructions have been sent.' });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Could not process forgot password request' });
   }

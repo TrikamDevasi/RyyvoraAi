@@ -187,7 +187,7 @@ export default function FramerHero() {
           }}
         >
           <Link
-            href="/exam"
+            href="/for-trainees"
             style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -205,11 +205,11 @@ export default function FramerHero() {
             onMouseEnter={(e) => (e.currentTarget.style.transform = 'translateY(-2px)')}
             onMouseLeave={(e) => (e.currentTarget.style.transform = 'translateY(0)')}
           >
-            <Sparkles size={16} /> Analyze Skills Now <ArrowRight size={15} />
+            <Sparkles size={16} /> Explore the Platform <ArrowRight size={15} />
           </Link>
 
           <Link
-            href="/admin/governance"
+            href="/for-government"
             style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -234,11 +234,11 @@ export default function FramerHero() {
               e.currentTarget.style.background = 'rgba(17, 24, 39, 0.8)';
             }}
           >
-            <Activity size={16} style={{ color: '#06b6d4' }} /> Government Cockpit
+            <Activity size={16} style={{ color: '#06b6d4' }} /> For Government
           </Link>
 
           <Link
-            href="/verify/demo-hash"
+            href="/employer-verification"
             style={{
               display: 'inline-flex',
               alignItems: 'center',

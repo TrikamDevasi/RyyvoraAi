@@ -39,6 +39,10 @@ const envSchema = z.object({
   // Passport secret
   PASSPORT_SECRET: z.string().default('skillsense-passport-verification-secret'),
 
+  // ── Demo Access Control ──────────────────────────────────────────────────────
+  // In production, DEMO_MODE is strictly disabled by default. Must be 'false' unless explicitly enabled for isolated staging.
+  DEMO_MODE: z.enum(['true', 'false']).default('false'),
+
   // ── Billing Configuration ───────────────────────────────────────────────────
   // BILLING_MODE: 'demo' (default, no real payment) | 'razorpay' | 'stripe'
   BILLING_MODE: z.enum(['demo', 'razorpay', 'stripe']).default('demo'),
@@ -57,7 +61,17 @@ const parseEnv = () => {
       throw new Error('Fatal: Invalid environment configuration in production');
     }
   }
-  return result.success ? result.data : envSchema.parse({});
+
+  const data = result.success ? result.data : envSchema.parse({});
+
+  // Security guard: In production, reject weak or default JWT secret
+  if (data.NODE_ENV === 'production') {
+    if (!process.env.JWT_SECRET || process.env.JWT_SECRET === 'skillsense_jwt_secret_production_key_32chars_min') {
+      throw new Error('Fatal Security Invariant: JWT_SECRET must be set to a secure, unique 32+ character key in production.');
+    }
+  }
+
+  return data;
 };
 
 export const env = parseEnv();

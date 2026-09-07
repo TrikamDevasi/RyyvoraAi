@@ -17,6 +17,13 @@ import { authLimiter, otpSendLimiter, otpVerifyLimiter } from '../middleware/rat
 import { IUser } from '../models/User.model';
 import { signToken } from '../utils/jwt.utils';
 import env from '../config/env';
+import { validateTrustedOrigin } from '../config/origins';
+
+const sanitizeOAuthRole = (candidate: string | null | undefined): string => {
+  const safeRoles = ['student', 'employer', 'institute', 'industry'];
+  const normalized = (candidate || '').toLowerCase().trim();
+  return safeRoles.includes(normalized) ? normalized : 'student';
+};
 
 const router = Router();
 
@@ -44,6 +51,14 @@ router.post('/mobile/link-phone', protect, linkMobilePhone);
 router.post('/register', authLimiter, register);
 router.post('/login', authLimiter, login);
 router.post('/demo-login', async (req: Request, res: Response) => {
+  // Strict environment guard: demo-login is disabled in production and when DEMO_MODE is false
+  if (env.NODE_ENV === 'production' || env.DEMO_MODE !== 'true') {
+    res.status(404).json({
+      success: false,
+      message: 'Demo login is disabled in this environment. Please authenticate via standard sign in.',
+    });
+    return;
+  }
   try {
     const role = (req.body.role || 'student').toLowerCase();
     const demoEmails: Record<string, string> = {
@@ -116,29 +131,29 @@ router.post('/demo-login', async (req: Request, res: Response) => {
     const token = signToken({ id: String(user._id), role: user.role, email: user.email });
 
     res.cookie('ryyvora_token', token, {
-      httpOnly: false,
-      secure: env.NODE_ENV === 'production',
+      httpOnly: true,
+      secure: false,
       sameSite: 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000,
       path: '/',
     });
     res.cookie('skillsense_token', token, {
-      httpOnly: false,
-      secure: env.NODE_ENV === 'production',
+      httpOnly: true,
+      secure: false,
       sameSite: 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000,
       path: '/',
     });
     res.cookie('ryyvora_role', user.role, {
       httpOnly: false,
-      secure: env.NODE_ENV === 'production',
+      secure: false,
       sameSite: 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000,
       path: '/',
     });
     res.cookie('skillsense_role', user.role, {
       httpOnly: false,
-      secure: env.NODE_ENV === 'production',
+      secure: false,
       sameSite: 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000,
       path: '/',
@@ -167,6 +182,16 @@ router.post('/demo-login', async (req: Request, res: Response) => {
 });
 router.post('/switch-role', protect, async (req: Request, res: Response) => {
   try {
+    const currentUser = req.user as IUser;
+    // Privilege Escalation Guard: Only administrators can switch stakeholder perspective
+    if (!currentUser || currentUser.role !== 'admin') {
+      res.status(403).json({
+        success: false,
+        message: 'Forbidden: Only platform administrators are authorized to switch stakeholder perspectives.',
+      });
+      return;
+    }
+
     const rawRole = (req.body.role || '').toLowerCase();
     const validRoles = ['student', 'employer', 'institute', 'industry', 'government', 'admin'];
     if (!validRoles.includes(rawRole)) {
@@ -187,14 +212,14 @@ router.post('/switch-role', protect, async (req: Request, res: Response) => {
     const token = signToken({ id: String(user._id), role: user.role, email: user.email });
 
     res.cookie('ryyvora_token', token, {
-      httpOnly: false,
+      httpOnly: true,
       secure: env.NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000,
       path: '/',
     });
     res.cookie('skillsense_token', token, {
-      httpOnly: false,
+      httpOnly: true,
       secure: env.NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000,
@@ -266,16 +291,19 @@ const isGoogleConfigured = () => {
 
 // ── Google OAuth ───────────────────────────────────────────────────────────────
 router.get('/google', (req: Request, res: Response, next) => {
-  const origin = (req.query.origin as string) || (req.headers.referer ? new URL(req.headers.referer).origin : null) || env.FRONTEND_URL || 'http://localhost:5173';
-  const role = ((req.query.role as string) || '').toLowerCase();
+  const origin = validateTrustedOrigin((req.query.origin as string) || (req.headers.referer ? new URL(req.headers.referer).origin : null));
+  const role = sanitizeOAuthRole(req.query.role as string);
   const statePayload = Buffer.from(JSON.stringify({ origin, role })).toString('base64');
 
   if (!isGoogleConfigured()) {
+    if (env.NODE_ENV === 'production') {
+      return res.redirect(`${origin}/auth?error=oauth_failed`);
+    }
     // If not configured in development, perform dev login
     (async () => {
       try {
         let user = await User.findOne({ email: 'google.dev@skillsense.demo' });
-        const userRole = (role && ['student', 'employer', 'institute', 'industry', 'government', 'admin'].includes(role)) ? role : 'student';
+        const userRole = role;
         if (!user) {
           user = await User.create({
             name: 'Google Verified User',
@@ -317,15 +345,15 @@ router.get('/google', (req: Request, res: Response, next) => {
 
 router.get('/google/callback',
   (req: Request, res: Response, next) => {
-    let origin = env.FRONTEND_URL || 'http://localhost:5173';
+    let origin = validateTrustedOrigin(null);
     try {
       const stateRaw = (req.query.state as string) || '';
       if (stateRaw) {
         const decoded = JSON.parse(Buffer.from(stateRaw, 'base64').toString('utf-8'));
-        if (decoded.origin) origin = decoded.origin;
+        if (decoded.origin) origin = validateTrustedOrigin(decoded.origin);
       }
     } catch {
-      if ((req.query.state as string)?.startsWith('http')) origin = req.query.state as string;
+      if ((req.query.state as string)?.startsWith('http')) origin = validateTrustedOrigin(req.query.state as string);
     }
     passport.authenticate('google', {
       session: false,
@@ -334,24 +362,24 @@ router.get('/google/callback',
   },
   async (req: Request, res: Response) => {
     let user = req.user as IUser;
-    let origin = env.FRONTEND_URL || 'http://localhost:5173';
+    let origin = validateTrustedOrigin(null);
     let requestedRole = '';
 
     try {
       const stateRaw = (req.query.state as string) || '';
       if (stateRaw) {
         const decoded = JSON.parse(Buffer.from(stateRaw, 'base64').toString('utf-8'));
-        if (decoded.origin) origin = decoded.origin;
-        if (decoded.role) requestedRole = String(decoded.role).toLowerCase();
+        if (decoded.origin) origin = validateTrustedOrigin(decoded.origin);
+        if (decoded.role) requestedRole = sanitizeOAuthRole(decoded.role);
       }
     } catch {
-      if ((req.query.state as string)?.startsWith('http')) origin = req.query.state as string;
+      if ((req.query.state as string)?.startsWith('http')) origin = validateTrustedOrigin(req.query.state as string);
     }
 
-    const validRoles = ['student', 'employer', 'institute', 'industry', 'government', 'admin'];
-    if (requestedRole && validRoles.includes(requestedRole)) {
+    if (requestedRole) {
       const dbUser = await User.findById(user._id);
-      if (dbUser) {
+      // Privilege Escalation Prevention: Never overwrite admin or government roles from query params
+      if (dbUser && !['admin', 'government'].includes(dbUser.role) && requestedRole !== dbUser.role) {
         dbUser.role = requestedRole as any;
         await dbUser.save();
         user = dbUser;
@@ -362,14 +390,14 @@ router.get('/google/callback',
     const encoded = encodeUser(user);
 
     res.cookie('ryyvora_token', token, {
-      httpOnly: false,
+      httpOnly: true,
       secure: env.NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000,
       path: '/',
     });
     res.cookie('skillsense_token', token, {
-      httpOnly: false,
+      httpOnly: true,
       secure: env.NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000,
@@ -398,16 +426,19 @@ router.get('/google/callback',
 
 // ── GitHub OAuth ───────────────────────────────────────────────────────────────
 router.get('/github', (req: Request, res: Response, next) => {
-  const origin = (req.query.origin as string) || (req.headers.referer ? new URL(req.headers.referer).origin : null) || env.FRONTEND_URL || 'http://localhost:5173';
-  const role = ((req.query.role as string) || '').toLowerCase();
+  const origin = validateTrustedOrigin((req.query.origin as string) || (req.headers.referer ? new URL(req.headers.referer).origin : null));
+  const role = sanitizeOAuthRole(req.query.role as string);
   const statePayload = Buffer.from(JSON.stringify({ origin, role })).toString('base64');
 
   if (!isGitHubConfigured()) {
-    // If GitHub OAuth credentials are not set in .env, seamlessly log in/create the GitHub developer user
+    if (env.NODE_ENV === 'production') {
+      return res.redirect(`${origin}/auth?error=oauth_failed`);
+    }
+    // If GitHub OAuth credentials are not set in development, seamlessly log in/create the GitHub developer user
     (async () => {
       try {
         let user = await User.findOne({ email: 'github.developer@skillsense.demo' });
-        const userRole = (role && ['student', 'employer', 'institute', 'industry', 'government', 'admin'].includes(role)) ? role : 'student';
+        const userRole = role;
         if (!user) {
           user = await User.create({
             name: 'GitHub Verified Developer',
@@ -450,15 +481,15 @@ router.get('/github', (req: Request, res: Response, next) => {
 
 router.get('/github/callback',
   (req: Request, res: Response, next) => {
-    let origin = env.FRONTEND_URL || 'http://localhost:5173';
+    let origin = validateTrustedOrigin(null);
     try {
       const stateRaw = (req.query.state as string) || '';
       if (stateRaw) {
         const decoded = JSON.parse(Buffer.from(stateRaw, 'base64').toString('utf-8'));
-        if (decoded.origin) origin = decoded.origin;
+        if (decoded.origin) origin = validateTrustedOrigin(decoded.origin);
       }
     } catch {
-      if ((req.query.state as string)?.startsWith('http')) origin = req.query.state as string;
+      if ((req.query.state as string)?.startsWith('http')) origin = validateTrustedOrigin(req.query.state as string);
     }
     passport.authenticate('github', {
       session: false,
@@ -467,24 +498,24 @@ router.get('/github/callback',
   },
   async (req: Request, res: Response) => {
     let user = req.user as IUser;
-    let origin = env.FRONTEND_URL || 'http://localhost:5173';
+    let origin = validateTrustedOrigin(null);
     let requestedRole = '';
 
     try {
       const stateRaw = (req.query.state as string) || '';
       if (stateRaw) {
         const decoded = JSON.parse(Buffer.from(stateRaw, 'base64').toString('utf-8'));
-        if (decoded.origin) origin = decoded.origin;
-        if (decoded.role) requestedRole = String(decoded.role).toLowerCase();
+        if (decoded.origin) origin = validateTrustedOrigin(decoded.origin);
+        if (decoded.role) requestedRole = sanitizeOAuthRole(decoded.role);
       }
     } catch {
-      if ((req.query.state as string)?.startsWith('http')) origin = req.query.state as string;
+      if ((req.query.state as string)?.startsWith('http')) origin = validateTrustedOrigin(req.query.state as string);
     }
 
-    const validRoles = ['student', 'employer', 'institute', 'industry', 'government', 'admin'];
-    if (requestedRole && validRoles.includes(requestedRole)) {
+    if (requestedRole) {
       const dbUser = await User.findById(user._id);
-      if (dbUser) {
+      // Privilege Escalation Prevention: Never overwrite admin or government roles from query params
+      if (dbUser && !['admin', 'government'].includes(dbUser.role) && requestedRole !== dbUser.role) {
         dbUser.role = requestedRole as any;
         await dbUser.save();
         user = dbUser;
@@ -495,14 +526,14 @@ router.get('/github/callback',
     const encoded = encodeUser(user);
 
     res.cookie('ryyvora_token', token, {
-      httpOnly: false,
+      httpOnly: true,
       secure: env.NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000,
       path: '/',
     });
     res.cookie('skillsense_token', token, {
-      httpOnly: false,
+      httpOnly: true,
       secure: env.NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000,

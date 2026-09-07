@@ -1,4 +1,9 @@
 import assert from 'assert';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 console.log('====================================================');
 console.log('[RUNNER] Ryyvora AI Frontend Automated Test Runner');
@@ -389,8 +394,61 @@ function runFrontendUnitTests() {
   assert.strictEqual(AUTH_BRAND_CONTRACT.lucideIconsOnly, true, 'Only Lucide icons are permitted in the auth experience');
   console.log('[PASS] Auth brand integrity, monogram contract, and legacy orb elimination verified.');
 
+  // ── Test 21: Public Landing Page Test/Demo CTA Elimination ──────────────
+  console.log('Testing Public Landing Page Test/Demo Access Elimination...');
+  const pagePath = path.resolve(__dirname, '../app/page.tsx');
+  const heroPath = path.resolve(__dirname, '../components/landing/FramerHero.tsx');
+  const bentoPath = path.resolve(__dirname, '../components/landing/FramerBento.tsx');
+  const pillarsPath = path.resolve(__dirname, '../components/landing/FramerPillars.tsx');
+
+  const pageContent = fs.readFileSync(pagePath, 'utf8');
+  const heroContent = fs.readFileSync(heroPath, 'utf8');
+  const bentoContent = fs.readFileSync(bentoPath, 'utf8');
+  const pillarsContent = fs.readFileSync(pillarsPath, 'utf8');
+
+  // Must NOT contain direct links to internal dashboard routes
+  assert.ok(!pageContent.includes('href="/student/'), 'page.tsx must not link directly to /student/ internal routes');
+  assert.ok(!pageContent.includes('href="/admin"'), 'page.tsx must not link directly to /admin');
+  assert.ok(!pageContent.includes('href="/employer"'), 'page.tsx must not link directly to /employer');
+  assert.ok(!heroContent.includes('href="/exam"'), 'FramerHero must not link to /exam');
+  assert.ok(!heroContent.includes('href="/admin/governance"'), 'FramerHero must not link to /admin/governance');
+  assert.ok(!heroContent.includes('href="/verify/demo-hash"'), 'FramerHero must not link to /verify/demo-hash');
+  assert.ok(!bentoContent.includes('href="/admin/governance"'), 'FramerBento must not link to /admin/governance');
+  assert.ok(!pillarsContent.includes('href="/verify/demo-hash"'), 'FramerPillars must not link to /verify/demo-hash');
+  console.log('[PASS] Public landing page test/demo access elimination verified (0 direct internal cockpit links).');
+
+  // ── Test 22: Auth Page Hardening & Demo Spoofing Elimination ─────────────
+  console.log('Testing Auth Page Hardening & Demo Spoofing Elimination...');
+  const authPagePath = path.resolve(__dirname, '../app/auth/page.tsx');
+  const authStorePath = path.resolve(__dirname, '../store/authStore.ts');
+  const authPageContent = fs.readFileSync(authPagePath, 'utf8');
+  const authStoreContent = fs.readFileSync(authStorePath, 'utf8');
+
+  assert.ok(!authPageContent.includes('Instant Demo Portals'), 'auth/page.tsx must not contain Instant Demo Portals tab/header');
+  assert.ok(!authPageContent.includes('auth-demo-grid'), 'auth/page.tsx must not render auth-demo-grid');
+  assert.ok(!authPageContent.includes('handleInstantDemoLogin'), 'auth/page.tsx must not have handleInstantDemoLogin handler');
+  assert.ok(!authPageContent.includes('demo_token_'), 'auth/page.tsx must not mint demo_token_');
+  assert.ok(!authStoreContent.includes('demo_token_'), 'authStore.ts must not forge demo_token_ on backend failure');
+  console.log('[PASS] Auth page hardening and fake demo token elimination verified.');
+
+  // ── Test 23: Next.js Edge Proxy & Security Headers Contract ─────────────
+  console.log('Testing Edge Proxy & HTTP Security Headers Contract...');
+  const proxyPath = path.resolve(__dirname, '../proxy.ts');
+  const nextConfigPath = path.resolve(__dirname, '../next.config.ts');
+  assert.ok(fs.existsSync(proxyPath), 'frontend/proxy.ts must exist for Next.js 16 Edge execution');
+
+  const proxyContent = fs.readFileSync(proxyPath, 'utf8');
+  assert.ok(proxyContent.includes('export default function proxy'), 'proxy.ts must export proxy function');
+  assert.ok(proxyContent.includes('ROLE_ROUTES'), 'proxy.ts must enforce RBAC ROLE_ROUTES');
+
+  const nextConfigContent = fs.readFileSync(nextConfigPath, 'utf8');
+  assert.ok(nextConfigContent.includes('X-Frame-Options'), 'next.config.ts must configure X-Frame-Options');
+  assert.ok(nextConfigContent.includes('X-Content-Type-Options'), 'next.config.ts must configure X-Content-Type-Options');
+  assert.ok(nextConfigContent.includes('Strict-Transport-Security'), 'next.config.ts must configure Strict-Transport-Security');
+  console.log('[PASS] Edge proxy and HTTP security headers contract verified.');
+
   console.log('\n====================================================');
-  console.log('[SUCCESS] ALL FRONTEND INTEGRATION & CONTRACT TESTS PASSED! (20/20)');
+  console.log('[SUCCESS] ALL FRONTEND INTEGRATION & CONTRACT TESTS PASSED! (23/23)');
   console.log('====================================================');
 }
 

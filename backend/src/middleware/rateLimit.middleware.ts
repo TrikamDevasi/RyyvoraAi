@@ -51,3 +51,12 @@ export const aiLimiter = rateLimit({
   message: rateLimitResponse('AI rate limit exceeded. Please wait before making more AI requests.'),
 });
 
+export const verificationLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 120, // Max 120 public verification queries per 15m per IP
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: (req) => req.method === 'OPTIONS',
+  message: rateLimitResponse('Too many verification requests. Please try again in 15 minutes.'),
+});
+

@@ -20,18 +20,25 @@ const REGISTRATION_TOKEN_SECRET = env.JWT_SECRET || 'skillsense_mobile_reg_secre
 // Helper to set auth cookies (same as auth.controller.ts)
 // Sets both ryyvora_* and legacy skillsense_* cookies for zero-downtime dual-brand compatibility
 const setAuthCookie = (res: Response, token: string, role?: string) => {
-  const cookieOpts = {
-    httpOnly: false,
+  const tokenOpts = {
+    httpOnly: true,
     secure: env.NODE_ENV === 'production',
     sameSite: 'lax' as const,
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     path: '/',
   };
-  res.cookie('ryyvora_token', token, cookieOpts);
-  res.cookie('skillsense_token', token, cookieOpts);
+  res.cookie('ryyvora_token', token, tokenOpts);
+  res.cookie('skillsense_token', token, tokenOpts);
   if (role) {
-    res.cookie('ryyvora_role', role, cookieOpts);
-    res.cookie('skillsense_role', role, cookieOpts);
+    const roleOpts = {
+      httpOnly: false,
+      secure: env.NODE_ENV === 'production',
+      sameSite: 'lax' as const,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: '/',
+    };
+    res.cookie('ryyvora_role', role, roleOpts);
+    res.cookie('skillsense_role', role, roleOpts);
   }
 };
 
@@ -96,7 +103,7 @@ export const sendMobileOtp = async (req: Request, res: Response): Promise<void> 
     // Dispatch SMS via service (logs to console in dev mode, sends SMS in production)
     const smsResult = await sendOtpSms(normalizedPhone, otp);
 
-    const isDev = process.env.NODE_ENV === 'development' || !process.env.SMS_PROVIDER;
+    const isDev = process.env.NODE_ENV === 'development';
 
     res.status(200).json({
       success: true,
@@ -106,7 +113,7 @@ export const sendMobileOtp = async (req: Request, res: Response): Promise<void> 
         maskedPhone: maskPhoneNumber(normalizedPhone),
         cooldownSeconds: 60,
         expiresInSeconds: 300,
-        // Only provide dev helper in non-production environments
+        // Only provide dev helper in strictly development environment
         ...(isDev ? { _devOtp: otp } : {}),
       },
     });
