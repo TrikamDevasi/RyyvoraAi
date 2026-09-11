@@ -93,10 +93,52 @@ export default function AdminPage() {
   const [auditComplete, setAuditComplete] = useState(false);
 
   useEffect(() => {
-    Promise.allSettled([
-      api.get('/admin/stats'),
-      api.get('/contact/industry'),
-    ]).then(() => {});
+    api
+      .get('/admin/users')
+      .then((res) => {
+        const data = res.data?.data;
+        if (Array.isArray(data) && data.length > 0) {
+          const mapped: RecentUser[] = data.slice(0, 10).map((u: any) => {
+            const rawRole = u.role ? u.role.toLowerCase() : 'student';
+            const roleCap = (rawRole.charAt(0).toUpperCase() + rawRole.slice(1)) as any;
+            return {
+              id: u._id || u.id,
+              name: u.name,
+              email: u.email,
+              role: roleCap,
+              entity: u.institution || 'State Provisioned Entity MH',
+              joinedDate: u.createdAt
+                ? new Date(u.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                : 'Feb 2026',
+              status: u.isActive ? 'ACTIVE' : 'FLAGGED',
+            };
+          });
+          setUsers(mapped);
+        }
+      })
+      .catch(() => {});
+
+    api
+      .get('/contact/industry')
+      .then((res) => {
+        const data = res.data?.data;
+        if (Array.isArray(data) && data.length > 0) {
+          const mapped: IndustryInquiry[] = data.map((c: any) => ({
+            id: c._id || c.id,
+            companyName: c.company || c.companyName || 'Enterprise Partner',
+            contactName: c.name || c.contactName || 'Lead Executive',
+            email: c.email,
+            plan: c.plan || 'Enterprise Sovereign',
+            teamSize: c.teamSize || '100+ Hires',
+            status: c.status || 'NEW',
+            date: c.createdAt
+              ? new Date(c.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+              : 'March 2026',
+          }));
+          setInquiries(mapped);
+        }
+      })
+      .catch(() => {});
   }, []);
 
   const handleRunSystemAudit = () => {

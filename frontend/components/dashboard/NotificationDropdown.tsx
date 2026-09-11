@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { Bell, Check, CheckCheck, Award, Brain, Shield, Sparkles, ExternalLink, X } from 'lucide-react';
+import api from '@/lib/api';
 
 interface NotificationItem {
   id: string;
@@ -11,44 +12,40 @@ interface NotificationItem {
   timestamp: string;
   unread: boolean;
   href: string;
-  type: 'passport' | 'ai' | 'compliance';
+  type: 'passport' | 'ai' | 'compliance' | 'job' | 'system';
 }
-
-const INITIAL_NOTIFICATIONS: NotificationItem[] = [
-  {
-    id: 'n1',
-    title: 'Skill Passport Cryptographically Signed',
-    description: 'SHA-256 verified ledger record is active with NSQF Level 5 certification.',
-    timestamp: '10m ago',
-    unread: true,
-    href: '/student/passport',
-    type: 'passport',
-  },
-  {
-    id: 'n2',
-    title: 'AI Competency Analysis Ready',
-    description: 'Market grounding report updated with +15% Cloud Architecture recommendations.',
-    timestamp: '1h ago',
-    unread: true,
-    href: '/student/analyzer',
-    type: 'ai',
-  },
-  {
-    id: 'n3',
-    title: 'Algorithmic Fairness Audit Passed',
-    description: '4/5ths parity standard satisfied across all cohort demographic buckets.',
-    timestamp: '3h ago',
-    unread: true,
-    href: '/admin/fairness',
-    type: 'compliance',
-  },
-];
 
 export default function NotificationDropdown() {
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'all' | 'unread'>('all');
-  const [notifications, setNotifications] = useState<NotificationItem[]>(INITIAL_NOTIFICATIONS);
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const fetchNotifications = () => {
+    api
+      .get('/notifications')
+      .then((res) => {
+        if (res.data?.data?.notifications && Array.isArray(res.data.data.notifications)) {
+          const list = res.data.data.notifications.map((n: any) => ({
+            id: n.id || n._id,
+            title: n.title,
+            description: n.description,
+            timestamp: n.createdAt
+              ? new Date(n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+              : 'Recently',
+            unread: n.unread !== false,
+            href: n.href || '/student',
+            type: n.type || 'system',
+          }));
+          setNotifications(list);
+        }
+      })
+      .catch(() => {});
+  };
+
+  useEffect(() => {
+    fetchNotifications();
+  }, []);
 
   const unreadCount = notifications.filter((n) => n.unread).length;
 
@@ -66,6 +63,7 @@ export default function NotificationDropdown() {
     }
 
     if (isOpen) {
+      fetchNotifications();
       document.addEventListener('mousedown', handleClickOutside);
       document.addEventListener('keydown', handleKeyDown);
     }
@@ -76,10 +74,12 @@ export default function NotificationDropdown() {
   }, [isOpen]);
 
   const markAllAsRead = () => {
+    api.put('/notifications/read-all').catch(() => {});
     setNotifications((prev) => prev.map((n) => ({ ...n, unread: false })));
   };
 
   const markAsRead = (id: string) => {
+    api.put(`/notifications/${id}/read`).catch(() => {});
     setNotifications((prev) =>
       prev.map((n) => (n.id === id ? { ...n, unread: false } : n))
     );

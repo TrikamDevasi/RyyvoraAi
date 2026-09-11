@@ -155,48 +155,74 @@ export default function InstitutesPage() {
   const [enrolledCount, setEnrolledCount] = useState(800);
   const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
+  const fetchInstitutes = () => {
     api
       .get('/admin/institutes')
-      .then(() => {})
+      .then((res) => {
+        const data = res.data?.data;
+        if (Array.isArray(data) && data.length > 0) {
+          const mapped: AccreditedInstitute[] = data.map((inst: any, idx: number) => ({
+            id: inst._id || inst.id,
+            name: inst.name,
+            type: inst.type || 'Polytechnic',
+            location: `${inst.district || 'Pune'}, Maharashtra`,
+            district: `${inst.district || 'Pune'} District`,
+            nsqfTier: inst.nsqfAffiliation ? 'NSQF Level 5 Hub' : 'State Accredited Hub',
+            enrolledStudents: inst.studentCount || 850 + idx * 120,
+            placementRate: inst.placementRate || 82.5,
+            avgCtcLPA: inst.avgCtcLPA || 7.2,
+            ledgerNodeKey: `0x${String(inst._id || '0000').slice(0, 6)}...NODE_KEY`,
+            isVerified: inst.isVerified !== false,
+            programs: Array.isArray(inst.programs) && inst.programs.length > 0
+              ? inst.programs
+              : ['Full-Stack Web', 'Applied AI', 'Cloud SRE'],
+          }));
+          setInstitutes(mapped);
+        }
+      })
       .catch(() => {});
-  }, []);
-
-  const handleVerify = (id: string, instName: string) => {
-    setInstitutes((prev) =>
-      prev.map((inst) => (inst.id === id ? { ...inst, isVerified: true } : inst))
-    );
-    toast.success(`Accreditation verified for ${instName}. State ledger key activated.`);
   };
 
-  const handleCreateInstitute = (e: React.FormEvent) => {
+  useEffect(() => {
+    fetchInstitutes();
+  }, []);
+
+  const handleVerify = async (id: string, instName: string) => {
+    try {
+      await api.patch(`/admin/institutes/${id}/verify`);
+      setInstitutes((prev) =>
+        prev.map((inst) => (inst.id === id ? { ...inst, isVerified: true } : inst))
+      );
+      toast.success(`Accreditation verified for ${instName}. State ledger key activated.`);
+    } catch {
+      toast.error('Failed to verify institute status');
+    }
+  };
+
+  const handleCreateInstitute = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !location) return;
+    if (!name.trim() || !location.trim()) return;
 
     setSubmitting(true);
-    setTimeout(() => {
-      const newInst: AccreditedInstitute = {
-        id: `inst_${Date.now()}`,
-        name,
+    try {
+      await api.post('/admin/institutes', {
+        name: name.trim(),
         type,
-        location,
-        district,
-        nsqfTier,
-        enrolledStudents: Number(enrolledCount),
-        placementRate: 80.0,
-        avgCtcLPA: 6.5,
-        ledgerNodeKey: `0x${Math.random().toString(16).substring(2, 8)}...KEY`,
+        state: 'Maharashtra',
+        district: district.replace(' District', ''),
+        programs: ['Full-Stack Web', 'Applied AI', 'Cloud SRE'],
         isVerified: true,
-        programs: ['Full-Stack Web', 'Cloud Infrastructure', 'Applied AI'],
-      };
-
-      setInstitutes((prev) => [newInst, ...prev]);
-      setSubmitting(false);
+      });
+      toast.success(`Institution ${name} onboarded and accredited in MongoDB.`);
       setShowModal(false);
       setName('');
       setLocation('');
-      toast.success(`Institution ${newInst.name} onboarded and accredited.`);
-    }, 800);
+      fetchInstitutes();
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Failed to create institution');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleExportCSV = () => {

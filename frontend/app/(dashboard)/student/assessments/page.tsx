@@ -26,7 +26,7 @@ export default function AssessmentsPage() {
     }, []);
 
     const skills = profile?.skills || [];
-    const overallScore = profile?.overallScore || 78;
+    const overallScore = profile?.overallScore !== undefined && profile.overallScore !== null ? profile.overallScore : null;
 
     return (
         <ErrorBoundary>
@@ -72,7 +72,7 @@ export default function AssessmentsPage() {
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 14 }}>
                             {[
                                 { label: 'Assessed Competencies', value: `${skills.length}`, color: '#22c55e' },
-                                { label: 'Composite Skill Score', value: `${overallScore}%`, color: GOLD },
+                                { label: 'Composite Skill Score', value: overallScore !== null ? `${overallScore}%` : 'Unassessed', color: GOLD },
                                 { label: 'Certified Tier', value: `Level ${profile?.nsqfLevel || 4}`, color: '#a78bfa' },
                             ].map((stat, i) => (
                                 <div key={i} style={{ padding: 18, background: 'rgba(255,255,255,0.02)', borderRadius: 12, border: '1px solid rgba(255,255,255,0.08)' }}>

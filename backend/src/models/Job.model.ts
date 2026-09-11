@@ -14,6 +14,11 @@ export interface IJob extends Document {
   description: string;
   isActive: boolean;
   applyUrl: string;
+  isHiringDrive?: boolean;
+  openings?: number;
+  applicantsCount?: number;
+  deadline?: Date;
+  employerId?: mongoose.Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -36,6 +41,11 @@ const JobSchema: mongoose.Schema = new Schema(
     description: { type: String, required: true },
     isActive: { type: Boolean, default: true, index: true },
     applyUrl: { type: String, default: '#' },
+    isHiringDrive: { type: Boolean, default: false, index: true },
+    openings: { type: Number, default: 1 },
+    applicantsCount: { type: Number, default: 0 },
+    deadline: { type: Date },
+    employerId: { type: Schema.Types.ObjectId, ref: 'User' },
   },
   {
     timestamps: true,

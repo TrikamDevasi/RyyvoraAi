@@ -146,44 +146,61 @@ export default function UsersPage() {
   const [entity, setEntity] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
+  const fetchUsers = () => {
     api
       .get('/admin/users')
       .then((res) => {
         const data = res.data?.data;
         if (Array.isArray(data) && data.length > 0) {
-          // map if exists
+          const mapped: SystemUser[] = data.map((u: any) => {
+            const rawRole = (u.role || 'STUDENT').toUpperCase() as any;
+            return {
+              id: u._id || u.id,
+              name: u.name,
+              email: u.email,
+              role: rawRole,
+              entity: u.institution || entity || 'State Provisioned Entity MH',
+              mfaStatus: true,
+              status: u.isActive ? 'ACTIVE' : 'SUSPENDED',
+              registeredDate: u.createdAt
+                ? new Date(u.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                : 'Feb 2026',
+              lastLogin: 'Active recently',
+            };
+          });
+          setUsers(mapped);
         }
       })
       .catch(() => {});
+  };
+
+  useEffect(() => {
+    fetchUsers();
   }, []);
 
-  const handleCreateUser = (e: React.FormEvent) => {
+  const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !email) return;
+    if (!name.trim() || !email.trim()) return;
 
     setSubmitting(true);
-    setTimeout(() => {
-      const newUser: SystemUser = {
-        id: `usr_${Date.now()}`,
-        name,
-        email,
-        role,
-        entity: entity || 'State Provisioned Entity',
-        mfaStatus: true,
-        status: 'ACTIVE',
-        registeredDate: 'Today',
-        lastLogin: 'Just now',
-      };
-
-      setUsers((prev) => [newUser, ...prev]);
-      setSubmitting(false);
+    try {
+      await api.post('/admin/users', {
+        name: name.trim(),
+        email: email.trim(),
+        password: 'Demo@1234',
+        role: role.toLowerCase(),
+      });
+      toast.success(`User ${name} provisioned with ${role} authorization in MongoDB.`);
       setShowModal(false);
       setName('');
       setEmail('');
       setEntity('');
-      toast.success(`User ${newUser.name} provisioned with ${newUser.role} authorization.`);
-    }, 800);
+      fetchUsers();
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Failed to create user');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleExportCSV = () => {

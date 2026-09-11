@@ -175,41 +175,57 @@ export default function EmployerPlacementsPage() {
   const [newDriveCtc, setNewDriveCtc] = useState('₹7.0 – ₹10.0 LPA');
   const [newDriveOpenings, setNewDriveOpenings] = useState(10);
 
-  useEffect(() => {
+  const fetchDrivesAndPlacements = () => {
     api
-      .get('/students')
+      .get('/employer/drives')
       .then((res) => {
         if (Array.isArray(res.data?.data) && res.data.data.length > 0) {
-          // Live students data available
+          setDrives(res.data.data);
         }
       })
       .catch(() => {});
+
+    api
+      .get('/employer/placements')
+      .then((res) => {
+        if (Array.isArray(res.data?.data) && res.data.data.length > 0) {
+          setPlacements(res.data.data);
+        }
+      })
+      .catch(() => {});
+  };
+
+  useEffect(() => {
+    fetchDrivesAndPlacements();
   }, []);
 
-  const handleCreateDrive = (e: React.FormEvent) => {
+  const handleCreateDrive = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newDriveTitle.trim()) {
       toast.error('Please enter a hiring drive title');
       return;
     }
 
-    const newDrive: HiringDrive = {
-      id: `drv_${Date.now()}`,
-      title: newDriveTitle,
-      role: newDriveRole,
-      minNsqf: newDriveNsqf,
-      minScore: 80,
-      ctcRange: newDriveCtc,
-      openings: Number(newDriveOpenings),
-      applicantsCount: 0,
-      status: 'ACTIVE',
-      deadline: 'May 30, 2026',
-    };
+    try {
+      const res = await api.post('/employer/drives', {
+        title: newDriveTitle.trim(),
+        role: newDriveRole,
+        minNsqf: newDriveNsqf,
+        minScore: 80,
+        ctcRange: newDriveCtc,
+        openings: Number(newDriveOpenings),
+      });
 
-    setDrives((prev) => [newDrive, ...prev]);
-    setShowCreateModal(false);
-    setNewDriveTitle('');
-    toast.success('New placement hiring drive published across verified network.');
+      if (res.data?.data) {
+        setDrives((prev) => [res.data.data, ...prev]);
+      }
+      setShowCreateModal(false);
+      setNewDriveTitle('');
+      toast.success('New placement hiring drive published across verified network in MongoDB.');
+      fetchDrivesAndPlacements();
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Failed to create hiring drive');
+    }
   };
 
   const handleExportCSV = () => {

@@ -3,6 +3,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { protect, optionalProtect } from '../middleware/auth.middleware';
 import Assessment from '../models/Assessment.model';
 import Student from '../models/Student.model';
+import Question from '../models/Question.model';
 import { buildApiResponse } from '../utils/pagination.utils';
 import logger from '../utils/logger';
 import { getExamQuestions, QUESTION_BANK } from '../config/questions.bank';
@@ -18,17 +19,34 @@ router.get('/questions', optionalProtect, async (req: Request, res: Response, ne
     const countQuery = parseInt((req.query.count as string) || '20', 10);
     const resolvedDomain = resolveDomain(domainQuery);
 
-    const questions = getExamQuestions(resolvedDomain.code, Math.min(countQuery, 30));
+    // 1. First attempt to fetch from MongoDB Question collection
+    const dbQuestions = await Question.find({ domain: resolvedDomain.code })
+      .limit(Math.min(countQuery, 30))
+      .lean();
 
-    // Strip answers and explanations
-    const sanitized = questions.map((q, idx) => ({
-      index: idx,
-      id: q.id,
-      domain: q.domain,
-      topic: q.topic,
-      question: q.question,
-      options: q.options,
-    }));
+    let sanitized: any[] = [];
+
+    if (dbQuestions.length > 0) {
+      sanitized = dbQuestions.map((q, idx) => ({
+        index: idx,
+        id: String(q._id),
+        domain: q.domain,
+        topic: 'Engineering Competency',
+        question: q.text,
+        options: q.options,
+      }));
+    } else {
+      // Fallback to canonical bank if domain not yet populated in MongoDB
+      const questions = getExamQuestions(resolvedDomain.code, Math.min(countQuery, 30));
+      sanitized = questions.map((q, idx) => ({
+        index: idx,
+        id: q.id,
+        domain: q.domain,
+        topic: q.topic,
+        question: q.question,
+        options: q.options,
+      }));
+    }
 
     res.status(200).json(
       buildApiResponse(

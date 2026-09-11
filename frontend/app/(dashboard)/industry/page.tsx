@@ -57,79 +57,23 @@ interface SkillGapItem {
   urgency: 'CRITICAL' | 'HIGH' | 'MODERATE';
 }
 
-const SKILL_GAPS: SkillGapItem[] = [
-  {
-    id: 'gap_1',
-    name: 'Full-Stack Web & Next.js Architecture',
-    nosCode: 'SSC/Q0501',
-    domain: 'Software Engineering',
-    industryDemand: 96,
-    talentSupply: 72,
-    deficitPercent: -24,
-    openRequisitions: 14200,
-    avgCtcLPA: 8.8,
-    urgency: 'HIGH',
-  },
-  {
-    id: 'gap_2',
-    name: 'Applied AI, LangChain & Vector Systems',
-    nosCode: 'SSC/Q0702',
-    domain: 'Artificial Intelligence',
-    industryDemand: 98,
-    talentSupply: 62,
-    deficitPercent: -36,
-    openRequisitions: 9800,
-    avgCtcLPA: 11.2,
-    urgency: 'CRITICAL',
-  },
-  {
-    id: 'gap_3',
-    name: 'Cloud Native & Kubernetes Platform SRE',
-    nosCode: 'SSC/Q0801',
-    domain: 'Cloud & Infrastructure',
-    industryDemand: 92,
-    talentSupply: 68,
-    deficitPercent: -24,
-    openRequisitions: 8400,
-    avgCtcLPA: 8.2,
-    urgency: 'HIGH',
-  },
-  {
-    id: 'gap_4',
-    name: 'Zero-Trust Cybersecurity & SecOps',
-    nosCode: 'SSC/Q0904',
-    domain: 'Information Security',
-    industryDemand: 94,
-    talentSupply: 56,
-    deficitPercent: -38,
-    openRequisitions: 6100,
-    avgCtcLPA: 9.6,
-    urgency: 'CRITICAL',
-  },
-  {
-    id: 'gap_5',
-    name: 'Frontend Systems & UI Performance',
-    nosCode: 'SSC/Q0504',
-    domain: 'Software Engineering',
-    industryDemand: 88,
-    talentSupply: 82,
-    deficitPercent: -6,
-    openRequisitions: 4000,
-    avgCtcLPA: 7.0,
-    urgency: 'MODERATE',
-  },
-];
-
 export default function IndustryPage() {
-  const [skills, setSkills] = useState<SkillGapItem[]>(SKILL_GAPS);
+  const [skills, setSkills] = useState<SkillGapItem[]>([]);
+  const [loading, setLoading] = useState(true);
   const [domainFilter, setDomainFilter] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
+    setLoading(true);
     api
       .get('/analytics/industry-demand')
-      .then(() => {})
-      .catch(() => {});
+      .then((res) => {
+        if (Array.isArray(res.data?.data) && res.data.data.length > 0) {
+          setSkills(res.data.data);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, []);
 
   const handleExportForecast = () => {

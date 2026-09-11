@@ -30,6 +30,7 @@ import dataQualityRouter from './routes/dataQuality.routes';
 import billingRouter from './routes/billing.routes';
 import jobRouter from './routes/job.routes';
 import employerRouter from './routes/employer.routes';
+import notificationRouter from './routes/notification.routes';
 
 
 const app = express();
@@ -158,6 +159,7 @@ app.use('/api/v1/data-quality', dataQualityRouter);
 app.use('/api/v1/billing', billingRouter);
 app.use('/api/v1/jobs', jobRouter);
 app.use('/api/v1/employer', employerRouter);
+app.use('/api/v1/notifications', notificationRouter);
 
 
 // ── 404 Handler ────────────────────────────────────────────────────────────
