@@ -16,7 +16,7 @@ export default function FramerCTA() {
       transition={{ duration: 0.8 }}
       style={{
         padding: '120px 24px 100px',
-        background: 'radial-gradient(circle at 50% 100%, rgba(30, 58, 138, 0.35) 0%, rgba(11, 15, 23, 0.98) 60%, #06080e 100%)',
+        background: 'radial-gradient(circle at 50% 100%, rgba(16, 185, 129, 0.2) 0%, rgba(245, 158, 11, 0.08) 40%, rgba(11, 15, 23, 0.98) 70%, #06080e 100%)',
         position: 'relative',
         overflow: 'hidden',
         borderTop: '1px solid rgba(255, 255, 255, 0.08)',

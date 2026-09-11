@@ -3452,10 +3452,10 @@ select:focus {
 /* ── 1. Cosmic Atmosphere & Atmospheric Horizon ── */
 .cosmic-hero-canvas {
   position: relative;
-  background: radial-gradient(circle at 50% 15%, rgba(30, 58, 138, 0.28) 0%, rgba(15, 23, 42, 0.75) 45%, #06080e 100%);
+  background: radial-gradient(circle at 50% 15%, rgba(16, 185, 129, 0.14) 0%, rgba(245, 158, 11, 0.05) 30%, rgba(15, 23, 42, 0.85) 60%, #06080e 100%);
   overflow: hidden;
-  padding-top: 140px;
-  padding-bottom: 120px;
+  padding-top: 100px;
+  padding-bottom: 0px;
 }
 
 .cosmic-stars-overlay {
@@ -3480,8 +3480,8 @@ select:focus {
   position: relative;
   width: 140%;
   left: -20%;
-  height: 380px;
-  margin-top: 50px;
+  height: 90px;
+  margin-top: 32px;
   border-top: 1.5px solid rgba(6, 182, 212, 0.55);
   border-radius: 50% / 100% 100% 0 0;
   background: radial-gradient(ellipse at 50% 0%, rgba(6, 182, 212, 0.12) 0%, rgba(11, 15, 23, 0.85) 45%, #06080e 100%);
@@ -3492,15 +3492,15 @@ select:focus {
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  padding-top: 32px;
+  padding-top: 16px;
 }
 
 @media (max-width: 768px) {
   .cosmic-horizon-arc {
     width: 180%;
     left: -40%;
-    height: 260px;
-    margin-top: 30px;
+    height: 70px;
+    margin-top: 20px;
   }
 }
 

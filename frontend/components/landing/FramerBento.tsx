@@ -348,14 +348,14 @@ export default function FramerBento() {
             {/* Widget 4: Dynamic Placement Pulse Banner */}
             <motion.div
               style={{
-                background: 'linear-gradient(135deg, #1E3A8A 0%, #3B82F6 100%)',
+                background: 'linear-gradient(135deg, #065f46 0%, #059669 50%, #10b981 100%)',
                 borderRadius: 20,
                 padding: '22px 28px',
                 color: '#ffffff',
                 display: 'flex',
                 alignItems: 'center',
                 gap: 16,
-                boxShadow: '0 12px 30px -6px rgba(30, 58, 138, 0.5)',
+                boxShadow: '0 12px 30px -6px rgba(16, 185, 129, 0.35)',
               }}
               variants={cardVariant}
               custom={0}

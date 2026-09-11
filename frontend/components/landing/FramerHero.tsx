@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
+import { useAuth } from '@/hooks/useAuth';
 import {
   ShieldCheck,
   TrendingUp,
@@ -19,6 +20,18 @@ import {
 } from 'lucide-react';
 
 export default function FramerHero() {
+  const { user, isAuthenticated } = useAuth();
+
+  const getStartedHref = isAuthenticated
+    ? user?.role === 'employer'
+      ? '/employer'
+      : user?.role === 'government'
+      ? '/government'
+      : user?.role === 'institute'
+      ? '/institute'
+      : '/student'
+    : '/auth';
+
   return (
     <section className="cosmic-hero-canvas">
       {/* Background Starfield & Glow */}
@@ -31,7 +44,7 @@ export default function FramerHero() {
           transform: 'translateX(-50%)',
           width: '900px',
           height: '450px',
-          background: 'radial-gradient(circle, rgba(30, 58, 138, 0.22) 0%, rgba(6, 182, 212, 0.12) 40%, transparent 75%)',
+          background: 'radial-gradient(circle, rgba(16, 185, 129, 0.16) 0%, rgba(245, 158, 11, 0.08) 35%, transparent 75%)',
           filter: 'blur(80px)',
           pointerEvents: 'none',
         }}
@@ -156,7 +169,7 @@ export default function FramerHero() {
               marginBottom: 10,
             }}
           >
-            From Skills to Sustainable Outcomes.
+            Track Skills. Verify Outcomes. Build Trusted Careers.
           </p>
           <p
             className="font-manrope"
@@ -168,7 +181,7 @@ export default function FramerHero() {
               margin: '0 auto',
             }}
           >
-            Unified national outcome intelligence connecting training, biometric-verified certification, employer hiring, 12-month retention, and predictive policy action.
+            Track skills, verify employment outcomes, discover personalized job matches, and build a cryptographically trusted digital Skill Passport aligned to national NSQF standards.
           </p>
         </motion.div>
 
@@ -183,11 +196,11 @@ export default function FramerHero() {
             justifyContent: 'center',
             gap: 14,
             flexWrap: 'wrap',
-            marginBottom: 60,
+            marginBottom: 32,
           }}
         >
           <Link
-            href="/for-trainees"
+            href={getStartedHref}
             style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -205,11 +218,11 @@ export default function FramerHero() {
             onMouseEnter={(e) => (e.currentTarget.style.transform = 'translateY(-2px)')}
             onMouseLeave={(e) => (e.currentTarget.style.transform = 'translateY(0)')}
           >
-            <Sparkles size={16} /> Explore the Platform <ArrowRight size={15} />
+            <Sparkles size={16} /> Get Started <ArrowRight size={15} />
           </Link>
 
           <Link
-            href="/for-government"
+            href="/how-it-works"
             style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -223,18 +236,18 @@ export default function FramerHero() {
               fontSize: 15,
               textDecoration: 'none',
               backdropFilter: 'blur(10px)',
-              transition: 'all 0.2s ease',
+              transition: 'background 0.2s ease, border-color 0.2s ease',
             }}
             onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)';
               e.currentTarget.style.borderColor = 'rgba(245, 158, 11, 0.4)';
-              e.currentTarget.style.background = 'rgba(26, 34, 52, 0.9)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.15)';
               e.currentTarget.style.background = 'rgba(17, 24, 39, 0.8)';
+              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.15)';
             }}
           >
-            <Activity size={16} style={{ color: '#06b6d4' }} /> For Government
+            See How It Works <ArrowRight size={15} />
           </Link>
 
           <Link

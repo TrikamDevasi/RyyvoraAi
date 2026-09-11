@@ -14,6 +14,7 @@ export interface SampleStudent {
   salary?: number;
   enrollmentNumber?: string;
   passportHash?: string;
+  institution?: string;
 }
 
 export const sampleStudents: SampleStudent[] = [

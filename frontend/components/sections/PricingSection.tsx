@@ -185,7 +185,7 @@ function calcSavings(monthly: number, yearly: number): number {
 
 // ─── InView hook ─────────────────────────────────────────────────────────────
 function useInView(ref: React.RefObject<HTMLElement | null>) {
-  const [inView, setInView] = useState(false);
+  const [inView, setInView] = useState(true);
   useEffect(() => {
     const obs = new IntersectionObserver(
       ([e]) => { if (e.isIntersecting) setInView(true); },
@@ -272,7 +272,7 @@ export default function PricingSection() {
             borderRadius: 99, padding: '5px 14px', marginBottom: 20,
           }}>
             <span style={{ fontSize: 10.5, fontWeight: 800, color: 'var(--gold)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-              Plans for Every Scale
+              Institutional Plans & Billing
             </span>
           </div>
 
@@ -280,15 +280,26 @@ export default function PricingSection() {
             className="font-display"
             style={{ fontSize: 'clamp(30px, 4vw, 50px)', fontWeight: 900, color: 'var(--text-primary)', margin: '0 0 14px', lineHeight: 1.1 }}
           >
-            Start Small.{' '}
+            Predictable Pricing.{' '}
             <span style={{ color: 'var(--brand-gold)' }}>
-              Scale Your Impact.
+              Transparent Billing.
             </span>
           </h2>
-          <p style={{ color: 'var(--text-secondary)', fontSize: 16, maxWidth: 600, margin: '0 auto 32px' }}>
-            Flexible plans for training providers, institutions, and organizations tracking skills,
-            employment outcomes, and long-term workforce impact.
+          <p style={{ color: 'var(--text-secondary)', fontSize: 16, maxWidth: 640, margin: '0 auto 16px' }}>
+            Flexible subscription tiers for training providers, enterprise employers, and government missions. Free forever for students and job seekers.
           </p>
+
+          {/* Payment Gateway Trust Badge */}
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: 8,
+            padding: '5px 14px', borderRadius: 99,
+            background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)',
+            fontSize: 12, color: '#10b981', fontWeight: 600,
+            marginBottom: 28,
+          }}>
+            <ShieldCheck size={14} />
+            <span>Instant Plan Activation · Razorpay & Stripe Gateway Ready · Zero Card Required for Demo Evaluation</span>
+          </div>
 
           {/* ── Billing Cycle Toggle ── */}
           <div style={{

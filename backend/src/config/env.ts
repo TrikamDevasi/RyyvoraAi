@@ -56,6 +56,11 @@ const envSchema = z.object({
   // Razorpay (only needed when BILLING_MODE=razorpay)
   RAZORPAY_KEY_ID: z.string().optional(),
   RAZORPAY_KEY_SECRET: z.string().optional(),
+  RAZORPAY_WEBHOOK_SECRET: z.string().optional(),
+  // Stripe (only needed when BILLING_MODE=stripe)
+  STRIPE_SECRET_KEY: z.string().optional(),
+  STRIPE_PUBLISHABLE_KEY: z.string().optional(),
+  STRIPE_WEBHOOK_SECRET: z.string().optional(),
   // Generic webhook signature secret (used by any real provider)
   BILLING_WEBHOOK_SECRET: z.string().optional(),
 });

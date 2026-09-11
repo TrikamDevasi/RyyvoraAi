@@ -154,9 +154,10 @@ const JOB_REQUISITIONS = [
 
 export default function EmployerPage() {
   const chartTheme = useChartTheme();
-  const [candidates, setCandidates] = useState<Candidate[]>(PRE_SCREENED_CANDIDATES);
+  const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTrack, setSelectedTrack] = useState('ALL');
+  const [jobRequisitions, setJobRequisitions] = useState(JOB_REQUISITIONS);
   const [selectedJob, setSelectedJob] = useState(JOB_REQUISITIONS[0]);
   const [matchingCandidate, setMatchingCandidate] = useState<Candidate | null>(null);
   const [matchLoading, setMatchLoading] = useState(false);
@@ -166,46 +167,56 @@ export default function EmployerPage() {
     status: 'IDLE',
     message: '',
   });
-  const [chartData, setChartData] = useState(DEFAULT_PLACEMENT_TRENDS);
+  const [chartData, setChartData] = useState<{ month: string; hires: number }[]>([]);
   const [verifyLoading, setVerifyLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({
+    totalVerifiedCandidates: 48,
+    activeRequisitionsCount: 6,
+    verifiedHiresCount: 124,
+    retentionRate90Day: 89,
+  });
 
   useEffect(() => {
-    api
-      .get('/analytics/placement-trends')
-      .then((res) => {
-        if (Array.isArray(res.data?.data) && res.data.data.length > 0) {
-          setChartData(res.data.data.map((s: any) => ({ month: s.month, hires: s.placed ?? 0 })));
-        }
-      })
-      .catch(() => {
-        // Fallback to default placement trends
-      });
+    let cancelled = false;
 
-    // Attempt to load live students if authorized
-    api
-      .get('/students?limit=20')
-      .then((res) => {
-        if (Array.isArray(res.data?.data) && res.data.data.length > 0) {
-          const liveMapped: Candidate[] = res.data.data.map((s: any, idx: number) => ({
-            id: s._id || `cand_live_${idx}`,
-            name: s.userId?.name || s.name || `Trainee ${s.enrollmentNumber || idx + 1}`,
-            roleTitle: s.program || 'Technical Graduate',
-            location: s.state || 'Maharashtra, MH',
-            nsqfLevel: `NSQF Level ${s.nsqfLevel || 5}`,
-            score: s.overallScore || 86,
-            skills: Array.isArray(s.skills) && s.skills.length > 0
-              ? s.skills.map((sk: any) => (typeof sk === 'string' ? sk : sk.name || 'Core Competency'))
-              : ['React', 'Node.js', 'PostgreSQL', 'System Architecture'],
-            githubScore: 88,
-            hash: `0x${(s._id || '9e7a').slice(0, 4)}...${(s._id || '4b12').slice(-4)}_HMAC_VERIFIED`,
-            status: s.placementStatus === 'placed' ? 'PLACED' : 'AVAILABLE',
-          }));
-          setCandidates(liveMapped);
+    async function loadEmployerData() {
+      setLoading(true);
+      try {
+        const res = await api.get('/employer/dashboard-stats');
+        const data = res.data?.data;
+        if (cancelled || !data) return;
+
+        setStats({
+          totalVerifiedCandidates: data.totalVerifiedCandidates ?? 48,
+          activeRequisitionsCount: data.activeRequisitionsCount ?? 6,
+          verifiedHiresCount: data.verifiedHiresCount ?? 124,
+          retentionRate90Day: data.retentionRate90Day ?? 89,
+        });
+
+        if (Array.isArray(data.candidates) && data.candidates.length > 0) {
+          setCandidates(data.candidates);
         }
-      })
-      .catch(() => {
-        // Retain verified candidate set
-      });
+
+        if (Array.isArray(data.placementTrends) && data.placementTrends.length > 0) {
+          setChartData(data.placementTrends);
+        }
+
+        if (Array.isArray(data.requisitions) && data.requisitions.length > 0) {
+          setJobRequisitions(data.requisitions);
+          setSelectedJob(data.requisitions[0]);
+        }
+      } catch (err) {
+        console.error('Failed to load employer dashboard stats:', err);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    loadEmployerData();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const handleRunAIMatch = async (candidate: Candidate) => {
@@ -328,10 +339,34 @@ export default function EmployerPage() {
         <div style={{ marginBottom: 20 }}>
           <MetricStrip
             items={[
-              { label: 'Pre-Assessed Candidates', value: '48,200+', subtext: 'Verified across Maharashtra', icon: Users, color: 'var(--gold)' },
-              { label: 'Avg Time-to-Hire', value: '9.4 Days', trend: { value: '-62% vs Traditional', direction: 'down' }, icon: Zap, color: 'var(--success)' },
-              { label: 'Ledger Verifications', value: '1,840 Passports', subtext: 'Cryptographically Confirmed', icon: ShieldCheck, color: 'var(--info)' },
-              { label: 'Placement Retention', value: '91.8%', subtext: '365d Industry Tenure Index', icon: TrendingUp, color: '#a855f7' },
+              {
+                label: 'Pre-Assessed Candidates',
+                value: `${stats.totalVerifiedCandidates} Verified`,
+                subtext: 'NSQF Qualified Talent Pool',
+                icon: Users,
+                color: 'var(--gold)',
+              },
+              {
+                label: 'Active Requisitions',
+                value: `${stats.activeRequisitionsCount} Openings`,
+                trend: { value: 'Verified Matching Active', direction: 'up' },
+                icon: Briefcase,
+                color: 'var(--success)',
+              },
+              {
+                label: 'Verified Placements',
+                value: `${stats.verifiedHiresCount} Hires`,
+                subtext: 'Cryptographically Confirmed',
+                icon: ShieldCheck,
+                color: 'var(--info)',
+              },
+              {
+                label: '90-Day Retention',
+                value: `${stats.retentionRate90Day}%`,
+                subtext: 'Post-Placement Employment Tenure',
+                icon: TrendingUp,
+                color: '#a855f7',
+              },
             ]}
           />
         </div>
@@ -571,6 +606,41 @@ export default function EmployerPage() {
               </button>
             ))}
           </div>
+        </div>
+
+        {/* ── Verified Placement Velocity Trends ── */}
+        <div style={{ marginBottom: 20 }}>
+          <AnalyticsPanel
+            eyebrow="RECRUITMENT VELOCITY"
+            title="Verified Placement Volume & Retention Trajectory"
+            description="Monthly candidate placement volume verified through tamper-proof cryptographic ledger blocks."
+          >
+            {chartData.length === 0 ? (
+              <div style={{ padding: '36px 20px', textAlign: 'center', color: 'var(--text-muted)', fontSize: 13 }}>
+                Loading verified placement velocity metrics...
+              </div>
+            ) : (
+              <div style={{ height: 260, width: '100%', marginTop: 12 }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+                    <XAxis dataKey="month" stroke="var(--text-muted)" fontSize={11} tickLine={false} />
+                    <YAxis stroke="var(--text-muted)" fontSize={11} tickLine={false} />
+                    <Tooltip
+                      contentStyle={{
+                        background: 'var(--bg-surface-elevated)',
+                        border: '1px solid var(--border)',
+                        borderRadius: 8,
+                        fontSize: 12,
+                        color: '#fff',
+                      }}
+                    />
+                    <Bar dataKey="hires" fill="var(--gold)" radius={[4, 4, 0, 0]} name="Verified Hires" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+          </AnalyticsPanel>
         </div>
 
         {/* ── Pre-Assessed Candidate Talent Pipeline ── */}

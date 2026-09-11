@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import {
   listStudents, getStudent, updateStudent,
-  getStudentSkills, getStudentPassport,
+  getStudentSkills, getStudentPassport, issueStudentPassport,
   submitAssessment, getCareerPaths, getInterventions,
   getMyStudentProfile, analyzeStudentSkills,
   verifyPublicPassport, getBranchCatalog,
@@ -25,11 +25,14 @@ router.use(protect);
 // Current student profile
 router.get('/me', getMyStudentProfile);
 
+// Issue or sync cryptographic Skill Passport for current student
+router.post('/passport/issue', requireRole('student'), issueStudentPassport);
+
 // AI Skill Extraction & Analysis for current student
 router.post('/analyze-skills', aiLimiter, analyzeStudentSkills);
 
-// Admin / Government / Institute / Industry: list all students
-router.get('/', requireRole('admin', 'government', 'industry', 'institute'), listStudents);
+// All authenticated roles (admin, government, industry, institute, student) can access leaderboard list
+router.get('/', requireRole('admin', 'government', 'industry', 'institute', 'student'), listStudents);
 
 // ID-based student endpoints guarded with strict ownership checks
 router.get('/:id', requireStudentOwnership, getStudent);

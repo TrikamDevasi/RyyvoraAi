@@ -21,8 +21,8 @@ const PILLARS = [
     ctaText: 'Explore Trainee Platform',
     ctaLink: '/for-trainees',
     image: '/images/reference/platform-telemetry-banner.png',
-    bgColor: 'linear-gradient(150deg, rgba(30, 58, 138, 0.4) 0%, rgba(15, 23, 42, 0.9) 100%)',
-    borderColor: 'rgba(59, 130, 246, 0.25)',
+    bgColor: 'linear-gradient(150deg, rgba(16, 185, 129, 0.2) 0%, rgba(15, 23, 42, 0.9) 100%)',
+    borderColor: 'rgba(16, 185, 129, 0.3)',
     reversed: false,
     stats: [
       { label: 'Diagnostic Precision', value: '98.4%' },
@@ -177,7 +177,7 @@ export default function FramerPillars() {
           transform: 'translateX(-50%)',
           width: '800px',
           height: '400px',
-          background: 'radial-gradient(circle, rgba(30,58,138,0.18) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(16,185,129,0.14) 0%, transparent 70%)',
           filter: 'blur(80px)',
           pointerEvents: 'none',
         }}

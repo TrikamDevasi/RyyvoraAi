@@ -14,9 +14,8 @@ const nextConfig: NextConfig = {
         unoptimized: true,
     },
     turbopack: {
-        // Pin Turbopack to the frontend dir so it does not walk up and pick up
-        // package-lock.json (multiple-lockfile warning + wrong workspace root).
-        root: path.resolve(__dirname),
+        // Point Turbopack to the monorepo root so it can resolve workspace packages and Next.js server import map
+        root: path.resolve(__dirname, '..'),
     },
     devIndicators: false,
     async headers() {

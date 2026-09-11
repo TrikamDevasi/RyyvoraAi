@@ -12,6 +12,7 @@ import { runPolicyCopilotTests } from './policyCopilot.test';
 import { runBillingTests } from './billing.test';
 import { runSecurityTests } from './security.test';
 import { runInstituteE2ETests } from './instituteE2E.test';
+import { runSkillAnalyzerTests } from './skillAnalyzer.test';
 
 async function main() {
   console.log('====================================================');
@@ -26,6 +27,8 @@ async function main() {
     await runFairnessTests();
     console.log('');
     await runAITests();
+    console.log('');
+    await runSkillAnalyzerTests();
     console.log('');
     await runOutcomeTests();
     console.log('');
@@ -42,7 +45,7 @@ async function main() {
     await runIntegrationTests();
     console.log('');
     console.log('====================================================');
-    console.log('🎉 ALL AUTOMATED INTEGRATION, UNIT & AI TESTS PASSED! (11/11)');
+    console.log('🎉 ALL AUTOMATED INTEGRATION, UNIT, AI & ANALYZER TESTS PASSED! (12/12)');
     console.log('====================================================');
     process.exit(0);
   } catch (error) {

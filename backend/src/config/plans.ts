@@ -25,6 +25,7 @@ export interface PlanLimits {
   customDashboards: boolean;
   prioritySupport: boolean;
   apiAccess: boolean;
+  jobMatches: boolean;
   customIntegrations: boolean;
   dedicatedAccountManager: boolean;
 }
@@ -88,6 +89,7 @@ export const PLANS: Record<PlanId, PlanDefinition> = {
       customDashboards: false,
       prioritySupport: false,
       apiAccess: false,
+      jobMatches: false,
       customIntegrations: false,
       dedicatedAccountManager: false,
     },
@@ -134,6 +136,7 @@ export const PLANS: Record<PlanId, PlanDefinition> = {
       customDashboards: false,
       prioritySupport: false,
       apiAccess: false,
+      jobMatches: true,
       customIntegrations: false,
       dedicatedAccountManager: false,
     },
@@ -181,6 +184,7 @@ export const PLANS: Record<PlanId, PlanDefinition> = {
       customDashboards: false,
       prioritySupport: true,
       apiAccess: false,
+      jobMatches: true,
       customIntegrations: false,
       dedicatedAccountManager: false,
     },
@@ -230,6 +234,7 @@ export const PLANS: Record<PlanId, PlanDefinition> = {
       customDashboards: true,
       prioritySupport: true,
       apiAccess: true,
+      jobMatches: true,
       customIntegrations: true,
       dedicatedAccountManager: true,
     },

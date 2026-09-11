@@ -167,35 +167,89 @@ function FormattedMessageContent({ text }: { text: string }) {
 }
 
 const ROLE_SUGGESTIONS: Record<string, string[]> = {
-  government: [
-    'Explain district retention disparities across Maharashtra',
-    'Summarize NSQF compliance across state ITIs',
-    'Project fund allocation ROI for underperforming districts',
+  student: [
+    'Explain my biggest skill gap and next learning step',
+    'Build an upskilling roadmap for NSQF Level 5 certification',
+    'Which employers are actively hiring for my verified skills?',
+    'Generate a mock technical interview for Full-Stack Engineering',
+    'Analyze my resume against high-growth Cloud DevOps roles',
+    'Recommend open-source repositories to boost my portfolio',
+    'How do I earn verified micro-credentials on Ryyvora?',
+    'What are the top 3 high-demand competencies in Maharashtra tech parks?',
+    'Prepare a 30-day study plan for System Design assessments',
+    'Evaluate my project readiness for SIH Hackathon evaluation',
+    'How does my skill percentile compare to state top performers?',
+    'What certifications give the best ROI for Artificial Intelligence careers?',
   ],
   employer: [
     'Summarize pending candidate verification claims',
     'Benchmark required skills against active hiring drives',
     'Find candidates verified at NSQF Level 5 or higher',
+    'Generate a targeted skills rubric for Senior Backend roles',
+    'Identify talent pools with 90-day retention exceeding 85%',
+    'Compare university graduate readiness across regional engineering colleges',
+    'Filter verified profiles by hands-on Kubernetes and Docker competencies',
+    'Analyze salary compensation bands for emerging AI Engineers',
+    'Assess apprenticeship conversion rates across our technical cohorts',
+    'Audit skill verification authenticity and cryptographic proof stamps',
+    'Draft an inclusive job requisition aligned to National Occupational Standards',
+    'Track time-to-hire metrics across tech placement pipelines',
   ],
   institute: [
     'Identify training batches with low 90-day retention',
     'Recommend curriculum updates for regional industry demand',
     'Compare placement outcomes across technical domains',
+    'Generate an AI readiness audit for NAAC/NBA accreditation',
+    'Track student progress on competitive mock assessments',
+    'Highlight high-performing mentors and their cohort graduation rates',
+    'Map our computer science syllabus to NSQF Level 6 standards',
+    'Predict placement probability for pre-final year engineering students',
+    'Find alumni industry mentors for underrepresented student cohorts',
+    'Generate an executive summary of college placement statistics for recruiters',
+    'Detect student skill fatigue and drop-off risks in semester exams',
+    'Benchmark our institution against top-performing state polytechnics',
+  ],
+  government: [
+    'Explain district retention disparities across Maharashtra',
+    'Summarize NSQF compliance across state ITIs',
+    'Project fund allocation ROI for underperforming districts',
+    'Analyze gender participation in rural vocational upskilling programs',
+    'Evaluate PMKVY 4.0 training center placement effectiveness',
+    'Forecast green energy and EV technician demand for 2026-2028',
+    'Generate district-wise skill heatmaps for Vidarbha and Marathwada',
+    'Audit public training subsidy disbursement and wage verification',
+    'Benchmark state workforce metrics against national NCVET targets',
+    'Identify critical industrial cluster skill shortages in Pune & MMR',
+    'Synthesize citizen feedback on state youth employment drives',
+    'Generate an executive policy brief for the Ministry of Skill Development',
   ],
   industry: [
     'Analyze emerging vocational skill shortages in Maharashtra',
     'Map National Occupational Standards to active requisitions',
     'Review industry apprenticeship demand signals',
+    'Estimate talent supply deficits in industrial automation and PLC',
+    'Partner with state polytechnics for customized co-op programs',
+    'Evaluate supply chain logistics workforce readiness',
+    'Track apprentice retention past the mandatory 12-month tenure',
+    'Benchmark shop-floor safety compliance training outcomes',
+    'Formulate micro-credentialing standards for semiconductor manufacturing',
+    'Identify reskilling requirements for legacy automotive engineers',
+    'Access pre-screened talent rosters verified on Ryyvora',
+    'Monitor real-time regional wage escalation trends',
   ],
   admin: [
     'Explain algorithmic fairness disparity ratios',
     'Review system security audit logs & DPDP consent health',
     'Check data integrity across verification ledger nodes',
-  ],
-  student: [
-    'Explain my biggest skill gap and next learning step',
-    'Build an upskilling roadmap for NSQF Level 5 certification',
-    'Which employers are actively hiring for my verified skills?',
+    'Monitor API rate limit usage and latency bottlenecks',
+    'Run an automated check on student verification queue latency',
+    'Inspect suspicious authentication attempts and IP anomalies',
+    'Review tenant isolation and multi-organization data boundaries',
+    'Audit database query performance across the assessment collection',
+    'Verify SSL certificates, HMAC secret rotations, and webhook signatures',
+    'Analyze active system telemetry and WebSocket connection health',
+    'Generate a platform compliance report for ISO 27001 readiness',
+    'Review automated test coverage and zero-downtime deployment logs',
   ],
 };
 
@@ -203,7 +257,49 @@ const DEFAULT_SUGGESTIONS = [
   'Explain skill gap priorities against NSQF frameworks',
   'Summarize recent employment and retention outcomes',
   'Review verified credentials and verification ledger status',
+  'Generate an upskilling roadmap for high-demand careers',
+  'Assess regional workforce retention trends in Maharashtra',
+  'How does Ryyvora calculate verifiable competency scores?',
 ];
+
+const FIFO_STORAGE_KEY = 'ryyvora_served_suggestions_fifo';
+const FIFO_MAX_HISTORY = 9;
+
+function getRotatingSuggestions(role: string, count: number = 3): string[] {
+  const pool = ROLE_SUGGESTIONS[role.toLowerCase()] || DEFAULT_SUGGESTIONS;
+  if (!pool || pool.length <= count) return pool;
+
+  let servedHistory: string[] = [];
+  if (typeof window !== 'undefined') {
+    try {
+      const raw = sessionStorage.getItem(FIFO_STORAGE_KEY);
+      if (raw) servedHistory = JSON.parse(raw);
+    } catch {
+      servedHistory = [];
+    }
+  }
+
+  // Filter candidates not in servedHistory
+  const candidates = pool.filter((p) => !servedHistory.includes(p));
+  let selected: string[] = [];
+
+  if (candidates.length >= count) {
+    const shuffled = [...candidates].sort(() => 0.5 - Math.random());
+    selected = shuffled.slice(0, count);
+  } else {
+    const remainder = pool.filter((p) => !candidates.includes(p)).sort(() => 0.5 - Math.random());
+    selected = [...candidates, ...remainder].slice(0, count);
+  }
+
+  if (typeof window !== 'undefined') {
+    try {
+      const updatedHistory = [...servedHistory, ...selected].slice(-FIFO_MAX_HISTORY);
+      sessionStorage.setItem(FIFO_STORAGE_KEY, JSON.stringify(updatedHistory));
+    } catch {}
+  }
+
+  return selected;
+}
 
 export default function AIChatWidget() {
   const { user } = useAuth();
@@ -211,14 +307,13 @@ export default function AIChatWidget() {
   const [expanded, setExpanded] = useState(false);
 
   const roleKey = (user?.role || 'student').toLowerCase();
-  const currentRoleSuggestions = ROLE_SUGGESTIONS[roleKey] || DEFAULT_SUGGESTIONS;
 
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '0',
       role: 'assistant',
       content: "Hello! I am your Ryyvora Workforce & Policy Copilot. Ask me about state retention outcomes, NSQF competency benchmarks, candidate verification, or district skill analytics.",
-      suggestions: currentRoleSuggestions,
+      suggestions: [],
     },
   ]);
   const [input, setInput] = useState('');
@@ -241,9 +336,46 @@ export default function AIChatWidget() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Fetch session history
+  const historyFetchedFor = useRef<string | null>(null);
+
+  // Refresh suggestions helper
+  const handleRefreshSuggestions = useCallback(() => {
+    const fresh = getRotatingSuggestions(roleKey, 3);
+    setMessages((prev) => {
+      if (prev.length === 0) return prev;
+      // Update the suggestions of the last assistant message that has suggestions, or message id '0'
+      const updated = [...prev];
+      for (let i = updated.length - 1; i >= 0; i--) {
+        if (updated[i].role === 'assistant') {
+          updated[i] = { ...updated[i], suggestions: fresh };
+          break;
+        }
+      }
+      return updated;
+    });
+  }, [roleKey]);
+
+  // Set role-based suggestions when user role changes or on initial mount
   useEffect(() => {
-    if (user) {
+    const suggestions = getRotatingSuggestions(roleKey, 3);
+    setMessages((prev) => {
+      if (prev.length === 1 && prev[0].id === '0') {
+        return [{ ...prev[0], suggestions }];
+      }
+      return prev;
+    });
+  }, [roleKey]);
+
+  // Fetch session history only ONCE when widget is opened
+  useEffect(() => {
+    const userId = user?.id || (user as any)?._id;
+    if (!userId) {
+      historyFetchedFor.current = null;
+      return;
+    }
+
+    if (open && historyFetchedFor.current !== userId) {
+      historyFetchedFor.current = userId;
       api
         .get('/ai/history')
         .then(({ data }) => {
@@ -253,20 +385,20 @@ export default function AIChatWidget() {
               role: m.role,
               content: m.content,
             }));
-            setMessages((prev) => [prev[0], ...mapped]);
+            setMessages((prev) => {
+              const first = prev[0] || {
+                id: '0',
+                role: 'assistant',
+                content: "Hello! I am your Ryyvora Workforce & Policy Copilot.",
+                suggestions: getRotatingSuggestions(roleKey, 3),
+              };
+              return [first, ...mapped];
+            });
           }
         })
         .catch(() => {});
-
-      const suggestions = ROLE_SUGGESTIONS[user.role?.toLowerCase() || ''] || DEFAULT_SUGGESTIONS;
-      setMessages((prev) => {
-        if (prev.length === 1 && prev[0].id === '0') {
-          return [{ ...prev[0], suggestions }];
-        }
-        return prev;
-      });
     }
-  }, [user]);
+  }, [open, user?.id, (user as any)?._id, roleKey]);
 
   // Clean up streaming on unmount or when closed
   useEffect(() => {
@@ -731,7 +863,7 @@ export default function AIChatWidget() {
 
                     {/* Suggestion Chips */}
                     {isAssistant && m.suggestions && m.suggestions.length > 0 && !m.isError && (
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 8, maxWidth: '92%' }}>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 6, marginTop: 8, maxWidth: '95%' }}>
                         {m.suggestions.map((s, idx) => (
                           <button
                             key={idx}
@@ -756,6 +888,28 @@ export default function AIChatWidget() {
                             <ChevronRight size={10} /> {s}
                           </button>
                         ))}
+                        <button
+                          type="button"
+                          onClick={handleRefreshSuggestions}
+                          title="Roll 3 new fresh suggestions"
+                          aria-label="Roll new suggestions"
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: 4,
+                            padding: '4px 8px',
+                            borderRadius: 99,
+                            background: 'var(--bg-surface-elevated, rgba(255,255,255,0.04))',
+                            border: '1px solid var(--border)',
+                            color: 'var(--text-muted, #94a3b8)',
+                            fontSize: 10.5,
+                            fontWeight: 500,
+                            cursor: 'pointer',
+                          }}
+                        >
+                          <RefreshCw size={11} />
+                          <span>More ideas</span>
+                        </button>
                       </div>
                     )}
                   </div>

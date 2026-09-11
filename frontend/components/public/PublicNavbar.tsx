@@ -18,13 +18,26 @@ import {
   BarChart3,
   FileCheck,
   ArrowRight,
+  Sparkles,
 } from 'lucide-react';
 import ThemeToggle from '@/components/shared/ThemeToggle';
 import BrandLogo from '@/components/shared/BrandLogo';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function PublicNavbar() {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user, isAuthenticated } = useAuth();
+
+  const getStartedHref = isAuthenticated
+    ? user?.role === 'employer'
+      ? '/employer'
+      : user?.role === 'government'
+      ? '/government'
+      : user?.role === 'institute'
+      ? '/institute'
+      : '/student'
+    : '/auth';
 
   return (
     <header className="landing-header-wrapper is-scrolled" style={{ position: 'sticky', top: 0, zIndex: 100 }}>
@@ -160,14 +173,18 @@ export default function PublicNavbar() {
             <Link href="/how-it-works" className={`nav-link-pill ${pathname === '/how-it-works' ? 'active' : ''}`} style={{ whiteSpace: 'nowrap' }}>
               How It Works
             </Link>
+            <Link href="/brainstorm" className={`nav-link-pill ${pathname === '/brainstorm' ? 'active' : ''}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, whiteSpace: 'nowrap' }}>
+              <Sparkles size={13} style={{ color: 'var(--gold, #f59e0b)' }} />
+              <span>Brainstorm</span>
+            </Link>
             <Link href="/skill-passport" className={`nav-link-pill ${pathname === '/skill-passport' ? 'active' : ''}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, whiteSpace: 'nowrap' }}>
               <span>Skill Passport</span>
               <span style={{ fontSize: 9.5, fontWeight: 700, padding: '1px 5px', borderRadius: 4, background: 'rgba(16,185,129,0.12)', color: '#10b981', border: '1px solid rgba(16,185,129,0.25)', whiteSpace: 'nowrap' }}>
                 SHA-256
               </span>
             </Link>
-            <Link href="/pricing" className={`nav-link-pill ${pathname === '/pricing' ? 'active' : ''}`} style={{ whiteSpace: 'nowrap' }}>
-              Pricing
+            <Link href="/#pricing" className={`nav-link-pill ${pathname === '/pricing' ? 'active' : ''}`} style={{ whiteSpace: 'nowrap' }}>
+              Pricing & Billing
             </Link>
             <Link href="/faq" className={`nav-link-pill ${pathname === '/faq' ? 'active' : ''}`} style={{ whiteSpace: 'nowrap' }}>
               FAQ
@@ -187,20 +204,22 @@ export default function PublicNavbar() {
               <ThemeToggle variant="icon" />
             </div>
 
-            <Link
-              href="/auth"
-              className="btn-secondary landing-signin-btn"
-              style={{ fontSize: 12.5, fontWeight: 600, padding: '6px 14px', borderRadius: 7, whiteSpace: 'nowrap' }}
-            >
-              Sign In
-            </Link>
+            {!isAuthenticated && (
+              <Link
+                href="/auth"
+                className="btn-secondary landing-signin-btn"
+                style={{ fontSize: 12.5, fontWeight: 600, padding: '6px 14px', borderRadius: 7, whiteSpace: 'nowrap' }}
+              >
+                Sign In
+              </Link>
+            )}
 
             <Link
-              href="/for-trainees"
+              href={getStartedHref}
               className="btn-gold landing-header-cta"
               style={{ fontSize: 12.5, fontWeight: 700, padding: '7px 16px', borderRadius: 7, display: 'inline-flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap' }}
             >
-              Get Started <ArrowRight size={13} />
+              {isAuthenticated ? 'Dashboard' : 'Get Started'} <ArrowRight size={13} />
             </Link>
 
             {/* Mobile Hamburger */}
@@ -249,6 +268,9 @@ export default function PublicNavbar() {
               </Link>
 
               <div className="mobile-nav-group-label" style={{ marginTop: 10 }}>Intelligence Engines</div>
+              <Link href="/brainstorm" onClick={() => setMobileMenuOpen(false)} className="mobile-nav-link-item" style={{ color: 'var(--gold, #f59e0b)', fontWeight: 700 }}>
+                <Sparkles size={15} /> AI Brainstorm Cockpit
+              </Link>
               <Link href="/workforce-analytics" onClick={() => setMobileMenuOpen(false)} className="mobile-nav-link-item">
                 <BarChart3 size={15} /> Workforce Analytics
               </Link>
@@ -266,8 +288,8 @@ export default function PublicNavbar() {
               <Link href="/how-it-works" onClick={() => setMobileMenuOpen(false)} className="mobile-nav-link-item">
                 How It Works
               </Link>
-              <Link href="/pricing" onClick={() => setMobileMenuOpen(false)} className="mobile-nav-link-item">
-                Pricing
+              <Link href="/#pricing" onClick={() => setMobileMenuOpen(false)} className="mobile-nav-link-item">
+                Pricing & Billing
               </Link>
               <Link href="/faq" onClick={() => setMobileMenuOpen(false)} className="mobile-nav-link-item">
                 FAQ

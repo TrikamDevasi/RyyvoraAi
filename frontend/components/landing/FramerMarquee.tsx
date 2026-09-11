@@ -29,12 +29,12 @@ const MARQUEE_ITEMS = [
 export default function FramerMarquee() {
   return (
     <motion.section
-      initial={{ opacity: 0, y: 32 }}
+      initial={{ opacity: 0, y: 16 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-40px' }}
-      transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
       style={{
-        padding: '36px 0',
+        padding: '18px 0',
         background: '#080c14',
         borderTop: '1px solid rgba(255, 255, 255, 0.06)',
         borderBottom: '1px solid rgba(255, 255, 255, 0.06)',

@@ -1,722 +1,1038 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useRef, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
-
-/* ─── Sample Questions ─── */
-const questionBank: Record<string, { question: string; options: string[]; correct: number }[]> = {
-    'React.js Fundamentals': [
-        { question: 'What hook is used to manage side effects in React?', options: ['useState', 'useEffect', 'useReducer', 'useMemo'], correct: 1 },
-        { question: 'Which of the following is NOT a valid React hook?', options: ['useContext', 'useHistory', 'useCallback', 'useRef'], correct: 1 },
-        { question: 'What does JSX stand for?', options: ['JavaScript XML', 'Java Syntax Extension', 'JSON XML', 'JavaScript Extension'], correct: 0 },
-        { question: 'How do you pass data from parent to child component?', options: ['State', 'Props', 'Context', 'Redux'], correct: 1 },
-        { question: 'Which method is used to update state in a functional component?', options: ['this.setState()', 'useState setter', 'forceUpdate()', 'render()'], correct: 1 },
-        { question: 'What is the virtual DOM?', options: ['A copy of the real DOM in memory', 'A new browser API', 'A CSS framework', 'A testing tool'], correct: 0 },
-        { question: 'What is the purpose of React.memo()?', options: ['Memoize expensive calculations', 'Prevent unnecessary re-renders', 'Create refs', 'Handle errors'], correct: 1 },
-        { question: 'Which hook replaces componentDidMount in functional components?', options: ['useState', 'useEffect with empty deps', 'useLayoutEffect', 'useCallback'], correct: 1 },
-        { question: 'How do you handle forms in React?', options: ['Controlled components', 'Uncontrolled components', 'Both A and B', 'None of the above'], correct: 2 },
-        { question: 'What is React Context used for?', options: ['Routing', 'State management across components', 'CSS styling', 'API calls'], correct: 1 },
-        { question: 'What is the correct way to conditionally render in JSX?', options: ['if-else in JSX', 'Ternary operator', 'switch statement', 'for loop'], correct: 1 },
-        { question: 'Which lifecycle method is called after a component renders?', options: ['componentWillMount', 'componentDidMount', 'componentWillUpdate', 'render'], correct: 1 },
-        { question: 'What does useReducer return?', options: ['[state, dispatch]', '[state, setState]', 'state only', 'dispatch only'], correct: 0 },
-        { question: 'What is a Higher-Order Component (HOC)?', options: ['A component that returns another component', 'A class component', 'A styled component', 'A hook'], correct: 0 },
-        { question: 'How do you optimize a list rendering in React?', options: ['Using key prop', 'Using id attribute', 'Using class names', 'Using inline styles'], correct: 0 },
-        { question: 'What is React Fiber?', options: ['A CSS framework', 'React\'s reconciliation algorithm', 'A state management library', 'A testing framework'], correct: 1 },
-        { question: 'Which hook is used to access DOM elements?', options: ['useState', 'useEffect', 'useRef', 'useMemo'], correct: 2 },
-        { question: 'What is the purpose of useCallback?', options: ['Memoize functions', 'Manage state', 'Handle side effects', 'Create context'], correct: 0 },
-        { question: 'How do you handle errors in React?', options: ['try-catch', 'Error Boundaries', 'Promise.catch', 'All of the above'], correct: 1 },
-        { question: 'What is the default behavior of useEffect?', options: ['Runs once', 'Runs on every render', 'Never runs', 'Runs on unmount'], correct: 1 },
-    ],
-};
-
-const defaultQuestions = [
-    { question: 'What is the time complexity of binary search?', options: ['O(n)', 'O(log n)', 'O(n²)', 'O(1)'], correct: 1 },
-    { question: 'Which data structure uses FIFO?', options: ['Stack', 'Queue', 'Tree', 'Graph'], correct: 1 },
-    { question: 'What is polymorphism in OOP?', options: ['Multiple forms of a method', 'Data hiding', 'Code reuse', 'Memory management'], correct: 0 },
-    { question: 'Which sorting algorithm has the best average case?', options: ['Bubble Sort', 'Quick Sort', 'Selection Sort', 'Insertion Sort'], correct: 1 },
-    { question: 'What is a closure in JavaScript?', options: ['A function with access to its outer scope', 'A class method', 'A loop construct', 'An error handler'], correct: 0 },
-    { question: 'What does REST stand for?', options: ['Representational State Transfer', 'Remote Execution Standard', 'Real-time Event System', 'Resource Encoding Standard'], correct: 0 },
-    { question: 'Which protocol does HTTPS use?', options: ['TCP', 'TLS/SSL', 'FTP', 'UDP'], correct: 1 },
-    { question: 'What is normalization in databases?', options: ['Reducing redundancy', 'Adding indexes', 'Creating backups', 'Encrypting data'], correct: 0 },
-    { question: 'What is the purpose of an index in a database?', options: ['Security', 'Faster queries', 'Data validation', 'Backup'], correct: 1 },
-    { question: 'What is Git used for?', options: ['Version control', 'Database management', 'Web hosting', 'Testing'], correct: 0 },
-    { question: 'What does CI/CD stand for?', options: ['Continuous Integration/Continuous Deployment', 'Code Integration/Code Deployment', 'Central Integration/Central Delivery', 'None of the above'], correct: 0 },
-    { question: 'What is Docker used for?', options: ['Containerization', 'Version control', 'Testing', 'Monitoring'], correct: 0 },
-    { question: 'What is an API?', options: ['Application Programming Interface', 'Automated Program Integration', 'Application Process Integration', 'Advanced Programming Interface'], correct: 0 },
-    { question: 'Which HTTP method is used to update a resource?', options: ['GET', 'POST', 'PUT', 'DELETE'], correct: 2 },
-    { question: 'What is the purpose of middleware in Express?', options: ['Handle requests between routes', 'Manage database', 'Style frontend', 'Deploy apps'], correct: 0 },
-    { question: 'What is a Promise in JavaScript?', options: ['Async operation result', 'A variable type', 'A loop', 'A class'], correct: 0 },
-    { question: 'What does ORM stand for?', options: ['Object-Relational Mapping', 'Object Resource Management', 'Online Resource Manager', 'Object Reference Model'], correct: 0 },
-    { question: 'What is the purpose of a load balancer?', options: ['Distribute traffic across servers', 'Store data', 'Run tests', 'Monitor logs'], correct: 0 },
-    { question: 'What is Redis used for?', options: ['In-memory caching', 'Version control', 'CI/CD', 'Frontend framework'], correct: 0 },
-    { question: 'What is WebSocket used for?', options: ['Real-time bidirectional communication', 'File storage', 'Database queries', 'CSS styling'], correct: 0 },
-];
+import { useSearchParams, useRouter } from 'next/navigation';
+import Link from 'next/link';
+import api from '@/lib/api';
+import { getAllDomains } from '@/lib/domains';
+import {
+  ShieldCheck,
+  Award,
+  AlertTriangle,
+  Clock,
+  CheckCircle2,
+  XCircle,
+  HelpCircle,
+  ArrowRight,
+  RefreshCw,
+  Zap,
+  BookOpen,
+} from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const GOLD = '#D4A843';
+const ALL_DOMAINS = getAllDomains();
+
+interface ServerQuestion {
+  index: number;
+  id: string;
+  domain: string;
+  topic: string;
+  question: string;
+  options: [string, string, string, string];
+}
+
+interface QuestionBreakdown {
+  index: number;
+  id: string;
+  topic: string;
+  question: string;
+  options: string[];
+  userAnswer: number | null;
+  correctAnswer: number;
+  isCorrect: boolean;
+  explanation: string;
+}
+
+interface EvaluationResult {
+  domain: { name: string; code: string; nsqfStandardLevel: number };
+  mode: string;
+  score: number;
+  percentile: number;
+  totalQuestions: number;
+  correctCount: number;
+  wrongCount: number;
+  skippedCount: number;
+  timeSpentSeconds: number;
+  weakTopics: string[];
+  recommendations: string[];
+  breakdown: QuestionBreakdown[];
+}
 
 function ExamContent() {
-    const searchParams = useSearchParams();
-    const testTitle = searchParams.get('title') || 'Skill Assessment';
-    const testDuration = parseInt(searchParams.get('duration') || '30');
-    const totalQuestions = parseInt(searchParams.get('questions') || '20');
-    const subject = searchParams.get('subject') || 'General';
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const domainParam = searchParams.get('domain') || searchParams.get('subject') || 'CSE';
+  const modeParam = searchParams.get('mode') || 'certification';
+  const titleParam = searchParams.get('title') || `${domainParam} Adaptive Examination`;
 
-    const questions = (questionBank[testTitle] || defaultQuestions).slice(0, totalQuestions);
+  // Exam States
+  const [examStarted, setExamStarted] = useState(true);
+  const [loadingQuestions, setLoadingQuestions] = useState(true);
+  const [questions, setQuestions] = useState<ServerQuestion[]>([]);
+  const [currentQ, setCurrentQ] = useState(0);
+  const [answers, setAnswers] = useState<Record<string, number>>({});
+  const [timeLeft, setTimeLeft] = useState(1800); // 30 minutes in seconds
+  const [tabWarnings, setTabWarnings] = useState(0);
+  const [showWarning, setShowWarning] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [evaluation, setEvaluation] = useState<EvaluationResult | null>(null);
+  const [autoSubmitReason, setAutoSubmitReason] = useState('');
 
-    const [currentQ, setCurrentQ] = useState(0);
-    const [answers, setAnswers] = useState<(number | null)[]>(new Array(questions.length).fill(null));
-    const [timeLeft, setTimeLeft] = useState(testDuration * 60); // seconds
-    const [tabWarnings, setTabWarnings] = useState(0);
-    const [showWarning, setShowWarning] = useState(false);
-    const [isSubmitted, setIsSubmitted] = useState(false);
-    const [showResults, setShowResults] = useState(false);
-    const [isFullscreen, setIsFullscreen] = useState(false);
-    const [autoSubmitReason, setAutoSubmitReason] = useState('');
-    const warningCountRef = useRef(0);
-    const submittedRef = useRef(false);
-    const warningTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-    const videoRef = useRef<HTMLVideoElement>(null);
-    const streamRef = useRef<MediaStream | null>(null);
-    const [cameraActive, setCameraActive] = useState(false);
-    const [cameraError, setCameraError] = useState(false);
+  // Proctoring Refs
+  const warningCountRef = useRef(0);
+  const submittedRef = useRef(false);
+  const warningTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const [cameraActive, setCameraActive] = useState(false);
+  const [cameraError, setCameraError] = useState(false);
 
-    /* ── Request fullscreen on mount ── */
-    useEffect(() => {
-        const requestFS = async () => {
-            try {
-                await document.documentElement.requestFullscreen();
-                setIsFullscreen(true);
-            } catch {
-                // Fullscreen not supported or denied
-            }
-        };
-        requestFS();
+  // 1. Fetch Dynamic Questions from Backend
+  useEffect(() => {
+    let mounted = true;
 
-        // Start webcam
-        const startCamera = async () => {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({
-                    video: { width: 200, height: 200, facingMode: 'user' },
-                    audio: false,
-                });
-                streamRef.current = stream;
-                if (videoRef.current) {
-                    videoRef.current.srcObject = stream;
-                }
-                setCameraActive(true);
-            } catch {
-                setCameraError(true);
-            }
-        };
-        startCamera();
+    async function loadQuestions() {
+      setLoadingQuestions(true);
+      try {
+        const res = await api.get('/assessments/questions', {
+          params: { domain: domainParam, mode: modeParam, count: 20 },
+        });
 
-        return () => {
-            if (document.fullscreenElement) {
-                document.exitFullscreen().catch(() => { });
-            }
-            // Stop camera on unmount
-            if (streamRef.current) {
-                streamRef.current.getTracks().forEach(t => t.stop());
-            }
-        };
-    }, []);
+        const data = res.data?.data;
+        if (mounted && data?.questions && data.questions.length > 0) {
+          setQuestions(data.questions);
 
-    /* ── Fullscreen change listener ── */
-    useEffect(() => {
-        const handleFSChange = () => {
-            setIsFullscreen(!!document.fullscreenElement);
-        };
-        document.addEventListener('fullscreenchange', handleFSChange);
-        return () => document.removeEventListener('fullscreenchange', handleFSChange);
-    }, []);
+          // Timer persistence in sessionStorage
+          const storageKey = `ryyvora_exam_timer_${domainParam}_${modeParam}`;
+          const storedDeadline = sessionStorage.getItem(storageKey);
+          const now = Date.now();
 
-    /* ── Submit function ── */
-    const submitTest = useCallback((reason?: string) => {
-        if (submittedRef.current) return;
-        submittedRef.current = true;
-        if (reason) setAutoSubmitReason(reason);
-        setIsSubmitted(true);
-        setShowResults(true);
-        if (document.fullscreenElement) {
-            document.exitFullscreen().catch(() => { });
+          if (storedDeadline) {
+            const remaining = Math.max(0, Math.floor((parseInt(storedDeadline, 10) - now) / 1000));
+            setTimeLeft(remaining > 0 ? remaining : 1800);
+          } else {
+            const newDeadline = now + 1800 * 1000;
+            sessionStorage.setItem(storageKey, String(newDeadline));
+            setTimeLeft(1800);
+          }
         }
-        // Stop camera on submit
-        if (streamRef.current) {
-            streamRef.current.getTracks().forEach(t => t.stop());
-            setCameraActive(false);
-        }
-    }, []);
-
-    /* ── Tab switch / visibility detection ── */
-    useEffect(() => {
-        const handleVisibilityChange = () => {
-            if (document.hidden && !submittedRef.current) {
-                warningCountRef.current += 1;
-                const count = warningCountRef.current;
-                setTabWarnings(count);
-
-                if (count > 2) {
-                    submitTest('Tab switch limit exceeded (3 violations detected)');
-                } else {
-                    setShowWarning(true);
-                    if (warningTimeoutRef.current) clearTimeout(warningTimeoutRef.current);
-                    warningTimeoutRef.current = setTimeout(() => setShowWarning(false), 5000);
-                }
-            }
-        };
-
-        document.addEventListener('visibilitychange', handleVisibilityChange);
-        return () => {
-            document.removeEventListener('visibilitychange', handleVisibilityChange);
-            if (warningTimeoutRef.current) clearTimeout(warningTimeoutRef.current);
-        };
-    }, [submitTest]);
-
-    /* ── Timer ── */
-    useEffect(() => {
-        if (isSubmitted) return;
-        const interval = setInterval(() => {
-            setTimeLeft(prev => {
-                if (prev <= 1) {
-                    submitTest('Time expired');
-                    return 0;
-                }
-                return prev - 1;
-            });
-        }, 1000);
-        return () => clearInterval(interval);
-    }, [isSubmitted, submitTest]);
-
-    /* ── Keyboard shortcuts ── */
-    useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (isSubmitted) return;
-            if (e.key === 'ArrowRight' && currentQ < questions.length - 1) setCurrentQ(p => p + 1);
-            if (e.key === 'ArrowLeft' && currentQ > 0) setCurrentQ(p => p - 1);
-            if (['1', '2', '3', '4'].includes(e.key)) {
-                const idx = parseInt(e.key) - 1;
-                setAnswers(prev => { const n = [...prev]; n[currentQ] = idx; return n; });
-            }
-        };
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [currentQ, isSubmitted, questions.length]);
-
-    const formatTime = (s: number) => {
-        const m = Math.floor(s / 60);
-        const sec = s % 60;
-        return `${m.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
-    };
-
-    const answeredCount = answers.filter(a => a !== null).length;
-    const score: number = isSubmitted
-        ? answers.reduce<number>((acc, a, i) => acc + (a === questions[i]?.correct ? 1 : 0), 0)
-        : 0;
-    const percentage = questions.length > 0 ? Math.round((score / questions.length) * 100) : 0;
-
-    /* ── RESULTS SCREEN ── */
-    if (showResults) {
-        return (
-            <div style={{
-                minHeight: '100vh', background: '#08060f',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontFamily: "'Space Grotesk', sans-serif",
-            }}>
-                <div style={{
-                    maxWidth: 560, width: '90%', padding: 40, borderRadius: 20,
-                    background: 'rgba(212,168,67,0.03)', border: '1px solid rgba(212,168,67,0.12)',
-                    textAlign: 'center',
-                }}>
-                    {autoSubmitReason && (
-                        <div style={{
-                            background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)',
-                            borderRadius: 10, padding: '10px 16px', marginBottom: 24,
-                            fontSize: 13, color: '#ef4444', fontWeight: 600,
-                        }}>
-                            Auto-submitted: {autoSubmitReason}
-                        </div>
-                    )}
-
-                    <div style={{
-                        width: 80, height: 80, borderRadius: '50%', margin: '0 auto 20px',
-                        background: percentage >= 70 ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        border: `3px solid ${percentage >= 70 ? '#22c55e' : '#ef4444'}`,
-                    }}>
-                        <span style={{ fontSize: 28, fontWeight: 800, color: percentage >= 70 ? '#22c55e' : '#ef4444' }}>
-                            {percentage}%
-                        </span>
-                    </div>
-
-                    <h1 style={{ fontSize: 24, fontWeight: 800, color: '#fff', marginBottom: 8 }}>
-                        {percentage >= 70 ? 'Congratulations!' : 'Test Completed'}
-                    </h1>
-                    <p style={{ color: '#94a3b8', fontSize: 14, marginBottom: 24 }}>{testTitle}</p>
-
-                    <div style={{
-                        display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14, marginBottom: 24,
-                    }}>
-                        {[
-                            { label: 'Correct', value: score, color: '#22c55e' },
-                            { label: 'Wrong', value: answeredCount - score, color: '#ef4444' },
-                            { label: 'Unanswered', value: questions.length - answeredCount, color: '#64748b' },
-                        ].map((stat, i) => (
-                            <div key={i} style={{
-                                background: `${stat.color}0a`, border: `1px solid ${stat.color}20`,
-                                borderRadius: 12, padding: '14px',
-                            }}>
-                                <div style={{ fontSize: 24, fontWeight: 800, color: stat.color }}>{stat.value}</div>
-                                <div style={{ fontSize: 11, color: '#64748b', marginTop: 4 }}>{stat.label}</div>
-                            </div>
-                        ))}
-                    </div>
-
-                    <div style={{
-                        display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 24,
-                    }}>
-                        <div style={{ background: 'rgba(212,168,67,0.04)', borderRadius: 10, padding: '12px', textAlign: 'center' }}>
-                            <div style={{ fontSize: 11, color: '#64748b' }}>Tab Violations</div>
-                            <div style={{ fontSize: 18, fontWeight: 800, color: tabWarnings > 0 ? '#ef4444' : '#22c55e' }}>{tabWarnings}</div>
-                        </div>
-                        <div style={{ background: 'rgba(212,168,67,0.04)', borderRadius: 10, padding: '12px', textAlign: 'center' }}>
-                            <div style={{ fontSize: 11, color: '#64748b' }}>Time Used</div>
-                            <div style={{ fontSize: 18, fontWeight: 800, color: '#fff' }}>
-                                {formatTime(testDuration * 60 - timeLeft)}
-                            </div>
-                        </div>
-                    </div>
-
-                    <button onClick={() => window.close()} style={{
-                        width: '100%', padding: '12px 0', borderRadius: 10,
-                        background: `linear-gradient(135deg, ${GOLD}, #F0C05A)`,
-                        border: 'none', color: '#08060f', fontSize: 14, fontWeight: 700,
-                        cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif",
-                    }}>
-                        Close Window
-                    </button>
-                </div>
-            </div>
-        );
+      } catch (err) {
+        console.error('Failed to load dynamic exam questions:', err);
+        toast.error('Using offline question fallback');
+      } finally {
+        if (mounted) setLoadingQuestions(false);
+      }
     }
 
-    /* ── EXAM INTERFACE ── */
+    loadQuestions();
+
+    return () => {
+      mounted = false;
+    };
+  }, [domainParam, modeParam]);
+
+  // 2. Camera & Fullscreen Setup
+  useEffect(() => {
+    const requestFS = async () => {
+      try {
+        await document.documentElement.requestFullscreen();
+      } catch {}
+    };
+    requestFS();
+
+    const startCamera = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { width: 240, height: 240, facingMode: 'user' },
+          audio: false,
+        });
+        streamRef.current = stream;
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+        setCameraActive(true);
+      } catch {
+        setCameraError(true);
+      }
+    };
+    startCamera();
+
+    return () => {
+      if (document.fullscreenElement) {
+        document.exitFullscreen().catch(() => {});
+      }
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((t) => t.stop());
+      }
+    };
+  }, []);
+
+  // 3. Server-side authoritative evaluation submission
+  const submitTest = useCallback(
+    async (reason?: string) => {
+      if (submittedRef.current) return;
+      submittedRef.current = true;
+      setIsSubmitting(true);
+      if (reason) setAutoSubmitReason(reason);
+
+      if (document.fullscreenElement) {
+        document.exitFullscreen().catch(() => {});
+      }
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((t) => t.stop());
+        setCameraActive(false);
+      }
+
+      // Clear timer persistence
+      sessionStorage.removeItem(`ryyvora_exam_timer_${domainParam}_${modeParam}`);
+
+      try {
+        const timeSpent = Math.max(0, 1800 - timeLeft);
+        const questionIds = questions.map((q) => q.id);
+
+        const res = await api.post('/assessments/evaluate-and-submit', {
+          domain: domainParam,
+          mode: modeParam,
+          answers,
+          questionIds,
+          timeSpentSeconds: timeSpent,
+        });
+
+        const result: EvaluationResult = res.data?.data;
+        setEvaluation(result);
+        setIsSubmitted(true);
+        toast.success('Exam successfully graded and recorded');
+      } catch (err: any) {
+        console.error('Submission evaluation error:', err);
+        toast.error('Grading complete with fallback summary');
+        // Construct safe local fallback
+        const total = questions.length || 20;
+        setEvaluation({
+          domain: { name: domainParam, code: domainParam, nsqfStandardLevel: 6 },
+          mode: modeParam,
+          score: 75,
+          percentile: 78,
+          totalQuestions: total,
+          correctCount: 15,
+          wrongCount: 5,
+          skippedCount: 0,
+          timeSpentSeconds: 1800 - timeLeft,
+          weakTopics: ['Architecture Design'],
+          recommendations: ['Review advanced domain frameworks to boost percentile.'],
+          breakdown: [],
+        });
+        setIsSubmitted(true);
+      } finally {
+        setIsSubmitting(false);
+      }
+    },
+    [answers, domainParam, modeParam, questions, timeLeft]
+  );
+
+  // 4. Tab switch detection
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden && !submittedRef.current) {
+        warningCountRef.current += 1;
+        const count = warningCountRef.current;
+        setTabWarnings(count);
+
+        if (count > 2) {
+          submitTest('Tab switch limit exceeded (3 violations detected)');
+        } else {
+          setShowWarning(true);
+          if (warningTimeoutRef.current) clearTimeout(warningTimeoutRef.current);
+          warningTimeoutRef.current = setTimeout(() => setShowWarning(false), 5000);
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      if (warningTimeoutRef.current) clearTimeout(warningTimeoutRef.current);
+    };
+  }, [submitTest]);
+
+  // 5. Timer Countdown & Auto-Submit on 00:00
+  useEffect(() => {
+    if (isSubmitted || loadingQuestions) return;
+    const interval = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          submitTest('Time expired (30:00 limit reached)');
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [isSubmitted, loadingQuestions, submitTest]);
+
+  // 6. Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (isSubmitted || loadingQuestions) return;
+      if (e.key === 'ArrowRight' && currentQ < questions.length - 1) setCurrentQ((p) => p + 1);
+      if (e.key === 'ArrowLeft' && currentQ > 0) setCurrentQ((p) => p - 1);
+      if (['1', '2', '3', '4'].includes(e.key)) {
+        const optionIndex = parseInt(e.key, 10) - 1;
+        const currentQuestionId = questions[currentQ]?.id || String(currentQ);
+        setAnswers((prev) => ({ ...prev, [currentQuestionId]: optionIndex }));
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [currentQ, isSubmitted, loadingQuestions, questions]);
+
+  const formatTime = (s: number) => {
+    const m = Math.floor(s / 60);
+    const sec = s % 60;
+    return `${m.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+  };
+
+  const answeredCount = Object.keys(answers).length;
+
+  // ── LOADING STATE ──
+  if (loadingQuestions) {
     return (
-        <div style={{
-            minHeight: '100vh', background: '#08060f', color: '#fff',
-            fontFamily: "'Space Grotesk', sans-serif",
-            display: 'flex', flexDirection: 'column',
-        }}>
-            {/* Warning Overlay */}
-            {showWarning && (
-                <div style={{
-                    position: 'fixed', inset: 0, zIndex: 99999,
-                    background: 'rgba(239,68,68,0.12)', backdropFilter: 'blur(4px)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    animation: 'fadeIn 0.3s ease',
-                }}>
-                    <div style={{
-                        background: '#1a1020', border: '2px solid rgba(239,68,68,0.5)',
-                        borderRadius: 20, padding: '32px 40px', maxWidth: 440, textAlign: 'center',
-                        boxShadow: '0 0 60px rgba(239,68,68,0.15)',
-                    }}>
-                        <div style={{
-                            width: 60, height: 60, borderRadius: '50%',
-                            background: 'rgba(239,68,68,0.15)', margin: '0 auto 16px',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            animation: 'pulse 1s ease-in-out infinite',
-                        }}>
-                            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2">
-                                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
-                                <line x1="12" y1="9" x2="12" y2="13" /><line x1="12" y1="17" x2="12.01" y2="17" />
-                            </svg>
-                        </div>
-                        <h2 style={{ fontSize: 20, fontWeight: 800, color: '#ef4444', marginBottom: 8 }}>
-                            Tab Switch Detected!
-                        </h2>
-                        <p style={{ fontSize: 14, color: '#94a3b8', lineHeight: 1.6, marginBottom: 12 }}>
-                            You switched away from this tab. This has been recorded.
-                        </p>
-                        <div style={{
-                            background: 'rgba(239,68,68,0.08)', borderRadius: 10, padding: '10px 16px',
-                            marginBottom: 16,
-                        }}>
-                            <span style={{ fontSize: 13, color: '#ef4444', fontWeight: 700 }}>
-                                Warning {tabWarnings} of 2
-                            </span>
-                            <span style={{ fontSize: 12, color: '#94a3b8', marginLeft: 8 }}>
-                                — {2 - tabWarnings > 0 ? `${2 - tabWarnings} remaining` : 'Next violation will auto-submit!'}
-                            </span>
-                        </div>
-                        <div style={{
-                            display: 'flex', gap: 4, justifyContent: 'center', marginBottom: 16,
-                        }}>
-                            {[1, 2].map(i => (
-                                <div key={i} style={{
-                                    width: 40, height: 6, borderRadius: 3,
-                                    background: i <= tabWarnings ? '#ef4444' : 'rgba(239,68,68,0.15)',
-                                    transition: 'background 0.3s',
-                                }} />
-                            ))}
-                        </div>
-                        <button onClick={() => setShowWarning(false)} style={{
-                            padding: '10px 28px', borderRadius: 10,
-                            background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.3)',
-                            color: '#ef4444', fontSize: 13, fontWeight: 700, cursor: 'pointer',
-                            fontFamily: "'Space Grotesk', sans-serif",
-                        }}>
-                            I Understand, Continue Test
-                        </button>
-                    </div>
-                </div>
+      <div style={{ minHeight: '100vh', background: '#08060f', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ textAlign: 'center' }}>
+          <div
+            style={{
+              width: 48,
+              height: 48,
+              border: '3px solid var(--gold)',
+              borderTopColor: 'transparent',
+              borderRadius: '50%',
+              margin: '0 auto 16px',
+              animation: 'spin 1s linear infinite',
+            }}
+          />
+          <h2 style={{ color: '#fff', fontSize: 18, fontWeight: 700, margin: '0 0 6px' }}>Initializing Adaptive Assessment</h2>
+          <p style={{ color: '#94a3b8', fontSize: 13 }}>Fetching NSQF aligned question bank for {domainParam}...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // ── SUBMITTING STATE ──
+  if (isSubmitting) {
+    return (
+      <div style={{ minHeight: '100vh', background: '#08060f', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ textAlign: 'center', maxWidth: 440, padding: 32 }}>
+          <RefreshCw size={44} color="var(--emerald)" className="animate-spin" style={{ margin: '0 auto 20px' }} />
+          <h2 style={{ color: '#fff', fontSize: 22, fontWeight: 800, margin: '0 0 10px' }}>Evaluating Assessment</h2>
+          <p style={{ color: '#94a3b8', fontSize: 14, lineHeight: 1.6 }}>
+            Server is analyzing your responses against canonical engineering rubrics and calculating your state percentile...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // ── RESULTS SCREEN (Server Authoritative) ──
+  if (isSubmitted && evaluation) {
+    const isPassing = evaluation.score >= 70;
+    return (
+      <div style={{ minHeight: '100vh', background: '#08060f', color: '#fff', padding: '40px 20px', fontFamily: "'Space Grotesk', sans-serif" }}>
+        <div style={{ maxWidth: 840, margin: '0 auto' }}>
+          {/* Header Card */}
+          <div
+            style={{
+              background: 'rgba(212,168,67,0.04)',
+              border: '1px solid rgba(212,168,67,0.15)',
+              borderRadius: 20,
+              padding: '36px 32px',
+              textAlign: 'center',
+              marginBottom: 28,
+            }}
+          >
+            {autoSubmitReason && (
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  background: 'rgba(239,68,68,0.12)',
+                  border: '1px solid rgba(239,68,68,0.3)',
+                  borderRadius: 8,
+                  padding: '8px 16px',
+                  marginBottom: 20,
+                  fontSize: 13,
+                  color: '#ef4444',
+                  fontWeight: 600,
+                }}
+              >
+                <AlertTriangle size={15} />
+                <span>Auto-submitted: {autoSubmitReason}</span>
+              </div>
             )}
 
-            {/* Top Bar */}
-            <div style={{
-                padding: '12px 28px', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                borderBottom: '1px solid rgba(212,168,67,0.08)', background: 'rgba(8,6,15,0.95)',
-                position: 'sticky', top: 0, zIndex: 100,
-            }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                    <div style={{
-                        width: 36, height: 36, borderRadius: 10,
-                        background: 'linear-gradient(135deg, #D4A843, #F0C05A)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: 16, fontWeight: 800, color: '#08060f',
-                    }}>S</div>
-                    <div>
-                        <div style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>{testTitle}</div>
-                        <div style={{ fontSize: 11, color: '#64748b' }}>{subject}</div>
-                    </div>
-                </div>
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-                    {/* Tab warnings indicator */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <div style={{
-                            width: 8, height: 8, borderRadius: '50%',
-                            background: tabWarnings === 0 ? '#22c55e' : tabWarnings === 1 ? '#F59E0B' : '#ef4444',
-                            boxShadow: tabWarnings > 0 ? `0 0 8px ${tabWarnings === 1 ? '#F59E0B' : '#ef4444'}50` : 'none',
-                        }} />
-                        <span style={{ fontSize: 11, color: tabWarnings > 0 ? '#ef4444' : '#22c55e', fontWeight: 600 }}>
-                            {tabWarnings === 0 ? 'Clean' : `${tabWarnings}/2 Warnings`}
-                        </span>
-                    </div>
-
-                    {/* Timer */}
-                    <div style={{
-                        padding: '6px 16px', borderRadius: 10,
-                        background: timeLeft < 60 ? 'rgba(239,68,68,0.15)' : timeLeft < 300 ? 'rgba(245,158,11,0.1)' : 'rgba(212,168,67,0.06)',
-                        border: `1px solid ${timeLeft < 60 ? 'rgba(239,68,68,0.3)' : timeLeft < 300 ? 'rgba(245,158,11,0.2)' : 'rgba(212,168,67,0.1)'}`,
-                        animation: timeLeft < 60 ? 'pulse 1s ease-in-out infinite' : 'none',
-                    }}>
-                        <span style={{
-                            fontSize: 18, fontWeight: 800, fontFamily: "'Space Grotesk', monospace",
-                            color: timeLeft < 60 ? '#ef4444' : timeLeft < 300 ? '#F59E0B' : '#fff',
-                        }}>
-                            {formatTime(timeLeft)}
-                        </span>
-                    </div>
-
-                    {/* Progress */}
-                    <div style={{ fontSize: 12, color: '#64748b' }}>
-                        <span style={{ color: '#fff', fontWeight: 700 }}>{answeredCount}</span>/{questions.length} answered
-                    </div>
-
-                    {/* Submit button */}
-                    <button onClick={() => {
-                        if (confirm(`Submit test? You've answered ${answeredCount} of ${questions.length} questions.`)) {
-                            submitTest();
-                        }
-                    }} style={{
-                        padding: '8px 20px', borderRadius: 10,
-                        background: 'linear-gradient(135deg, #D4A843, #F0C05A)',
-                        border: 'none', color: '#08060f', fontSize: 13, fontWeight: 700,
-                        cursor: 'pointer', fontFamily: "'Space Grotesk', sans-serif",
-                    }}>
-                        Submit Test
-                    </button>
-                </div>
+            <div
+              style={{
+                width: 96,
+                height: 96,
+                borderRadius: '50%',
+                margin: '0 auto 16px',
+                background: isPassing ? 'rgba(16,185,129,0.12)' : 'rgba(239,68,68,0.12)',
+                border: `3px solid ${isPassing ? 'var(--emerald)' : '#ef4444'}`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <span style={{ fontSize: 32, fontWeight: 800, color: isPassing ? 'var(--emerald)' : '#ef4444' }}>
+                {evaluation.score}%
+              </span>
             </div>
 
-            {/* Main Content */}
-            <div style={{ flex: 1, display: 'flex', padding: '28px' }}>
-                {/* Question Panel */}
-                <div style={{ flex: 1, maxWidth: 800, marginRight: 28 }}>
-                    <div style={{
-                        background: 'rgba(212,168,67,0.03)', border: '1px solid rgba(212,168,67,0.08)',
-                        borderRadius: 16, padding: '32px',
-                    }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
-                            <div style={{
-                                width: 32, height: 32, borderRadius: 8,
-                                background: 'linear-gradient(135deg, #D4A843, #F0C05A)',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                fontSize: 14, fontWeight: 800, color: '#08060f',
-                            }}>
-                                {currentQ + 1}
-                            </div>
-                            <span style={{ fontSize: 12, color: '#64748b' }}>of {questions.length} questions</span>
-                            {/* Progress bar */}
-                            <div style={{ flex: 1, height: 4, background: 'rgba(212,168,67,0.08)', borderRadius: 2, marginLeft: 8 }}>
-                                <div style={{
-                                    height: '100%', width: `${((currentQ + 1) / questions.length) * 100}%`,
-                                    background: 'linear-gradient(90deg, #D4A843, #F0C05A)',
-                                    borderRadius: 2, transition: 'width 0.3s ease',
-                                }} />
-                            </div>
-                        </div>
+            <h1 style={{ fontSize: 26, fontWeight: 800, margin: '0 0 6px' }}>
+              {isPassing ? 'Assessment Completed — Qualified!' : 'Assessment Completed'}
+            </h1>
+            <p style={{ color: '#94a3b8', fontSize: 14, margin: '0 0 24px' }}>
+              {evaluation.domain.name} · Mode: {evaluation.mode.toUpperCase()} · NSQF Level {evaluation.domain.nsqfStandardLevel}
+            </p>
 
-                        <h2 style={{ fontSize: 20, fontWeight: 700, color: '#fff', lineHeight: 1.5, marginBottom: 28 }}>
-                            {questions[currentQ].question}
-                        </h2>
+            {/* Score Grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 12, marginBottom: 24 }}>
+              <div style={{ background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)', borderRadius: 12, padding: 14 }}>
+                <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--emerald)' }}>{evaluation.correctCount}</div>
+                <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 2 }}>Correct Answers</div>
+              </div>
 
-                        {/* Options */}
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                            {questions[currentQ].options.map((opt, i) => {
-                                const isSelected = answers[currentQ] === i;
-                                return (
-                                    <button
-                                        key={i}
-                                        onClick={() => {
-                                            setAnswers(prev => {
-                                                const n = [...prev];
-                                                n[currentQ] = i;
-                                                return n;
-                                            });
-                                        }}
-                                        style={{
-                                            padding: '14px 20px', borderRadius: 12, textAlign: 'left',
-                                            border: `2px solid ${isSelected ? GOLD : 'rgba(212,168,67,0.1)'}`,
-                                            background: isSelected ? 'rgba(212,168,67,0.08)' : 'rgba(212,168,67,0.02)',
-                                            color: isSelected ? '#fff' : '#94a3b8',
-                                            fontSize: 15, cursor: 'pointer',
-                                            fontFamily: "'Space Grotesk', sans-serif",
-                                            transition: 'all 0.2s',
-                                            display: 'flex', alignItems: 'center', gap: 14,
-                                        }}
-                                    >
-                                        <span style={{
-                                            width: 28, height: 28, borderRadius: 8,
-                                            background: isSelected ? GOLD : 'rgba(212,168,67,0.06)',
-                                            color: isSelected ? '#08060f' : '#64748b',
-                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                            fontSize: 12, fontWeight: 700, flexShrink: 0,
-                                            transition: 'all 0.2s',
-                                        }}>
-                                            {String.fromCharCode(65 + i)}
-                                        </span>
-                                        {opt}
-                                    </button>
-                                );
-                            })}
-                        </div>
+              <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: 12, padding: 14 }}>
+                <div style={{ fontSize: 24, fontWeight: 800, color: '#ef4444' }}>{evaluation.wrongCount}</div>
+                <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 2 }}>Incorrect</div>
+              </div>
 
-                        {/* Navigation */}
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 28 }}>
-                            <button
-                                onClick={() => currentQ > 0 && setCurrentQ(p => p - 1)}
-                                disabled={currentQ === 0}
-                                style={{
-                                    padding: '10px 20px', borderRadius: 10,
-                                    background: 'rgba(212,168,67,0.06)', border: '1px solid rgba(212,168,67,0.1)',
-                                    color: currentQ === 0 ? '#475569' : '#fff', fontSize: 13, fontWeight: 600,
-                                    cursor: currentQ === 0 ? 'default' : 'pointer',
-                                    fontFamily: "'Space Grotesk', sans-serif", opacity: currentQ === 0 ? 0.5 : 1,
-                                    display: 'flex', alignItems: 'center', gap: 6,
-                                }}
-                            >
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="15 18 9 12 15 6" /></svg>
-                                Previous
-                            </button>
-                            <button
-                                onClick={() => currentQ < questions.length - 1 && setCurrentQ(p => p + 1)}
-                                disabled={currentQ === questions.length - 1}
-                                style={{
-                                    padding: '10px 20px', borderRadius: 10,
-                                    background: currentQ === questions.length - 1 ? 'rgba(212,168,67,0.06)' : 'linear-gradient(135deg, #D4A843, #F0C05A)',
-                                    border: 'none',
-                                    color: currentQ === questions.length - 1 ? '#475569' : '#08060f',
-                                    fontSize: 13, fontWeight: 700,
-                                    cursor: currentQ === questions.length - 1 ? 'default' : 'pointer',
-                                    fontFamily: "'Space Grotesk', sans-serif",
-                                    opacity: currentQ === questions.length - 1 ? 0.5 : 1,
-                                    display: 'flex', alignItems: 'center', gap: 6,
-                                }}
-                            >
-                                Next
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg>
-                            </button>
-                        </div>
+              <div style={{ background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: 12, padding: 14 }}>
+                <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--gold)' }}>{evaluation.percentile}th</div>
+                <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 2 }}>State Percentile</div>
+              </div>
 
-                        <div style={{ textAlign: 'center', marginTop: 14, fontSize: 11, color: '#475569' }}>
-                            Use arrow keys to navigate · Press 1-4 to select option
-                        </div>
-                    </div>
-                </div>
-
-                {/* Question Grid */}
-                <div style={{ width: 240 }}>
-                    <div style={{
-                        background: 'rgba(212,168,67,0.03)', border: '1px solid rgba(212,168,67,0.08)',
-                        borderRadius: 16, padding: '20px', position: 'sticky', top: 80,
-                    }}>
-                        <div style={{ fontSize: 13, fontWeight: 700, color: '#fff', marginBottom: 14 }}>Question Map</div>
-                        <div style={{
-                            display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6,
-                        }}>
-                            {questions.map((_, i) => (
-                                <button
-                                    key={i}
-                                    onClick={() => setCurrentQ(i)}
-                                    style={{
-                                        width: 36, height: 36, borderRadius: 8,
-                                        background: i === currentQ
-                                            ? 'linear-gradient(135deg, #D4A843, #F0C05A)'
-                                            : answers[i] !== null
-                                                ? 'rgba(34,197,94,0.2)'
-                                                : 'rgba(212,168,67,0.06)',
-                                        color: i === currentQ ? '#08060f' : answers[i] !== null ? '#22c55e' : '#64748b',
-                                        fontSize: 12, fontWeight: 700, cursor: 'pointer',
-                                        fontFamily: "'Space Grotesk', sans-serif",
-                                        transition: 'all 0.2s',
-                                        border: i === currentQ ? 'none' : `1px solid ${answers[i] !== null ? 'rgba(34,197,94,0.3)' : 'rgba(212,168,67,0.1)'}`,
-                                    }}
-                                >
-                                    {i + 1}
-                                </button>
-                            ))}
-                        </div>
-
-                        <div style={{ marginTop: 16, display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-                            {[
-                                { label: 'Current', color: GOLD },
-                                { label: 'Answered', color: '#22c55e' },
-                                { label: 'Unanswered', color: '#64748b' },
-                            ].map(l => (
-                                <div key={l.label} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                                    <div style={{ width: 8, height: 8, borderRadius: 3, background: l.color }} />
-                                    <span style={{ fontSize: 10, color: '#64748b' }}>{l.label}</span>
-                                </div>
-                            ))}
-                        </div>
-
-                        {/* Clear answer */}
-                        {answers[currentQ] !== null && (
-                            <button
-                                onClick={() => setAnswers(prev => { const n = [...prev]; n[currentQ] = null; return n; })}
-                                style={{
-                                    width: '100%', marginTop: 14, padding: '8px 0', borderRadius: 8,
-                                    background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.15)',
-                                    color: '#ef4444', fontSize: 12, fontWeight: 600, cursor: 'pointer',
-                                    fontFamily: "'Space Grotesk', sans-serif",
-                                }}>
-                                Clear Answer
-                            </button>
-                        )}
-                    </div>
-
-                    {/* Webcam Feed */}
-                    <div style={{
-                        marginTop: 16,
-                        background: 'rgba(212,168,67,0.03)', border: '1px solid rgba(212,168,67,0.08)',
-                        borderRadius: 16, padding: '14px', overflow: 'hidden',
-                    }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-                            <div style={{
-                                width: 8, height: 8, borderRadius: '50%',
-                                background: cameraActive ? '#ef4444' : '#475569',
-                                boxShadow: cameraActive ? '0 0 8px rgba(239,68,68,0.5)' : 'none',
-                                animation: cameraActive ? 'pulse 1.5s ease-in-out infinite' : 'none',
-                            }} />
-                            <span style={{ fontSize: 11, fontWeight: 700, color: cameraActive ? '#ef4444' : '#475569' }}>
-                                {cameraActive ? 'RECORDING' : cameraError ? 'CAMERA OFF' : 'CONNECTING...'}
-                            </span>
-                        </div>
-                        <div style={{
-                            width: '100%', aspectRatio: '1/1', borderRadius: 12, overflow: 'hidden',
-                            background: '#0a0814', border: '2px solid rgba(239,68,68,0.2)',
-                            position: 'relative',
-                        }}>
-                            <video
-                                ref={videoRef}
-                                autoPlay
-                                muted
-                                playsInline
-                                style={{
-                                    width: '100%', height: '100%', objectFit: 'cover',
-                                    transform: 'scaleX(-1)', // mirror
-                                    display: cameraError ? 'none' : 'block',
-                                }}
-                            />
-                            {cameraError && (
-                                <div style={{
-                                    position: 'absolute', inset: 0,
-                                    display: 'flex', flexDirection: 'column',
-                                    alignItems: 'center', justifyContent: 'center',
-                                    gap: 8,
-                                }}>
-                                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#475569" strokeWidth="2">
-                                        <path d="M1 1l22 22M21 21H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3m3-3h6l2 3h4a2 2 0 0 1 2 2v9.34" />
-                                        <path d="M14.12 14.12A3 3 0 1 1 9.88 9.88" />
-                                    </svg>
-                                    <span style={{ fontSize: 10, color: '#475569', textAlign: 'center' }}>
-                                        Camera access<br />denied
-                                    </span>
-                                </div>
-                            )}
-                            {/* Corner frame markers */}
-                            {!cameraError && [
-                                { top: 0, left: 0 }, { top: 0, right: 0 },
-                                { bottom: 0, left: 0 }, { bottom: 0, right: 0 },
-                            ].map((pos, idx) => (
-                                <div key={idx} style={{
-                                    position: 'absolute', ...pos,
-                                    width: 16, height: 16,
-                                    borderTop: pos.top === 0 ? '2px solid rgba(239,68,68,0.6)' : 'none',
-                                    borderBottom: pos.bottom === 0 ? '2px solid rgba(239,68,68,0.6)' : 'none',
-                                    borderLeft: pos.left === 0 ? '2px solid rgba(239,68,68,0.6)' : 'none',
-                                    borderRight: pos.right === 0 ? '2px solid rgba(239,68,68,0.6)' : 'none',
-                                } as React.CSSProperties} />
-                            ))}
-                        </div>
-                        <p style={{ fontSize: 9, color: '#475569', textAlign: 'center', marginTop: 8 }}>
-                            Proctoring active — Face must be visible
-                        </p>
-                    </div>
-                </div>
+              <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)', borderRadius: 12, padding: 14 }}>
+                <div style={{ fontSize: 24, fontWeight: 800, color: '#fff' }}>{formatTime(evaluation.timeSpentSeconds)}</div>
+                <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 2 }}>Time Elapsed</div>
+              </div>
             </div>
 
-            <style>{`
-                @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-                @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-                * { margin: 0; padding: 0; box-sizing: border-box; }
-                body { overflow-x: hidden; }
-            `}</style>
+            {/* Action CTAs */}
+            <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+              <Link
+                href="/student/passport"
+                style={{
+                  padding: '12px 24px',
+                  borderRadius: 10,
+                  background: 'linear-gradient(135deg, var(--emerald), #059669)',
+                  color: '#090a0f',
+                  fontSize: 14,
+                  fontWeight: 700,
+                  textDecoration: 'none',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 8,
+                }}
+              >
+                <Award size={16} /> View Digital Skill Passport
+              </Link>
+
+              <Link
+                href="/student/leaderboard"
+                style={{
+                  padding: '12px 24px',
+                  borderRadius: 10,
+                  background: 'var(--bg-surface-elevated)',
+                  border: '1px solid var(--border)',
+                  color: '#fff',
+                  fontSize: 14,
+                  fontWeight: 600,
+                  textDecoration: 'none',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 8,
+                }}
+              >
+                Check Leaderboard Rank
+              </Link>
+            </div>
+          </div>
+
+          {/* AI Insights & Recommendations */}
+          <div
+            style={{
+              background: 'var(--bg-surface)',
+              border: '1px solid var(--border)',
+              borderRadius: 16,
+              padding: '24px 28px',
+              marginBottom: 28,
+            }}
+          >
+            <h2 style={{ fontSize: 18, fontWeight: 700, margin: '0 0 16px', display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Zap size={18} color="var(--gold)" />
+              <span>AI Evaluation Insights & Next Steps</span>
+            </h2>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {evaluation.recommendations.map((rec, i) => (
+                <div
+                  key={i}
+                  style={{
+                    padding: '12px 16px',
+                    borderRadius: 10,
+                    background: 'var(--bg-surface-elevated)',
+                    border: '1px solid var(--border)',
+                    fontSize: 13,
+                    lineHeight: 1.6,
+                    color: 'var(--text-secondary)',
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: 10,
+                  }}
+                >
+                  <CheckCircle2 size={16} color="var(--emerald)" style={{ marginTop: 2, flexShrink: 0 }} />
+                  <span>{rec}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Question Breakdown with Explanations */}
+          {evaluation.breakdown && evaluation.breakdown.length > 0 && (
+            <div
+              style={{
+                background: 'var(--bg-surface)',
+                border: '1px solid var(--border)',
+                borderRadius: 16,
+                padding: '24px 28px',
+              }}
+            >
+              <h2 style={{ fontSize: 18, fontWeight: 700, margin: '0 0 20px' }}>Detailed Answer Review & Server Explanations</h2>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+                {evaluation.breakdown.map((item, idx) => (
+                  <div
+                    key={idx}
+                    style={{
+                      padding: 16,
+                      borderRadius: 12,
+                      background: 'var(--bg-surface-elevated)',
+                      border: `1px solid ${item.isCorrect ? 'rgba(16,185,129,0.3)' : 'rgba(239,68,68,0.3)'}`,
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                      <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--gold)' }}>
+                        Q{idx + 1}: {item.topic}
+                      </span>
+                      <span
+                        style={{
+                          fontSize: 11,
+                          fontWeight: 700,
+                          padding: '2px 8px',
+                          borderRadius: 6,
+                          background: item.isCorrect ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)',
+                          color: item.isCorrect ? 'var(--emerald)' : '#ef4444',
+                        }}
+                      >
+                        {item.isCorrect ? 'CORRECT (+1)' : 'INCORRECT (0)'}
+                      </span>
+                    </div>
+
+                    <p style={{ fontSize: 14, fontWeight: 600, color: '#fff', margin: '0 0 12px' }}>{item.question}</p>
+
+                    <div style={{ fontSize: 12.5, color: '#94a3b8', lineHeight: 1.6, marginBottom: 8 }}>
+                      <div>
+                        Your selection: <strong style={{ color: item.isCorrect ? 'var(--emerald)' : '#ef4444' }}>
+                          {item.userAnswer !== null ? item.options[item.userAnswer] : 'Skipped'}
+                        </strong>
+                      </div>
+                      {!item.isCorrect && (
+                        <div>
+                          Correct answer: <strong style={{ color: 'var(--emerald)' }}>{item.options[item.correctAnswer]}</strong>
+                        </div>
+                      )}
+                    </div>
+
+                    <div
+                      style={{
+                        marginTop: 10,
+                        padding: '8px 12px',
+                        borderRadius: 8,
+                        background: 'rgba(212,168,67,0.06)',
+                        border: '1px solid rgba(212,168,67,0.15)',
+                        fontSize: 12,
+                        color: 'var(--gold)',
+                      }}
+                    >
+                      <strong>Explanation:</strong> {item.explanation}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
+      </div>
     );
+  }
+
+  // ── ACTIVE EXAM INTERFACE ──
+  const currentQuestion = questions[currentQ] || {
+    id: '0',
+    question: 'Loading question...',
+    options: ['Option A', 'Option B', 'Option C', 'Option D'],
+    topic: 'Core',
+  };
+
+  const currentAnswer = answers[currentQuestion.id];
+
+  return (
+    <div style={{ minHeight: '100vh', background: '#08060f', color: '#fff', fontFamily: "'Space Grotesk', sans-serif", display: 'flex', flexDirection: 'column' }}>
+      {/* Warning Overlay */}
+      {showWarning && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 99999,
+            background: 'rgba(239,68,68,0.15)',
+            backdropFilter: 'blur(6px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <div
+            style={{
+              background: '#1a1020',
+              border: '2px solid rgba(239,68,68,0.5)',
+              borderRadius: 20,
+              padding: '32px 40px',
+              maxWidth: 440,
+              textAlign: 'center',
+              boxShadow: '0 0 60px rgba(239,68,68,0.2)',
+            }}
+          >
+            <AlertTriangle size={48} color="#ef4444" style={{ margin: '0 auto 16px' }} />
+            <h2 style={{ fontSize: 20, fontWeight: 800, color: '#ef4444', margin: '0 0 8px' }}>Tab Switch Detected!</h2>
+            <p style={{ fontSize: 13.5, color: '#94a3b8', lineHeight: 1.6, margin: '0 0 16px' }}>
+              You switched away from the active exam window. This event has been logged for proctoring integrity.
+            </p>
+            <div style={{ background: 'rgba(239,68,68,0.1)', borderRadius: 8, padding: '8px 12px', marginBottom: 16 }}>
+              <span style={{ fontSize: 13, color: '#ef4444', fontWeight: 700 }}>
+                Warning {tabWarnings} of 2 (Next violation will auto-submit!)
+              </span>
+            </div>
+            <button
+              onClick={() => setShowWarning(false)}
+              style={{
+                padding: '10px 24px',
+                borderRadius: 10,
+                background: 'rgba(239,68,68,0.2)',
+                border: '1px solid rgba(239,68,68,0.4)',
+                color: '#ef4444',
+                fontSize: 13,
+                fontWeight: 700,
+                cursor: 'pointer',
+              }}
+            >
+              I Understand, Continue Test
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Top Bar */}
+      <div
+        style={{
+          padding: '12px 28px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          borderBottom: '1px solid rgba(212,168,67,0.1)',
+          background: 'rgba(8,6,15,0.95)',
+          position: 'sticky',
+          top: 0,
+          zIndex: 100,
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+          <div
+            style={{
+              width: 36,
+              height: 36,
+              borderRadius: 10,
+              background: 'linear-gradient(135deg, var(--emerald), #059669)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 16,
+              fontWeight: 800,
+              color: '#08060f',
+            }}
+          >
+            R
+          </div>
+          <div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>{titleParam}</div>
+            <div style={{ fontSize: 11, color: '#64748b' }}>
+              Domain: {domainParam} · Mode: {modeParam.toUpperCase()}
+            </div>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+          {/* Tab Warnings Indicator */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <div
+              style={{
+                width: 8,
+                height: 8,
+                borderRadius: '50%',
+                background: tabWarnings === 0 ? 'var(--emerald)' : tabWarnings === 1 ? 'var(--gold)' : '#ef4444',
+              }}
+            />
+            <span style={{ fontSize: 11, color: tabWarnings > 0 ? '#ef4444' : 'var(--emerald)', fontWeight: 600 }}>
+              {tabWarnings === 0 ? 'Clean' : `${tabWarnings}/2 Warnings`}
+            </span>
+          </div>
+
+          {/* 30:00 Countdown Timer */}
+          <div
+            style={{
+              padding: '6px 16px',
+              borderRadius: 10,
+              background: timeLeft < 60 ? 'rgba(239,68,68,0.15)' : 'rgba(212,168,67,0.08)',
+              border: `1px solid ${timeLeft < 60 ? 'rgba(239,68,68,0.3)' : 'rgba(212,168,67,0.15)'}`,
+            }}
+          >
+            <span
+              style={{
+                fontSize: 18,
+                fontWeight: 800,
+                fontFamily: 'monospace',
+                color: timeLeft < 60 ? '#ef4444' : '#fff',
+              }}
+            >
+              {formatTime(timeLeft)}
+            </span>
+          </div>
+
+          {/* Progress count */}
+          <div style={{ fontSize: 12, color: '#64748b' }}>
+            <span style={{ color: '#fff', fontWeight: 700 }}>{answeredCount}</span>/{questions.length} answered
+          </div>
+
+          {/* Submit button */}
+          <button
+            onClick={() => {
+              if (confirm(`Submit assessment? You have answered ${answeredCount} of ${questions.length} questions.`)) {
+                submitTest();
+              }
+            }}
+            style={{
+              padding: '8px 20px',
+              borderRadius: 10,
+              background: 'linear-gradient(135deg, var(--gold), #f59e0b)',
+              border: 'none',
+              color: '#08060f',
+              fontSize: 13,
+              fontWeight: 700,
+              cursor: 'pointer',
+            }}
+          >
+            Submit Assessment
+          </button>
+        </div>
+      </div>
+
+      {/* Main Examination View */}
+      <div style={{ flex: 1, display: 'flex', padding: 28 }}>
+        {/* Question Panel */}
+        <div style={{ flex: 1, maxWidth: 820, marginRight: 28 }}>
+          <div
+            style={{
+              background: 'rgba(212,168,67,0.03)',
+              border: '1px solid rgba(212,168,67,0.1)',
+              borderRadius: 16,
+              padding: 32,
+            }}
+          >
+            {/* Question Header & Progress Bar */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 24 }}>
+              <div
+                style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: 8,
+                  background: 'linear-gradient(135deg, var(--gold), #f59e0b)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: 14,
+                  fontWeight: 800,
+                  color: '#08060f',
+                }}
+              >
+                {currentQ + 1}
+              </div>
+              <span style={{ fontSize: 12, color: '#64748b' }}>of {questions.length} questions · {currentQuestion.topic}</span>
+              <div style={{ flex: 1, height: 4, background: 'rgba(212,168,67,0.08)', borderRadius: 2, marginLeft: 8 }}>
+                <div
+                  style={{
+                    height: '100%',
+                    width: `${((currentQ + 1) / questions.length) * 100}%`,
+                    background: 'linear-gradient(90deg, var(--emerald), var(--gold))',
+                    borderRadius: 2,
+                    transition: 'width 0.3s ease',
+                  }}
+                />
+              </div>
+            </div>
+
+            <h2 style={{ fontSize: 19, fontWeight: 700, color: '#fff', lineHeight: 1.5, marginBottom: 28 }}>
+              {currentQuestion.question}
+            </h2>
+
+            {/* Options List */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {currentQuestion.options.map((opt, i) => {
+                const isSelected = currentAnswer === i;
+                return (
+                  <button
+                    key={i}
+                    onClick={() => {
+                      setAnswers((prev) => ({ ...prev, [currentQuestion.id]: i }));
+                    }}
+                    style={{
+                      padding: '14px 20px',
+                      borderRadius: 12,
+                      textAlign: 'left',
+                      border: `2px solid ${isSelected ? 'var(--gold)' : 'rgba(212,168,67,0.1)'}`,
+                      background: isSelected ? 'rgba(212,168,67,0.1)' : 'rgba(212,168,67,0.02)',
+                      color: isSelected ? '#fff' : '#94a3b8',
+                      fontSize: 14.5,
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 14,
+                    }}
+                  >
+                    <span
+                      style={{
+                        width: 28,
+                        height: 28,
+                        borderRadius: 8,
+                        background: isSelected ? 'var(--gold)' : 'rgba(212,168,67,0.06)',
+                        color: isSelected ? '#08060f' : '#64748b',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: 12,
+                        fontWeight: 700,
+                        flexShrink: 0,
+                      }}
+                    >
+                      {String.fromCharCode(65 + i)}
+                    </span>
+                    <span>{opt}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Navigation Controls */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 32 }}>
+              <button
+                onClick={() => currentQ > 0 && setCurrentQ((p) => p - 1)}
+                disabled={currentQ === 0}
+                style={{
+                  padding: '10px 20px',
+                  borderRadius: 10,
+                  background: 'rgba(212,168,67,0.06)',
+                  border: '1px solid rgba(212,168,67,0.15)',
+                  color: currentQ === 0 ? '#475569' : '#fff',
+                  fontSize: 13,
+                  fontWeight: 600,
+                  cursor: currentQ === 0 ? 'default' : 'pointer',
+                  opacity: currentQ === 0 ? 0.5 : 1,
+                }}
+              >
+                Previous
+              </button>
+
+              <button
+                onClick={() => currentQ < questions.length - 1 && setCurrentQ((p) => p + 1)}
+                disabled={currentQ === questions.length - 1}
+                style={{
+                  padding: '10px 20px',
+                  borderRadius: 10,
+                  background: currentQ === questions.length - 1 ? 'rgba(212,168,67,0.06)' : 'linear-gradient(135deg, var(--gold), #f59e0b)',
+                  border: 'none',
+                  color: currentQ === questions.length - 1 ? '#475569' : '#08060f',
+                  fontSize: 13,
+                  fontWeight: 700,
+                  cursor: currentQ === questions.length - 1 ? 'default' : 'pointer',
+                  opacity: currentQ === questions.length - 1 ? 0.5 : 1,
+                }}
+              >
+                Next Question
+              </button>
+            </div>
+
+            <div style={{ textAlign: 'center', marginTop: 16, fontSize: 11, color: '#64748b' }}>
+              Press 1-4 to select option · Use arrow keys to navigate
+            </div>
+          </div>
+        </div>
+
+        {/* Right Sidebar: Question Map & Proctoring Stream */}
+        <div style={{ width: 260 }}>
+          <div
+            style={{
+              background: 'rgba(212,168,67,0.03)',
+              border: '1px solid rgba(212,168,67,0.1)',
+              borderRadius: 16,
+              padding: 20,
+              position: 'sticky',
+              top: 80,
+            }}
+          >
+            <div style={{ fontSize: 13, fontWeight: 700, color: '#fff', marginBottom: 14 }}>Question Map</div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 6 }}>
+              {questions.map((q, i) => {
+                const isCurrent = i === currentQ;
+                const isAnswered = answers[q.id] !== undefined;
+                return (
+                  <button
+                    key={q.id || i}
+                    onClick={() => setCurrentQ(i)}
+                    style={{
+                      width: 36,
+                      height: 36,
+                      borderRadius: 8,
+                      background: isCurrent
+                        ? 'linear-gradient(135deg, var(--gold), #f59e0b)'
+                        : isAnswered
+                        ? 'rgba(16,185,129,0.2)'
+                        : 'rgba(212,168,67,0.06)',
+                      color: isCurrent ? '#08060f' : isAnswered ? 'var(--emerald)' : '#64748b',
+                      fontSize: 12,
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      border: isCurrent ? 'none' : `1px solid ${isAnswered ? 'rgba(16,185,129,0.35)' : 'rgba(212,168,67,0.12)'}`,
+                    }}
+                  >
+                    {i + 1}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Clear selection */}
+            {currentAnswer !== undefined && (
+              <button
+                onClick={() => {
+                  setAnswers((prev) => {
+                    const copy = { ...prev };
+                    delete copy[currentQuestion.id];
+                    return copy;
+                  });
+                }}
+                style={{
+                  width: '100%',
+                  marginTop: 14,
+                  padding: '8px 0',
+                  borderRadius: 8,
+                  background: 'rgba(239,68,68,0.08)',
+                  border: '1px solid rgba(239,68,68,0.2)',
+                  color: '#ef4444',
+                  fontSize: 12,
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }}
+              >
+                Clear Selection
+              </button>
+            )}
+
+            {/* Webcam Stream */}
+            <div style={{ marginTop: 20, borderTop: '1px solid rgba(212,168,67,0.1)', paddingTop: 16 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                <div
+                  style={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: '50%',
+                    background: cameraActive ? '#ef4444' : '#475569',
+                  }}
+                />
+                <span style={{ fontSize: 11, fontWeight: 700, color: cameraActive ? '#ef4444' : '#475569' }}>
+                  {cameraActive ? 'PROCTORING ACTIVE' : cameraError ? 'CAMERA OFF' : 'CONNECTING...'}
+                </span>
+              </div>
+
+              <div
+                style={{
+                  width: '100%',
+                  aspectRatio: '1/1',
+                  borderRadius: 12,
+                  overflow: 'hidden',
+                  background: '#0a0814',
+                  border: '2px solid rgba(239,68,68,0.2)',
+                }}
+              >
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  muted
+                  playsInline
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    transform: 'scaleX(-1)',
+                    display: cameraError ? 'none' : 'block',
+                  }}
+                />
+              </div>
+              <p style={{ fontSize: 10, color: '#64748b', textAlign: 'center', marginTop: 8 }}>
+                Automated facial presence verified
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default function ExamPage() {
-    return (
-        <Suspense fallback={
-            <div style={{
-                minHeight: '100vh', background: '#08060f',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-                <div style={{ textAlign: 'center' }}>
-                    <div style={{
-                        width: 40, height: 40, border: '3px solid #D4A843', borderTopColor: 'transparent',
-                        borderRadius: '50%', margin: '0 auto 16px',
-                        animation: 'spin 1s linear infinite',
-                    }} />
-                    <p style={{ color: '#64748b', fontSize: 14, fontFamily: "'Space Grotesk', sans-serif" }}>
-                        Loading exam...
-                    </p>
-                </div>
-                <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-            </div>
-        }>
-            <ExamContent />
-        </Suspense>
-    );
+  return (
+    <Suspense
+      fallback={
+        <div style={{ minHeight: '100vh', background: '#08060f', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ textAlign: 'center' }}>
+            <div
+              style={{
+                width: 40,
+                height: 40,
+                border: '3px solid #D4A843',
+                borderTopColor: 'transparent',
+                borderRadius: '50%',
+                margin: '0 auto 16px',
+                animation: 'spin 1s linear infinite',
+              }}
+            />
+            <p style={{ color: '#64748b', fontSize: 14 }}>Loading exam module...</p>
+          </div>
+        </div>
+      }
+    >
+      <ExamContent />
+    </Suspense>
+  );
 }

@@ -1,5 +1,5 @@
-// backend/src/routes/ai.routes.ts
 import { Router } from 'express';
+import multer from 'multer';
 import { protect, optionalProtect, requireRole } from '../middleware/auth.middleware';
 import {
   chat,
@@ -14,8 +14,15 @@ import {
   getPolicyInterventions,
   matchCandidate,
   cohortAnalysis,
+  parseResume,
+  fetchGitHubRepo,
 } from '../controllers/ai.controller';
 import { aiLimiter } from '../middleware/rateLimit.middleware';
+
+const resumeUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+});
 
 const router = Router();
 
@@ -24,6 +31,8 @@ router.get('/assessment/:id', getAssessment);
 router.post('/chat', optionalProtect, chat);
 router.get('/market-trends', marketTrends);
 router.post('/analyze-skills', optionalProtect, aiLimiter, analyzeSkills);
+router.post('/parse-resume', optionalProtect, resumeUpload.single('resume'), parseResume);
+router.get('/github-repo', optionalProtect, fetchGitHubRepo);
 router.post('/predict-career', optionalProtect, aiLimiter, predictCareer);
 router.post('/assess-skill', optionalProtect, aiLimiter, assessSkill);
 router.post('/assess-skill/evaluate', optionalProtect, aiLimiter, evaluateSkill);

@@ -6,6 +6,7 @@ import Assessment from '../models/Assessment.model';
 import { aiService } from '../services/ai.service';
 import { buildApiResponse, parsePagination, buildPaginatedResponse } from '../utils/pagination.utils';
 import { resolveBranch, getAllBranchesSummary } from '../data/branches.data';
+import { passportService, SkillEntry } from '../services/passport.service';
 
 export const listStudents = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -16,8 +17,21 @@ export const listStudents = async (req: Request, res: Response, next: NextFuncti
     if (req.query.placementStatus) filter.placementStatus = req.query.placementStatus;
     if (req.query.institutionId) filter.institutionId = req.query.institutionId;
 
+    if (req.query.domain && req.query.domain !== 'ALL') {
+      const dom = String(req.query.domain).trim();
+      (filter as any).$or = [
+        { program: { $regex: dom, $options: 'i' } },
+        { 'skills.skillId': { $regex: dom, $options: 'i' } },
+      ];
+    }
+
     const [students, total] = await Promise.all([
-      Student.find(filter).skip(skip).limit(limit).select('-skills.history').populate('userId', 'name email avatar'),
+      Student.find(filter)
+        .sort({ overallScore: -1, createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .select('-skills.history')
+        .populate('userId', 'name email avatar'),
       Student.countDocuments(filter),
     ]);
     res.status(200).json(buildPaginatedResponse(students, total, page, limit, 'Students retrieved'));
@@ -127,6 +141,103 @@ export const getStudentPassport = async (req: Request, res: Response, next: Next
       return;
     }
     res.status(200).json(buildApiResponse({ passportHash: student.passportHash, student }, 'Passport retrieved'));
+  } catch (err) { next(err); }
+};
+
+export const issueStudentPassport = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const userId = (req as any).user?._id;
+    if (!userId) {
+      res.status(401).json(buildApiResponse(null, 'Authentication required', false));
+      return;
+    }
+
+    let student: any = await Student.findOne({ userId })
+      .populate('userId', 'name email avatar')
+      .populate('skills.skillId', 'name domain');
+
+    if (!student) {
+      res.status(404).json(buildApiResponse(null, 'Trainee profile not found', false));
+      return;
+    }
+
+    const { evaluationResult } = req.body || {};
+
+    // If student already has passportHash and no new evaluation payload is submitted, return existing record
+    if (student.passportHash && !evaluationResult) {
+      const baseUrl = process.env.BASE_VERIFICATION_URL || 'https://ryyvora.com/verify';
+      res.status(200).json(buildApiResponse({
+        alreadyIssued: true,
+        passportHash: student.passportHash,
+        verificationUrl: `${baseUrl}/${student.passportHash}`,
+        isVerified: true,
+        issuedAt: student.updatedAt || new Date().toISOString(),
+        status: 'ALREADY_ISSUED',
+      }, 'Digital Skill Passport already issued'));
+      return;
+    }
+
+    // Merge evaluation skills if provided
+    if (evaluationResult?.technicalSkills && Array.isArray(evaluationResult.technicalSkills)) {
+      for (const s of evaluationResult.technicalSkills) {
+        if (!s?.name || typeof s?.score !== 'number') continue;
+        const existingIdx = student.skills.findIndex(
+          (sk: any) => sk.skillId?.toString() === s.name || (sk.skillId as any)?.name === s.name
+        );
+        if (existingIdx >= 0) {
+          student.skills[existingIdx].score = s.score;
+          student.skills[existingIdx].lastAssessed = new Date();
+        } else {
+          student.skills.push({
+            skillId: s.name as any,
+            score: s.score,
+            lastAssessed: new Date(),
+          });
+        }
+      }
+    }
+
+    const formattedSkills: SkillEntry[] = (student.skills || []).map((s: any) => ({
+      skill: typeof s.skillId === 'object' && s.skillId?.name ? s.skillId.name : String(s.skillId || 'Core Competency'),
+      score: s.score || 75,
+      assessedOn: (s.lastAssessed ? new Date(s.lastAssessed) : new Date()).toISOString(),
+      assessedBy: 'Ryyvora AI Neural Skill Engine 4.2',
+      verified: true,
+    }));
+
+    const overallScore = evaluationResult?.overallScore || student.overallScore || 80;
+    const nsqfLevel = evaluationResult?.nsqfLevel || student.nsqfLevel || 6;
+
+    const passport = await passportService.generatePassport({
+      studentId: student._id.toString(),
+      studentName: (student.userId as any)?.name || 'Trainee',
+      gender: student.gender || 'male',
+      program: student.program || evaluationResult?.branchName || 'Engineering',
+      institutionId: student.institutionId?.toString() || 'INST-MSSDS-01',
+      institutionName: 'Ryyvora Accredited Vocational Partner',
+      state: student.state || 'Maharashtra',
+      nsqfLevel,
+      batch: student.batch || '2024-2025',
+      skills: formattedSkills,
+      overallScore,
+      placementStatus: student.placementStatus || 'seeking',
+    });
+
+    student.passportHash = passport.credentialHash;
+    if (evaluationResult?.recommendations && Array.isArray(evaluationResult.recommendations)) {
+      student.careerPathways = evaluationResult.recommendations;
+    }
+    await student.save();
+
+    res.status(201).json(buildApiResponse({
+      alreadyIssued: false,
+      passportHash: passport.credentialHash,
+      verificationUrl: passport.verificationUrl,
+      isVerified: true,
+      issuedAt: passport.issuedAt,
+      passport,
+      status: 'ISSUED',
+    }, 'Digital Skill Passport cryptographic seal generated and recorded on ledger'));
   } catch (err) { next(err); }
 };
 
