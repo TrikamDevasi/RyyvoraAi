@@ -48,4 +48,5 @@ dist/
 build/
 build_output*
 .vercel/
+data/
 

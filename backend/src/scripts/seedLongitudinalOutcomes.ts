@@ -20,10 +20,14 @@ import path from 'path';
 
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
+// ── Demo accounts for SIH 2026 evaluation ─────────────────────────────────────
+// All accounts use password: Demo@1234
+// Email domain: @ryyvora.demo (brand-consistent)
+// Idempotent: upserted by email on each seed run
 const DEMO_USERS = [
   {
     name: 'Maharashtra Skilling Directorate',
-    email: 'government@skillsense.demo',
+    email: 'government@ryyvora.demo',
     password: 'Demo@1234',
     role: 'government',
     location: 'Mumbai',
@@ -32,7 +36,7 @@ const DEMO_USERS = [
   },
   {
     name: 'MSSDS Pune Regional Training Center',
-    email: 'provider@skillsense.demo',
+    email: 'institute@ryyvora.demo',
     password: 'Demo@1234',
     role: 'institute',
     location: 'Pune',
@@ -41,7 +45,7 @@ const DEMO_USERS = [
   },
   {
     name: 'Aarav Deshmukh',
-    email: 'trainee@skillsense.demo',
+    email: 'trainee@ryyvora.demo',
     password: 'Demo@1234',
     role: 'student',
     location: 'Pune',
@@ -51,7 +55,7 @@ const DEMO_USERS = [
   },
   {
     name: 'Tata Consultancy Services (TCS)',
-    email: 'employer@skillsense.demo',
+    email: 'employer@ryyvora.demo',
     password: 'Demo@1234',
     role: 'employer',
     location: 'Pune',
@@ -59,8 +63,17 @@ const DEMO_USERS = [
     isActive: true,
   },
   {
-    name: 'System Admin',
-    email: 'admin@skillsense.demo',
+    name: 'MSSDS Sector Skill Council Intelligence',
+    email: 'industry@ryyvora.demo',
+    password: 'Demo@1234',
+    role: 'industry',
+    location: 'Mumbai',
+    isVerified: true,
+    isActive: true,
+  },
+  {
+    name: 'Ryyvora Platform Admin',
+    email: 'admin@ryyvora.demo',
     password: 'Demo@1234',
     role: 'admin',
     location: 'Mumbai',
@@ -167,7 +180,7 @@ async function seed() {
       state: 'Maharashtra',
       district: 'Pune',
       nsqfAffiliation: 'NSQF-MSSDS-MH-2024',
-      contactEmail: 'provider@skillsense.demo',
+      contactEmail: 'institute@ryyvora.demo',
       studentCount: 120,
       placementRate: 85,
       isVerified: true,
@@ -176,46 +189,46 @@ async function seed() {
   }
 
   // Associate primary institution with provider user for dashboard linking
-  const providerUser = userMap['provider@skillsense.demo'];
+  const providerUser = userMap['institute@ryyvora.demo'];
   if (providerUser) {
     providerUser.institutionId = primaryInst._id;
     await providerUser.save();
-    console.log(` Linked Institution ${primaryInst.name} to provider@skillsense.demo`);
+    console.log(` Linked Institution ${primaryInst.name} to institute@ryyvora.demo`);
   }
 
   // 3. Setup Aarav Deshmukh (Primary Trainee Demo)
-  const primaryTraineeUser = userMap['trainee@skillsense.demo'];
+  const primaryTraineeUser = userMap['trainee@ryyvora.demo'];
   const passportHash = '0x8f4c2e91b5a3d76e48c10927fa118239cb72e01a';
 
-  let primaryStudent = await Student.findOne({ userId: primaryTraineeUser._id });
-  if (!primaryStudent) {
-    primaryStudent = await Student.create({
-      userId: primaryTraineeUser._id,
-      institutionId: primaryInst._id,
-      enrollmentNumber: 'MH-MSSDS-2024-0101',
-      program: 'MSSDS Advanced Web Engineering',
-      nsqfLevel: 5,
-      batch: '2024-2025',
-      state: 'Maharashtra',
-      gender: 'male',
-      skills: [
-        { score: 88, lastAssessed: new Date('2024-09-15') },
-        { score: 82, lastAssessed: new Date('2024-09-15') },
-        { score: 90, lastAssessed: new Date('2024-09-15') },
-      ],
-      placementStatus: 'placed',
-      placedAt: new Date('2024-11-01'),
-      placedRole: 'Associate Software Engineer',
-      salary: 384000,
-      passportHash,
-    });
-  } else {
-    primaryStudent.passportHash = passportHash;
-    primaryStudent.placementStatus = 'placed';
-    primaryStudent.placedRole = 'Associate Software Engineer';
-    primaryStudent.salary = 384000;
-    await primaryStudent.save();
-  }
+  // Upsert primary student (idempotent — keyed on enrollmentNumber)
+  const primaryStudent = await Student.findOneAndUpdate(
+    { enrollmentNumber: 'MH-MSSDS-2024-0101' },
+    {
+      $set: {
+        userId: primaryTraineeUser._id,
+        institutionId: primaryInst._id,
+        passportHash,
+        placementStatus: 'placed',
+        placedAt: new Date('2024-11-01'),
+        placedRole: 'Associate Software Engineer',
+        salary: 384000,
+      },
+      $setOnInsert: {
+        enrollmentNumber: 'MH-MSSDS-2024-0101',
+        program: 'MSSDS Advanced Web Engineering',
+        nsqfLevel: 5,
+        batch: '2024-2025',
+        state: 'Maharashtra',
+        gender: 'male',
+        skills: [
+          { score: 88, lastAssessed: new Date('2024-09-15') },
+          { score: 82, lastAssessed: new Date('2024-09-15') },
+          { score: 90, lastAssessed: new Date('2024-09-15') },
+        ],
+      },
+    },
+    { upsert: true, new: true }
+  );
 
   // Create Consent for Primary Trainee
   await Consent.findOneAndUpdate(
@@ -406,7 +419,7 @@ async function seed() {
     status: 'EMPLOYED',
     employerName: 'Tata Consultancy Services',
     employerContact: 'campus.hiring@tcs.com',
-    employerId: userMap['employer@skillsense.demo']._id,
+    employerId: userMap['employer@ryyvora.demo']._id,
     jobRole: 'Associate Software Engineer',
     industryDomain: 'Information Technology',
     employmentType: 'full_time',
@@ -426,7 +439,7 @@ async function seed() {
     verificationStatus: 'VERIFIED',
     verificationSource: 'EMPLOYER_VERIFICATION',
     confidenceScore: 0.98,
-    verifiedBy: userMap['employer@skillsense.demo']._id,
+    verifiedBy: userMap['employer@ryyvora.demo']._id,
     verifiedAt: new Date('2024-11-05'),
   });
 
@@ -605,7 +618,7 @@ async function seed() {
       if (isPlaced) {
         const empName = EMPLOYERS[globalStudentCount % EMPLOYERS.length];
         const isTCSEmployer = !selfEmployed && empName === 'Tata Consultancy Services';
-        const employerId = isTCSEmployer ? userMap['employer@skillsense.demo']._id : undefined;
+        const employerId = isTCSEmployer ? userMap['employer@ryyvora.demo']._id : undefined;
         // For TCS, make half verified and half pending/self-reported so employer has a live queue
         const isVerifiedEmployer = isTCSEmployer ? (i % 2 === 0) : (i % 4 !== 0);
         const role = selfEmployed ? 'Founder / Consultant' : apprenticeship ? 'Trade Apprentice' : 'Technical Associate';
@@ -658,7 +671,7 @@ async function seed() {
           verificationStatus: isVerifiedEmployer ? 'VERIFIED' : 'SELF_REPORTED',
           verificationSource: isVerifiedEmployer ? 'EMPLOYER_VERIFICATION' : 'TRAINEE_SELF_REPORT',
           confidenceScore: isVerifiedEmployer ? 0.95 : 0.70,
-          verifiedBy: isVerifiedEmployer ? userMap['employer@skillsense.demo']._id : undefined,
+          verifiedBy: isVerifiedEmployer ? userMap['employer@ryyvora.demo']._id : undefined,
           verifiedAt: isVerifiedEmployer ? new Date('2024-11-20') : undefined,
         });
 
@@ -776,13 +789,16 @@ async function seed() {
     },
   ]);
 
-  console.log(`\n🎉 Seed Completed Successfully!`);
-  console.log(` Created ${globalStudentCount + 1} longitudinal trainee outcome records across 9 Maharashtra districts.`);
-  console.log(` Generated macro skilling funnel, retention curves, follow-ups, and evidence-grounded AI policy interventions.`);
-  console.log('\nDemo Logins for SIH 2026 Evaluation:');
+  console.log(`\n✅ Seed Completed Successfully!`);
+  console.log(`   ${globalStudentCount + 1} longitudinal trainee outcome records seeded across 9 Maharashtra districts.`);
+  console.log('   Macro skilling funnel, retention curves, follow-ups, and AI policy interventions generated.');
+  console.log('\n📋 Demo Accounts for SIH 2026 Evaluation (password: Demo@1234):');
+  console.log('─'.repeat(58));
   DEMO_USERS.forEach((u) => {
-    console.log(`  ${u.role.toUpperCase().padEnd(12)} -> ${u.email.padEnd(30)} / ${u.password}`);
+    console.log(`  ${u.role.toUpperCase().padEnd(12)} ${u.email.padEnd(30)}`);
   });
+  console.log('─'.repeat(58));
+  console.log('  All accounts → password: Demo@1234');
 
   await mongoose.disconnect();
   process.exit(0);

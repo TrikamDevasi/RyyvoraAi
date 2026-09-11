@@ -18,7 +18,9 @@ const envSchema = z.object({
   JWT_EXPIRES_IN: z.string().default('7d'),
   SESSION_SECRET: z.string().default('skillsense_session_secret_key_production_32'),
 
-  // Email (Gmail or SMTP)
+  // Email — Resend is the primary provider; Gmail is the legacy fallback
+  RESEND_API_KEY: z.string().optional(),
+  RESEND_FROM_EMAIL: z.string().optional(),
   GMAIL_USER: z.string().optional(),
   GMAIL_APP_PASSWORD: z.string().optional(),
   
@@ -36,11 +38,16 @@ const envSchema = z.object({
   GITHUB_CLIENT_SECRET: z.string().optional(),
   GITHUB_CALLBACK_URL: z.string().optional(),
   
-  // Passport secret
-  PASSPORT_SECRET: z.string().default('skillsense-passport-verification-secret'),
+  // Passport / Credential HMAC signing secret
+  // In production this MUST be a strong random secret — the default will cause a fatal error.
+  PASSPORT_SECRET: z.string().optional(),
+
+  // Public passport verification base URL
+  BASE_VERIFICATION_URL: z.string().optional(),
 
   // ── Demo Access Control ──────────────────────────────────────────────────────
-  // In production, DEMO_MODE is strictly disabled by default. Must be 'false' unless explicitly enabled for isolated staging.
+  // DEMO_MODE=true enables the /auth/demo-login endpoint for hackathon evaluation.
+  // This endpoint is blocked in production unless explicitly enabled.
   DEMO_MODE: z.enum(['true', 'false']).default('false'),
 
   // ── Billing Configuration ───────────────────────────────────────────────────
@@ -53,6 +60,14 @@ const envSchema = z.object({
   BILLING_WEBHOOK_SECRET: z.string().optional(),
 });
 
+/** Known insecure default secrets that must never be used in production */
+const INSECURE_PASSPORT_DEFAULTS = [
+  'skillsense-default-secret',
+  'skillsense-passport-verification-secret',
+  'passport-secret',
+  'secret',
+];
+
 const parseEnv = () => {
   const result = envSchema.safeParse(process.env);
   if (!result.success) {
@@ -64,11 +79,29 @@ const parseEnv = () => {
 
   const data = result.success ? result.data : envSchema.parse({});
 
-  // Security guard: In production, reject weak or default JWT secret
+  // ── Security guard: JWT ──────────────────────────────────────────────────────
   if (data.NODE_ENV === 'production') {
     if (!process.env.JWT_SECRET || process.env.JWT_SECRET === 'skillsense_jwt_secret_production_key_32chars_min') {
       throw new Error('Fatal Security Invariant: JWT_SECRET must be set to a secure, unique 32+ character key in production.');
     }
+  }
+
+  // ── Security guard: PASSPORT_SECRET ─────────────────────────────────────────
+  const rawPassportSecret = data.PASSPORT_SECRET;
+  if (data.NODE_ENV === 'production') {
+    if (!rawPassportSecret || INSECURE_PASSPORT_DEFAULTS.includes(rawPassportSecret)) {
+      throw new Error(
+        'Fatal Security Invariant: PASSPORT_SECRET must be set to a strong, unique random value in production. ' +
+        'Set PASSPORT_SECRET in your environment. Do not use default values.'
+      );
+    }
+  } else if (!rawPassportSecret || INSECURE_PASSPORT_DEFAULTS.includes(rawPassportSecret)) {
+    // Development: use a clearly-marked development-only value but warn loudly
+    logger.warn(
+      '[SECURITY WARNING] PASSPORT_SECRET is not set or is using an insecure default. ' +
+      'Skill Passport HMAC signatures are NOT production-grade. ' +
+      'Set PASSPORT_SECRET in your .env file before deploying.'
+    );
   }
 
   return data;

@@ -1,5 +1,11 @@
 // frontend/lib/auth.ts
-// Token helpers — sets and removes JWT tokens in localStorage and cookies (dual-token compatibility).
+// Token helpers — sets and removes JWT tokens in localStorage and cookies.
+//
+// DUAL-TOKEN DESIGN (intentional backward compatibility):
+//   - Canonical token: ryyvora_token  (primary, current brand)
+//   - Legacy token:    skillsense_token (kept for session backward compat during brand migration)
+//   Both tokens carry the same JWT value. Middleware accepts either.
+//   Once all legacy sessions expire (after JWT_EXPIRE period), skillsense_token can be removed.
 
 const COOKIE_MAX_AGE = 7 * 24 * 60 * 60; // 7 days in seconds
 
@@ -7,18 +13,18 @@ export function setTokens(accessToken: string, role?: string) {
   if (typeof window === 'undefined') return;
 
   localStorage.setItem('ryyvora_token', accessToken);
-  localStorage.setItem('skillsense_token', accessToken);
+  localStorage.setItem('skillsense_token', accessToken); // backward compat
   if (role) {
     localStorage.setItem('ryyvora_role', role);
-    localStorage.setItem('skillsense_role', role);
+    localStorage.setItem('skillsense_role', role); // backward compat
   }
 
   // Cookie for Next.js Edge Middleware route gating
   document.cookie = `ryyvora_token=${accessToken}; path=/; max-age=${COOKIE_MAX_AGE}; SameSite=Lax`;
-  document.cookie = `skillsense_token=${accessToken}; path=/; max-age=${COOKIE_MAX_AGE}; SameSite=Lax`;
+  document.cookie = `skillsense_token=${accessToken}; path=/; max-age=${COOKIE_MAX_AGE}; SameSite=Lax`; // backward compat
   if (role) {
     document.cookie = `ryyvora_role=${role}; path=/; max-age=${COOKIE_MAX_AGE}; SameSite=Lax`;
-    document.cookie = `skillsense_role=${role}; path=/; max-age=${COOKIE_MAX_AGE}; SameSite=Lax`;
+    document.cookie = `skillsense_role=${role}; path=/; max-age=${COOKIE_MAX_AGE}; SameSite=Lax`; // backward compat
   }
 }
 

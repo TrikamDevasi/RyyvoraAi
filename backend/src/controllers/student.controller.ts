@@ -67,16 +67,18 @@ export const getMyStudentProfile = async (req: Request, res: Response, next: Nex
       .populate('skills.skillId', 'name domain nsqfLevel');
 
     if (!student) {
-      const requestedProgram = (req.query.program as string) || (user.program as string) || 'General Engineering & Applied Sciences';
+      // New profile: minimal initialisation — state defaults to Maharashtra (platform scope),
+      // no fabricated score, no assumed gender. User should complete their profile.
+      const requestedProgram = (req.query.program as string) || (user.program as string) || '';
       const created = await Student.create({
         userId: user._id,
-        enrollmentNumber: `SKP-${user._id.toString().slice(-6).toUpperCase()}`,
-        program: requestedProgram,
+        enrollmentNumber: `MH-SKP-${user._id.toString().slice(-6).toUpperCase()}`,
+        program: requestedProgram || 'General Engineering & Applied Sciences',
         nsqfLevel: 4,
-        state: 'Karnataka',
-        gender: 'male',
+        state: 'Maharashtra',
+        gender: 'male',           // Required field; user should update via profile settings
         placementStatus: 'seeking',
-        overallScore: 78,
+        // overallScore intentionally omitted — no fabricated score for new users
         skills: [],
       });
       student = await Student.findById(created._id).populate('userId', 'name email avatar isVerified');

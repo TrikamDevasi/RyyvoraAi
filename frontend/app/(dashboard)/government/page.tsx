@@ -3,6 +3,11 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import api from '@/lib/api';
+import {
+  getLongitudinalPipeline,
+  getDynamicWageCurve,
+  MAHARASHTRA_DISTRICT_TELEMETRY,
+} from '@/lib/governmentData';
 import { ErrorBoundary } from '@/components/shared/ErrorBoundary';
 import { FadeIn } from '@/components/shared/FadeIn';
 import { SectionHeader } from '@/components/ui/SectionHeader';
@@ -162,6 +167,9 @@ export default function GovernmentMacroDashboardPage() {
   const [copilotLoading, setCopilotLoading] = useState<boolean>(false);
   const [copilotResponse, setCopilotResponse] = useState<CopilotResponse | null>(null);
 
+  // ── Offline Fallback State ───────────────────────────────────────────────
+  const [isOfflineFallback, setIsOfflineFallback] = useState<boolean>(false);
+
   // ── Data Fetching Logic ─────────────────────────────────────────────────
   const loadDashboardData = useCallback(async (district = selectedDistrict, program = selectedProgram) => {
     setLoading(true);
@@ -233,7 +241,39 @@ export default function GovernmentMacroDashboardPage() {
       }
 
       if (!hasSuccess) {
-        setError('Unable to synchronize live state skilling telemetry. Please verify backend connectivity.');
+        // ── Offline Fallback ─────────────────────────────────────────────────
+        // Backend returned no data. Activate client-side fallback using
+        // governmentData.ts (pre-computed Maharashtra district telemetry).
+        // This data is clearly marked as DEMO/OFFLINE in the UI.
+        // Priority: backend data ALWAYS takes precedence when available.
+        const fallbackFunnel = getLongitudinalPipeline(selectedDistrict, selectedProgram);
+        const fallbackWage = getDynamicWageCurve(selectedDistrict, selectedProgram);
+        // Map fallback district data to the DistrictMetric interface expected by the dashboard
+        const fallbackDistricts = MAHARASHTRA_DISTRICT_TELEMETRY.map((d) => ({
+          district: d.district,
+          state: d.state,
+          totalTrainees: d.totalTrainees,
+          isSmallSample: d.isSmallSample,
+          employmentRate: d.employmentRate,
+          salariedRate: d.salariedRate,
+          selfEmployedRate: d.selfEmployedRate,
+          apprenticeshipRate: d.apprenticeshipRate,
+          retention90dRate: d.retention90dRate,
+          verificationRate: d.verificationRate,
+          medianSalary: d.medianSalary,
+          statusLabel: d.statusLabel,
+        }));
+
+        setFunnelStages(fallbackFunnel.stages);
+        setFunnelBreakdown(fallbackFunnel.breakdown);
+        setDistrictData(fallbackDistricts);
+        setDistrictOptions(fallbackDistricts.map((d) => d.district).sort());
+        setWageCurve(fallbackWage.wageCurve);
+        setWageSummary(fallbackWage.wageSummary);
+        setIsOfflineFallback(true);
+        setError(null); // Clear error — fallback is active
+      } else {
+        setIsOfflineFallback(false);
       }
     } catch (err: any) {
       setError(err?.response?.data?.message || 'Failed to load government analytics data.');
@@ -465,6 +505,39 @@ export default function GovernmentMacroDashboardPage() {
   return (
     <ErrorBoundary>
       <FadeIn style={{ maxWidth: 1240, margin: '0 auto', paddingBottom: 60 }}>
+
+        {/* ── Offline Fallback Banner ── */}
+        {isOfflineFallback && (
+          <div
+            role="alert"
+            style={{
+              marginBottom: 20,
+              padding: '12px 20px',
+              borderRadius: 10,
+              background: 'rgba(245, 158, 11, 0.08)',
+              border: '1px solid rgba(245, 158, 11, 0.35)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+              flexWrap: 'wrap',
+            }}
+          >
+            <AlertTriangle size={16} style={{ color: '#F59E0B', flexShrink: 0 }} />
+            <span style={{ fontSize: 12.5, color: '#D1D5DB', flex: 1, lineHeight: 1.5 }}>
+              <strong style={{ color: '#F59E0B' }}>OFFLINE / DEMO MODE</strong>
+              {' '}— Backend telemetry unavailable. Displaying pre-computed Maharashtra district data for demonstration purposes.
+              This data does NOT represent live government statistics.{' '}
+              <button
+                type="button"
+                onClick={() => loadDashboardData()}
+                style={{ color: '#F59E0B', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline', fontSize: 12.5, padding: 0 }}
+              >
+                Retry live sync →
+              </button>
+            </span>
+          </div>
+        )}
+
         {/* ── 1. Sovereign Page Header ── */}
         <SectionHeader
           breadcrumbs={[

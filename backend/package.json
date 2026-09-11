@@ -9,8 +9,10 @@
     "start": "node dist/index.js",
     "lint": "eslint src --ext .ts",
     "test": "ts-node tests/runAllTests.ts",
+    "seed": "ts-node src/scripts/seedLongitudinalOutcomes.ts",
+    "seed:outcomes": "ts-node src/scripts/seedLongitudinalOutcomes.ts",
     "seed:demo": "ts-node src/scripts/seedDemo.ts",
-    "seed:outcomes": "ts-node src/scripts/seedLongitudinalOutcomes.ts"
+    "seed:reset": "RESET_SEED=true ts-node src/scripts/seedLongitudinalOutcomes.ts"
   },
   "engines": {
     "node": ">=20.0.0"

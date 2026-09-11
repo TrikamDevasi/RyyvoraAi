@@ -64,7 +64,13 @@ export class PassportService {
   private readonly PASSPORT_VERSION    = '1.0';
   private readonly VALIDITY_YEARS      = 3;
   private readonly BASE_VERIFICATION_URL = process.env.BASE_VERIFICATION_URL || 'https://ryyvora.com/verify';
-  private readonly HASH_SECRET = process.env.PASSPORT_SECRET ?? 'skillsense-default-secret';
+  /**
+   * SECURITY: PASSPORT_SECRET must be set in the environment.
+   * In development, a clearly-marked dev-only fallback is used and a warning is emitted.
+   * In production, env.ts enforces a non-default secret; the server will refuse to start
+   * if the secret is missing or a known insecure default.
+   */
+  private readonly HASH_SECRET = process.env.PASSPORT_SECRET || 'ryyvora-dev-only-not-for-production';
 
   // ── 1. Generate Full Skill Passport (in-memory / API response) ─────────────
   async generatePassport(input: PassportInput): Promise<SkillPassport> {

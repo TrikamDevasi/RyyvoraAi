@@ -61,24 +61,26 @@ router.post('/demo-login', async (req: Request, res: Response) => {
   }
   try {
     const role = (req.body.role || 'student').toLowerCase();
+    // Demo accounts are seeded by src/scripts/seedLongitudinalOutcomes.ts (npm run seed:outcomes).
+    // These email addresses MUST match the DEMO_USERS array in that script.
     const demoEmails: Record<string, string> = {
-      student: 'trainee@skillsense.demo',
-      employer: 'employer@skillsense.demo',
-      institute: 'provider@skillsense.demo',
-      government: 'government@skillsense.demo',
-      admin: 'admin@skillsense.demo',
-      industry: 'industry@skillsense.demo',
+      student:    'trainee@ryyvora.demo',
+      employer:   'employer@ryyvora.demo',
+      institute:  'institute@ryyvora.demo',
+      government: 'government@ryyvora.demo',
+      admin:      'admin@ryyvora.demo',
+      industry:   'industry@ryyvora.demo',
     };
     const demoNames: Record<string, string> = {
-      student: 'Aarav Deshmukh',
-      employer: 'Tata Consultancy Services (TCS)',
-      institute: 'MSSDS Pune Regional Training Center',
+      student:    'Aarav Deshmukh',
+      employer:   'Tata Consultancy Services (TCS)',
+      institute:  'MSSDS Pune Regional Training Center',
       government: 'Maharashtra Skilling Directorate',
-      industry: 'Sector Skill Council Intelligence Lead',
-      admin: 'System Admin',
+      industry:   'MSSDS Sector Skill Council Intelligence',
+      admin:      'Ryyvora Platform Admin',
     };
 
-    const email = demoEmails[role] || `${role}.demo@skillsense.gov.in`;
+    const email = demoEmails[role] || `${role}.demo@ryyvora.demo`;
     const name = demoNames[role] || `Demo ${role.charAt(0).toUpperCase() + role.slice(1)}`;
 
     let user = await User.findOne({ email });
@@ -96,7 +98,9 @@ router.post('/demo-login', async (req: Request, res: Response) => {
     if (role === 'institute') {
       if (!user.institutionId) {
         const Institution = (await import('../models/Institution.model')).default;
-        const inst = await Institution.findOne({ contactEmail: 'provider@skillsense.demo' }) || await Institution.findOne({});
+        // Try seeded institution first, then any available institution
+        const inst = await Institution.findOne({ contactEmail: 'institute@ryyvora.demo' })
+          || await Institution.findOne({});
         if (inst) {
           user.institutionId = inst._id as any;
           await user.save();
